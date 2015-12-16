@@ -16,7 +16,7 @@
 # along with dromozoa-unix.  If not, see <http://www.gnu.org/licenses/>.
 
 CPPFLAGS = -I$(LUA_INCDIR)
-CXXFLAGS = -Wall -W $(CFLAGS)
+CXXFLAGS = -Wall -W -Wno-missing-field-initializers $(CFLAGS)
 LDFLAGS = -L$(LUA_LIBDIR) $(LIBFLAG)
 LDLIBS =
 
