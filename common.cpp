@@ -17,40 +17,18 @@
 
 extern "C" {
 #include <lua.h>
-#include <lauxlib.h>
 }
 
-#include <time.h>
+#include <errno.h>
+#include <string.h>
 #include "common.hpp"
 
 namespace dromozoa {
-  int unix_nanosleep(lua_State* L) {
-    struct timespec tv1 = {};
-    struct timespec tv2 = {};
-
-    lua_getfield(L, 1, "tv_sec");
-    tv1.tv_sec = luaL_checkinteger(L, -1);
-    lua_pop(L, 1);
-    lua_getfield(L, 1, "tv_nsec");
-    tv1.tv_nsec = luaL_checkinteger(L, -1);
-    lua_pop(L, 1);
-
-    if (nanosleep(&tv1, &tv2) != -1) {
-      lua_pushinteger(L, 0);
-      return 1;
-    } else {
-      int result = push_error(L);
-      lua_newtable(L);
-      lua_pushinteger(L, tv2.tv_sec);
-      lua_setfield(L, -2, "tv_sec");
-      lua_pushinteger(L, tv2.tv_nsec);
-      lua_setfield(L, -2, "tv_nsec");
-      return result + 1;
-    }
+  int push_error(lua_State* L) {
+    int code = errno;
+    lua_pushnil(L);
+    lua_pushstring(L, strerror(code));
+    lua_pushinteger(L, code);
+    return 3;
   }
-}
-
-extern "C" int luaopen_dromozoa_unix_nanosleep(lua_State* L) {
-  lua_pushcfunction(L, dromozoa::unix_nanosleep);
-  return 1;
 }

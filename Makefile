@@ -20,17 +20,20 @@ CXXFLAGS = -Wall -W -Wno-missing-field-initializers $(CFLAGS)
 LDFLAGS = -L$(LUA_LIBDIR) $(LIBFLAG)
 LDLIBS =
 
-TARGET = nanosleep.so
+TARGET = gettimeofday.so nanosleep.so
 
 all: $(TARGET)
 
 clean:
 	rm -f *.o $(TARGET)
 
-nanosleep.so: nanosleep.o
+gettimeofday.so: gettimeofday.o common.o
 	$(CXX) $(LDFLAGS) $^ $(LDLIBS) -o $@
 
-nanosleep.o: nanosleep.cpp
+nanosleep.so: nanosleep.o common.o
+	$(CXX) $(LDFLAGS) $^ $(LDLIBS) -o $@
+
+.cpp.o:
 	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -c $<
 
 install:
