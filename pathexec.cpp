@@ -22,12 +22,12 @@
 
 namespace dromozoa {
   namespace {
-    char* copy(char* p, char c) {
+    inline char* copy(char* p, char c) {
       *p = c;
       return p + 1;
     }
 
-    char* copy(char* p1, const char* p2, size_t n) {
+    inline char* copy(char* p1, const char* p2, size_t n) {
       for (size_t i = 0; i < n; ++i) {
         p1[i] = p2[i];
       }
