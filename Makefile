@@ -20,7 +20,7 @@ CXXFLAGS = -Wall -W -Wno-missing-field-initializers $(CFLAGS)
 LDFLAGS = -L$(LUA_LIBDIR) $(LIBFLAG)
 LDLIBS =
 
-TARGET = gettimeofday.so nanosleep.so
+TARGET = gettimeofday.so nanosleep.so forkexec.so
 
 all: $(TARGET)
 
@@ -31,6 +31,9 @@ gettimeofday.so: gettimeofday.o common.o
 	$(CXX) $(LDFLAGS) $^ $(LDLIBS) -o $@
 
 nanosleep.so: nanosleep.o common.o
+	$(CXX) $(LDFLAGS) $^ $(LDLIBS) -o $@
+
+forkexec.so: pathexec.o
 	$(CXX) $(LDFLAGS) $^ $(LDLIBS) -o $@
 
 .cpp.o:
