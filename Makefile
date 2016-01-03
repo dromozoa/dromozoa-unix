@@ -33,7 +33,7 @@ gettimeofday.so: gettimeofday.o common.o
 nanosleep.so: nanosleep.o common.o
 	$(CXX) $(LDFLAGS) $^ $(LDLIBS) -o $@
 
-forkexec.so: pathexec.o
+forkexec.so: forkexec.o pathexec.o
 	$(CXX) $(LDFLAGS) $^ $(LDLIBS) -o $@
 
 .cpp.o:
