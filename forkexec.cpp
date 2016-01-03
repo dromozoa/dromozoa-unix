@@ -23,7 +23,6 @@
 
 #include <vector>
 
-#include "forkexec.hpp"
 #include "pathexec.hpp"
 
 namespace dromozoa {
