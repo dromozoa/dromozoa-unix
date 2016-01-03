@@ -15,27 +15,4 @@
 # You should have received a copy of the GNU General Public License
 # along with dromozoa-unix.  If not, see <http://www.gnu.org/licenses/>.
 
-m4_include([version.m4])
-AC_INIT([dromozoa], DROMOZOA_VERSION, [moyu@dromozoa.com], [], [https://github.com/dromozoa/dromozoa-unix/])
-AM_INIT_AUTOMAKE
-LT_INIT
-
-AC_CONFIG_MACRO_DIR([m4])
-AC_CONFIG_HEADER([config.h])
-AC_CONFIG_FILES([Makefile])
-
-AC_PROG_CXX
-AC_FUNC_STRERROR_R
-AC_CHECK_FUNCS([pipe2])
-
-AX_PTHREAD()
-
-AX_PROG_LUA([5.1], [], [], [AC_MSG_ERROR([could not find lua])])
-AX_LUA_HEADERS([], [AC_MSG_ERROR([could not find lua])])
-AX_LUA_LIBS([], [AC_MSG_ERROR([could not find lua])])
-save_LDFLAGS=$LDFLAGS
-LDFLAGS="$LDFLAGS $LUA_LIB"
-AC_CHECK_FUNCS([luaL_setfuncs]) # 5.2.0 or later
-LDFLAGS=$save_LDFLAGS
-
-AC_OUTPUT
+ACLOCAL_AMFLAGS = -I m4
