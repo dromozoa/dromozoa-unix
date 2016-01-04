@@ -32,7 +32,7 @@ extern "C" {
 namespace dromozoa {
   int push_error(lua_State* L) {
     int code = errno;
-    char* p = 0;
+    char* buffer = 0;
     size_t n = 1;
 
     lua_pushnil(L);
@@ -42,14 +42,14 @@ namespace dromozoa {
       errno = 0;
 #ifdef HAVE_STRERROR_R
       n = n * 2;
-      if (char* b = static_cast<char*>(realloc(p, n))) {
-        p = b;
+      if (char* b = static_cast<char*>(realloc(buffer, n))) {
+        buffer = b;
 #ifdef STRERROR_R_CHAR_P
-        what = strerror_r(code, b, n);
+        what = strerror_r(code, buffer, n);
 #else
-        int result = strerror_r(code, b, n);
+        int result = strerror_r(code, buffer, n);
         if (result == 0) {
-          what = b;
+          what = buffer;
         } else if (result != -1) {
           errno = result;
         }
@@ -73,7 +73,7 @@ namespace dromozoa {
         break;
       }
     } while (true);
-    free(p);
+    free(buffer);
 
     lua_pushinteger(L, code);
     errno = code;
