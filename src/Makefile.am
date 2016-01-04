@@ -23,16 +23,10 @@ luaexec_LTLIBRARIES = \
 	nanosleep.la
 
 fcntl_la_LDFLAGS = -module -avoid-version
-fcntl_la_SOURCES = \
-	common.cpp \
-	fcntl.cpp
+fcntl_la_SOURCES = common.cpp unix_fcntl.cpp
 
 gettimeofday_la_LDFLAGS = -module -avoid-version
-gettimeofday_la_SOURCES = \
-	common.cpp \
-	gettimeofday.cpp
+gettimeofday_la_SOURCES = common.cpp unix_gettimeofday.cpp
 
 nanosleep_la_LDFLAGS = -module -avoid-version
-nanosleep_la_SOURCES = \
-	common.cpp \
-	nanosleep.cpp
+nanosleep_la_SOURCES = common.cpp unix_nanosleep.cpp

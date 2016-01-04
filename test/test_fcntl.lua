@@ -17,5 +17,7 @@
 
 local fcntl = require "dromozoa.unix.fcntl"
 
-print(fcntl.O_CLOEXEC)
-print(fcntl.O_NONBLOCK)
+-- print(fcntl.O_CLOEXEC)
+-- print(fcntl.O_NONBLOCK)
+assert(fcntl.O_CLOEXEC)
+assert(fcntl.O_NONBLOCK)
