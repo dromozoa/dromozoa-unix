@@ -20,6 +20,7 @@ local nanosleep = require "dromozoa.unix.nanosleep"
 assert(nanosleep({ tv_sec = 0, tv_nsec = 200 }) == 0)
 
 local result, message, code, tv = nanosleep({ tv_sec = -1, tv_nsec = 0 })
+-- print(message, code)
 assert(result == nil)
 assert(tv.tv_sec == 0)
 assert(tv.tv_nsec == 0)

@@ -15,20 +15,68 @@
 // You should have received a copy of the GNU General Public License
 // along with dromozoa-unix.  If not, see <http://www.gnu.org/licenses/>.
 
+#ifdef HAVE_CONFIG_H
+#include "config.h"
+#endif
+
 extern "C" {
 #include <lua.h>
 }
 
 #include <errno.h>
+#include <stdlib.h>
 #include <string.h>
+
 #include "common.hpp"
 
 namespace dromozoa {
   int push_error(lua_State* L) {
     int code = errno;
+    char* p = 0;
+    size_t n = 1;
+
     lua_pushnil(L);
-    lua_pushstring(L, strerror(code));
+
+    do {
+      const char* what = 0;
+      errno = 0;
+#ifdef HAVE_STRERROR_R
+      n = n * 2;
+      if (char* b = static_cast<char*>(realloc(p, n))) {
+        p = b;
+#ifdef STRERROR_R_CHAR_P
+        what = strerror_r(code, b, n);
+#else
+        int result = strerror_r(code, b, n);
+        if (result == 0) {
+          what = b;
+        } else if (result > 0) {
+          errno = result;
+        }
+#endif
+      } else {
+        errno = ENOMEM;
+      }
+#else
+      what = strerror(code);
+#endif
+
+      if (what && errno == 0) {
+        lua_pushstring(L, what);
+        break;
+#ifdef HAVE_STRERROR_R
+      } else if (errno == ERANGE) {
+        continue;
+#endif
+      } else {
+        lua_pushfstring(L, "error number %d", code);
+        break;
+      }
+    } while (true);
+    free(p);
+
     lua_pushinteger(L, code);
+    errno = code;
     return 3;
   }
 }
