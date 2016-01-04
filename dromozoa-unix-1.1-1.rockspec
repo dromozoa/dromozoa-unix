@@ -13,5 +13,5 @@ description = {
 build = {
   type = "command";
   build_command = "env CPPFLAGS='-I$(LUA_INCDIR)' CXXFLAGS='$(CFLAGS)' LDFLAGS='-L$(LUA_LIBDIR)' ./configure --prefix='$(PREFIX)' && make clean && make";
-  install_command = "make luaexecdir='$(LIBDIR)/dromozoa/unix' install";
+  install_command = "make luaexecdir='$(LIBDIR)/dromozoa/unix' install && ls -l $(LIBDIR)/dromozoa/unix";
 }

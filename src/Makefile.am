@@ -21,12 +21,12 @@ luaexec_LTLIBRARIES = \
 	gettimeofday.la \
 	nanosleep.la
 
-gettimeofday_la_LDFLAGS = -module
+gettimeofday_la_LDFLAGS = -module -avoid-version
 gettimeofday_la_SOURCES = \
 	common.cpp \
 	gettimeofday.cpp
 
-nanosleep_la_LDFLAGS = -module
+nanosleep_la_LDFLAGS = -module -avoid-version
 nanosleep_la_SOURCES = \
 	common.cpp \
 	nanosleep.cpp
