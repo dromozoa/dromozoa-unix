@@ -20,6 +20,7 @@ extern "C" {
 }
 
 #include <sys/time.h>
+
 #include "common.hpp"
 
 namespace dromozoa {

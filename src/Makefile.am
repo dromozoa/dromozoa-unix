@@ -18,8 +18,14 @@
 noinst_HEADERS = common.hpp pathexec.hpp
 
 luaexec_LTLIBRARIES = \
+	fcntl.la \
 	gettimeofday.la \
 	nanosleep.la
+
+fcntl_la_LDFLAGS = -module -avoid-version
+fcntl_la_SOURCES = \
+	common.cpp \
+	fcntl.cpp
 
 gettimeofday_la_LDFLAGS = -module -avoid-version
 gettimeofday_la_SOURCES = \

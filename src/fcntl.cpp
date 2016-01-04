@@ -1,4 +1,4 @@
-// Copyright (C) 2015 Tomoyuki Fujimori <moyu@dromozoa.com>
+// Copyright (C) 2016 Tomoyuki Fujimori <moyu@dromozoa.com>
 //
 // This file is part of dromozoa-unix.
 //
@@ -15,19 +15,17 @@
 // You should have received a copy of the GNU General Public License
 // along with dromozoa-unix.  If not, see <http://www.gnu.org/licenses/>.
 
-#ifndef DROMOZOA_COMMON_HPP
-#define DROMOZOA_COMMON_HPP
-
 extern "C" {
 #include <lua.h>
 }
 
-namespace dromozoa {
-  void set_field(lua_State* L, const char* key, lua_Integer value);
-  int push_error(lua_State* L);
+#include <fcntl.h>
+
+#include "common.hpp"
+
+extern "C" int luaopen_dromozoa_unix_fcntl(lua_State* L) {
+  lua_newtable(L);
+  DROMOZOA_SET_FIELD(L, O_CLOEXEC);
+  DROMOZOA_SET_FIELD(L, O_NONBLOCK);
+  return 1;
 }
-
-#define DROMOZOA_SET_FIELD(L, value) \
-  dromozoa::set_field(L, #value, (value))
-
-#endif

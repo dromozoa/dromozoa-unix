@@ -30,10 +30,15 @@ extern "C" {
 #include "common.hpp"
 
 namespace dromozoa {
+  void set_field(lua_State* L, const char* key, lua_Integer value) {
+    lua_pushinteger(L, value);
+    lua_setfield(L, -2, key);
+  }
+
   int push_error(lua_State* L) {
     int code = errno;
     char* buffer = 0;
-    size_t n = 1;
+    size_t size = 32;
 
     lua_pushnil(L);
 
@@ -41,13 +46,13 @@ namespace dromozoa {
       const char* what = 0;
       errno = 0;
 #ifdef HAVE_STRERROR_R
-      n = n * 2;
-      if (char* b = static_cast<char*>(realloc(buffer, n))) {
+      size = size * 2;
+      if (char* b = static_cast<char*>(realloc(buffer, size))) {
         buffer = b;
 #ifdef STRERROR_R_CHAR_P
-        what = strerror_r(code, buffer, n);
+        what = strerror_r(code, buffer, size);
 #else
-        int result = strerror_r(code, buffer, n);
+        int result = strerror_r(code, buffer, size);
         if (result == 0) {
           what = buffer;
         } else if (result != -1) {
