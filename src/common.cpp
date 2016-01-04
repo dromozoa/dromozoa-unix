@@ -50,7 +50,7 @@ namespace dromozoa {
         int result = strerror_r(code, b, n);
         if (result == 0) {
           what = b;
-        } else if (result > 0) {
+        } else if (result != -1) {
           errno = result;
         }
 #endif
