@@ -12,6 +12,6 @@ description = {
 }
 build = {
   type = "command";
-  build_command = "env CPPFLAGS='-I$(LUA_INCDIR)' CFLAGS='$(CFLAGS)' CXXFLAGS='$(CFLAGS)' LDFLAGS='-L$(LUA_LIBDIR)' LUA='$(LUA)' ./configure --prefix='$(PREFIX)' --libexec='$(LIBDIR)' && make clean && make";
-  install_command = "make luaexecdir='$(LUA_LIBDIR)' install";
+  build_command = "env CPPFLAGS='-I$(LUA_INCDIR)' CXXFLAGS='$(CFLAGS)' LDFLAGS='-L$(LUA_LIBDIR)' ./configure --prefix='$(PREFIX)' && make clean && make";
+  install_command = "make luaexecdir='$(LIBDIR)' install";
 }
