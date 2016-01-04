@@ -16,21 +16,4 @@
 # along with dromozoa-unix.  If not, see <http://www.gnu.org/licenses/>.
 
 ACLOCAL_AMFLAGS = -I m4
-
-noinst_HEADERS = common.hpp pathexec.hpp
-
-luaexec_LTLIBRARIES = \
-	gettimeofday.la \
-	nanosleep.la
-
-gettimeofday_la_LDFLAGS = \
-	-module -version 1:0:0
-gettimeofday_la_SOURCES = \
-	common.cpp \
-	gettimeofday.cpp
-
-nanosleep_la_LDFLAGS = \
-	-module -version 1:0:0
-nanosleep_la_SOURCES = \
-	common.cpp \
-	nanosleep.cpp
+SUBDIRS = src

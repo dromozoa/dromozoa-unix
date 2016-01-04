@@ -15,26 +15,20 @@
 # You should have received a copy of the GNU General Public License
 # along with dromozoa-unix.  If not, see <http://www.gnu.org/licenses/>.
 
-m4_include([version.m4])
-AC_INIT([dromozoa], DROMOZOA_VERSION, [moyu@dromozoa.com], [], [https://github.com/dromozoa/dromozoa-unix/])
-AM_INIT_AUTOMAKE
-LT_INIT
+noinst_HEADERS = common.hpp pathexec.hpp
 
-AC_CONFIG_MACRO_DIR([m4])
-AC_CONFIG_HEADER([config.h])
-AC_CONFIG_FILES([Makefile src/Makefile])
+luaexec_LTLIBRARIES = \
+	gettimeofday.la \
+	nanosleep.la
 
-AC_PROG_CXX
-AC_FUNC_STRERROR_R
-AC_CHECK_FUNCS([pipe2])
+gettimeofday_la_LDFLAGS = \
+	-module -version 1:0:0
+gettimeofday_la_SOURCES = \
+	common.cpp \
+	gettimeofday.cpp
 
-AX_PTHREAD()
-
-AX_PROG_LUA([5.1], [], [], [AC_MSG_ERROR([could not find lua])])
-AX_LUA_HEADERS([], [AC_MSG_ERROR([could not find lua])])
-AX_LUA_LIBS([], [AC_MSG_ERROR([could not find lua])])
-save_LDFLAGS=$LDFLAGS
-LDFLAGS="$LDFLAGS $LUA_LIB"
-LDFLAGS=$save_LDFLAGS
-
-AC_OUTPUT
+nanosleep_la_LDFLAGS = \
+	-module -version 1:0:0
+nanosleep_la_SOURCES = \
+	common.cpp \
+	nanosleep.cpp
