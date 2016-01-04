@@ -16,7 +16,7 @@
 # along with dromozoa-unix.  If not, see <http://www.gnu.org/licenses/>.
 
 m4_include([version.m4])
-AC_INIT([dromozoa], DROMOZOA_VERSION, [moyu@dromozoa.com], [], [https://github.com/dromozoa/dromozoa-unix/])
+AC_INIT([dromozoa-unix], DROMOZOA_UNIX_VERSION, [moyu@dromozoa.com], [], [https://github.com/dromozoa/dromozoa-unix/])
 AM_INIT_AUTOMAKE
 LT_INIT
 
