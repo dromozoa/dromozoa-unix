@@ -11,14 +11,7 @@ description = {
   maintainer = "Tomoyuki Fujimori <moyu@dromozoa.com>";
 }
 build = {
-  type = "make";
-  build_variables = {
-    CFLAGS = "$(CFLAGS)";
-    LIBFLAG = "$(LIBFLAG)";
-    LUA_INCDIR = "$(LUA_INCDIR)";
-    LUA_LIBDIR = "$(LUA_LIBDIR)";
-  };
-  install_variables = {
-    LIBDIR = "$(LIBDIR)";
-  };
+  type = "command";
+  build_command = "env CPPFLAGS='-I$(LUA_INCDIR)' CFLAGS='$(CFLAGS)' CXXFLAGS='$(CFLAGS)' LDFLAGS='-L($LUA_LIBDIR)' ./configure --prefix='$(PREFIX)' && make";
+  install_command = "make install";
 }
