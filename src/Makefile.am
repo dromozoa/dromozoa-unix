@@ -28,6 +28,7 @@ noinst_HEADERS = \
 	pathexec.hpp \
 	pipe.hpp \
 	set_field.hpp \
+	signal_mask.hpp \
 	success.hpp \
 	wait.hpp
 
@@ -47,6 +48,7 @@ unix_la_SOURCES = \
 	pathexec.cpp \
 	pipe.cpp \
 	set_field.cpp \
+	signal_mask.cpp \
 	success.cpp \
 	unix.cpp \
 	wait.cpp

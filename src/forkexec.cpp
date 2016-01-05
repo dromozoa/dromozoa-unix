@@ -15,74 +15,21 @@
 // You should have received a copy of the GNU General Public License
 // along with dromozoa-unix.  If not, see <http://www.gnu.org/licenses/>.
 
-#ifdef HAVE_CONFIG_H
-#include "config.h"
-#endif
-
 #include <errno.h>
 #include <fcntl.h>
 #include <signal.h>
 #include <unistd.h>
 #include <sys/wait.h>
 
-#include <iostream>
 #include <vector>
 
-#include "error.hpp"
 #include "forkexec.hpp"
-#include "log_level.hpp"
 #include "pipe.hpp"
 #include "pathexec.hpp"
+#include "signal_mask.hpp"
 
 namespace dromozoa {
   namespace {
-#ifdef HAVE_PTHREAD
-    int signal_mask(int how, const sigset_t* new_mask, sigset_t* old_mask) {
-      return pthread_sigmask(how, new_mask, old_mask);
-    }
-#else
-    int signal_mask(int how, const sigset_t* new_mask, sigset_t* old_mask) {
-      return sigprocmask(how, new_mask, old_mask);
-    }
-#endif
-
-    class scoped_signal_mask {
-    public:
-      scoped_signal_mask() : masked_() {}
-
-      ~scoped_signal_mask() {
-        if (masked_) {
-          if (signal_mask(SIG_SETMASK, &mask_, 0) == -1) {
-            int code = errno;
-            if (get_log_level() > 0) {
-              std::cerr << "[dromozoa-unix] cannot reset signal mask: ";
-              print_error(std::cerr, code);
-              std::cerr << std::endl;
-            }
-          }
-        }
-      }
-
-      int mask_all_signals() {
-        sigset_t mask;
-        if (sigfillset(&mask) == -1) {
-          return -1;
-        }
-        if (signal_mask(SIG_SETMASK, &mask, &mask_) == -1) {
-          return -1;
-        }
-        masked_ = true;
-        return 0;
-      }
-
-    private:
-      bool masked_;
-      sigset_t mask_;
-
-      scoped_signal_mask(const scoped_signal_mask&);
-      scoped_signal_mask& operator=(const scoped_signal_mask&);
-    };
-
     void die(int die_fd[2]) {
       int code = errno;
       write(die_fd[1], &code, sizeof(code));
