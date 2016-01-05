@@ -37,7 +37,7 @@ assert(unix.fd.get(0) == 0)
 assert(not unix.fd.close(-1))
 
 do
-  local reader, writer = unix.pipe(unix.fcntl.O_CLOEXEC)
+  local reader, writer = unix.pipe(unix.O_CLOEXEC)
   assert(reader:get() == fd[1])
   assert(writer:get() == fd[2])
   assert(reader:close():get() == -1)

@@ -37,9 +37,7 @@ namespace dromozoa {
     initialize_ndelay(L);
     lua_setfield(L, -2, "fd");
 
-    open_fcntl(L);
-    lua_setfield(L, -2, "fcntl");
-
+    dromozoa::initialize_fcntl(L);
     dromozoa::initialize_gettimeofday(L);
     dromozoa::initialize_log_level(L);
     dromozoa::initialize_nanosleep(L);

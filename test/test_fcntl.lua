@@ -16,9 +16,8 @@
 -- along with dromozoa-unix.  If not, see <http://www.gnu.org/licenses/>.
 
 local unix = require "dromozoa.unix"
-local fcntl = unix.fcntl
 
--- print(("O_CLOEXEC: %08x"):format(fcntl.O_CLOEXEC))
--- print(("O_NONBLOCK: %08x"):format(fcntl.O_NONBLOCK))
-assert(fcntl.O_CLOEXEC)
-assert(fcntl.O_NONBLOCK)
+-- print(("O_CLOEXEC: %08x"):format(unix.O_CLOEXEC))
+-- print(("O_NONBLOCK: %08x"):format(unix.O_NONBLOCK))
+assert(unix.O_CLOEXEC)
+assert(unix.O_NONBLOCK)
