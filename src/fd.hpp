@@ -20,7 +20,7 @@ extern "C" {
 }
 
 namespace dromozoa {
-  void new_fd(lua_State* L, int fd);
+  int new_fd(lua_State* L, int fd);
   void set_fd(lua_State* L, int n, int fd);
   int get_fd(lua_State* L, int n);
   void initialize_fd(lua_State* L);

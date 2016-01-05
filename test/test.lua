@@ -25,5 +25,4 @@ do
   local reader, writer = unix.pipe2()
   reader:close()
   print(reader:close())
-  writer:close()
 end

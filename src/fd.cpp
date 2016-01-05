@@ -30,10 +30,14 @@ extern "C" {
 #include "set_field.hpp"
 
 namespace dromozoa {
-  void new_fd(lua_State* L, int fd) {
+  int new_fd(lua_State* L, int fd) {
     *static_cast<int*>(lua_newuserdata(L, sizeof(int))) = fd;
     luaL_getmetatable(L, "dromozoa.unix.fd");
     lua_setmetatable(L, -2);
+    if (get_log_level() > 2) {
+      std::cerr << "[dromozoa-unix] attach fd " << fd << std::endl;
+    }
+    return 1;
   }
 
   void set_fd(lua_State* L, int n, int fd) {
@@ -60,6 +64,9 @@ namespace dromozoa {
       if (close(fd) == -1) {
         return push_error(L);
       } else {
+        if (get_log_level() > 2) {
+          std::cerr << "[dromozoa-unix] detach fd " << fd << std::endl;
+        }
         lua_pushinteger(L, 0);
         return 1;
       }
@@ -74,9 +81,14 @@ namespace dromozoa {
         set_fd(L, 1, -1);
         if (close(fd) == -1) {
           if (get_log_level() > 0) {
+            int code = errno;
             std::cerr << "[dromozoa-unix] cannot close fd " << fd << ": ";
-            print_error(std::cerr);
+            print_error(std::cerr, code);
             std::cerr << std::endl;
+          }
+        } else {
+          if (get_log_level() > 2) {
+            std::cerr << "[dromozoa-unix] detach fd " << fd << std::endl;
           }
         }
       }
