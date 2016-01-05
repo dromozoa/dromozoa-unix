@@ -27,7 +27,7 @@ extern "C" {
 #include <stdlib.h>
 #include <string.h>
 
-#include "push_error.hpp"
+#include "error.hpp"
 
 namespace dromozoa {
   int push_error(lua_State* L) {

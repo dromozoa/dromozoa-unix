@@ -15,8 +15,8 @@
 // You should have received a copy of the GNU General Public License
 // along with dromozoa-unix.  If not, see <http://www.gnu.org/licenses/>.
 
-#ifndef DROMOZOA_PUSH_ERROR_HPP
-#define DROMOZOA_PUSH_ERROR_HPP
+#ifndef DROMOZOA_ERROR_HPP
+#define DROMOZOA_ERROR_HPP
 
 extern "C" {
 #include <lua.h>
