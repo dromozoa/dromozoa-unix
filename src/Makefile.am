@@ -34,7 +34,7 @@ unix_la_SOURCES = \
 	error.cpp \
 	fd.cpp \
 	log_level.cpp \
-	pipe2.cpp \
+	pipe.cpp \
 	set_field.cpp \
 	success.cpp \
 	unix.cpp

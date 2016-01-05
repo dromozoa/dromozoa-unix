@@ -26,7 +26,7 @@ extern "C" {
 #include "error.hpp"
 #include "fd.hpp"
 #include "log_level.hpp"
-#include "pipe2.hpp"
+#include "pipe.hpp"
 #include "set_field.hpp"
 
 namespace dromozoa {
