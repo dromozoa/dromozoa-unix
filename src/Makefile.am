@@ -17,16 +17,23 @@
 
 noinst_HEADERS = common.hpp pathexec.hpp
 
-luaexec_LTLIBRARIES = \
-	fcntl.la \
-	gettimeofday.la \
-	nanosleep.la
+luaexec_LTLIBRARIES = unix.la
 
-fcntl_la_LDFLAGS = -module -avoid-version
-fcntl_la_SOURCES = common.cpp unix_fcntl.cpp
+#fcntl_la_LDFLAGS = -module -avoid-version
+#fcntl_la_SOURCES = common.cpp unix_fcntl.cpp
+#
+#gettimeofday_la_LDFLAGS = -module -avoid-version
+#gettimeofday_la_SOURCES = common.cpp unix_gettimeofday.cpp
+#
+#nanosleep_la_LDFLAGS = -module -avoid-version
+#nanosleep_la_SOURCES = common.cpp unix_nanosleep.cpp
 
-gettimeofday_la_LDFLAGS = -module -avoid-version
-gettimeofday_la_SOURCES = common.cpp unix_gettimeofday.cpp
-
-nanosleep_la_LDFLAGS = -module -avoid-version
-nanosleep_la_SOURCES = common.cpp unix_nanosleep.cpp
+unix_la_LDFLAGS = -module -avoid-version
+unix_la_SOURCES = \
+	coe.cpp \
+	fd.cpp \
+	log_level.cpp \
+	pipe2.cpp \
+	push_error.cpp \
+	set_field.cpp \
+	unix.cpp
