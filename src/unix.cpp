@@ -31,6 +31,7 @@ extern "C" {
 #include "pipe.hpp"
 #include "read.hpp"
 #include "wait.hpp"
+#include "write.hpp"
 
 namespace dromozoa {
   int open(lua_State* L) {
@@ -40,6 +41,7 @@ namespace dromozoa {
     initialize_coe(L);
     initialize_ndelay(L);
     initialize_read(L);
+    initialize_write(L);
     lua_setfield(L, -2, "fd");
 
     dromozoa::initialize_environ(L);

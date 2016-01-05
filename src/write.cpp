@@ -27,24 +27,44 @@ extern "C" {
 
 #include "error.hpp"
 #include "fd.hpp"
-#include "read.hpp"
+#include "write.hpp"
 #include "set_field.hpp"
 
 namespace dromozoa {
-  namespace {
-    int impl_read(lua_State* L) {
-      std::vector<char> buffer(luaL_checkinteger(L, 2));
-      ssize_t result = read(get_fd(L, 1), &buffer[0], buffer.size());
+  int impl_write(lua_State* L) {
+    size_t size;
+    const char* buffer = luaL_checklstring(L, 2, &size);
+    ssize_t i = luaL_optinteger(L, 3, 1);
+    if (i < 0) {
+      i = size + i + 1;
+    }
+    if (i < 1) {
+      i = 1;
+    }
+    ssize_t j = luaL_optinteger(L, 4, size);
+    if (j < 0) {
+      j = size + j + 1;
+    }
+    if (j > static_cast<ssize_t>(size)) {
+      j = size;
+    }
+    if (i <= j) {
+      const char* p = buffer + i - 1;
+      size_t n = j - (i - 1);
+      ssize_t result = write(get_fd(L, 1), p, n);
       if (result == -1) {
         return push_error(L);
       } else {
-        lua_pushlstring(L, &buffer[0], result);
+        lua_pushinteger(L, result);
         return 1;
       }
+    } else {
+      lua_pushinteger(L, 0);
+      return 1;
     }
   }
 
-  void initialize_read(lua_State* L) {
-    set_field(L, "read", impl_read);
+  void initialize_write(lua_State* L) {
+    set_field(L, "write", impl_write);
   }
 }

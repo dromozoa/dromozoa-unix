@@ -33,7 +33,8 @@ noinst_HEADERS = \
 	set_field.hpp \
 	signal_mask.hpp \
 	success.hpp \
-	wait.hpp
+	wait.hpp \
+	write.hpp
 
 luaexec_LTLIBRARIES = unix.la
 
@@ -57,4 +58,5 @@ unix_la_SOURCES = \
 	signal_mask.cpp \
 	success.cpp \
 	unix.cpp \
-	wait.cpp
+	wait.cpp \
+	write.cpp
