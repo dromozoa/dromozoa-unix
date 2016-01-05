@@ -21,11 +21,14 @@ extern "C" {
 
 #include <fcntl.h>
 
-#include "common.hpp"
+#include "fcntl.hpp"
+#include "set_field.hpp"
 
-extern "C" int luaopen_dromozoa_unix_fcntl(lua_State* L) {
-  lua_newtable(L);
-  DROMOZOA_SET_FIELD(L, O_CLOEXEC);
-  DROMOZOA_SET_FIELD(L, O_NONBLOCK);
-  return 1;
+namespace dromozoa {
+  int open_fcntl(lua_State* L) {
+    lua_newtable(L);
+    DROMOZOA_SET_FIELD(L, O_CLOEXEC);
+    DROMOZOA_SET_FIELD(L, O_NONBLOCK);
+    return 1;
+  }
 }

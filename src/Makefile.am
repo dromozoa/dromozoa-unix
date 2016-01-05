@@ -31,6 +31,7 @@ luaexec_LTLIBRARIES = unix.la
 unix_la_LDFLAGS = -module -avoid-version
 unix_la_SOURCES = \
 	coe.cpp \
+	fcntl.cpp \
 	error.cpp \
 	fd.cpp \
 	log_level.cpp \

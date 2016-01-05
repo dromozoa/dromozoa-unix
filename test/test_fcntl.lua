@@ -15,9 +15,10 @@
 -- You should have received a copy of the GNU General Public License
 -- along with dromozoa-unix.  If not, see <http://www.gnu.org/licenses/>.
 
-local fcntl = require "dromozoa.unix.fcntl"
+local unix = require "dromozoa.unix"
+local fcntl = unix.fcntl
 
--- print(fcntl.O_CLOEXEC)
--- print(fcntl.O_NONBLOCK)
+-- print(("O_CLOEXEC: %08x"):format(fcntl.O_CLOEXEC))
+-- print(("O_NONBLOCK: %08x"):format(fcntl.O_NONBLOCK))
 assert(fcntl.O_CLOEXEC)
 assert(fcntl.O_NONBLOCK)
