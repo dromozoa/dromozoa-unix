@@ -15,14 +15,30 @@
 -- You should have received a copy of the GNU General Public License
 -- along with dromozoa-unix.  If not, see <http://www.gnu.org/licenses/>.
 
-local ipairs = require "dromozoa.commons.ipairs"
 local unix = require "dromozoa.unix"
 
-local env = unix.environ()
-for i, v in ipairs(env) do
-  print(i, v)
+local reader, writer = unix.pipe(unix.O_CLOEXEC)
+
+local pid = unix.forkexec(os.getenv("PATH"), { "ls", "-l" }, unix.environ(), "/", { [1] = writer })
+writer:close()
+while true do
+  local result = assert(reader:read(64))
+  if #result == 0 then
+    break
+  end
+  -- io.write(result)
 end
+assert(unix.wait() == pid)
 
+local t1 = unix.gettimeofday()
+local pid = unix.forkexec(os.getenv("PATH"), { "sleep", "1" }, unix.environ(), "/", {})
+assert(unix.wait() == pid)
+local t2 = unix.gettimeofday()
 
-
-
+local u = t2.tv_usec - t1.tv_usec
+local s = t2.tv_sec - t1.tv_sec
+if u < 0 then
+  u = u + 1000000
+  s = s - 1
+end
+-- print(("%d.%06d"):format(s, u))

@@ -17,44 +17,31 @@
 
 extern "C" {
 #include <lua.h>
+#include <lauxlib.h>
 }
 
-#include "coe.hpp"
-#include "environ.hpp"
-#include "fcntl.hpp"
+#include <vector>
+
+#include "error.hpp"
 #include "fd.hpp"
-#include "forkexec.hpp"
-#include "gettimeofday.hpp"
-#include "log_level.hpp"
-#include "nanosleep.hpp"
-#include "ndelay.hpp"
-#include "pipe.hpp"
 #include "read.hpp"
-#include "wait.hpp"
+#include "set_field.hpp"
 
 namespace dromozoa {
-  int open(lua_State* L) {
-    lua_newtable(L);
-
-    open_fd(L);
-    initialize_coe(L);
-    initialize_ndelay(L);
-    initialize_read(L);
-    lua_setfield(L, -2, "fd");
-
-    dromozoa::initialize_environ(L);
-    dromozoa::initialize_fcntl(L);
-    dromozoa::initialize_forkexec(L);
-    dromozoa::initialize_gettimeofday(L);
-    dromozoa::initialize_log_level(L);
-    dromozoa::initialize_nanosleep(L);
-    dromozoa::initialize_pipe(L);
-    dromozoa::initialize_wait(L);
-
-    return 1;
+  namespace {
+    int impl_read(lua_State* L) {
+      std::vector<char> buffer(luaL_checkinteger(L, 2));
+      ssize_t result = read(get_fd(L, 1), &buffer[0], buffer.size());
+      if (result == -1) {
+        return push_error(L);
+      } else {
+        lua_pushlstring(L, &buffer[0], result);
+        return 1;
+      }
+    }
   }
-}
 
-extern "C" int luaopen_dromozoa_unix(lua_State* L) {
-  return dromozoa::open(L);
+  void initialize_read(lua_State* L) {
+    set_field(L, "read", impl_read);
+  }
 }

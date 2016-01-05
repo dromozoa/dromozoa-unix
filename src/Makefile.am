@@ -29,6 +29,7 @@ noinst_HEADERS = \
 	ndelay.hpp \
 	pathexec.hpp \
 	pipe.hpp \
+	read.hpp \
 	set_field.hpp \
 	signal_mask.hpp \
 	success.hpp \
@@ -51,6 +52,7 @@ unix_la_SOURCES = \
 	ndelay.cpp \
 	pathexec.cpp \
 	pipe.cpp \
+	read.cpp \
 	set_field.cpp \
 	signal_mask.cpp \
 	success.cpp \
