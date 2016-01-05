@@ -21,24 +21,40 @@ extern "C" {
 
 #include <fcntl.h>
 
-#include "coe.hpp"
 #include "error.hpp"
 #include "fd.hpp"
+#include "ndelay.hpp"
 #include "set_field.hpp"
 #include "success.hpp"
 
 namespace dromozoa {
-  int coe(int fd) {
-    int result = fcntl(fd, F_GETFD);
+  int ndelay_on(int fd) {
+    int result = fcntl(fd, F_GETFL);
     if (result == -1) {
       return -1;
     }
-    return fcntl(fd, F_SETFD, result | FD_CLOEXEC);
+    return fcntl(fd, F_SETFL, result | O_NONBLOCK);
+  }
+
+  int ndelay_off(int fd) {
+    int result = fcntl(fd, F_GETFL);
+    if (result == -1) {
+      return -1;
+    }
+    return fcntl(fd, F_SETFL, result & ~O_NONBLOCK);
   }
 
   namespace {
-    int impl_coe(lua_State* L) {
-      if (coe(get_fd(L, 1)) == -1) {
+    int impl_ndealy_on(lua_State* L) {
+      if (ndelay_on(get_fd(L, 1)) == -1) {
+        return push_error(L);
+      } else {
+        return success(L);
+      }
+    }
+
+    int impl_ndealy_off(lua_State* L) {
+      if (ndelay_off(get_fd(L, 1)) == -1) {
         return push_error(L);
       } else {
         return success(L);
@@ -46,7 +62,8 @@ namespace dromozoa {
     }
   }
 
-  void initialize_coe(lua_State* L) {
-    set_field(L, "coe", impl_coe);
+  void initialize_ndelay(lua_State* L) {
+    set_field(L, "ndelay_on", impl_ndealy_on);
+    set_field(L, "ndelay_off", impl_ndealy_off);
   }
 }

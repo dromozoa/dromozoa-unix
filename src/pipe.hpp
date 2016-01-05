@@ -15,11 +15,12 @@
 // You should have received a copy of the GNU General Public License
 // along with dromozoa-unix.  If not, see <http://www.gnu.org/licenses/>.
 
-#ifndef DROMOZOA_PIPE2_HPP
-#define DROMOZOA_PIPE2_HPP
+#ifndef DROMOZOA_PIPE_HPP
+#define DROMOZOA_PIPE_HPP
 
 namespace dromozoa {
   int pipe2(int fd[2], int flags);
+  void initialize_pipe(lua_State* L);
 }
 
 #endif

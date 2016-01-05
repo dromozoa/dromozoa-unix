@@ -15,38 +15,17 @@
 // You should have received a copy of the GNU General Public License
 // along with dromozoa-unix.  If not, see <http://www.gnu.org/licenses/>.
 
+#ifndef DROMOZOA_NDELAY_HPP
+#define DROMOZOA_NDELAY_HPP
+
 extern "C" {
 #include <lua.h>
 }
 
-#include <fcntl.h>
-
-#include "coe.hpp"
-#include "error.hpp"
-#include "fd.hpp"
-#include "set_field.hpp"
-#include "success.hpp"
-
 namespace dromozoa {
-  int coe(int fd) {
-    int result = fcntl(fd, F_GETFD);
-    if (result == -1) {
-      return -1;
-    }
-    return fcntl(fd, F_SETFD, result | FD_CLOEXEC);
-  }
-
-  namespace {
-    int impl_coe(lua_State* L) {
-      if (coe(get_fd(L, 1)) == -1) {
-        return push_error(L);
-      } else {
-        return success(L);
-      }
-    }
-  }
-
-  void initialize_coe(lua_State* L) {
-    set_field(L, "coe", impl_coe);
-  }
+  int ndelay_on(int fd);
+  int ndelay_off(int fd);
+  void initialize_ndelay(lua_State* L);
 }
+
+#endif

@@ -26,6 +26,7 @@ extern "C" {
 #include "error.hpp"
 #include "fd.hpp"
 #include "log_level.hpp"
+#include "ndelay.hpp"
 #include "pipe.hpp"
 #include "set_field.hpp"
 
@@ -47,6 +48,7 @@ extern "C" int luaopen_dromozoa_unix(lua_State* L) {
   lua_newtable(L);
   dromozoa::open_fd(L);
   dromozoa::initialize_coe(L);
+  dromozoa::initialize_ndelay(L);
   lua_setfield(L, -2, "fd");
   dromozoa::set_field(L, "pipe2", dromozoa::impl_pipe2);
   dromozoa::initialize_log_level(L);
