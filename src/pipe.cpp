@@ -15,11 +15,21 @@
 // You should have received a copy of the GNU General Public License
 // along with dromozoa-unix.  If not, see <http://www.gnu.org/licenses/>.
 
+extern "C" {
+#include <lua.h>
+#include <lauxlib.h>
+}
+
 #include <errno.h>
 #include <fcntl.h>
 #include <unistd.h>
 
 #include "coe.hpp"
+#include "error.hpp"
+#include "fd.hpp"
+#include "ndelay.hpp"
+#include "pipe.hpp"
+#include "set_field.hpp"
 
 namespace dromozoa {
 #ifdef HAVE_PIPE2
@@ -40,6 +50,14 @@ namespace dromozoa {
           break;
         }
       }
+      if (flags & O_NONBLOCK) {
+        if (ndelay_on(fd[0]) == -1) {
+          break;
+        }
+        if (ndelay_on(fd[1]) == -1) {
+          break;
+        }
+      }
       return 0;
     } while (false);
     int code = errno;
@@ -49,4 +67,26 @@ namespace dromozoa {
     return -1;
   }
 #endif
+
+  namespace {
+    int impl_pipe(lua_State* L) {
+      int fd[2] = { -1, -1 };
+      if (lua_isnoneornil(L, 1)) {
+        if (pipe(fd) == -1) {
+          return push_error(L);
+        }
+      } else {
+        if (pipe2(fd, luaL_checkinteger(L, 1)) == -1) {
+          return push_error(L);
+        }
+      }
+      new_fd(L, fd[0]);
+      new_fd(L, fd[1]);
+      return 2;
+    }
+  }
+
+  void initialize_pipe(lua_State* L) {
+    dromozoa::set_field(L, "pipe", dromozoa::impl_pipe);
+  }
 }

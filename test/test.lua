@@ -22,7 +22,7 @@ unix.set_log_level(3)
 assert(unix.get_log_level() == 3)
 
 do
-  local reader, writer = unix.pipe2()
+  local reader, writer = unix.pipe()
   print(reader:coe():ndelay_on():get())
   reader:close()
   print(reader:close())

@@ -18,6 +18,10 @@
 #ifndef DROMOZOA_PIPE_HPP
 #define DROMOZOA_PIPE_HPP
 
+extern "C" {
+#include <lua.h>
+}
+
 namespace dromozoa {
   int pipe2(int fd[2], int flags);
   void initialize_pipe(lua_State* L);

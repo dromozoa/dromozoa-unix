@@ -17,40 +17,30 @@
 
 extern "C" {
 #include <lua.h>
-#include <lauxlib.h>
 }
 
-#include <unistd.h>
-
 #include "coe.hpp"
-#include "error.hpp"
 #include "fd.hpp"
 #include "log_level.hpp"
 #include "ndelay.hpp"
 #include "pipe.hpp"
-#include "set_field.hpp"
 
 namespace dromozoa {
-  int impl_pipe2(lua_State* L) {
-    int fd[2] = { -1, -1 };
-    int flags = luaL_optinteger(L, 1, 0);
-    if (pipe2(fd, flags) == -1) {
-      return push_error(L);
-    } else {
-      new_fd(L, fd[0]);
-      new_fd(L, fd[1]);
-      return 2;
-    }
+  int open(lua_State* L) {
+    lua_newtable(L);
+
+    open_fd(L);
+    initialize_coe(L);
+    initialize_ndelay(L);
+    lua_setfield(L, -2, "fd");
+
+    dromozoa::initialize_log_level(L);
+    dromozoa::initialize_pipe(L);
+
+    return 1;
   }
 }
 
 extern "C" int luaopen_dromozoa_unix(lua_State* L) {
-  lua_newtable(L);
-  dromozoa::open_fd(L);
-  dromozoa::initialize_coe(L);
-  dromozoa::initialize_ndelay(L);
-  lua_setfield(L, -2, "fd");
-  dromozoa::set_field(L, "pipe2", dromozoa::impl_pipe2);
-  dromozoa::initialize_log_level(L);
-  return 1;
+  return dromozoa::open(L);
 }

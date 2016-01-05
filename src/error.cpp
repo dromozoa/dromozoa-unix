@@ -61,7 +61,7 @@ namespace dromozoa {
 
     lua_pushnil(L);
 
-    do {
+    while (true) {
       const char* what = 0;
       errno = 0;
 #ifdef HAVE_STRERROR_R
@@ -87,7 +87,7 @@ namespace dromozoa {
         lua_pushfstring(L, "error number %d", code);
         break;
       }
-    } while (true);
+    }
     free(buffer);
 
     lua_pushinteger(L, code);
@@ -100,7 +100,7 @@ namespace dromozoa {
     char* buffer = 0;
     size_t size = 32;
 
-    do {
+    while (true) {
       const char* what = 0;
       errno = 0;
 #ifdef HAVE_STRERROR_R
@@ -126,7 +126,7 @@ namespace dromozoa {
         out << "error number " << code;
         break;
       }
-    } while (true);
+    }
     free(buffer);
 
     errno = save;
