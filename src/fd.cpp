@@ -28,6 +28,7 @@ extern "C" {
 #include "fd.hpp"
 #include "log_level.hpp"
 #include "set_field.hpp"
+#include "success.hpp"
 
 namespace dromozoa {
   int new_fd(lua_State* L, int fd) {
@@ -73,8 +74,7 @@ namespace dromozoa {
         if (get_log_level() > 2) {
           std::cerr << "[dromozoa-unix] close fd " << fd << std::endl;
         }
-        lua_pushinteger(L, 0);
-        return 1;
+        return success(L);
       }
     }
 

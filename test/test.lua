@@ -23,10 +23,16 @@ assert(unix.get_log_level() == 3)
 
 do
   local reader, writer = unix.pipe()
-  print(reader:coe():ndelay_on():get())
-  reader:close()
-  print(reader:close())
+  reader:coe():ndelay_on()
+  assert(reader:close())
+  assert(not reader:close())
 end
 
 assert(unix.fd.get(0) == 0)
-unix.fd.close(0)
+assert(not unix.fd.close(-1))
+
+do
+  local reader, writer = unix.pipe(unix.fcntl.O_CLOEXEC)
+  assert(reader:close():get() == -1)
+  assert(writer:close():get() == -1)
+end
