@@ -15,6 +15,9 @@
 // You should have received a copy of the GNU General Public License
 // along with dromozoa-unix.  If not, see <http://www.gnu.org/licenses/>.
 
+#ifndef DROMOZOA_LOG_LEVEL_HPP
+#define DROMOZOA_LOG_LEVEL_HPP
+
 extern "C" {
 #include <lua.h>
 }
@@ -23,3 +26,5 @@ namespace dromozoa {
   lua_Integer get_log_level();
   void initialize_log_level(lua_State* L);
 }
+
+#endif

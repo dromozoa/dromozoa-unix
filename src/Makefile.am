@@ -36,4 +36,5 @@ unix_la_SOURCES = \
 	log_level.cpp \
 	pipe2.cpp \
 	set_field.cpp \
+	success.cpp \
 	unix.cpp
