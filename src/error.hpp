@@ -22,8 +22,13 @@ extern "C" {
 #include <lua.h>
 }
 
+#include <errno.h>
+
+#include <iosfwd>
+
 namespace dromozoa {
-  int push_error(lua_State* L);
+  int push_error(lua_State* L, int code = errno);
+  void print_error(std::ostream& out, int code = errno);
 }
 
 #endif

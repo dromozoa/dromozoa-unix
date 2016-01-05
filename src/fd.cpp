@@ -74,7 +74,9 @@ namespace dromozoa {
         set_fd(L, 1, -1);
         if (close(fd) == -1) {
           if (get_log_level() > 0) {
-            std::cerr << "[dromozoa-unix] cannot close fd" << std::endl;
+            std::cerr << "[dromozoa-unix] cannot close fd " << fd << ": ";
+            print_error(std::cerr);
+            std::cerr << std::endl;
           }
         }
       }

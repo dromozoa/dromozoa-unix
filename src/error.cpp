@@ -27,11 +27,35 @@ extern "C" {
 #include <stdlib.h>
 #include <string.h>
 
+#include <iostream>
+
 #include "error.hpp"
 
 namespace dromozoa {
-  int push_error(lua_State* L) {
-    int code = errno;
+  namespace {
+#ifdef HAVE_STRERROR_R
+#ifdef STRERROR_R_CHAR_P
+    const char* strerror_r(int code, char* buffer, size_t size) {
+      return ::strerror_r(code, buffer, size);
+    }
+#else
+    const char* strerror_r(int code, char* buffer, size_t size) {
+      int result = ::strerror_r(code, buffer, size);
+      if (result == 0) {
+        return buffer;
+      } else {
+        if (result != -1) {
+          errno = result;
+        }
+        return 0;
+      }
+    }
+#endif
+#endif
+  }
+
+  int push_error(lua_State* L, int code) {
+    int save = errno;
     char* buffer = 0;
     size_t size = 32;
 
@@ -44,16 +68,7 @@ namespace dromozoa {
       size = size * 2;
       if (char* b = static_cast<char*>(realloc(buffer, size))) {
         buffer = b;
-#ifdef STRERROR_R_CHAR_P
         what = strerror_r(code, buffer, size);
-#else
-        int result = strerror_r(code, buffer, size);
-        if (result == 0) {
-          what = buffer;
-        } else if (result != -1) {
-          errno = result;
-        }
-#endif
       } else {
         errno = ENOMEM;
       }
@@ -76,7 +91,44 @@ namespace dromozoa {
     free(buffer);
 
     lua_pushinteger(L, code);
-    errno = code;
+    errno = save;
     return 3;
+  }
+
+  void print_error(std::ostream& out, int code) {
+    int save = errno;
+    char* buffer = 0;
+    size_t size = 32;
+
+    do {
+      const char* what = 0;
+      errno = 0;
+#ifdef HAVE_STRERROR_R
+      size = size * 2;
+      if (char* b = static_cast<char*>(realloc(buffer, size))) {
+        buffer = b;
+        what = strerror_r(code, buffer, size);
+      } else {
+        errno = ENOMEM;
+      }
+#else
+      what = strerror(code);
+#endif
+
+      if (what && errno == 0) {
+        out << what;
+        break;
+#ifdef HAVE_STRERROR_R
+      } else if (errno == ERANGE) {
+        continue;
+#endif
+      } else {
+        out << "error number " << code;
+        break;
+      }
+    } while (true);
+    free(buffer);
+
+    errno = save;
   }
 }
