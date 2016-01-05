@@ -15,21 +15,15 @@
 // You should have received a copy of the GNU General Public License
 // along with dromozoa-unix.  If not, see <http://www.gnu.org/licenses/>.
 
-#ifndef DROMOZOA_PATHEXEC_HPP
-#define DROMOZOA_PATHEXEC_HPP
+#ifndef DROMOZOA_FORKEXEC_HPP
+#define DROMOZOA_FORKEXEC_HPP
 
-#include <stddef.h>
+extern "C" {
+#include <lua.h>
+}
 
 namespace dromozoa {
-  size_t pathexec_buffer_size(
-      const char* path,
-      const char* const* argv);
-  int pathexec(
-      const char* path,
-      const char* const* argv,
-      const char* const* envp,
-      char* buffer,
-      size_t size);
+  void initialize_forkexec(lua_State* L);
 }
 
 #endif

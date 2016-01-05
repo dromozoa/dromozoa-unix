@@ -67,7 +67,7 @@ namespace dromozoa {
     return path_size + command_size + 2;
   }
 
-  int pathexec(const char* path, const char* const* argv, const char* const* envp, std::vector<char>& buffer) {
+  int pathexec(const char* path, const char* const* argv, const char* const* envp, char* buffer, size_t size) {
     const char* command = argv[0];
     size_t i = 0;
     for (; command[i] != '\0'; ++i) {
@@ -89,8 +89,8 @@ namespace dromozoa {
       char c = path[i];
       if (c == ':' || c == '\0') {
         size_t path_size = i > j ? i - j : 1;
-        if (path_size + 1 + command_size < buffer.size()) {
-          char* p = &buffer[0];
+        if (path_size + 1 + command_size < size) {
+          char* p = buffer;
           if (i > j) {
             p = copy(p, path + j, path_size);
           } else {
@@ -99,7 +99,7 @@ namespace dromozoa {
           p = copy(p, '/');
           p = copy(p, command, command_size);
           p = copy(p, '\0');
-          execve(&buffer[0], const_cast<char**>(argv), const_cast<char**>(envp));
+          execve(buffer, const_cast<char**>(argv), const_cast<char**>(envp));
           switch (errno) {
             case ENOENT:
               break;

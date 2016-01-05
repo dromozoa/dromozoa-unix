@@ -20,10 +20,12 @@ noinst_HEADERS = \
 	error.hpp \
 	fcntl.hpp \
 	fd.hpp \
+	forkexec.hpp \
 	gettimeofday.hpp \
 	log_level.hpp \
 	nanosleep.hpp \
 	ndelay.hpp \
+	pathexec.hpp \
 	pipe.hpp \
 	set_field.hpp \
 	success.hpp
@@ -36,10 +38,12 @@ unix_la_SOURCES = \
 	error.cpp \
 	fcntl.cpp \
 	fd.cpp \
+	forkexec.cpp \
 	gettimeofday.cpp \
 	log_level.cpp \
 	nanosleep.cpp \
 	ndelay.cpp \
+	pathexec.cpp \
 	pipe.cpp \
 	set_field.cpp \
 	success.cpp \
