@@ -28,7 +28,8 @@ noinst_HEADERS = \
 	pathexec.hpp \
 	pipe.hpp \
 	set_field.hpp \
-	success.hpp
+	success.hpp \
+	wait.hpp
 
 luaexec_LTLIBRARIES = unix.la
 
@@ -47,4 +48,5 @@ unix_la_SOURCES = \
 	pipe.cpp \
 	set_field.cpp \
 	success.cpp \
-	unix.cpp
+	unix.cpp \
+	wait.cpp
