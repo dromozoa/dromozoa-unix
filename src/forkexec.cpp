@@ -15,17 +15,27 @@
 // You should have received a copy of the GNU General Public License
 // along with dromozoa-unix.  If not, see <http://www.gnu.org/licenses/>.
 
+extern "C" {
+#include <lua.h>
+#include <lauxlib.h>
+}
+
 #include <errno.h>
 #include <fcntl.h>
 #include <signal.h>
 #include <unistd.h>
 #include <sys/wait.h>
 
+#include <string>
 #include <vector>
 
+#include "argument_vector.hpp"
+#include "error.hpp"
+#include "fd.hpp"
 #include "forkexec.hpp"
 #include "pipe.hpp"
 #include "pathexec.hpp"
+#include "set_field.hpp"
 #include "signal_mask.hpp"
 
 namespace dromozoa {
@@ -180,10 +190,30 @@ namespace dromozoa {
     }
 
     int impl_forkexec(lua_State* L) {
-      return 0;
+      std::string path(luaL_checkstring(L, 1));
+      argument_vector argv(L, 2);
+      argument_vector envp(L, 3);
+      std::string chdir(luaL_checkstring(L, 4));
+      int dup2_stdio[3] = { -1, -1, -1 };
+      for (int i = 0; i < 3; ++i) {
+        lua_pushinteger(L, i);
+        lua_gettable(L, 5);
+        if (!lua_isnil(L, -1)) {
+          dup2_stdio[i] = get_fd(L, -1);
+        }
+        lua_pop(L, 1);
+      }
+      pid_t result = forkexec(path.c_str(), argv.get(), envp.get(), chdir.c_str(), dup2_stdio);
+      if (result == -1) {
+        return push_error(L);
+      } else {
+        lua_pushinteger(L, result);
+        return 1;
+      }
     }
   }
 
   void initialize_forkexec(lua_State* L) {
+    set_field(L, "forkexec", impl_forkexec);
   }
 }

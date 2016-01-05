@@ -15,44 +15,27 @@
 // You should have received a copy of the GNU General Public License
 // along with dromozoa-unix.  If not, see <http://www.gnu.org/licenses/>.
 
+#ifndef DROMOZOA_ARGUMENT_VECTOR_HPP
+#define DROMOZOA_ARGUMENT_VECTOR_HPP
+
 extern "C" {
 #include <lua.h>
 }
 
-#include "coe.hpp"
-#include "environ.hpp"
-#include "fcntl.hpp"
-#include "fd.hpp"
-#include "forkexec.hpp"
-#include "gettimeofday.hpp"
-#include "log_level.hpp"
-#include "nanosleep.hpp"
-#include "ndelay.hpp"
-#include "pipe.hpp"
-#include "wait.hpp"
+#include <string>
+#include <vector>
 
 namespace dromozoa {
-  int open(lua_State* L) {
-    lua_newtable(L);
-
-    open_fd(L);
-    initialize_coe(L);
-    initialize_ndelay(L);
-    lua_setfield(L, -2, "fd");
-
-    dromozoa::initialize_environ(L);
-    dromozoa::initialize_fcntl(L);
-    dromozoa::initialize_forkexec(L);
-    dromozoa::initialize_gettimeofday(L);
-    dromozoa::initialize_log_level(L);
-    dromozoa::initialize_nanosleep(L);
-    dromozoa::initialize_pipe(L);
-    dromozoa::initialize_wait(L);
-
-    return 1;
-  }
+  class argument_vector {
+  public:
+    argument_vector(lua_State* L, int n);
+    const char* const* get() const;
+  private:
+    std::vector<std::string> str_;
+    std::vector<const char*> ptr_;
+    argument_vector(const argument_vector&);
+    argument_vector& operator=(const argument_vector&);
+  };
 }
 
-extern "C" int luaopen_dromozoa_unix(lua_State* L) {
-  return dromozoa::open(L);
-}
+#endif

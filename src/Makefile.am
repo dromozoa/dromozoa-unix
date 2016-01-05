@@ -16,7 +16,9 @@
 # along with dromozoa-unix.  If not, see <http://www.gnu.org/licenses/>.
 
 noinst_HEADERS = \
+	argument_vector.hpp \
 	coe.hpp \
+	environ.hpp \
 	error.hpp \
 	fcntl.hpp \
 	fd.hpp \
@@ -36,7 +38,9 @@ luaexec_LTLIBRARIES = unix.la
 
 unix_la_LDFLAGS = -module -avoid-version
 unix_la_SOURCES = \
+	argument_vector.cpp \
 	coe.cpp \
+	environ.cpp \
 	error.cpp \
 	fcntl.cpp \
 	fd.cpp \
