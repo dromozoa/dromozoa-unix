@@ -1,4 +1,4 @@
-// Copyright (C) 2015 Tomoyuki Fujimori <moyu@dromozoa.com>
+// Copyright (C) 2016 Tomoyuki Fujimori <moyu@dromozoa.com>
 //
 // This file is part of dromozoa-unix.
 //
@@ -15,22 +15,15 @@
 // You should have received a copy of the GNU General Public License
 // along with dromozoa-unix.  If not, see <http://www.gnu.org/licenses/>.
 
-#ifndef DROMOZOA_PATHEXEC_HPP
-#define DROMOZOA_PATHEXEC_HPP
+#ifndef DROMOZOA_GETTIMEOFDAY_HPP
+#define DROMOZOA_GETTIMEOFDAY_HPP
 
-#include <stddef.h>
-#include <vector>
+extern "C" {
+#include <lua.h>
+}
 
 namespace dromozoa {
-  size_t pathexec_buffer_size(
-      const char* path,
-      const char* const* argv);
-
-  int pathexec(
-      const char* path,
-      const char* const* argv,
-      const char* const* envp,
-      std::vector<char>& buffer);
+  void initialize_gettimeofday(lua_State* L);
 }
 
 #endif

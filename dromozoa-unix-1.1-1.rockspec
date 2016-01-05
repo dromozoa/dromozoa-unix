@@ -11,14 +11,7 @@ description = {
   maintainer = "Tomoyuki Fujimori <moyu@dromozoa.com>";
 }
 build = {
-  type = "make";
-  build_variables = {
-    CFLAGS = "$(CFLAGS)";
-    LIBFLAG = "$(LIBFLAG)";
-    LUA_INCDIR = "$(LUA_INCDIR)";
-    LUA_LIBDIR = "$(LUA_LIBDIR)";
-  };
-  install_variables = {
-    LIBDIR = "$(LIBDIR)";
-  };
+  type = "command";
+  build_command = "env CPPFLAGS='-I$(LUA_INCDIR)' CXXFLAGS='-Wall -W $(CFLAGS)' LDFLAGS='-L$(LUA_LIBDIR)' LUA='$(LUA_BINDIR)/$(LUA)' ./configure --prefix='$(PREFIX)' && make clean && make";
+  install_command = "make luaexecdir='$(LIBDIR)/dromozoa' install";
 }

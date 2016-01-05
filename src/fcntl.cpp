@@ -1,4 +1,4 @@
-// Copyright (C) 2015 Tomoyuki Fujimori <moyu@dromozoa.com>
+// Copyright (C) 2016 Tomoyuki Fujimori <moyu@dromozoa.com>
 //
 // This file is part of dromozoa-unix.
 //
@@ -19,16 +19,16 @@ extern "C" {
 #include <lua.h>
 }
 
-#include <errno.h>
-#include <string.h>
-#include "common.hpp"
+#include <fcntl.h>
+
+#include "fcntl.hpp"
+#include "set_field.hpp"
 
 namespace dromozoa {
-  int push_error(lua_State* L) {
-    int code = errno;
-    lua_pushnil(L);
-    lua_pushstring(L, strerror(code));
-    lua_pushinteger(L, code);
-    return 3;
+  int open_fcntl(lua_State* L) {
+    lua_newtable(L);
+    DROMOZOA_SET_FIELD(L, O_CLOEXEC);
+    DROMOZOA_SET_FIELD(L, O_NONBLOCK);
+    return 1;
   }
 }

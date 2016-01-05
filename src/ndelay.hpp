@@ -1,4 +1,4 @@
-// Copyright (C) 2015 Tomoyuki Fujimori <moyu@dromozoa.com>
+// Copyright (C) 2016 Tomoyuki Fujimori <moyu@dromozoa.com>
 //
 // This file is part of dromozoa-unix.
 //
@@ -15,30 +15,17 @@
 // You should have received a copy of the GNU General Public License
 // along with dromozoa-unix.  If not, see <http://www.gnu.org/licenses/>.
 
+#ifndef DROMOZOA_NDELAY_HPP
+#define DROMOZOA_NDELAY_HPP
+
 extern "C" {
 #include <lua.h>
 }
 
-#include <sys/time.h>
-#include "common.hpp"
-
 namespace dromozoa {
-  int unix_gettimeofday(lua_State* L) {
-    struct timeval tv = {};
-    if (gettimeofday(&tv, 0) != -1) {
-      lua_newtable(L);
-      lua_pushinteger(L, tv.tv_sec);
-      lua_setfield(L, -2, "tv_sec");
-      lua_pushinteger(L, tv.tv_usec);
-      lua_setfield(L, -2, "tv_usec");
-      return 1;
-    } else {
-      return push_error(L);
-    }
-  }
+  int ndelay_on(int fd);
+  int ndelay_off(int fd);
+  void initialize_ndelay(lua_State* L);
 }
 
-extern "C" int luaopen_dromozoa_unix_gettimeofday(lua_State* L) {
-  lua_pushcfunction(L, dromozoa::unix_gettimeofday);
-  return 1;
-}
+#endif

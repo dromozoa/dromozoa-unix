@@ -1,4 +1,4 @@
-# Copyright (C) 2015 Tomoyuki Fujimori <moyu@dromozoa.com>
+# Copyright (C) 2016 Tomoyuki Fujimori <moyu@dromozoa.com>
 #
 # This file is part of dromozoa-unix.
 #
@@ -15,30 +15,32 @@
 # You should have received a copy of the GNU General Public License
 # along with dromozoa-unix.  If not, see <http://www.gnu.org/licenses/>.
 
-CPPFLAGS = -I$(LUA_INCDIR)
-CXXFLAGS = -Wall -W -Wno-missing-field-initializers $(CFLAGS)
-LDFLAGS = -L$(LUA_LIBDIR) $(LIBFLAG)
-LDLIBS =
+noinst_HEADERS = \
+	coe.hpp \
+	error.hpp \
+	fcntl.hpp \
+	fd.hpp \
+	gettimeofday.hpp \
+	log_level.hpp \
+	nanosleep.hpp \
+	ndelay.hpp \
+	pipe.hpp \
+	set_field.hpp \
+	success.hpp
 
-TARGET = gettimeofday.so nanosleep.so forkexec.so
+luaexec_LTLIBRARIES = unix.la
 
-all: $(TARGET)
-
-clean:
-	rm -f *.o $(TARGET)
-
-gettimeofday.so: gettimeofday.o common.o
-	$(CXX) $(LDFLAGS) $^ $(LDLIBS) -o $@
-
-nanosleep.so: nanosleep.o common.o
-	$(CXX) $(LDFLAGS) $^ $(LDLIBS) -o $@
-
-forkexec.so: forkexec.o pathexec.o
-	$(CXX) $(LDFLAGS) $^ $(LDLIBS) -o $@
-
-.cpp.o:
-	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -c $<
-
-install:
-	mkdir -p $(LIBDIR)/dromozoa/unix
-	cp $(TARGET) $(LIBDIR)/dromozoa/unix
+unix_la_LDFLAGS = -module -avoid-version
+unix_la_SOURCES = \
+	coe.cpp \
+	error.cpp \
+	fcntl.cpp \
+	fd.cpp \
+	gettimeofday.cpp \
+	log_level.cpp \
+	nanosleep.cpp \
+	ndelay.cpp \
+	pipe.cpp \
+	set_field.cpp \
+	success.cpp \
+	unix.cpp
