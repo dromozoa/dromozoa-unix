@@ -32,18 +32,20 @@ namespace dromozoa {
     return log_level;
   }
 
-  int unix_set_log_level(lua_State* L) {
-    log_level = luaL_checkinteger(L, 1);
-    return 0;
-  }
+  namespace {
+    int impl_set_log_level(lua_State* L) {
+      log_level = luaL_checkinteger(L, 1);
+      return 0;
+    }
 
-  int unix_get_log_level(lua_State* L) {
-    lua_pushinteger(L, log_level);
-    return 1;
+    int impl_get_log_level(lua_State* L) {
+      lua_pushinteger(L, log_level);
+      return 1;
+    }
   }
 
   void initialize_log_level(lua_State* L) {
-    set_field(L, "set_log_level", unix_set_log_level);
-    set_field(L, "get_log_level", unix_get_log_level);
+    set_field(L, "set_log_level", impl_set_log_level);
+    set_field(L, "get_log_level", impl_get_log_level);
   }
 }

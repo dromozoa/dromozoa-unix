@@ -35,37 +35,43 @@ namespace dromozoa {
     luaL_getmetatable(L, "dromozoa.unix.fd");
     lua_setmetatable(L, -2);
     if (get_log_level() > 2) {
-      std::cerr << "[dromozoa-unix] attach fd " << fd << std::endl;
+      std::cerr << "[dromozoa-unix] new fd " << fd << std::endl;
     }
     return 1;
   }
 
-  void set_fd(lua_State* L, int n, int fd) {
-    if (int* data = static_cast<int*>(lua_touserdata(L, n))) {
-      *data = fd;
-    } else {
-      luaL_argerror(L, n, "userdata expected, got nil");
-    }
-  }
-
   int get_fd(lua_State* L, int n) {
-    if (const int* data = static_cast<const int*>(lua_touserdata(L, n))) {
-      return *data;
+    if (lua_isuserdata(L, n)) {
+      return *static_cast<const int*>(luaL_checkudata(L, n, "dromozoa.unix.fd"));
     } else {
-      luaL_argerror(L, n, "userdata expected, got nil");
-      return -1;
+      return luaL_checkinteger(L, n);
     }
   }
 
   namespace {
+    int reset_fd(lua_State* L, int n) {
+      if (lua_isuserdata(L, n)) {
+        int* data = static_cast<int*>(luaL_checkudata(L, n, "dromozoa.unix.fd"));
+        int fd = *data;
+        *data = -1;
+        return fd;
+      } else {
+        return luaL_checkinteger(L, n);
+      }
+    }
+
+    int impl_get(lua_State* L) {
+      lua_pushinteger(L, get_fd(L, 1));
+      return 1;
+    }
+
     int impl_close(lua_State* L) {
-      int fd = get_fd(L, 1);
-      set_fd(L, 1, -1);
+      int fd = reset_fd(L, 1);
       if (close(fd) == -1) {
         return push_error(L);
       } else {
         if (get_log_level() > 2) {
-          std::cerr << "[dromozoa-unix] detach fd " << fd << std::endl;
+          std::cerr << "[dromozoa-unix] close fd " << fd << std::endl;
         }
         lua_pushinteger(L, 0);
         return 1;
@@ -73,22 +79,21 @@ namespace dromozoa {
     }
 
     int impl_gc(lua_State* L) {
-      int fd = get_fd(L, 1);
+      int fd = reset_fd(L, 1);
       if (fd != -1) {
         if (get_log_level() > 1) {
           std::cerr << "[dromozoa-unix] fd " << fd << " detected" << std::endl;
         }
-        set_fd(L, 1, -1);
         if (close(fd) == -1) {
+          int code = errno;
           if (get_log_level() > 0) {
-            int code = errno;
             std::cerr << "[dromozoa-unix] cannot close fd " << fd << ": ";
             print_error(std::cerr, code);
             std::cerr << std::endl;
           }
         } else {
           if (get_log_level() > 2) {
-            std::cerr << "[dromozoa-unix] detach fd " << fd << std::endl;
+            std::cerr << "[dromozoa-unix] close fd " << fd << std::endl;
           }
         }
       }
@@ -96,13 +101,15 @@ namespace dromozoa {
     }
   }
 
-  void initialize_fd(lua_State* L) {
+  int open_fd(lua_State* L) {
     lua_newtable(L);
+    set_field(L, "get", impl_get);
     set_field(L, "close", impl_close);
     luaL_newmetatable(L, "dromozoa.unix.fd");
     lua_pushvalue(L, -2);
     lua_setfield(L, -2, "__index");
     set_field(L, "__gc", impl_gc);
     lua_pop(L, 1);
+    return 1;
   }
 }

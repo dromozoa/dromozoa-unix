@@ -29,28 +29,7 @@ extern "C" {
 #include "set_field.hpp"
 
 namespace dromozoa {
-  int unix_fd_gc(lua_State* L) {
-    int fd = get_fd(L, 1);
-    if (fd != -1) {
-      set_fd(L, 1, -1);
-      close(fd);
-    }
-    return 0;
-  }
-
-  int unix_fd_close(lua_State* L) {
-    int fd = get_fd(L, 1);
-    if (fd != -1) {
-      set_fd(L, 1, -1);
-      if (close(fd) == -1) {
-        return push_error(L);
-      }
-    }
-    lua_pushinteger(L, 0);
-    return 1;
-  }
-
-  int unix_pipe2(lua_State* L) {
+  int impl_pipe2(lua_State* L) {
     int fd[2] = { -1, -1 };
     int flags = luaL_optinteger(L, 1, 0);
     if (pipe2(fd, flags) == -1) {
@@ -65,9 +44,9 @@ namespace dromozoa {
 
 extern "C" int luaopen_dromozoa_unix(lua_State* L) {
   lua_newtable(L);
-  dromozoa::initialize_fd(L);
+  dromozoa::open_fd(L);
   lua_setfield(L, -2, "fd");
-  dromozoa::set_field(L, "pipe2", dromozoa::unix_pipe2);
+  dromozoa::set_field(L, "pipe2", dromozoa::impl_pipe2);
   dromozoa::initialize_log_level(L);
   return 1;
 }

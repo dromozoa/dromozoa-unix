@@ -18,11 +18,14 @@
 local unix = require "dromozoa.unix"
 
 assert(unix.get_log_level() == 0)
-unix.set_log_level(42)
-assert(unix.get_log_level() == 42)
+unix.set_log_level(3)
+assert(unix.get_log_level() == 3)
 
 do
   local reader, writer = unix.pipe2()
   reader:close()
   print(reader:close())
 end
+
+assert(unix.fd.get(0) == 0)
+unix.fd.close(0)
