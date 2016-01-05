@@ -35,6 +35,7 @@ unix_la_SOURCES = \
 	error.cpp \
 	fd.cpp \
 	log_level.cpp \
+	nanosleep.cpp \
 	ndelay.cpp \
 	pipe.cpp \
 	set_field.cpp \

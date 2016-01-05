@@ -1,4 +1,4 @@
--- Copyright (C) 2015 Tomoyuki Fujimori <moyu@dromozoa.com>
+-- Copyright (C) 2015,2016 Tomoyuki Fujimori <moyu@dromozoa.com>
 --
 -- This file is part of dromozoa-unix.
 --
@@ -15,7 +15,8 @@
 -- You should have received a copy of the GNU General Public License
 -- along with dromozoa-unix.  If not, see <http://www.gnu.org/licenses/>.
 
-local nanosleep = require "dromozoa.unix.nanosleep"
+local unix = require "dromozoa.unix"
+local nanosleep = unix.nanosleep
 
 assert(nanosleep({ tv_sec = 0, tv_nsec = 200 }) == 0)
 
