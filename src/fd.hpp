@@ -15,6 +15,9 @@
 // You should have received a copy of the GNU General Public License
 // along with dromozoa-unix.  If not, see <http://www.gnu.org/licenses/>.
 
+#ifndef DROMOZOA_FD_HPP
+#define DROMOZOA_FD_HPP
+
 extern "C" {
 #include <lua.h>
 }
@@ -24,3 +27,5 @@ namespace dromozoa {
   int get_fd(lua_State* L, int n);
   int open_fd(lua_State* L);
 }
+
+#endif

@@ -74,7 +74,7 @@ namespace dromozoa {
         if (get_log_level() > 2) {
           std::cerr << "[dromozoa-unix] close fd " << fd << std::endl;
         }
-        return success(L);
+        return push_success(L);
       }
     }
 

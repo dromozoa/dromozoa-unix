@@ -49,7 +49,7 @@ namespace dromozoa {
       if (ndelay_on(get_fd(L, 1)) == -1) {
         return push_error(L);
       } else {
-        return success(L);
+        return push_success(L);
       }
     }
 
@@ -57,7 +57,7 @@ namespace dromozoa {
       if (ndelay_off(get_fd(L, 1)) == -1) {
         return push_error(L);
       } else {
-        return success(L);
+        return push_success(L);
       }
     }
   }

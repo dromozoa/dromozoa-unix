@@ -41,7 +41,7 @@ namespace dromozoa {
       if (coe(get_fd(L, 1)) == -1) {
         return push_error(L);
       } else {
-        return success(L);
+        return push_success(L);
       }
     }
   }

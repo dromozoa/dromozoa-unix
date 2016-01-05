@@ -23,7 +23,7 @@ extern "C" {
 }
 
 namespace dromozoa {
-  int success(lua_State* L);
+  int push_success(lua_State* L);
 }
 
 #endif

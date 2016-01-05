@@ -15,7 +15,18 @@
 # You should have received a copy of the GNU General Public License
 # along with dromozoa-unix.  If not, see <http://www.gnu.org/licenses/>.
 
-noinst_HEADERS = common.hpp pathexec.hpp
+noinst_HEADERS = \
+	coe.hpp \
+	error.hpp \
+	fcntl.hpp \
+	fd.hpp \
+	gettimeofday.hpp \
+	log_level.hpp \
+	nanosleep.hpp \
+	ndelay.hpp \
+	pipe.hpp \
+	set_field.hpp \
+	success.hpp
 
 luaexec_LTLIBRARIES = unix.la
 

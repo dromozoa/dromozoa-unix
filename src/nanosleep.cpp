@@ -40,7 +40,7 @@ namespace dromozoa {
       lua_pop(L, 1);
 
       if (nanosleep(&tv1, &tv2) != -1) {
-        return success(L);
+        return push_success(L);
       } else {
         int result = push_error(L);
         lua_newtable(L);

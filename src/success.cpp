@@ -18,7 +18,7 @@
 #include "success.hpp"
 
 namespace dromozoa {
-  int success(lua_State* L) {
+  int push_success(lua_State* L) {
     if (lua_isuserdata(L, 1)) {
       lua_pushvalue(L, 1);
     } else {
