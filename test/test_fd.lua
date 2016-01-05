@@ -20,19 +20,26 @@ local unix = require "dromozoa.unix"
 assert(unix.get_log_level() == 0)
 unix.set_log_level(3)
 assert(unix.get_log_level() == 3)
+unix.set_log_level(0)
+
+local fd
 
 do
   local reader, writer = unix.pipe()
-  reader:coe():ndelay_on()
+  fd = { reader:coe():ndelay_on():get(), writer:get() }
   assert(reader:close())
   assert(not reader:close())
 end
+collectgarbage()
+collectgarbage()
 
 assert(unix.fd.get(0) == 0)
 assert(not unix.fd.close(-1))
 
 do
   local reader, writer = unix.pipe(unix.fcntl.O_CLOEXEC)
+  assert(reader:get() == fd[1])
+  assert(writer:get() == fd[2])
   assert(reader:close():get() == -1)
   assert(writer:close():get() == -1)
 end

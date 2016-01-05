@@ -34,6 +34,7 @@ unix_la_SOURCES = \
 	fcntl.cpp \
 	error.cpp \
 	fd.cpp \
+	gettimeofday.cpp \
 	log_level.cpp \
 	nanosleep.cpp \
 	ndelay.cpp \

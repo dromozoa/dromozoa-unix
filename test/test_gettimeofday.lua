@@ -15,7 +15,8 @@
 -- You should have received a copy of the GNU General Public License
 -- along with dromozoa-unix.  If not, see <http://www.gnu.org/licenses/>.
 
-local gettimeofday = require "dromozoa.unix.gettimeofday"
+local unix = require "dromozoa.unix"
+local gettimeofday = unix.gettimeofday
 
 local t1 = os.time()
 local t2 = gettimeofday()

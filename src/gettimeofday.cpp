@@ -21,25 +21,25 @@ extern "C" {
 
 #include <sys/time.h>
 
-#include "common.hpp"
+#include "error.hpp"
+#include "set_field.hpp"
 
 namespace dromozoa {
-  int unix_gettimeofday(lua_State* L) {
-    struct timeval tv = {};
-    if (gettimeofday(&tv, 0) != -1) {
-      lua_newtable(L);
-      lua_pushinteger(L, tv.tv_sec);
-      lua_setfield(L, -2, "tv_sec");
-      lua_pushinteger(L, tv.tv_usec);
-      lua_setfield(L, -2, "tv_usec");
-      return 1;
-    } else {
-      return push_error(L);
+  namespace {
+    int impl_gettimeofday(lua_State* L) {
+      struct timeval tv = {};
+      if (gettimeofday(&tv, 0) != -1) {
+        lua_newtable(L);
+        set_field(L, "tv_sec", tv.tv_sec);
+        set_field(L, "tv_usec", tv.tv_usec);
+        return 1;
+      } else {
+        return push_error(L);
+      }
     }
   }
-}
 
-extern "C" int luaopen_dromozoa_unix_gettimeofday(lua_State* L) {
-  lua_pushcfunction(L, dromozoa::unix_gettimeofday);
-  return 1;
+  void initialize_gettimeofday(lua_State* L) {
+    set_field(L, "gettimeofday", impl_gettimeofday);
+  }
 }
