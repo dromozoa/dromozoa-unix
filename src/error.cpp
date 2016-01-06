@@ -31,6 +31,7 @@ extern "C" {
 #include <iostream>
 
 #include "error.hpp"
+#include "set_field.hpp"
 
 namespace dromozoa {
   namespace {
@@ -131,5 +132,12 @@ namespace dromozoa {
     free(buffer);
 
     errno = save;
+  }
+
+  void initialize_error(lua_State* L) {
+    DROMOZOA_SET_FIELD(L, EAGAIN);
+    DROMOZOA_SET_FIELD(L, EINTR);
+    DROMOZOA_SET_FIELD(L, EPIPE);
+    DROMOZOA_SET_FIELD(L, EWOULDBLOCK);
   }
 }

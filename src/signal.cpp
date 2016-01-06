@@ -42,6 +42,10 @@ namespace dromozoa {
   }
 
   void initialize_signal(lua_State* L) {
+    struct sigaction sa = {};
+    sa.sa_handler = SIG_IGN;
+    sigaction(SIGPIPE, &sa, 0);
+
     function<impl_kill>::set_field(L, "kill");
     DROMOZOA_SET_FIELD(L, SIGABRT);
     DROMOZOA_SET_FIELD(L, SIGALRM);

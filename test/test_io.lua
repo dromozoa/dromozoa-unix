@@ -53,3 +53,16 @@ assert(reader:read(6) == "abcaba")
 assert(writer:close())
 assert(reader:read(1) == "")
 assert(reader:close())
+
+local reader, writer = unix.pipe(unix.O_NONBLOCK);
+
+local result, message, code = reader:read(1)
+assert(not result)
+-- print(message, code)
+assert(code == unix.EAGAIN or code == unix.EWOULDBLOCK)
+assert(reader:close())
+local result, message, code = writer:write("foo")
+assert(not result)
+-- print(message, code)
+assert(code == unix.EPIPE)
+assert(writer:close())

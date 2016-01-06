@@ -21,6 +21,7 @@ extern "C" {
 
 #include "coe.hpp"
 #include "environ.hpp"
+#include "error.hpp"
 #include "fcntl.hpp"
 #include "fd.hpp"
 #include "forkexec.hpp"
@@ -46,6 +47,7 @@ namespace dromozoa {
     lua_setfield(L, -2, "fd");
 
     dromozoa::initialize_environ(L);
+    dromozoa::initialize_error(L);
     dromozoa::initialize_fcntl(L);
     dromozoa::initialize_forkexec(L);
     dromozoa::initialize_gettimeofday(L);
