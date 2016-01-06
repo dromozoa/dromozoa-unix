@@ -1,4 +1,4 @@
--- Copyright (C) 2015,2016 Tomoyuki Fujimori <moyu@dromozoa.com>
+-- Copyright (C) 2016 Tomoyuki Fujimori <moyu@dromozoa.com>
 --
 -- This file is part of dromozoa-unix.
 --
@@ -16,12 +16,30 @@
 -- along with dromozoa-unix.  If not, see <http://www.gnu.org/licenses/>.
 
 local unix = require "dromozoa.unix"
-local nanosleep = unix.nanosleep
 
-assert(nanosleep({ tv_sec = 0, tv_nsec = 200 }) == 0)
+assert(unix.get_log_level() == 0)
+unix.set_log_level(3)
+assert(unix.get_log_level() == 3)
+unix.set_log_level(0)
 
-local result, message, code, tv = nanosleep({ tv_sec = -1, tv_nsec = 0 })
--- print(message, code)
-assert(result == nil)
-assert(tv.tv_sec == 0)
-assert(tv.tv_nsec == 0)
+local fd
+
+do
+  local reader, writer = unix.pipe()
+  fd = { reader:coe():ndelay_on():get(), writer:get() }
+  assert(reader:close())
+  assert(not reader:close())
+end
+collectgarbage()
+collectgarbage()
+
+assert(unix.fd.get(0) == 0)
+assert(not unix.fd.close(-1))
+
+do
+  local reader, writer = unix.pipe(unix.O_CLOEXEC)
+  assert(reader:get() == fd[1])
+  assert(writer:get() == fd[2])
+  assert(reader:close():get() == -1)
+  assert(writer:close():get() == -1)
+end

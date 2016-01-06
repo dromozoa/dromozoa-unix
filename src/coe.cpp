@@ -1,4 +1,4 @@
-// Copyright (C) 2015 Tomoyuki Fujimori <moyu@dromozoa.com>
+// Copyright (C) 2016 Tomoyuki Fujimori <moyu@dromozoa.com>
 //
 // This file is part of dromozoa-unix.
 //
@@ -19,26 +19,34 @@ extern "C" {
 #include <lua.h>
 }
 
-#include <sys/time.h>
-#include "common.hpp"
+#include <fcntl.h>
+
+#include "coe.hpp"
+#include "error.hpp"
+#include "fd.hpp"
+#include "function.hpp"
+#include "success.hpp"
 
 namespace dromozoa {
-  int unix_gettimeofday(lua_State* L) {
-    struct timeval tv = {};
-    if (gettimeofday(&tv, 0) != -1) {
-      lua_newtable(L);
-      lua_pushinteger(L, tv.tv_sec);
-      lua_setfield(L, -2, "tv_sec");
-      lua_pushinteger(L, tv.tv_usec);
-      lua_setfield(L, -2, "tv_usec");
-      return 1;
-    } else {
-      return push_error(L);
+  int coe(int fd) {
+    int result = fcntl(fd, F_GETFD);
+    if (result == -1) {
+      return -1;
+    }
+    return fcntl(fd, F_SETFD, result | FD_CLOEXEC);
+  }
+
+  namespace {
+    int impl_coe(lua_State* L) {
+      if (coe(get_fd(L, 1)) == -1) {
+        return push_error(L);
+      } else {
+        return push_success(L);
+      }
     }
   }
-}
 
-extern "C" int luaopen_dromozoa_unix_gettimeofday(lua_State* L) {
-  lua_pushcfunction(L, dromozoa::unix_gettimeofday);
-  return 1;
+  void initialize_coe(lua_State* L) {
+    function<impl_coe>::set_field(L, "coe");
+  }
 }

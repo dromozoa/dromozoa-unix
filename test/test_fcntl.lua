@@ -1,4 +1,4 @@
--- Copyright (C) 2015,2016 Tomoyuki Fujimori <moyu@dromozoa.com>
+-- Copyright (C) 2016 Tomoyuki Fujimori <moyu@dromozoa.com>
 --
 -- This file is part of dromozoa-unix.
 --
@@ -16,12 +16,8 @@
 -- along with dromozoa-unix.  If not, see <http://www.gnu.org/licenses/>.
 
 local unix = require "dromozoa.unix"
-local nanosleep = unix.nanosleep
 
-assert(nanosleep({ tv_sec = 0, tv_nsec = 200 }) == 0)
-
-local result, message, code, tv = nanosleep({ tv_sec = -1, tv_nsec = 0 })
--- print(message, code)
-assert(result == nil)
-assert(tv.tv_sec == 0)
-assert(tv.tv_nsec == 0)
+-- print(("O_CLOEXEC: %08x"):format(unix.O_CLOEXEC))
+-- print(("O_NONBLOCK: %08x"):format(unix.O_NONBLOCK))
+assert(unix.O_CLOEXEC)
+assert(unix.O_NONBLOCK)

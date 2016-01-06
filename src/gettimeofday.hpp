@@ -1,4 +1,4 @@
-// Copyright (C) 2015 Tomoyuki Fujimori <moyu@dromozoa.com>
+// Copyright (C) 2016 Tomoyuki Fujimori <moyu@dromozoa.com>
 //
 // This file is part of dromozoa-unix.
 //
@@ -15,20 +15,15 @@
 // You should have received a copy of the GNU General Public License
 // along with dromozoa-unix.  If not, see <http://www.gnu.org/licenses/>.
 
+#ifndef DROMOZOA_GETTIMEOFDAY_HPP
+#define DROMOZOA_GETTIMEOFDAY_HPP
+
 extern "C" {
 #include <lua.h>
 }
 
-#include <errno.h>
-#include <string.h>
-#include "common.hpp"
-
 namespace dromozoa {
-  int push_error(lua_State* L) {
-    int code = errno;
-    lua_pushnil(L);
-    lua_pushstring(L, strerror(code));
-    lua_pushinteger(L, code);
-    return 3;
-  }
+  void initialize_gettimeofday(lua_State* L);
 }
+
+#endif

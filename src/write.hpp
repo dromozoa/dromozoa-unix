@@ -1,4 +1,4 @@
-// Copyright (C) 2015 Tomoyuki Fujimori <moyu@dromozoa.com>
+// Copyright (C) 2016 Tomoyuki Fujimori <moyu@dromozoa.com>
 //
 // This file is part of dromozoa-unix.
 //
@@ -15,15 +15,15 @@
 // You should have received a copy of the GNU General Public License
 // along with dromozoa-unix.  If not, see <http://www.gnu.org/licenses/>.
 
-#ifndef DROMOZOA_COMMON_HPP
-#define DROMOZOA_COMMON_HPP
+#ifndef DROMOZOA_WRITE_HPP
+#define DROMOZOA_WRITE_HPP
 
 extern "C" {
 #include <lua.h>
 }
 
 namespace dromozoa {
-  int push_error(lua_State* L);
+  void initialize_write(lua_State* L);
 }
 
 #endif

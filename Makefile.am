@@ -1,4 +1,4 @@
-# Copyright (C) 2015 Tomoyuki Fujimori <moyu@dromozoa.com>
+# Copyright (C) 2016 Tomoyuki Fujimori <moyu@dromozoa.com>
 #
 # This file is part of dromozoa-unix.
 #
@@ -15,27 +15,6 @@
 # You should have received a copy of the GNU General Public License
 # along with dromozoa-unix.  If not, see <http://www.gnu.org/licenses/>.
 
-CPPFLAGS = -I$(LUA_INCDIR)
-CXXFLAGS = -Wall -W -Wno-missing-field-initializers $(CFLAGS)
-LDFLAGS = -L$(LUA_LIBDIR) $(LIBFLAG)
-LDLIBS =
-
-TARGET = gettimeofday.so nanosleep.so
-
-all: $(TARGET)
-
-clean:
-	rm -f *.o $(TARGET)
-
-gettimeofday.so: gettimeofday.o common.o
-	$(CXX) $(LDFLAGS) $^ $(LDLIBS) -o $@
-
-nanosleep.so: nanosleep.o common.o
-	$(CXX) $(LDFLAGS) $^ $(LDLIBS) -o $@
-
-.cpp.o:
-	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -c $<
-
-install:
-	mkdir -p $(LIBDIR)/dromozoa/unix
-	cp $(TARGET) $(LIBDIR)/dromozoa/unix
+ACLOCAL_AMFLAGS = -I m4
+SUBDIRS = src
+EXTRA_DIST = .gitignore README.md dromozoa-unix-*.rockspec m4/update test test.sh
