@@ -29,12 +29,12 @@ AC_FUNC_STRERROR_R
 AC_CHECK_FUNCS([pipe2])
 
 AX_PTHREAD()
+CXXFLAGS="$CXXFLAGS $PTHREAD_CFLAGS"
+LIBS="$LIBS $PTHREAD_LIBS"
+AC_SEARCH_LIBS([pthread_sigmask], [pthread])
 
 AX_PROG_LUA([5.1], [], [], [AC_MSG_ERROR([could not find lua])])
 AX_LUA_HEADERS([], [AC_MSG_ERROR([could not find lua])])
 AX_LUA_LIBS([], [AC_MSG_ERROR([could not find lua])])
-save_LDFLAGS=$LDFLAGS
-LDFLAGS="$LDFLAGS $LUA_LIB"
-LDFLAGS=$save_LDFLAGS
 
 AC_OUTPUT

@@ -34,15 +34,13 @@ extern "C" {
 #include "set_field.hpp"
 
 namespace dromozoa {
-  namespace {
 #ifdef HAVE_STRERROR_R
-#ifdef STRERROR_R_CHAR_P
-    const char* strerror_r(int code, char* buffer, size_t size) {
-      return ::strerror_r(code, buffer, size);
+  namespace {
+    const char* strerror_r_result(const char* result, char*) {
+      return result;
     }
-#else
-    const char* strerror_r(int code, char* buffer, size_t size) {
-      int result = ::strerror_r(code, buffer, size);
+
+    const char* strerror_r_result(int result, char* buffer) {
       if (result == 0) {
         return buffer;
       } else {
@@ -52,9 +50,12 @@ namespace dromozoa {
         return 0;
       }
     }
-#endif
-#endif
+
+    const char* strerror_r(int code, char* buffer, size_t size) {
+      return strerror_r_result(::strerror_r(code, buffer, size), buffer);
+    }
   }
+#endif
 
   int push_error(lua_State* L, int code) {
     int save = errno;
