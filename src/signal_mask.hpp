@@ -15,38 +15,25 @@
 // You should have received a copy of the GNU General Public License
 // along with dromozoa-unix.  If not, see <http://www.gnu.org/licenses/>.
 
-extern "C" {
-#include <lua.h>
-}
+#ifndef DROMOZOA_SIGNAL_MASK_HPP
+#define DROMOZOA_SIGNAL_MASK_HPP
 
-#include <fcntl.h>
-
-#include "coe.hpp"
-#include "error.hpp"
-#include "fd.hpp"
-#include "function.hpp"
-#include "success.hpp"
+#include <signal.h>
 
 namespace dromozoa {
-  int coe(int fd) {
-    int result = fcntl(fd, F_GETFD);
-    if (result == -1) {
-      return -1;
-    }
-    return fcntl(fd, F_SETFD, result | FD_CLOEXEC);
-  }
+  int signal_mask(int how, const sigset_t* new_mask, sigset_t* old_mask);
 
-  namespace {
-    int impl_coe(lua_State* L) {
-      if (coe(get_fd(L, 1)) == -1) {
-        return push_error(L);
-      } else {
-        return push_success(L);
-      }
-    }
-  }
-
-  void initialize_coe(lua_State* L) {
-    function<impl_coe>::set_field(L, "coe");
-  }
+  class scoped_signal_mask {
+  public:
+    scoped_signal_mask();
+    ~scoped_signal_mask();
+    int mask_all_signals();
+  private:
+    bool masked_;
+    sigset_t mask_;
+    scoped_signal_mask(const scoped_signal_mask&);
+    scoped_signal_mask& operator=(const scoped_signal_mask&);
+  };
 }
+
+#endif

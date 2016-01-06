@@ -17,36 +17,35 @@
 
 extern "C" {
 #include <lua.h>
+#include <lauxlib.h>
 }
 
-#include <fcntl.h>
+#include <errno.h>
+#include <stddef.h>
+#include <unistd.h>
 
-#include "coe.hpp"
+#include <vector>
+
 #include "error.hpp"
 #include "fd.hpp"
 #include "function.hpp"
-#include "success.hpp"
+#include "read.hpp"
 
 namespace dromozoa {
-  int coe(int fd) {
-    int result = fcntl(fd, F_GETFD);
-    if (result == -1) {
-      return -1;
-    }
-    return fcntl(fd, F_SETFD, result | FD_CLOEXEC);
-  }
-
   namespace {
-    int impl_coe(lua_State* L) {
-      if (coe(get_fd(L, 1)) == -1) {
+    int impl_read(lua_State* L) {
+      std::vector<char> buffer(luaL_checkinteger(L, 2));
+      ssize_t result = read(get_fd(L, 1), &buffer[0], buffer.size());
+      if (result == -1) {
         return push_error(L);
       } else {
-        return push_success(L);
+        lua_pushlstring(L, &buffer[0], result);
+        return 1;
       }
     }
   }
 
-  void initialize_coe(lua_State* L) {
-    function<impl_coe>::set_field(L, "coe");
+  void initialize_read(lua_State* L) {
+    function<impl_read>::set_field(L, "read");
   }
 }

@@ -23,7 +23,7 @@ extern "C" {
 }
 
 namespace dromozoa {
-  int open_fcntl(lua_State* L);
+  void initialize_fcntl(lua_State* L);
 }
 
 #endif

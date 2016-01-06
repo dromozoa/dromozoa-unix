@@ -17,7 +17,34 @@
 
 local unix = require "dromozoa.unix"
 
--- print(("O_CLOEXEC: %08x"):format(unix.O_CLOEXEC))
--- print(("O_NONBLOCK: %08x"):format(unix.O_NONBLOCK))
-assert(unix.O_CLOEXEC)
-assert(unix.O_NONBLOCK)
+unix.set_log_level(2)
+
+local reader, writer = unix.pipe(unix.O_CLOEXEC)
+
+local path = os.getenv("PATH")
+local envp = unix.environ()
+
+local pid = unix.forkexec(path, { "ls", "-l" }, envp, "/", { [1] = writer })
+writer:close()
+while true do
+  local result = assert(reader:read(64))
+  if #result == 0 then
+    break
+  end
+  -- io.write(result)
+end
+assert(unix.wait() == pid)
+reader:close()
+
+local pid, message, code = unix.forkexec(path, { "no such command" }, envp, "/", {})
+-- print(message, code)
+assert(not pid)
+
+local pid = unix.forkexec_daemon(path, { "sleep", "60" }, envp, "/")
+-- print(pid)
+assert(unix.kill(pid, 0))
+assert(unix.kill(pid))
+
+local pid, message, code = unix.forkexec_daemon(path, { "no such command" }, envp, "/")
+-- print(message, code)
+assert(not pid)

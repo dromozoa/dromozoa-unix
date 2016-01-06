@@ -17,36 +17,53 @@
 
 extern "C" {
 #include <lua.h>
+#include <lauxlib.h>
 }
 
-#include <fcntl.h>
+#include <stddef.h>
+#include <unistd.h>
 
-#include "coe.hpp"
+#include <vector>
+
 #include "error.hpp"
 #include "fd.hpp"
 #include "function.hpp"
-#include "success.hpp"
+#include "write.hpp"
 
 namespace dromozoa {
-  int coe(int fd) {
-    int result = fcntl(fd, F_GETFD);
-    if (result == -1) {
-      return -1;
+  int impl_write(lua_State* L) {
+    size_t size;
+    const char* buffer = luaL_checklstring(L, 2, &size);
+    ssize_t i = luaL_optinteger(L, 3, 0);
+    if (i < 0) {
+      i += size;
+      if (i < 0) {
+        i = 0;
+      }
+    } else if (i > 0) {
+      --i;
     }
-    return fcntl(fd, F_SETFD, result | FD_CLOEXEC);
-  }
-
-  namespace {
-    int impl_coe(lua_State* L) {
-      if (coe(get_fd(L, 1)) == -1) {
+    ssize_t j = luaL_optinteger(L, 4, size);
+    if (j < 0) {
+      j += size + 1;
+    } else if (j > static_cast<ssize_t>(size)) {
+      j = size;
+    }
+    if (i < j) {
+      ssize_t result = write(get_fd(L, 1), buffer + i, j - i);
+      if (result == -1) {
         return push_error(L);
       } else {
-        return push_success(L);
+        lua_pushinteger(L, result);
+        return 1;
       }
+    } else {
+      lua_pushinteger(L, 0);
+      return 1;
     }
   }
 
-  void initialize_coe(lua_State* L) {
-    function<impl_coe>::set_field(L, "coe");
+  void initialize_write(lua_State* L) {
+    function<impl_write>::set_field(L, "write");
   }
 }

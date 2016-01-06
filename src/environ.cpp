@@ -19,34 +19,31 @@ extern "C" {
 #include <lua.h>
 }
 
-#include <fcntl.h>
+#include <unistd.h>
 
-#include "coe.hpp"
-#include "error.hpp"
-#include "fd.hpp"
+#include "environ.hpp"
 #include "function.hpp"
-#include "success.hpp"
+
+extern char** environ;
 
 namespace dromozoa {
-  int coe(int fd) {
-    int result = fcntl(fd, F_GETFD);
-    if (result == -1) {
-      return -1;
-    }
-    return fcntl(fd, F_SETFD, result | FD_CLOEXEC);
-  }
-
   namespace {
-    int impl_coe(lua_State* L) {
-      if (coe(get_fd(L, 1)) == -1) {
-        return push_error(L);
-      } else {
-        return push_success(L);
+    int impl_environ(lua_State* L) {
+      lua_newtable(L);
+      for (int i = 0; ; ++i) {
+        if (const char* p = environ[i]) {
+          lua_pushinteger(L, i + 1);
+          lua_pushstring(L, p);
+          lua_settable(L, -3);
+        } else {
+          break;
+        }
       }
+      return 1;
     }
   }
 
-  void initialize_coe(lua_State* L) {
-    function<impl_coe>::set_field(L, "coe");
+  void initialize_environ(lua_State* L) {
+    function<impl_environ>::set_field(L, "environ");
   }
 }

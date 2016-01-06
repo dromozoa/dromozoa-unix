@@ -23,6 +23,7 @@ extern "C" {
 #include <time.h>
 
 #include "error.hpp"
+#include "function.hpp"
 #include "set_field.hpp"
 #include "success.hpp"
 
@@ -52,6 +53,6 @@ namespace dromozoa {
   }
 
   void initialize_nanosleep(lua_State* L) {
-    set_field(L, "nanosleep", impl_nanosleep);
+    function<impl_nanosleep>::set_field(L, "nanosleep");
   }
 }

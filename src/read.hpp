@@ -15,38 +15,15 @@
 // You should have received a copy of the GNU General Public License
 // along with dromozoa-unix.  If not, see <http://www.gnu.org/licenses/>.
 
+#ifndef DROMOZOA_READ_HPP
+#define DROMOZOA_READ_HPP
+
 extern "C" {
 #include <lua.h>
 }
 
-#include <fcntl.h>
-
-#include "coe.hpp"
-#include "error.hpp"
-#include "fd.hpp"
-#include "function.hpp"
-#include "success.hpp"
-
 namespace dromozoa {
-  int coe(int fd) {
-    int result = fcntl(fd, F_GETFD);
-    if (result == -1) {
-      return -1;
-    }
-    return fcntl(fd, F_SETFD, result | FD_CLOEXEC);
-  }
-
-  namespace {
-    int impl_coe(lua_State* L) {
-      if (coe(get_fd(L, 1)) == -1) {
-        return push_error(L);
-      } else {
-        return push_success(L);
-      }
-    }
-  }
-
-  void initialize_coe(lua_State* L) {
-    function<impl_coe>::set_field(L, "coe");
-  }
+  void initialize_read(lua_State* L);
 }
+
+#endif

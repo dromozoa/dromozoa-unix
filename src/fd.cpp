@@ -26,8 +26,8 @@ extern "C" {
 
 #include "error.hpp"
 #include "fd.hpp"
+#include "function.hpp"
 #include "log_level.hpp"
-#include "set_field.hpp"
 #include "success.hpp"
 
 namespace dromozoa {
@@ -103,12 +103,12 @@ namespace dromozoa {
 
   int open_fd(lua_State* L) {
     lua_newtable(L);
-    set_field(L, "get", impl_get);
-    set_field(L, "close", impl_close);
+    function<impl_get>::set_field(L, "get");
+    function<impl_close>::set_field(L, "close");
     luaL_newmetatable(L, "dromozoa.unix.fd");
     lua_pushvalue(L, -2);
     lua_setfield(L, -2, "__index");
-    set_field(L, "__gc", impl_gc);
+    function<impl_gc>::set_field(L, "__gc");
     lua_pop(L, 1);
     return 1;
   }

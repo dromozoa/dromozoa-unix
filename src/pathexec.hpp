@@ -19,18 +19,17 @@
 #define DROMOZOA_PATHEXEC_HPP
 
 #include <stddef.h>
-#include <vector>
 
 namespace dromozoa {
   size_t pathexec_buffer_size(
       const char* path,
       const char* const* argv);
-
   int pathexec(
       const char* path,
       const char* const* argv,
       const char* const* envp,
-      std::vector<char>& buffer);
+      char* buffer,
+      size_t size);
 }
 
 #endif

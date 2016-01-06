@@ -15,38 +15,35 @@
 // You should have received a copy of the GNU General Public License
 // along with dromozoa-unix.  If not, see <http://www.gnu.org/licenses/>.
 
+#ifndef DROMOZOA_FUNCTION_HPP
+#define DROMOZOA_FUNCTION_HPP
+
 extern "C" {
 #include <lua.h>
+#include <lauxlib.h>
 }
 
-#include <fcntl.h>
+#include <exception>
 
-#include "coe.hpp"
-#include "error.hpp"
-#include "fd.hpp"
-#include "function.hpp"
-#include "success.hpp"
+#include "set_field.hpp"
 
 namespace dromozoa {
-  int coe(int fd) {
-    int result = fcntl(fd, F_GETFD);
-    if (result == -1) {
-      return -1;
-    }
-    return fcntl(fd, F_SETFD, result | FD_CLOEXEC);
-  }
-
-  namespace {
-    int impl_coe(lua_State* L) {
-      if (coe(get_fd(L, 1)) == -1) {
-        return push_error(L);
-      } else {
-        return push_success(L);
+  template <lua_CFunction T>
+  struct function {
+    static int value(lua_State* L) {
+      try {
+        return T(L);
+      } catch (const std::exception& e) {
+        return luaL_error(L, "caught exception: %s", e.what());
+      } catch (...) {
+        return luaL_error(L, "caught exception");
       }
     }
-  }
 
-  void initialize_coe(lua_State* L) {
-    function<impl_coe>::set_field(L, "coe");
-  }
+    static void set_field(lua_State* L, const char* key) {
+      dromozoa::set_field(L, key, value);
+    }
+  };
 }
+
+#endif

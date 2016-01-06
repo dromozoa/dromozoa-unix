@@ -20,13 +20,20 @@ extern "C" {
 }
 
 #include "coe.hpp"
+#include "environ.hpp"
+#include "error.hpp"
 #include "fcntl.hpp"
 #include "fd.hpp"
+#include "forkexec.hpp"
 #include "gettimeofday.hpp"
 #include "log_level.hpp"
 #include "nanosleep.hpp"
 #include "ndelay.hpp"
 #include "pipe.hpp"
+#include "read.hpp"
+#include "signal.hpp"
+#include "wait.hpp"
+#include "write.hpp"
 
 namespace dromozoa {
   int open(lua_State* L) {
@@ -35,15 +42,20 @@ namespace dromozoa {
     open_fd(L);
     initialize_coe(L);
     initialize_ndelay(L);
+    initialize_read(L);
+    initialize_write(L);
     lua_setfield(L, -2, "fd");
 
-    open_fcntl(L);
-    lua_setfield(L, -2, "fcntl");
-
+    dromozoa::initialize_environ(L);
+    dromozoa::initialize_error(L);
+    dromozoa::initialize_fcntl(L);
+    dromozoa::initialize_forkexec(L);
     dromozoa::initialize_gettimeofday(L);
     dromozoa::initialize_log_level(L);
     dromozoa::initialize_nanosleep(L);
     dromozoa::initialize_pipe(L);
+    dromozoa::initialize_signal(L);
+    dromozoa::initialize_wait(L);
 
     return 1;
   }

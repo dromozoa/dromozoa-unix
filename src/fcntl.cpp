@@ -25,10 +25,8 @@ extern "C" {
 #include "set_field.hpp"
 
 namespace dromozoa {
-  int open_fcntl(lua_State* L) {
-    lua_newtable(L);
+  void initialize_fcntl(lua_State* L) {
     DROMOZOA_SET_FIELD(L, O_CLOEXEC);
     DROMOZOA_SET_FIELD(L, O_NONBLOCK);
-    return 1;
   }
 }

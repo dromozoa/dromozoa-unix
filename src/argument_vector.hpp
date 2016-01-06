@@ -15,38 +15,27 @@
 // You should have received a copy of the GNU General Public License
 // along with dromozoa-unix.  If not, see <http://www.gnu.org/licenses/>.
 
+#ifndef DROMOZOA_ARGUMENT_VECTOR_HPP
+#define DROMOZOA_ARGUMENT_VECTOR_HPP
+
 extern "C" {
 #include <lua.h>
 }
 
-#include <fcntl.h>
-
-#include "coe.hpp"
-#include "error.hpp"
-#include "fd.hpp"
-#include "function.hpp"
-#include "success.hpp"
+#include <string>
+#include <vector>
 
 namespace dromozoa {
-  int coe(int fd) {
-    int result = fcntl(fd, F_GETFD);
-    if (result == -1) {
-      return -1;
-    }
-    return fcntl(fd, F_SETFD, result | FD_CLOEXEC);
-  }
-
-  namespace {
-    int impl_coe(lua_State* L) {
-      if (coe(get_fd(L, 1)) == -1) {
-        return push_error(L);
-      } else {
-        return push_success(L);
-      }
-    }
-  }
-
-  void initialize_coe(lua_State* L) {
-    function<impl_coe>::set_field(L, "coe");
-  }
+  class argument_vector {
+  public:
+    argument_vector(lua_State* L, int n);
+    const char* const* get() const;
+  private:
+    std::vector<std::string> str_;
+    std::vector<const char*> ptr_;
+    argument_vector(const argument_vector&);
+    argument_vector& operator=(const argument_vector&);
+  };
 }
+
+#endif

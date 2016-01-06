@@ -16,31 +16,50 @@
 # along with dromozoa-unix.  If not, see <http://www.gnu.org/licenses/>.
 
 noinst_HEADERS = \
+	argument_vector.hpp \
 	coe.hpp \
+	environ.hpp \
 	error.hpp \
 	fcntl.hpp \
 	fd.hpp \
+	forkexec.hpp \
+	function.hpp \
 	gettimeofday.hpp \
 	log_level.hpp \
 	nanosleep.hpp \
 	ndelay.hpp \
+	pathexec.hpp \
 	pipe.hpp \
+	read.hpp \
 	set_field.hpp \
-	success.hpp
+	signal.hpp \
+	signal_mask.hpp \
+	success.hpp \
+	wait.hpp \
+	write.hpp
 
 luaexec_LTLIBRARIES = unix.la
 
 unix_la_LDFLAGS = -module -avoid-version
 unix_la_SOURCES = \
+	argument_vector.cpp \
 	coe.cpp \
+	environ.cpp \
 	error.cpp \
 	fcntl.cpp \
 	fd.cpp \
+	forkexec.cpp \
 	gettimeofday.cpp \
 	log_level.cpp \
 	nanosleep.cpp \
 	ndelay.cpp \
+	pathexec.cpp \
 	pipe.cpp \
+	read.cpp \
 	set_field.cpp \
+	signal.cpp \
+	signal_mask.cpp \
 	success.cpp \
-	unix.cpp
+	unix.cpp \
+	wait.cpp \
+	write.cpp

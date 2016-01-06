@@ -19,34 +19,34 @@ extern "C" {
 #include <lua.h>
 }
 
-#include <fcntl.h>
+#include <string>
+#include <vector>
 
-#include "coe.hpp"
-#include "error.hpp"
-#include "fd.hpp"
-#include "function.hpp"
-#include "success.hpp"
+#include "argument_vector.hpp"
 
 namespace dromozoa {
-  int coe(int fd) {
-    int result = fcntl(fd, F_GETFD);
-    if (result == -1) {
-      return -1;
-    }
-    return fcntl(fd, F_SETFD, result | FD_CLOEXEC);
-  }
-
-  namespace {
-    int impl_coe(lua_State* L) {
-      if (coe(get_fd(L, 1)) == -1) {
-        return push_error(L);
+  argument_vector::argument_vector(lua_State* L, int n) {
+    for (int i = 1; ; ++i) {
+      lua_pushinteger(L, i);
+      lua_gettable(L, n);
+      if (const char* p = lua_tostring(L, -1)) {
+        str_.push_back(p);
+        lua_pop(L, 1);
       } else {
-        return push_success(L);
+        lua_pop(L, 1);
+        break;
       }
     }
+    ptr_.reserve(str_.size() + 1);
+    std::vector<std::string>::const_iterator i = str_.begin();
+    std::vector<std::string>::const_iterator end = str_.end();
+    for (; i != end; ++i) {
+      ptr_.push_back((*i).c_str());
+    }
+    ptr_.push_back(0);
   }
 
-  void initialize_coe(lua_State* L) {
-    function<impl_coe>::set_field(L, "coe");
+  const char* const* argument_vector::get() const {
+    return &ptr_[0];
   }
 }
