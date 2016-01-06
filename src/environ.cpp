@@ -22,7 +22,7 @@ extern "C" {
 #include <unistd.h>
 
 #include "environ.hpp"
-#include "set_field.hpp"
+#include "function.hpp"
 
 extern char** environ;
 
@@ -44,6 +44,6 @@ namespace dromozoa {
   }
 
   void initialize_environ(lua_State* L) {
-    set_field(L, "environ", impl_environ);
+    function<impl_environ>::set_field(L, "environ");
   }
 }

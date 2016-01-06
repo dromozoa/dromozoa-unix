@@ -27,8 +27,8 @@ extern "C" {
 
 #include "error.hpp"
 #include "fd.hpp"
+#include "function.hpp"
 #include "write.hpp"
-#include "set_field.hpp"
 
 namespace dromozoa {
   int impl_write(lua_State* L) {
@@ -65,6 +65,6 @@ namespace dromozoa {
   }
 
   void initialize_write(lua_State* L) {
-    set_field(L, "write", impl_write);
+    function<impl_write>::set_field(L, "write");
   }
 }

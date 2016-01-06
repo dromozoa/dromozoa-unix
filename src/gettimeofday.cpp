@@ -22,6 +22,7 @@ extern "C" {
 #include <sys/time.h>
 
 #include "error.hpp"
+#include "function.hpp"
 #include "set_field.hpp"
 
 namespace dromozoa {
@@ -40,6 +41,6 @@ namespace dromozoa {
   }
 
   void initialize_gettimeofday(lua_State* L) {
-    set_field(L, "gettimeofday", impl_gettimeofday);
+    function<impl_gettimeofday>::set_field(L, "gettimeofday");
   }
 }

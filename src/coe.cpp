@@ -24,7 +24,7 @@ extern "C" {
 #include "coe.hpp"
 #include "error.hpp"
 #include "fd.hpp"
-#include "set_field.hpp"
+#include "function.hpp"
 #include "success.hpp"
 
 namespace dromozoa {
@@ -47,6 +47,6 @@ namespace dromozoa {
   }
 
   void initialize_coe(lua_State* L) {
-    set_field(L, "coe", impl_coe);
+    function<impl_coe>::set_field(L, "coe");
   }
 }

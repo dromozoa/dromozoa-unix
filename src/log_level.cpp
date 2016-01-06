@@ -21,7 +21,7 @@ extern "C" {
 }
 
 #include "log_level.hpp"
-#include "set_field.hpp"
+#include "function.hpp"
 
 namespace dromozoa {
   namespace {
@@ -45,7 +45,7 @@ namespace dromozoa {
   }
 
   void initialize_log_level(lua_State* L) {
-    set_field(L, "set_log_level", impl_set_log_level);
-    set_field(L, "get_log_level", impl_get_log_level);
+    function<impl_set_log_level>::set_field(L, "set_log_level");
+    function<impl_get_log_level>::set_field(L, "get_log_level");
   }
 }

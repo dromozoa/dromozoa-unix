@@ -23,6 +23,7 @@ extern "C" {
 #include <sys/wait.h>
 
 #include "error.hpp"
+#include "function.hpp"
 #include "set_field.hpp"
 #include "wait.hpp"
 
@@ -61,7 +62,7 @@ namespace dromozoa {
   }
 
   void initialize_wait(lua_State* L) {
-    set_field(L, "wait", impl_wait);
+    function<impl_wait>::set_field(L, "wait");
     DROMOZOA_SET_FIELD(L, WCONTINUED);
     DROMOZOA_SET_FIELD(L, WNOHANG);
     DROMOZOA_SET_FIELD(L, WUNTRACED);
