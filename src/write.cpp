@@ -34,24 +34,23 @@ namespace dromozoa {
   int impl_write(lua_State* L) {
     size_t size;
     const char* buffer = luaL_checklstring(L, 2, &size);
-    ssize_t i = luaL_optinteger(L, 3, 1);
+    ssize_t i = luaL_optinteger(L, 3, 0);
     if (i < 0) {
-      i = size + i + 1;
-    }
-    if (i < 1) {
-      i = 1;
+      i += size;
+      if (i < 0) {
+        i = 0;
+      }
+    } else if (i > 0) {
+      --i;
     }
     ssize_t j = luaL_optinteger(L, 4, size);
     if (j < 0) {
-      j = size + j + 1;
-    }
-    if (j > static_cast<ssize_t>(size)) {
+      j += size + 1;
+    } else if (j > static_cast<ssize_t>(size)) {
       j = size;
     }
-    if (i <= j) {
-      const char* p = buffer + i - 1;
-      size_t n = j - (i - 1);
-      ssize_t result = write(get_fd(L, 1), p, n);
+    if (i < j) {
+      ssize_t result = write(get_fd(L, 1), buffer + i, j - i);
       if (result == -1) {
         return push_error(L);
       } else {
