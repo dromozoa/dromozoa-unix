@@ -20,26 +20,44 @@ extern "C" {
 #include <lauxlib.h>
 }
 
+#include <errno.h>
 #include <stddef.h>
 #include <unistd.h>
 
+#include <exception>
+#include <iostream>
 #include <vector>
 
 #include "error.hpp"
 #include "fd.hpp"
+#include "log_level.hpp"
 #include "read.hpp"
 #include "set_field.hpp"
 
 namespace dromozoa {
   namespace {
     int impl_read(lua_State* L) {
-      std::vector<char> buffer(luaL_checkinteger(L, 2));
-      ssize_t result = read(get_fd(L, 1), &buffer[0], buffer.size());
-      if (result == -1) {
-        return push_error(L);
-      } else {
-        lua_pushlstring(L, &buffer[0], result);
-        return 1;
+      try {
+        std::vector<char> buffer(luaL_checkinteger(L, 2));
+        ssize_t result = read(get_fd(L, 1), &buffer[0], buffer.size());
+        if (result == -1) {
+          return push_error(L);
+        } else {
+          lua_pushlstring(L, &buffer[0], result);
+          return 1;
+        }
+      } catch (const std::exception& e) {
+        int code = errno;
+        if (get_log_level() > 0) {
+          std::cerr << "[dromozoa-unix] caught exception: " << e.what() << std::endl;
+        }
+        return push_error(L, code);
+      } catch (...) {
+        int code = errno;
+        if (get_log_level() > 0) {
+          std::cerr << "[dromozoa-unix] caught unknown exception" << std::endl;
+        }
+        return push_error(L, code);
       }
     }
   }
