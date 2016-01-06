@@ -42,3 +42,8 @@ if u < 0 then
   s = s - 1
 end
 -- print(("%d.%06d"):format(s, u))
+
+assert(not unix.forkexec(os.getenv("PATH"), { "no such command" }, unix.environ(), "/", {}))
+
+local pid = unix.forkexec_daemon(os.getenv("PATH"), { "sleep", "60" }, unix.environ(), "/")
+print(pid)
