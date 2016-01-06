@@ -32,6 +32,7 @@ noinst_HEADERS = \
 	pipe.hpp \
 	read.hpp \
 	set_field.hpp \
+	signal.hpp \
 	signal_mask.hpp \
 	success.hpp \
 	wait.hpp \
@@ -56,6 +57,7 @@ unix_la_SOURCES = \
 	pipe.cpp \
 	read.cpp \
 	set_field.cpp \
+	signal.cpp \
 	signal_mask.cpp \
 	success.cpp \
 	unix.cpp \

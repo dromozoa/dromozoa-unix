@@ -30,6 +30,7 @@ extern "C" {
 #include "ndelay.hpp"
 #include "pipe.hpp"
 #include "read.hpp"
+#include "signal.hpp"
 #include "wait.hpp"
 #include "write.hpp"
 
@@ -51,6 +52,7 @@ namespace dromozoa {
     dromozoa::initialize_log_level(L);
     dromozoa::initialize_nanosleep(L);
     dromozoa::initialize_pipe(L);
+    dromozoa::initialize_signal(L);
     dromozoa::initialize_wait(L);
 
     return 1;

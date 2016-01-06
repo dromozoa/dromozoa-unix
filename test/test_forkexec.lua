@@ -17,9 +17,14 @@
 
 local unix = require "dromozoa.unix"
 
+unix.set_log_level(2)
+
 local reader, writer = unix.pipe(unix.O_CLOEXEC)
 
-local pid = unix.forkexec(os.getenv("PATH"), { "ls", "-l" }, unix.environ(), "/", { [1] = writer })
+local path = os.getenv("PATH")
+local envp = unix.environ()
+
+local pid = unix.forkexec(path, { "ls", "-l" }, envp, "/", { [1] = writer })
 writer:close()
 while true do
   local result = assert(reader:read(64))
@@ -29,21 +34,17 @@ while true do
   -- io.write(result)
 end
 assert(unix.wait() == pid)
+reader:close()
 
-local t1 = unix.gettimeofday()
-local pid = unix.forkexec(os.getenv("PATH"), { "sleep", "1" }, unix.environ(), "/", {})
-assert(unix.wait() == pid)
-local t2 = unix.gettimeofday()
+local pid, message, code = unix.forkexec(path, { "no such command" }, envp, "/", {})
+-- print(message, code)
+assert(not pid)
 
-local u = t2.tv_usec - t1.tv_usec
-local s = t2.tv_sec - t1.tv_sec
-if u < 0 then
-  u = u + 1000000
-  s = s - 1
-end
--- print(("%d.%06d"):format(s, u))
+local pid = unix.forkexec_daemon(path, { "sleep", "60" }, envp, "/")
+-- print(pid)
+assert(unix.kill(pid, 0))
+assert(unix.kill(pid))
 
-assert(not unix.forkexec(os.getenv("PATH"), { "no such command" }, unix.environ(), "/", {}))
-
-local pid = unix.forkexec_daemon(os.getenv("PATH"), { "sleep", "60" }, unix.environ(), "/")
-print(pid)
+local pid, message, code = unix.forkexec_daemon(path, { "no such command" }, envp, "/")
+-- print(message, code)
+assert(not pid)
