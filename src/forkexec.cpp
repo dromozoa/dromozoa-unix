@@ -27,18 +27,15 @@ extern "C" {
 #include <unistd.h>
 #include <sys/wait.h>
 
-#include <exception>
-#include <iostream>
 #include <vector>
 
 #include "argument_vector.hpp"
 #include "error.hpp"
 #include "fd.hpp"
 #include "forkexec.hpp"
-#include "log_level.hpp"
+#include "function.hpp"
 #include "pipe.hpp"
 #include "pathexec.hpp"
-#include "set_field.hpp"
 #include "signal_mask.hpp"
 
 namespace dromozoa {
@@ -193,44 +190,30 @@ namespace dromozoa {
     }
 
     int impl_forkexec(lua_State* L) {
-      try {
-        const char* path = luaL_checkstring(L, 1);
-        argument_vector argv(L, 2);
-        argument_vector envp(L, 3);
-        const char* chdir = luaL_checkstring(L, 4);
-        int dup2_stdio[3] = { -1, -1, -1 };
-        for (int i = 0; i < 3; ++i) {
-          lua_pushinteger(L, i);
-          lua_gettable(L, 5);
-          if (!lua_isnil(L, -1)) {
-            dup2_stdio[i] = get_fd(L, -1);
-          }
-          lua_pop(L, 1);
+      const char* path = luaL_checkstring(L, 1);
+      argument_vector argv(L, 2);
+      argument_vector envp(L, 3);
+      const char* chdir = luaL_checkstring(L, 4);
+      int dup2_stdio[3] = { -1, -1, -1 };
+      for (int i = 0; i < 3; ++i) {
+        lua_pushinteger(L, i);
+        lua_gettable(L, 5);
+        if (!lua_isnil(L, -1)) {
+          dup2_stdio[i] = get_fd(L, -1);
         }
-        pid_t result = forkexec(path, argv.get(), envp.get(), chdir, dup2_stdio);
-        if (result == -1) {
-          return push_error(L);
-        } else {
-          lua_pushinteger(L, result);
-          return 1;
-        }
-      } catch (const std::exception& e) {
-        int code = errno;
-        if (get_log_level() > 0) {
-          std::cerr << "[dromozoa-unix] caught exception: " << e.what() << std::endl;
-        }
-        return push_error(L, code);
-      } catch (...) {
-        int code = errno;
-        if (get_log_level() > 0) {
-          std::cerr << "[dromozoa-unix] caught unknown exception" << std::endl;
-        }
-        return push_error(L, code);
+        lua_pop(L, 1);
+      }
+      pid_t result = forkexec(path, argv.get(), envp.get(), chdir, dup2_stdio);
+      if (result == -1) {
+        return push_error(L);
+      } else {
+        lua_pushinteger(L, result);
+        return 1;
       }
     }
   }
 
   void initialize_forkexec(lua_State* L) {
-    set_field(L, "forkexec", impl_forkexec);
+    function<impl_forkexec>::set_field(L, "forkexec");
   }
 }

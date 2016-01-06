@@ -15,37 +15,35 @@
 // You should have received a copy of the GNU General Public License
 // along with dromozoa-unix.  If not, see <http://www.gnu.org/licenses/>.
 
+#ifndef DROMOZOA_FUNCTION_HPP
+#define DROMOZOA_FUNCTION_HPP
+
 extern "C" {
 #include <lua.h>
 #include <lauxlib.h>
 }
 
-#include <errno.h>
-#include <stddef.h>
-#include <unistd.h>
+#include <exception>
 
-#include <vector>
-
-#include "error.hpp"
-#include "fd.hpp"
-#include "function.hpp"
-#include "read.hpp"
+#include "set_field.hpp"
 
 namespace dromozoa {
-  namespace {
-    int impl_read(lua_State* L) {
-      std::vector<char> buffer(luaL_checkinteger(L, 2));
-      ssize_t result = read(get_fd(L, 1), &buffer[0], buffer.size());
-      if (result == -1) {
-        return push_error(L);
-      } else {
-        lua_pushlstring(L, &buffer[0], result);
-        return 1;
+  template <lua_CFunction T>
+  struct function {
+    static int value(lua_State* L) {
+      try {
+        return T(L);
+      } catch (const std::exception& e) {
+        return luaL_error(L, "caught exception: %s", e.what());
+      } catch (...) {
+        return luaL_error(L, "caught exception");
       }
     }
-  }
 
-  void initialize_read(lua_State* L) {
-    function<impl_read>::set_field(L, "read");
-  }
+    static void set_field(lua_State* L, const char* key) {
+      dromozoa::set_field(L, key, value);
+    }
+  };
 }
+
+#endif

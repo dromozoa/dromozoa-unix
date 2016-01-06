@@ -23,6 +23,7 @@ noinst_HEADERS = \
 	fcntl.hpp \
 	fd.hpp \
 	forkexec.hpp \
+	function.hpp \
 	gettimeofday.hpp \
 	log_level.hpp \
 	nanosleep.hpp \
