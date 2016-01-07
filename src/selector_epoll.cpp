@@ -15,7 +15,10 @@
 // You should have received a copy of the GNU General Public License
 // along with dromozoa-unix.  If not, see <http://www.gnu.org/licenses/>.
 
+#include <errno.h>
+#include <fcntl.h>
 #include <time.h>
+#include <unistd.h>
 #include <sys/epoll.h>
 
 #include "coe.hpp"
@@ -23,7 +26,14 @@
 
 namespace dromozoa {
   selector_epoll::selector_epoll() : fd_(-1), result_(-1) {}
-  int selector_kqueue::open(int size, int flags) {
+
+  selector_epoll::~selector_epoll() {
+    if (fd_ != -1) {
+      close();
+    }
+  }
+
+  int selector_epoll::open(int size, int flags) {
     buffer_.resize(size);
 
     int fd = -1;
@@ -92,10 +102,6 @@ namespace dromozoa {
     return epoll_ctl(fd_, EPOLL_CTL_DEL, fd, &ev);
   }
 
-  int selector_epoll::get() const {
-    return fd_;
-  }
-
   int selector_epoll::select(const struct timespec* timeout) {
     int t = -1;
     if (timeout) {
@@ -105,7 +111,7 @@ namespace dromozoa {
     return result_;
   }
 
-  int selector_kqueue::event(int i, int& fd, int& event) const {
+  int selector_epoll::event(int i, int& fd, int& event) const {
     if (0 <= i && i < result_) {
       const struct epoll_event& ev = buffer_[i];
       fd = ev.data.fd;

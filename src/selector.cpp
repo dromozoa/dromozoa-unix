@@ -32,7 +32,7 @@ extern "C" {
 #include "success.hpp"
 #include "selector.hpp"
 
-#if defined(HAVE_EPOLL) || defined(HAVE_EPOLL1)
+#if defined(HAVE_EPOLL_CREATE) || defined(HAVE_EPOLL_CREATE1)
 #include "selector_epoll.hpp"
 namespace dromozoa {
   typedef selector_epoll selector_impl;

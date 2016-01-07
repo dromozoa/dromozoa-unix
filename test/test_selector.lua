@@ -27,16 +27,15 @@ assert(unix.fd.ndelay_on(0))
 -- s:select({ tv_sec = 1, tv_nsec = 0 })
 local done
 repeat
-  local result, message, code = s:select()
+  local result, message, code = assert(s:select())
   for i = 1, result do
     local fd, event = s:event(i)
     print(fd, event)
-    if event % 2 == 1 then
-      local result, message, code = assert(unix.fd.read(0, 256))
-      io.write(("%q"):format(result))
-      if not result or result == "" then
-        done = true
-      end
+
+    local result, message, code = assert(unix.fd.read(0, 256))
+    io.write(("%q"):format(result))
+    if not result or result == "" then
+      done = true
     end
   end
 until done
