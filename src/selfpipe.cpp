@@ -68,7 +68,7 @@ namespace dromozoa {
       return 1;
     }
 
-    int impl_count(lua_State* L) {
+    int impl_read(lua_State* L) {
       int count = 0;
       char c;
       while (read(dromozoa_selfpipe_fd[0], &c, 1) == 1) {
@@ -84,7 +84,7 @@ namespace dromozoa {
     function<impl_install>::set_field(L, "install");
     function<impl_uninstall>::set_field(L, "uninstall");
     function<impl_get>::set_field(L, "get");
-    function<impl_count>::set_field(L, "count");
+    function<impl_read>::set_field(L, "read");
     return 1;
   }
 }

@@ -34,7 +34,7 @@ print(pid1, pid2)
 local n = 0
 repeat
   assert(unix.unblock_signal(unix.SIGCHLD))
-  local count = unix.selfpipe.count()
+  local count = unix.selfpipe.read()
   assert(unix.block_signal(unix.SIGCHLD))
   if count > 0 then
     while true do
