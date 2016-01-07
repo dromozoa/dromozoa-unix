@@ -28,7 +28,7 @@ namespace dromozoa {
   class selector {
   public:
     virtual ~selector();
-    virtual int open(int size) = 0;
+    virtual int open(int size, int flags) = 0;
     virtual int close() = 0;
     virtual int get() const = 0;
     virtual int add(int fd, int event) = 0;

@@ -33,6 +33,10 @@ extern "C" {
 #include "selector.hpp"
 
 #if defined(HAVE_EPOLL) || defined(HAVE_EPOLL1)
+#include "selector_epoll.hpp"
+namespace dromozoa {
+  typedef selector_epoll selector_impl;
+}
 #elif defined(HAVE_KQUEUE)
 #include "selector_kqueue.hpp"
 namespace dromozoa {
@@ -63,7 +67,8 @@ namespace dromozoa {
 
     int impl_open(lua_State* L) {
       int size = luaL_checkinteger(L, 2);
-      if (get_selector(L, 1).open(size) == -1) {
+      int flags = luaL_optinteger(L, 3, 0);
+      if (get_selector(L, 1).open(size, flags) == -1) {
         return push_error(L);
       } else {
         return push_success(L);

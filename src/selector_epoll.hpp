@@ -15,23 +15,21 @@
 // You should have received a copy of the GNU General Public License
 // along with dromozoa-unix.  If not, see <http://www.gnu.org/licenses/>.
 
-#ifndef DROMOZOA_SELECTOR_KQUEUE_HPP
-#define DROMOZOA_SELECTOR_KQUEUE_HPP
+#ifndef DROMOZOA_SELECTOR_EPOLL_HPP
+#define DROMOZOA_SELECTOR_EPOLL_HPP
 
 #include <time.h>
-#include <sys/types.h>
-#include <sys/event.h>
-#include <sys/time.h>
+#include <sys/epoll.h>
 
 #include <vector>
 
 #include "selector.hpp"
 
 namespace dromozoa {
-  class selector_kqueue : public selector {
+  class selector_epoll : public selector {
   public:
-    selector_kqueue();
-    virtual ~selector_kqueue();
+    selector_epoll();
+    virtual ~selector_epoll();
     virtual int open(int size, int flags);
     virtual int close();
     virtual int get() const;
@@ -43,9 +41,9 @@ namespace dromozoa {
   private:
     int fd_;
     int result_;
-    std::vector<struct kevent> buffer_;
-    selector_kqueue(const selector_kqueue&);
-    selector_kqueue& operator=(const selector_kqueue&);
+    std::vector<struct epoll_event> buffer_;
+    selector_epoll(const selector_epoll&);
+    selector_epoll& operator=(const selector_epoll&);
   };
 }
 

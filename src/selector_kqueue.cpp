@@ -16,30 +16,26 @@
 // along with dromozoa-unix.  If not, see <http://www.gnu.org/licenses/>.
 
 #include <errno.h>
+#include <fcntl.h>
 #include <time.h>
 #include <unistd.h>
 #include <sys/types.h>
 #include <sys/event.h>
 #include <sys/time.h>
 
-#include <iostream>
-
 #include "coe.hpp"
 #include "selector_kqueue.hpp"
 
 namespace dromozoa {
-  selector_kqueue::selector_kqueue() : fd_(-1), result_(-1) {
-    std::cerr << "selector_kqueue construct" << std::endl;
-  }
+  selector_kqueue::selector_kqueue() : fd_(-1), result_(-1) {}
 
   selector_kqueue::~selector_kqueue() {
-    std::cerr << "selector_kqueue destruct" << std::endl;
     if (fd_ != -1) {
       close();
     }
   }
 
-  int selector_kqueue::open(int size) {
+  int selector_kqueue::open(int size, int flags) {
     buffer_.resize(size);
 
     int fd = kqueue();
@@ -47,9 +43,11 @@ namespace dromozoa {
       return -1;
     }
 
-    if (coe(fd) == -1) {
-      ::close(fd);
-      return -1;
+    if (flags & O_CLOEXEC) {
+      if (coe(fd) == -1) {
+        ::close(fd);
+        return -1;
+      }
     }
 
     fd_ = fd;

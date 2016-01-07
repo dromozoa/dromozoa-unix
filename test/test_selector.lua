@@ -18,8 +18,9 @@
 local unix = require "dromozoa.unix"
 
 local s = unix.selector()
-assert(s:open(256))
+assert(s:open(256, unix.O_CLOEXEC))
 
+print(s:get())
 assert(s:add(0, 1))
 assert(unix.fd.ndelay_on(0))
 
