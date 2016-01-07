@@ -19,9 +19,51 @@ extern "C" {
 #include <lua.h>
 }
 
+#include <netdb.h>
+
 #include "addrinfo.hpp"
+#include "function.hpp"
+#include "set_field.hpp"
 
 namespace dromozoa {
+  namespace {
+    int impl_getaddrinfo(lua_State* L) {
+      const char* nodename = lua_tostring(L, 1);
+      const char* servname = lua_tostring(L, 2);
+      struct addrinfo* result = 0;
+      int code = getaddrinfo(nodename, servname, 0, &result);
+      if (code == 0) {
+        lua_newtable(L);
+        int i = 1;
+        for (struct addrinfo* ai = result; ai; ai = ai->ai_next, ++i) {
+          lua_pushinteger(L, i);
+          lua_newtable(L);
+          set_field(L, "ai_family", ai->ai_family);
+          set_field(L, "ai_socktype", ai->ai_socktype);
+          set_field(L, "ai_protocol", ai->ai_protocol);
+          set_field(L, "ai_addrlen", ai->ai_addrlen);
+          if (ai->ai_canonname) {
+            lua_pushstring(L, ai->ai_canonname);
+            lua_setfield(L, -2, "ai_canonname");
+          }
+          lua_settable(L, -3);
+        }
+        freeaddrinfo(result);
+        return 1;
+      } else {
+        lua_pushnil(L);
+        if (const char* what = gai_strerror(code)) {
+          lua_pushstring(L, what);
+        } else {
+          lua_pushfstring(L, "error number %d", code);
+        }
+        lua_pushinteger(L, code);
+        return 3;
+      }
+    }
+  }
+
   void initialize_addrinfo(lua_State* L) {
+    function<impl_getaddrinfo>::set_field(L, "getaddrinfo");
   }
 }

@@ -19,6 +19,7 @@ extern "C" {
 #include <lua.h>
 }
 
+#include "addrinfo.hpp"
 #include "coe.hpp"
 #include "environ.hpp"
 #include "error.hpp"
@@ -54,6 +55,7 @@ namespace dromozoa {
     open_selfpipe(L);
     lua_setfield(L, -2, "selfpipe");
 
+    dromozoa::initialize_addrinfo(L);
     dromozoa::initialize_environ(L);
     dromozoa::initialize_error(L);
     dromozoa::initialize_fcntl(L);
