@@ -32,6 +32,8 @@ noinst_HEADERS = \
 	pipe.hpp \
 	read.hpp \
 	selector.hpp \
+	selector_epoll.hpp \
+	selector_kqueue.hpp \
 	selfpipe.hpp \
 	set_field.hpp \
 	signal.hpp \
