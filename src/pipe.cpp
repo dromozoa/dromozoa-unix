@@ -31,9 +31,9 @@ extern "C" {
 #include "coe.hpp"
 #include "error.hpp"
 #include "fd.hpp"
+#include "function.hpp"
 #include "ndelay.hpp"
 #include "pipe.hpp"
-#include "set_field.hpp"
 
 namespace dromozoa {
 #ifdef HAVE_PIPE2
@@ -97,6 +97,6 @@ namespace dromozoa {
   }
 
   void initialize_pipe(lua_State* L) {
-    dromozoa::set_field(L, "pipe", dromozoa::impl_pipe);
+    function<impl_pipe>::set_field(L, "pipe");
   }
 }

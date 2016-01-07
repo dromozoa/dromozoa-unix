@@ -25,8 +25,6 @@ extern "C" {
 
 #include <exception>
 
-#include "set_field.hpp"
-
 namespace dromozoa {
   template <lua_CFunction T>
   struct function {
@@ -41,7 +39,8 @@ namespace dromozoa {
     }
 
     static void set_field(lua_State* L, const char* key) {
-      dromozoa::set_field(L, key, value);
+      lua_pushcfunction(L, value);
+      lua_setfield(L, -2, key);
     }
   };
 }

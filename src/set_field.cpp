@@ -22,11 +22,6 @@ extern "C" {
 #include "set_field.hpp"
 
 namespace dromozoa {
-  void set_field(lua_State* L, const char* key, lua_CFunction value) {
-    lua_pushcfunction(L, value);
-    lua_setfield(L, -2, key);
-  }
-
   void set_field(lua_State* L, const char* key, lua_Integer value) {
     lua_pushinteger(L, value);
     lua_setfield(L, -2, key);
