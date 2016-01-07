@@ -53,12 +53,12 @@ namespace dromozoa {
     }
   }
 
-  int scoped_signal_mask::mask_all_signals() {
+  int scoped_signal_mask::block_all_signals() {
     sigset_t mask;
     if (sigfillset(&mask) == -1) {
       return -1;
     }
-    if (signal_mask(SIG_SETMASK, &mask, &mask_) == -1) {
+    if (signal_mask(SIG_BLOCK, &mask, &mask_) == -1) {
       return -1;
     }
     masked_ = true;

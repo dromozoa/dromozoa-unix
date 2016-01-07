@@ -27,7 +27,7 @@ namespace dromozoa {
   public:
     scoped_signal_mask();
     ~scoped_signal_mask();
-    int mask_all_signals();
+    int block_all_signals();
   private:
     bool masked_;
     sigset_t mask_;

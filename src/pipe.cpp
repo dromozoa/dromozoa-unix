@@ -15,6 +15,10 @@
 // You should have received a copy of the GNU General Public License
 // along with dromozoa-unix.  If not, see <http://www.gnu.org/licenses/>.
 
+#ifdef HAVE_CONFIG_H
+#include "config.h"
+#endif
+
 extern "C" {
 #include <lua.h>
 #include <lauxlib.h>
@@ -27,9 +31,9 @@ extern "C" {
 #include "coe.hpp"
 #include "error.hpp"
 #include "fd.hpp"
+#include "function.hpp"
 #include "ndelay.hpp"
 #include "pipe.hpp"
-#include "set_field.hpp"
 
 namespace dromozoa {
 #ifdef HAVE_PIPE2
@@ -60,13 +64,19 @@ namespace dromozoa {
       }
       return 0;
     } while (false);
-    int code = errno;
-    close(fd[0]);
-    close(fd[1]);
-    errno = code;
+    close_pipe(fd);
     return -1;
   }
 #endif
+
+  void close_pipe(int fd[2]) {
+    int code = errno;
+    close(fd[0]);
+    close(fd[1]);
+    fd[0] = -1;
+    fd[1] = -1;
+    errno = code;
+  }
 
   namespace {
     int impl_pipe(lua_State* L) {
@@ -87,6 +97,6 @@ namespace dromozoa {
   }
 
   void initialize_pipe(lua_State* L) {
-    dromozoa::set_field(L, "pipe", dromozoa::impl_pipe);
+    function<impl_pipe>::set_field(L, "pipe");
   }
 }

@@ -26,6 +26,9 @@ AC_CONFIG_FILES([Makefile src/Makefile])
 
 AC_PROG_CXX
 AC_FUNC_STRERROR_R
+AC_CHECK_FUNCS([epoll_create])
+AC_CHECK_FUNCS([epoll_create1])
+AC_CHECK_FUNCS([kqueue])
 AC_CHECK_FUNCS([pipe2])
 
 AX_PTHREAD()
@@ -36,5 +39,8 @@ AC_SEARCH_LIBS([pthread_sigmask], [pthread])
 AX_PROG_LUA([5.1], [], [], [AC_MSG_ERROR([could not find lua])])
 AX_LUA_HEADERS([], [AC_MSG_ERROR([could not find lua])])
 AX_LUA_LIBS([], [AC_MSG_ERROR([could not find lua])])
+
+AM_CONDITIONAL([HAVE_EPOLL], [test "x$ac_cv_func_epoll_create" = xyes || test "x$ac_cv_func_epoll_create1" = xyes])
+AM_CONDITIONAL([HAVE_KQUEUE], [test "x$ac_cv_func_kqueue" = xyes])
 
 AC_OUTPUT

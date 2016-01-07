@@ -31,6 +31,8 @@ extern "C" {
 #include "ndelay.hpp"
 #include "pipe.hpp"
 #include "read.hpp"
+#include "selector.hpp"
+#include "selfpipe.hpp"
 #include "signal.hpp"
 #include "wait.hpp"
 #include "write.hpp"
@@ -45,6 +47,12 @@ namespace dromozoa {
     initialize_read(L);
     initialize_write(L);
     lua_setfield(L, -2, "fd");
+
+    open_selector(L);
+    lua_setfield(L, -2, "selector");
+
+    open_selfpipe(L);
+    lua_setfield(L, -2, "selfpipe");
 
     dromozoa::initialize_environ(L);
     dromozoa::initialize_error(L);
