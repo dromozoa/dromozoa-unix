@@ -31,6 +31,7 @@ noinst_HEADERS = \
 	pathexec.hpp \
 	pipe.hpp \
 	read.hpp \
+	selector.hpp \
 	set_field.hpp \
 	signal.hpp \
 	signal_mask.hpp \
@@ -56,6 +57,7 @@ unix_la_SOURCES = \
 	pathexec.cpp \
 	pipe.cpp \
 	read.cpp \
+	selector.cpp \
 	set_field.cpp \
 	signal.cpp \
 	signal_mask.cpp \
@@ -63,3 +65,10 @@ unix_la_SOURCES = \
 	unix.cpp \
 	wait.cpp \
 	write.cpp
+
+if HAVE_EPOLL
+unix_la_SOURCES += selector_epoll.cpp
+endif
+if HAVE_KQUEUE
+unix_la_SOURCES += selector_kqueue.cpp
+endif

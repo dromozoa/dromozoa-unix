@@ -1,4 +1,4 @@
-// Copyright (C) 2015,2016 Tomoyuki Fujimori <moyu@dromozoa.com>
+// Copyright (C) 2016 Tomoyuki Fujimori <moyu@dromozoa.com>
 //
 // This file is part of dromozoa-unix.
 //
@@ -15,20 +15,30 @@
 // You should have received a copy of the GNU General Public License
 // along with dromozoa-unix.  If not, see <http://www.gnu.org/licenses/>.
 
+#ifndef DROMOZOA_SELECTOR_HPP
+#define DROMOZOA_SELECTOR_HPP
+
 extern "C" {
 #include <lua.h>
 }
 
-#include "set_field.hpp"
+#include <time.h>
 
 namespace dromozoa {
-  void set_field(lua_State* L, const char* key, lua_CFunction value) {
-    lua_pushcfunction(L, value);
-    lua_setfield(L, -2, key);
-  }
+  class selector {
+  public:
+    virtual ~selector();
+    virtual int open(int size) = 0;
+    virtual int close() = 0;
+    virtual int get() const = 0;
+    virtual int add(int fd, int event) = 0;
+    virtual int mod(int fd, int event) = 0;
+    virtual int del(int fd) = 0;
+    virtual int select(const struct timespec* timeout) = 0;
+    virtual int event(int i, int& fd, int& event) const = 0;
+  };
 
-  void set_field(lua_State* L, const char* key, lua_Integer value) {
-    lua_pushinteger(L, value);
-    lua_setfield(L, -2, key);
-  }
+  int open_selector(lua_State* L);
 }
+
+#endif
