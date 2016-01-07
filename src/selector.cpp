@@ -26,9 +26,12 @@ extern "C" {
 
 #include <time.h>
 
+#include <iostream>
+
 #include "error.hpp"
 #include "fd.hpp"
 #include "function.hpp"
+#include "log_level.hpp"
 #include "success.hpp"
 #include "selector.hpp"
 
@@ -57,11 +60,18 @@ namespace dromozoa {
       new(s) selector_impl();
       luaL_getmetatable(L, "dromozoa.unix.selector");
       lua_setmetatable(L, -2);
+      if (get_log_level() > 2) {
+        std::cerr << "[dromozoa-unix] new selector " << s << std::endl;
+      }
       return 1;
     }
 
     int impl_gc(lua_State* L) {
-      get_selector(L, 1).~selector();
+      selector& s = get_selector(L, 1);
+      if (get_log_level() > 2) {
+        std::cerr << "[dromozoa-unix] delete selector " << &s << std::endl;
+      }
+      s.~selector();
       return 0;
     }
 
