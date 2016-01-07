@@ -17,6 +17,8 @@
 
 local unix = require "dromozoa.unix"
 
+assert(unix.ignore_signal(unix.SIGPIPE))
+
 local reader, writer = unix.pipe()
 
 -- unix.set_log_level(3)

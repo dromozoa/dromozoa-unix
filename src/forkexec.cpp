@@ -141,7 +141,7 @@ namespace dromozoa {
       std::vector<char> buffer(pathexec_buffer_size(path, argv));
 
       scoped_signal_mask scoped_mask;
-      if (scoped_mask.mask_all_signals() == -1) {
+      if (scoped_mask.block_all_signals() == -1) {
         return -1;
       }
       int die_fd[] = { -1, -1 };
@@ -176,7 +176,7 @@ namespace dromozoa {
       std::vector<char> buffer(pathexec_buffer_size(path, argv));
 
       scoped_signal_mask scoped_mask;
-      if (scoped_mask.mask_all_signals() == -1) {
+      if (scoped_mask.block_all_signals() == -1) {
         return -1;
       }
       int die_fd[] = { -1, -1 };

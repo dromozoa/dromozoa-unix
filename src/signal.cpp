@@ -26,6 +26,7 @@ extern "C" {
 #include "function.hpp"
 #include "set_field.hpp"
 #include "signal.hpp"
+#include "signal_mask.hpp"
 #include "success.hpp"
 
 namespace dromozoa {
@@ -39,14 +40,77 @@ namespace dromozoa {
         return push_success(L);
       }
     }
+
+    int impl_default_signal(lua_State* L) {
+      struct sigaction sa = {};
+      sa.sa_handler = SIG_DFL;
+      if (sigaction(luaL_checkinteger(L, 1), &sa, 0) == -1) {
+        return push_error(L);
+      } else {
+        return push_success(L);
+      }
+    }
+
+    int impl_ignore_signal(lua_State* L) {
+      struct sigaction sa = {};
+      sa.sa_handler = SIG_IGN;
+      if (sigaction(luaL_checkinteger(L, 1), &sa, 0) == -1) {
+        return push_error(L);
+      } else {
+        return push_success(L);
+      }
+    }
+
+    int impl_block_signal(lua_State* L) {
+      sigset_t mask;
+      if (lua_isnoneornil(L, 1)) {
+        if (sigfillset(&mask) == -1) {
+          return push_error(L);
+        }
+      } else {
+        if (sigemptyset(&mask) == -1) {
+          return push_error(L);
+        }
+        if (sigaddset(&mask, luaL_checkinteger(L, 1)) == -1) {
+          return push_error(L);
+        }
+      }
+      if (signal_mask(SIG_BLOCK, &mask, 0) == -1) {
+        return push_error(L);
+      } else {
+        return push_success(L);
+      }
+    }
+
+    int impl_unblock_signal(lua_State* L) {
+      sigset_t mask;
+      if (lua_isnoneornil(L, 1)) {
+        if (sigfillset(&mask) == -1) {
+          return push_error(L);
+        }
+      } else {
+        if (sigemptyset(&mask) == -1) {
+          return push_error(L);
+        }
+        if (sigaddset(&mask, luaL_checkinteger(L, 1)) == -1) {
+          return push_error(L);
+        }
+      }
+      if (signal_mask(SIG_UNBLOCK, &mask, 0) == -1) {
+        return push_error(L);
+      } else {
+        return push_success(L);
+      }
+    }
   }
 
   void initialize_signal(lua_State* L) {
-    struct sigaction sa = {};
-    sa.sa_handler = SIG_IGN;
-    sigaction(SIGPIPE, &sa, 0);
-
     function<impl_kill>::set_field(L, "kill");
+    function<impl_default_signal>::set_field(L, "default_signal");
+    function<impl_ignore_signal>::set_field(L, "ignore_signal");
+    function<impl_block_signal>::set_field(L, "block_signal");
+    function<impl_unblock_signal>::set_field(L, "unblock_signal");
+
     DROMOZOA_SET_FIELD(L, SIGABRT);
     DROMOZOA_SET_FIELD(L, SIGALRM);
     DROMOZOA_SET_FIELD(L, SIGBUS);
