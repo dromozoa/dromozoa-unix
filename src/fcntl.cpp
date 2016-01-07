@@ -17,16 +17,41 @@
 
 extern "C" {
 #include <lua.h>
+#include <lauxlib.h>
 }
 
 #include <fcntl.h>
 
+#include "error.hpp"
 #include "fcntl.hpp"
+#include "fd.hpp"
+#include "function.hpp"
 #include "set_field.hpp"
 
 namespace dromozoa {
+  namespace {
+    int impl_open(lua_State* L) {
+      const char* path = luaL_checkstring(L, 1);
+      int flags = luaL_optinteger(L, 2, 0);
+      int mode = luaL_optinteger(L, 3, 0);
+      int result = open(path, flags, mode);
+      if (result == -1) {
+        return push_error(L);
+      } else {
+        new_fd(L, result);
+        return 1;
+      }
+    }
+  }
+
   void initialize_fcntl(lua_State* L) {
+    function<impl_open>::set_field(L, "open");
+    DROMOZOA_SET_FIELD(L, O_APPEND);
     DROMOZOA_SET_FIELD(L, O_CLOEXEC);
+    DROMOZOA_SET_FIELD(L, O_CREAT);
     DROMOZOA_SET_FIELD(L, O_NONBLOCK);
+    DROMOZOA_SET_FIELD(L, O_RDONLY);
+    DROMOZOA_SET_FIELD(L, O_RDWR);
+    DROMOZOA_SET_FIELD(L, O_WRONLY);
   }
 }

@@ -23,8 +23,8 @@ extern "C" {
 
 #include "error.hpp"
 #include "fd.hpp"
+#include "function.hpp"
 #include "ndelay.hpp"
-#include "set_field.hpp"
 #include "success.hpp"
 
 namespace dromozoa {
@@ -63,7 +63,7 @@ namespace dromozoa {
   }
 
   void initialize_ndelay(lua_State* L) {
-    set_field(L, "ndelay_on", impl_ndealy_on);
-    set_field(L, "ndelay_off", impl_ndealy_off);
+    function<impl_ndealy_on>::set_field(L, "ndelay_on");
+    function<impl_ndealy_off>::set_field(L, "ndelay_off");
   }
 }

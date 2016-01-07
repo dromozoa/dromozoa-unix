@@ -15,17 +15,30 @@
 // You should have received a copy of the GNU General Public License
 // along with dromozoa-unix.  If not, see <http://www.gnu.org/licenses/>.
 
-#ifndef DROMOZOA_PIPE_HPP
-#define DROMOZOA_PIPE_HPP
+#ifndef DROMOZOA_SELECTOR_HPP
+#define DROMOZOA_SELECTOR_HPP
 
 extern "C" {
 #include <lua.h>
 }
 
+#include <time.h>
+
 namespace dromozoa {
-  int pipe2(int fd[2], int flags);
-  void close_pipe(int fd[2]);
-  void initialize_pipe(lua_State* L);
+  class selector {
+  public:
+    virtual ~selector();
+    virtual int open(int size, int flags) = 0;
+    virtual int close() = 0;
+    virtual int get() const = 0;
+    virtual int add(int fd, int event) = 0;
+    virtual int mod(int fd, int event) = 0;
+    virtual int del(int fd) = 0;
+    virtual int select(const struct timespec* timeout) = 0;
+    virtual int event(int i, int& fd, int& event) const = 0;
+  };
+
+  int open_selector(lua_State* L);
 }
 
 #endif

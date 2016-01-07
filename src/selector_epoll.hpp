@@ -15,17 +15,36 @@
 // You should have received a copy of the GNU General Public License
 // along with dromozoa-unix.  If not, see <http://www.gnu.org/licenses/>.
 
-#ifndef DROMOZOA_PIPE_HPP
-#define DROMOZOA_PIPE_HPP
+#ifndef DROMOZOA_SELECTOR_EPOLL_HPP
+#define DROMOZOA_SELECTOR_EPOLL_HPP
 
-extern "C" {
-#include <lua.h>
-}
+#include <time.h>
+#include <sys/epoll.h>
+
+#include <vector>
+
+#include "selector.hpp"
 
 namespace dromozoa {
-  int pipe2(int fd[2], int flags);
-  void close_pipe(int fd[2]);
-  void initialize_pipe(lua_State* L);
+  class selector_epoll : public selector {
+  public:
+    selector_epoll();
+    virtual ~selector_epoll();
+    virtual int open(int size, int flags);
+    virtual int close();
+    virtual int get() const;
+    virtual int add(int fd, int event);
+    virtual int mod(int fd, int event);
+    virtual int del(int fd);
+    virtual int select(const struct timespec* timeout);
+    virtual int event(int i, int& fd, int& event) const;
+  private:
+    int fd_;
+    int result_;
+    std::vector<struct epoll_event> buffer_;
+    selector_epoll(const selector_epoll&);
+    selector_epoll& operator=(const selector_epoll&);
+  };
 }
 
 #endif

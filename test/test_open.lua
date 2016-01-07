@@ -19,34 +19,18 @@ local unix = require "dromozoa.unix"
 
 unix.set_log_level(2)
 
-local reader, writer = unix.pipe(unix.O_CLOEXEC)
-
 local path = os.getenv("PATH")
 local envp = unix.environ()
 
-local pid = assert(unix.forkexec(path, { "ls", "-l" }, envp, "/", { [1] = writer }))
--- print(pid)
-writer:close()
-while true do
-  local result = assert(reader:read(64))
-  if #result == 0 then
-    break
-  end
-  -- io.write(result)
-end
-assert(unix.wait() == pid)
-reader:close()
+local fd = assert(unix.open("test.txt", unix.O_WRONLY + unix.O_CREAT + unix.O_CLOEXEC, 438)) -- 0666
+fd:write("foo\n")
 
-local result, message, code, pid = unix.forkexec(path, { "no such command" }, envp, "/", {})
--- print(message, code, pid)
-assert(unix.wait() == pid)
+local pid = assert(unix.forkexec(path, { "ls", "-l" }, envp, "/", { [1] = fd, [2] = fd }))
+local a, b, c = unix.wait()
+-- print(a, b, c)
+assert(a == pid)
+assert(b == "exit")
+assert(c == 0)
 
-local pid1, pid2 = assert(unix.forkexec_daemon(path, { "sleep", "60" }, envp, "/"))
--- print(pid1, pid2)
-assert(unix.wait() == pid1)
-assert(unix.kill(pid2, 0))
-assert(unix.kill(pid2))
-
-local result, message, code, pid1, pid2 = unix.forkexec_daemon(path, { "no such command" }, envp, "/")
--- print(message, code, pid1, pid2)
-assert(unix.wait() == pid1)
+fd:write("bar\n")
+fd:close()
