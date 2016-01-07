@@ -62,13 +62,6 @@ namespace dromozoa {
       return pid;
     }
 
-    void close_pipe(int pipe_fd[2]) {
-      int code = errno;
-      close(pipe_fd[0]);
-      close(pipe_fd[1]);
-      errno = code;
-    }
-
     void forkexec(
         const char* path,
         const char* const* argv,

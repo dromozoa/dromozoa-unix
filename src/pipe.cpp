@@ -64,13 +64,19 @@ namespace dromozoa {
       }
       return 0;
     } while (false);
-    int code = errno;
-    close(fd[0]);
-    close(fd[1]);
-    errno = code;
+    close_pipe(fd);
     return -1;
   }
 #endif
+
+  void close_pipe(int fd[2]) {
+    int code = errno;
+    close(fd[0]);
+    close(fd[1]);
+    fd[0] = -1;
+    fd[1] = -1;
+    errno = code;
+  }
 
   namespace {
     int impl_pipe(lua_State* L) {
