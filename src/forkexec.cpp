@@ -125,12 +125,15 @@ namespace dromozoa {
       die(die_fd);
     }
 
-    pid_t forkexec(
+    int forkexec(
         const char* path,
         const char* const* argv,
         const char* const* envp,
         const char* chdir,
-        const int* dup2_stdio) {
+        const int* dup2_stdio,
+        pid_t& pid) {
+      pid = -1;
+
       std::vector<char> buffer(pathexec_buffer_size(path, argv));
 
       scoped_signal_mask scoped_mask;
@@ -142,7 +145,7 @@ namespace dromozoa {
         return -1;
       }
 
-      pid_t pid = fork();
+      pid = fork();
       if (pid == -1) {
         close_pipe(die_fd);
         return -1;
@@ -152,20 +155,23 @@ namespace dromozoa {
 
       int code = read_die(die_fd);
       if (code == 0) {
-        return pid;
+        return 0;
       } else {
-        int status;
-        waitpid(pid, &status, 0);
         errno = code;
         return -1;
       }
     }
 
-    pid_t forkexec_daemon(
+    int forkexec_daemon(
         const char* path,
         const char* const* argv,
         const char* const* envp,
-        const char* chdir) {
+        const char* chdir,
+        pid_t& pid1,
+        pid_t& pid2) {
+      pid1 = -1;
+      pid2 = -1;
+
       std::vector<char> buffer(pathexec_buffer_size(path, argv));
 
       scoped_signal_mask scoped_mask;
@@ -182,12 +188,12 @@ namespace dromozoa {
         return -1;
       }
 
-      pid_t pid = fork();
-      if (pid == -1) {
+      pid1 = fork();
+      if (pid1 == -1) {
         close_pipe(die_fd);
         close_pipe(pid_fd);
         return -1;
-      } else if (pid == 0) {
+      } else if (pid1 == 0) {
         if (setsid() == -1) {
           die(die_fd);
         }
@@ -202,11 +208,9 @@ namespace dromozoa {
       }
 
       int code = read_die(die_fd);
-      int status;
-      waitpid(pid, &status, 0);
-      pid = read_pid(pid_fd);
+      pid2 = read_pid(pid_fd);
       if (code == 0) {
-        return pid;
+        return 0;
       } else {
         errno = code;
         return -1;
@@ -227,11 +231,13 @@ namespace dromozoa {
         }
         lua_pop(L, 1);
       }
-      pid_t result = forkexec(path, argv.get(), envp.get(), chdir, dup2_stdio);
-      if (result == -1) {
-        return push_error(L);
+      pid_t pid = -1;
+      if (forkexec(path, argv.get(), envp.get(), chdir, dup2_stdio, pid) == -1) {
+        int result = push_error(L);
+        lua_pushinteger(L, pid);
+        return result + 1;
       } else {
-        lua_pushinteger(L, result);
+        lua_pushinteger(L, pid);
         return 1;
       }
     }
@@ -241,12 +247,17 @@ namespace dromozoa {
       argument_vector argv(L, 2);
       argument_vector envp(L, 3);
       const char* chdir = luaL_checkstring(L, 4);
-      pid_t result = forkexec_daemon(path, argv.get(), envp.get(), chdir);
-      if (result == -1) {
-        return push_error(L);
+      pid_t pid1 = -1;
+      pid_t pid2 = -1;
+      if (forkexec_daemon(path, argv.get(), envp.get(), chdir, pid1, pid2) == -1) {
+        int result = push_error(L);
+        lua_pushinteger(L, pid1);
+        lua_pushinteger(L, pid2);
+        return result + 2;
       } else {
-        lua_pushinteger(L, result);
-        return 1;
+        lua_pushinteger(L, pid1);
+        lua_pushinteger(L, pid2);
+        return 2;
       }
     }
   }

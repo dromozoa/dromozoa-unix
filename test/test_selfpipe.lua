@@ -26,24 +26,45 @@ assert(unix.selfpipe.get() ~= -1)
 local path = os.getenv("PATH")
 local envp = unix.environ()
 
-local pid1 = unix.forkexec(path, { "echo", "foo" }, envp, "/", {})
-local pid2 = unix.forkexec(path, { "echo", "bar" }, envp, "/", {})
+local selector = unix.selector()
+assert(selector:open(256, unix.O_CLOEXEC))
+selector:add(unix.selfpipe.get(), 1)
 
+-- local pid1 = assert(unix.forkexec(path, { "echo", "foo" }, envp, "/", {}))
+-- local pid2 = assert(unix.forkexec(path, { "echo", "bar" }, envp, "/", {}))
+local pid1 = assert(unix.forkexec(path, { "sleep", "7" }, envp, "/", {}))
+local pid2 = assert(unix.forkexec(path, { "sleep", "3" }, envp, "/", {}))
 print(pid1, pid2)
 
 local n = 0
 repeat
   assert(unix.unblock_signal(unix.SIGCHLD))
-  local count = unix.selfpipe.read()
+  local a, b, c = selector:select({ tv_sec = 1, tv_nsec = 0 })
+  print("select", a, b, c)
   assert(unix.block_signal(unix.SIGCHLD))
-  if count > 0 then
-    while true do
-      local a, b, c = unix.wait(-1, unix.WNOHANG)
-      print(a, b, c)
-      if a and a > 0 then
-        n = n + 1
-      else
-        break
+
+  if a then
+    if a == 0 then
+      print("timeout")
+    else
+      for i = 1, a do
+        local fd, ev = selector:event(i)
+        print("event", fd, ev)
+        if fd == unix.selfpipe.get() then
+          local result = unix.selfpipe.read()
+          print("selfpipe", result)
+          if result > 0 then
+            while true do
+              local a, b, c = unix.wait(-1, unix.WNOHANG)
+              print("wait", a, b, c)
+              if a and a > 0 then
+                n = n + 1
+              else
+                break
+              end
+            end
+          end
+        end
       end
     end
   end
