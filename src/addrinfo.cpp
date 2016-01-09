@@ -93,10 +93,6 @@ namespace dromozoa {
   void initialize_addrinfo(lua_State* L) {
     function<impl_getaddrinfo>::set_field(L, "getaddrinfo");
 
-    DROMOZOA_SET_FIELD(L, AF_INET);
-    DROMOZOA_SET_FIELD(L, AF_INET6);
-    DROMOZOA_SET_FIELD(L, AF_UNSPEC);
-
     DROMOZOA_SET_FIELD(L, AI_PASSIVE);
     DROMOZOA_SET_FIELD(L, AI_CANONNAME);
     DROMOZOA_SET_FIELD(L, AI_NUMERICHOST);

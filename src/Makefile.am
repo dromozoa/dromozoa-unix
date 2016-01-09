@@ -41,6 +41,7 @@ noinst_HEADERS = \
 	signal.hpp \
 	signal_mask.hpp \
 	sockaddr.hpp \
+	socket.hpp \
 	success.hpp \
 	wait.hpp \
 	write.hpp
@@ -71,6 +72,7 @@ unix_la_SOURCES = \
 	signal.cpp \
 	signal_mask.cpp \
 	sockaddr.cpp \
+	socket.cpp \
 	success.cpp \
 	unix.cpp \
 	wait.cpp \

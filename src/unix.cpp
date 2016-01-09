@@ -37,6 +37,7 @@ extern "C" {
 #include "selfpipe.hpp"
 #include "signal.hpp"
 #include "sockaddr.hpp"
+#include "socket.hpp"
 #include "wait.hpp"
 #include "write.hpp"
 
@@ -71,6 +72,7 @@ namespace dromozoa {
     dromozoa::initialize_nanosleep(L);
     dromozoa::initialize_pipe(L);
     dromozoa::initialize_signal(L);
+    dromozoa::initialize_socket(L);
     dromozoa::initialize_wait(L);
 
     return 1;

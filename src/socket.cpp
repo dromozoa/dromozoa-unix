@@ -15,15 +15,23 @@
 // You should have received a copy of the GNU General Public License
 // along with dromozoa-unix.  If not, see <http://www.gnu.org/licenses/>.
 
-#ifndef DROMOZOA_NAMEINFO_HPP
-#define DROMOZOA_NAMEINFO_HPP
-
 extern "C" {
 #include <lua.h>
 }
 
-namespace dromozoa {
-  void initialize_nameinfo(lua_State* L);
-}
+#include <sys/socket.h>
 
-#endif
+#include "set_field.hpp"
+#include "socket.hpp"
+
+namespace dromozoa {
+  void initialize_socket(lua_State* L) {
+    DROMOZOA_SET_FIELD(L, AF_INET);
+    DROMOZOA_SET_FIELD(L, AF_INET6);
+    DROMOZOA_SET_FIELD(L, AF_UNIX);
+    DROMOZOA_SET_FIELD(L, AF_UNSPEC);
+
+    DROMOZOA_SET_FIELD(L, SOCK_STREAM);
+    DROMOZOA_SET_FIELD(L, SOCK_DGRAM);
+  }
+}
