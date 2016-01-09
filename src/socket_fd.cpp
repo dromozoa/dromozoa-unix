@@ -151,6 +151,30 @@ namespace dromozoa {
         return push_success(L);
       }
     }
+
+    int impl_setsockopt(lua_State* L) {
+      int level = luaL_checkinteger(L, 2);
+      int name = luaL_checkinteger(L, 3);
+      int value = luaL_checkinteger(L, 4);
+      if (setsockopt(get_fd(L, 1), level, name, &value, sizeof(value)) == -1) {
+        return push_error(L);
+      } else {
+        return push_success(L);
+      }
+    }
+
+    int impl_getsockopt(lua_State* L) {
+      int level = luaL_checkinteger(L, 2);
+      int name = luaL_checkinteger(L, 3);
+      int value = 0;
+      socklen_t size = sizeof(value);
+      if (getsockopt(get_fd(L, 1), level, name, &value, &size) == -1) {
+        return push_error(L);
+      } else {
+        lua_pushinteger(L, value);
+        return 1;
+      }
+    }
   }
 
   void initialize_socket_fd(lua_State* L) {
@@ -161,5 +185,7 @@ namespace dromozoa {
     function<impl_accept>::set_field(L, "accept");
     function<impl_connect>::set_field(L, "connect");
     function<impl_shutdown>::set_field(L, "shutdown");
+    function<impl_setsockopt>::set_field(L, "setsockopt");
+    function<impl_getsockopt>::set_field(L, "getsockopt");
   }
 }

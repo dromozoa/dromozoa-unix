@@ -20,6 +20,8 @@ extern "C" {
 }
 
 #include <sys/socket.h>
+#include <netinet/in.h>
+#include <netinet/tcp.h>
 
 #include "error.hpp"
 #include "fd.hpp"
@@ -69,10 +71,21 @@ namespace dromozoa {
     DROMOZOA_SET_FIELD(L, SOCK_STREAM);
     DROMOZOA_SET_FIELD(L, SOCK_DGRAM);
 
+    DROMOZOA_SET_FIELD(L, IPPROTO_TCP);
+    DROMOZOA_SET_FIELD(L, IPPROTO_UDP);
+
     DROMOZOA_SET_FIELD(L, SOMAXCONN);
 
     DROMOZOA_SET_FIELD(L, SHUT_RD);
     DROMOZOA_SET_FIELD(L, SHUT_WR);
     DROMOZOA_SET_FIELD(L, SHUT_RDWR);
+
+    DROMOZOA_SET_FIELD(L, SOL_SOCKET);
+    DROMOZOA_SET_FIELD(L, SO_ERROR);
+    DROMOZOA_SET_FIELD(L, SO_RCVBUF);
+    DROMOZOA_SET_FIELD(L, SO_REUSEADDR);
+    DROMOZOA_SET_FIELD(L, SO_SNDBUF);
+
+    DROMOZOA_SET_FIELD(L, TCP_NODELAY);
   }
 }

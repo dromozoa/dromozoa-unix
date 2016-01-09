@@ -34,6 +34,10 @@ assert(sa1:path())
 -- print(sa2:size())
 -- print(("%q"):format(sa2:path()))
 
+assert(fd1:getsockopt(unix.SOL_SOCKET, unix.SO_ERROR) == 0)
+assert(fd1:getsockopt(unix.SOL_SOCKET, unix.SO_RCVBUF) > 0);
+assert(fd1:getsockopt(unix.SOL_SOCKET, unix.SO_SNDBUF) > 0);
+
 fd1:write("foo")
 fd1:close()
 
