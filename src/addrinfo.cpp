@@ -43,7 +43,25 @@ namespace dromozoa {
       const char* nodename = lua_tostring(L, 1);
       const char* servname = lua_tostring(L, 2);
       struct addrinfo* result = 0;
-      int code = getaddrinfo(nodename, servname, 0, &result);
+      int code = 0;
+      if (lua_isnoneornil(L, 3)) {
+        code = getaddrinfo(nodename, servname, 0, &result);
+      } else {
+        struct addrinfo hints = {};
+        lua_getfield(L, 3, "ai_flags");
+        hints.ai_flags = luaL_optinteger(L, -1, AI_V4MAPPED | AI_ADDRCONFIG);
+        lua_pop(L, 1);
+        lua_getfield(L, 3, "ai_family");
+        hints.ai_family = luaL_optinteger(L, -1, AF_UNSPEC);
+        lua_pop(L, 1);
+        lua_getfield(L, 3, "ai_socktype");
+        hints.ai_socktype = luaL_optinteger(L, -1, 0);
+        lua_pop(L, 1);
+        lua_getfield(L, 3, "ai_protocol");
+        hints.ai_protocol = luaL_optinteger(L, -1, 0);
+        lua_pop(L, 1);
+        code = getaddrinfo(nodename, servname, &hints, &result);
+      }
       if (code == 0) {
         lua_newtable(L);
         int i = 1;
@@ -74,6 +92,10 @@ namespace dromozoa {
 
   void initialize_addrinfo(lua_State* L) {
     function<impl_getaddrinfo>::set_field(L, "getaddrinfo");
+
+    DROMOZOA_SET_FIELD(L, AF_INET);
+    DROMOZOA_SET_FIELD(L, AF_INET6);
+    DROMOZOA_SET_FIELD(L, AF_UNSPEC);
 
     DROMOZOA_SET_FIELD(L, AI_PASSIVE);
     DROMOZOA_SET_FIELD(L, AI_CANONNAME);

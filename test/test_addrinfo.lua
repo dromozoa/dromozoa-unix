@@ -18,7 +18,8 @@
 local json = require "dromozoa.commons.json"
 local unix = require "dromozoa.unix"
 
-local addrinfo = assert(unix.getaddrinfo("localhost", "http"))
+-- local addrinfo = assert(unix.getaddrinfo("localhost", "http"))
+local addrinfo = assert(unix.getaddrinfo("localhost", "http", { ai_family = unix.AF_INET, ai_socktype = 1 }))
 -- print(json.encode(addrinfo))
 
 for _, ai in ipairs(addrinfo) do
