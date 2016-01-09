@@ -27,6 +27,7 @@ noinst_HEADERS = \
 	function.hpp \
 	gettimeofday.hpp \
 	log_level.hpp \
+	nameinfo.hpp \
 	nanosleep.hpp \
 	ndelay.hpp \
 	pathexec.hpp \
@@ -58,6 +59,7 @@ unix_la_SOURCES = \
 	forkexec.cpp \
 	gettimeofday.cpp \
 	log_level.cpp \
+	nameinfo.cpp \
 	nanosleep.cpp \
 	ndelay.cpp \
 	pathexec.cpp \

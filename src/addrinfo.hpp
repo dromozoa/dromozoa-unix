@@ -23,6 +23,7 @@ extern "C" {
 }
 
 namespace dromozoa {
+  int push_addrinfo_error(lua_State* L, int code);
   void initialize_addrinfo(lua_State* L);
 }
 

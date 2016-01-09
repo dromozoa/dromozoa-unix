@@ -18,10 +18,11 @@
 local json = require "dromozoa.commons.json"
 local unix = require "dromozoa.unix"
 
-local addrinfo = assert(unix.getaddrinfo("www.google.com", 80))
+local addrinfo = assert(unix.getaddrinfo("localhost", "http"))
 -- print(json.encode(addrinfo))
 
 for _, ai in ipairs(addrinfo) do
-  print(ai.ai_addr:family())
+  local host, serv = assert(ai.ai_addr:getnameinfo(unix.NI_NUMERICHOST))
+  print(ai.ai_addr:family(), host, serv)
 end
 

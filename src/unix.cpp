@@ -28,6 +28,7 @@ extern "C" {
 #include "forkexec.hpp"
 #include "gettimeofday.hpp"
 #include "log_level.hpp"
+#include "nameinfo.hpp"
 #include "nanosleep.hpp"
 #include "ndelay.hpp"
 #include "pipe.hpp"
@@ -57,6 +58,7 @@ namespace dromozoa {
     lua_setfield(L, -2, "selfpipe");
 
     open_sockaddr(L);
+    initialize_nameinfo(L);
     lua_setfield(L, -2, "sockaddr");
 
     dromozoa::initialize_addrinfo(L);

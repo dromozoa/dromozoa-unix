@@ -27,6 +27,17 @@ extern "C" {
 #include "sockaddr.hpp"
 
 namespace dromozoa {
+  int push_addrinfo_error(lua_State* L, int code) {
+    lua_pushnil(L);
+    if (const char* what = gai_strerror(code)) {
+      lua_pushstring(L, what);
+    } else {
+      lua_pushfstring(L, "error number %d", code);
+    }
+    lua_pushinteger(L, code);
+    return 3;
+  }
+
   namespace {
     int impl_getaddrinfo(lua_State* L) {
       const char* nodename = lua_tostring(L, 1);
@@ -56,19 +67,29 @@ namespace dromozoa {
         freeaddrinfo(result);
         return 1;
       } else {
-        lua_pushnil(L);
-        if (const char* what = gai_strerror(code)) {
-          lua_pushstring(L, what);
-        } else {
-          lua_pushfstring(L, "error number %d", code);
-        }
-        lua_pushinteger(L, code);
-        return 3;
+        return push_addrinfo_error(L, code);
       }
     }
   }
 
   void initialize_addrinfo(lua_State* L) {
     function<impl_getaddrinfo>::set_field(L, "getaddrinfo");
+
+    DROMOZOA_SET_FIELD(L, AI_PASSIVE);
+    DROMOZOA_SET_FIELD(L, AI_CANONNAME);
+    DROMOZOA_SET_FIELD(L, AI_NUMERICHOST);
+    DROMOZOA_SET_FIELD(L, AI_NUMERICSERV);
+    DROMOZOA_SET_FIELD(L, AI_V4MAPPED);
+    DROMOZOA_SET_FIELD(L, AI_ALL);
+    DROMOZOA_SET_FIELD(L, AI_ADDRCONFIG);
+
+    DROMOZOA_SET_FIELD(L, NI_NOFQDN);
+    DROMOZOA_SET_FIELD(L, NI_NUMERICHOST);
+    DROMOZOA_SET_FIELD(L, NI_NAMEREQD);
+    DROMOZOA_SET_FIELD(L, NI_NUMERICSERV);
+#ifdef NI_NUMERICSCOPE
+    DROMOZOA_SET_FIELD(L, NI_NUMERICSCOPE);
+#endif
+    DROMOZOA_SET_FIELD(L, NI_DGRAM);
   }
 }

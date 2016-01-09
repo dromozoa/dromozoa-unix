@@ -15,19 +15,16 @@
 // You should have received a copy of the GNU General Public License
 // along with dromozoa-unix.  If not, see <http://www.gnu.org/licenses/>.
 
-#ifndef DROMOZOA_SOCKADDR_HPP
-#define DROMOZOA_SOCKADDR_HPP
+#ifndef DROMOZOA_NAMEINFO_HPP
+#define DROMOZOA_NAMEINFO_HPP
 
 extern "C" {
 #include <lua.h>
 }
 
-#include <sys/socket.h>
-
 namespace dromozoa {
-  int new_sockaddr(lua_State* L, const struct sockaddr* address, socklen_t size);
-  const struct sockaddr* get_sockaddr(lua_State* L, int n, socklen_t& size);
-  int open_sockaddr(lua_State* L);
+  void initialize_nameinfo(lua_State* L);
 }
 
 #endif
+

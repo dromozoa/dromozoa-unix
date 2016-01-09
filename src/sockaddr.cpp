@@ -20,22 +20,40 @@ extern "C" {
 #include <lauxlib.h>
 }
 
+#include <stddef.h>
 #include <string.h>
 
 #include "function.hpp"
 #include "sockaddr.hpp"
 
 namespace dromozoa {
-  int new_sockaddr(lua_State* L, const void* address, socklen_t size) {
-    memcpy(lua_newuserdata(L, size), address, size);
+  namespace {
+    struct socket_address {
+      socklen_t size;
+      struct sockaddr address[1];
+    };
+  }
+
+  int new_sockaddr(lua_State* L, const struct sockaddr* address, socklen_t size) {
+    socket_address* data = static_cast<socket_address*>(lua_newuserdata(L, offsetof(socket_address, address) + size));
+    data->size = size;
+    memcpy(data->address, address, size);
     luaL_getmetatable(L, "dromozoa.unix.sockaddr");
     lua_setmetatable(L, -2);
     return 1;
   }
 
+  const sockaddr* get_sockaddr(lua_State* L, int n, socklen_t& size) {
+    socket_address* data = static_cast<socket_address*>(luaL_checkudata(L, n, "dromozoa.unix.sockaddr"));
+    size = data->size;
+    return data->address;
+  }
+
   namespace {
-    sockaddr* get_sockaddr(lua_State* L, int n) {
-      return static_cast<sockaddr*>(luaL_checkudata(L, n, "dromozoa.unix.sockaddr"));
+    namespace {
+      const struct sockaddr* get_sockaddr(lua_State* L, int n) {
+        return static_cast<socket_address*>(luaL_checkudata(L, n, "dromozoa.unix.sockaddr"))->address;
+      }
     }
 
     int impl_family(lua_State* L) {
