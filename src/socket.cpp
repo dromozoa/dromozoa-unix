@@ -29,6 +29,19 @@ extern "C" {
 
 namespace dromozoa {
   namespace {
+    int impl_socket(lua_State* L) {
+      int domain = luaL_checkinteger(L, 1);
+      int type = luaL_checkinteger(L, 2);
+      int protocol = luaL_optinteger(L, 3, 0);
+      int result = socket(domain, type, protocol);
+      if (result == -1) {
+        return push_error(L);
+      } else {
+        new_fd(L, result);
+        return 1;
+      }
+    }
+
     int impl_socketpair(lua_State* L) {
       int domain = luaL_checkinteger(L, 1);
       int type = luaL_checkinteger(L, 2);
@@ -45,6 +58,7 @@ namespace dromozoa {
   }
 
   void initialize_socket(lua_State* L) {
+    function<impl_socket>::set_field(L, "socket");
     function<impl_socketpair>::set_field(L, "socketpair");
 
     DROMOZOA_SET_FIELD(L, AF_INET);
@@ -54,5 +68,7 @@ namespace dromozoa {
 
     DROMOZOA_SET_FIELD(L, SOCK_STREAM);
     DROMOZOA_SET_FIELD(L, SOCK_DGRAM);
+
+    DROMOZOA_SET_FIELD(L, SOMAXCONN);
   }
 }

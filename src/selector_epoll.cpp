@@ -36,18 +36,17 @@ namespace dromozoa {
   int selector_epoll::open(int size, int flags) {
     buffer_.resize(size);
 
-    int fd = -1;
 #ifdef HAVE_EPOLL_CREATE1
+    int f = 0;
     if (flags & O_CLOEXEC) {
-      fd = epoll_create1(EPOLL_CLOEXEC);
-    } else {
-      fd = epoll_create1(0);
+      f |= EPOLL_CLOEXEC;
     }
+    int fd = epoll_create1(EPOLL_CLOEXEC, f);
     if (fd == -1) {
       return -1;
     }
 #else
-    fd = epoll_create(size);
+    int fd = epoll_create(size);
     if (fd == -1) {
       return -1;
     }

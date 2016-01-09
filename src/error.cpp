@@ -137,6 +137,7 @@ namespace dromozoa {
 
   void initialize_error(lua_State* L) {
     DROMOZOA_SET_FIELD(L, EAGAIN);
+    DROMOZOA_SET_FIELD(L, EINPROGRESS);
     DROMOZOA_SET_FIELD(L, EINTR);
     DROMOZOA_SET_FIELD(L, EPIPE);
     DROMOZOA_SET_FIELD(L, EWOULDBLOCK);

@@ -80,19 +80,15 @@ namespace dromozoa {
 
   namespace {
     int impl_pipe(lua_State* L) {
+      int flags = luaL_optinteger(L, 1, 0);
       int fd[2] = { -1, -1 };
-      if (lua_isnoneornil(L, 1)) {
-        if (pipe(fd) == -1) {
-          return push_error(L);
-        }
+      if (pipe2(fd, flags) == -1) {
+        return push_error(L);
       } else {
-        if (pipe2(fd, luaL_checkinteger(L, 1)) == -1) {
-          return push_error(L);
-        }
+        new_fd(L, fd[0]);
+        new_fd(L, fd[1]);
+        return 2;
       }
-      new_fd(L, fd[0]);
-      new_fd(L, fd[1]);
-      return 2;
     }
   }
 

@@ -15,20 +15,65 @@
 // You should have received a copy of the GNU General Public License
 // along with dromozoa-unix.  If not, see <http://www.gnu.org/licenses/>.
 
+#ifdef HAVE_CONFIG_H
+#include "config.h"
+#endif
+
 extern "C" {
 #include <lua.h>
+#include <lauxlib.h>
 }
 
+#include <fcntl.h>
+#include <unistd.h>
 #include <sys/socket.h>
 
+#include "coe.hpp"
 #include "error.hpp"
 #include "fd.hpp"
 #include "function.hpp"
+#include "ndelay.hpp"
 #include "sockaddr.hpp"
 #include "socket_fd.hpp"
+#include "success.hpp"
 
 namespace dromozoa {
   namespace {
+#ifdef HAVE_ACCEPT4
+    int accept4(int fd, struct sockaddr* address, socklen_t* size, int flags) {
+      int f = 0;
+      if (flags & O_CLOEXEC) {
+        f |= SOCK_CLOEXEC;
+      }
+      if (flags & O_NONBLOCK) {
+        f |= SOCK_NONBLOCK;
+      }
+      return ::accept4(fd, address, size, f);
+    }
+#else
+    int accept4(int fd, struct sockaddr* address, socklen_t* size, int flags) {
+      int result = accept(fd, address, size);
+      if (result == -1) {
+        return -1;
+      }
+      do {
+        if (flags & O_CLOEXEC) {
+          if (coe(result) == -1) {
+            break;
+          }
+        }
+        if (flags & O_NONBLOCK) {
+          if (ndelay_on(result) == -1) {
+            break;
+          }
+        }
+        return result;
+      } while (false);
+      close(result);
+      return -1;
+    }
+#endif
+
     struct sockaddr* sockaddr_cast(struct sockaddr_storage* address) {
       return reinterpret_cast<struct sockaddr*>(address);
     }
@@ -54,10 +99,57 @@ namespace dromozoa {
         return 1;
       }
     }
+
+    int impl_bind(lua_State* L) {
+      socklen_t size = 0;
+      const struct sockaddr* address = get_sockaddr(L, 2, size);
+      if (bind(get_fd(L, 1), address, size) == -1) {
+        return push_error(L);
+      } else {
+        return push_success(L);
+      }
+    }
+
+    int impl_listen(lua_State* L) {
+      int backlog = luaL_optinteger(L, 2, SOMAXCONN);
+      if (listen(get_fd(L, 1), backlog) == -1) {
+        return push_error(L);
+      } else {
+        return push_success(L);
+      }
+    }
+
+    int impl_accept(lua_State* L) {
+      int flags = luaL_optinteger(L, 2, 0);
+      struct sockaddr_storage ss = {};
+      socklen_t size = sizeof(ss);
+      int result = accept4(get_fd(L, 1), sockaddr_cast(&ss), &size, flags);
+      if (result == -1) {
+        return push_error(L);
+      } else {
+        new_fd(L, result);
+        new_sockaddr(L, sockaddr_cast(&ss), size);
+        return 2;
+      }
+    }
+
+    int impl_connect(lua_State* L) {
+      socklen_t size = 0;
+      const struct sockaddr* address = get_sockaddr(L, 2, size);
+      if (connect(get_fd(L, 1), address, size) == -1) {
+        return push_error(L);
+      } else {
+        return push_success(L);
+      }
+    }
   }
 
   void initialize_socket_fd(lua_State* L) {
     function<impl_getsockname>::set_field(L, "getsockname");
     function<impl_getpeername>::set_field(L, "getpeername");
+    function<impl_bind>::set_field(L, "bind");
+    function<impl_listen>::set_field(L, "listen");
+    function<impl_accept>::set_field(L, "accept");
+    function<impl_connect>::set_field(L, "connect");
   }
 }
