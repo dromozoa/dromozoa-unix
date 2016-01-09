@@ -37,11 +37,11 @@ extern "C" {
 
 namespace dromozoa {
 #ifdef HAVE_PIPE2
-  int pipe2(int fd[2], int flags) {
-    return ::pipe2(fd, flags);
+  int wrap_pipe2(int fd[2], int flags) {
+    return pipe2(fd, flags);
   }
 #else
-  int pipe2(int fd[2], int flags) {
+  int wrap_pipe2(int fd[2], int flags) {
     if (pipe(fd) == -1) {
       return -1;
     }
@@ -82,7 +82,7 @@ namespace dromozoa {
     int impl_pipe(lua_State* L) {
       int flags = luaL_optinteger(L, 1, 0);
       int fd[2] = { -1, -1 };
-      if (pipe2(fd, flags) == -1) {
+      if (wrap_pipe2(fd, flags) == -1) {
         return push_error(L);
       } else {
         new_fd(L, fd[0]);

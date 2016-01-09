@@ -141,7 +141,7 @@ namespace dromozoa {
         return -1;
       }
       int die_fd[] = { -1, -1 };
-      if (pipe2(die_fd, O_CLOEXEC) == -1) {
+      if (wrap_pipe2(die_fd, O_CLOEXEC) == -1) {
         return -1;
       }
 
@@ -179,11 +179,11 @@ namespace dromozoa {
         return -1;
       }
       int die_fd[] = { -1, -1 };
-      if (pipe2(die_fd, O_CLOEXEC) == -1) {
+      if (wrap_pipe2(die_fd, O_CLOEXEC) == -1) {
         return -1;
       }
       int pid_fd[] = { -1, -1 };
-      if (pipe2(pid_fd, O_CLOEXEC) == -1) {
+      if (wrap_pipe2(pid_fd, O_CLOEXEC) == -1) {
         close_pipe(die_fd);
         return -1;
       }

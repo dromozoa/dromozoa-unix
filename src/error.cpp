@@ -52,7 +52,7 @@ namespace dromozoa {
     }
 
     const char* wrap_strerror_r(int code, char* buffer, size_t size) {
-      return wrap_strerror_r_result(::strerror_r(code, buffer, size), buffer);
+      return wrap_strerror_r_result(strerror_r(code, buffer, size), buffer);
     }
   }
 #endif
