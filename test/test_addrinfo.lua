@@ -19,5 +19,9 @@ local json = require "dromozoa.commons.json"
 local unix = require "dromozoa.unix"
 
 local addrinfo = assert(unix.getaddrinfo("www.google.com", 80))
-print(json.encode(addrinfo))
+-- print(json.encode(addrinfo))
+
+for _, ai in ipairs(addrinfo) do
+  print(ai.ai_addr:family())
+end
 

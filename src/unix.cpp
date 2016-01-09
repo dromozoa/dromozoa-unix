@@ -35,6 +35,7 @@ extern "C" {
 #include "selector.hpp"
 #include "selfpipe.hpp"
 #include "signal.hpp"
+#include "sockaddr.hpp"
 #include "wait.hpp"
 #include "write.hpp"
 
@@ -54,6 +55,9 @@ namespace dromozoa {
 
     open_selfpipe(L);
     lua_setfield(L, -2, "selfpipe");
+
+    open_sockaddr(L);
+    lua_setfield(L, -2, "sockaddr");
 
     dromozoa::initialize_addrinfo(L);
     dromozoa::initialize_environ(L);

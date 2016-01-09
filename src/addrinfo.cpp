@@ -24,6 +24,7 @@ extern "C" {
 #include "addrinfo.hpp"
 #include "function.hpp"
 #include "set_field.hpp"
+#include "sockaddr.hpp"
 
 namespace dromozoa {
   namespace {
@@ -42,6 +43,10 @@ namespace dromozoa {
           set_field(L, "ai_socktype", ai->ai_socktype);
           set_field(L, "ai_protocol", ai->ai_protocol);
           set_field(L, "ai_addrlen", ai->ai_addrlen);
+          if (ai->ai_addr) {
+            new_sockaddr(L, ai->ai_addr, ai->ai_addrlen);
+            lua_setfield(L, -2, "ai_addr");
+          }
           if (ai->ai_canonname) {
             lua_pushstring(L, ai->ai_canonname);
             lua_setfield(L, -2, "ai_canonname");
