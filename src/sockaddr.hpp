@@ -15,17 +15,20 @@
 // You should have received a copy of the GNU General Public License
 // along with dromozoa-unix.  If not, see <http://www.gnu.org/licenses/>.
 
-#ifndef DROMOZOA_PIPE_HPP
-#define DROMOZOA_PIPE_HPP
+#ifndef DROMOZOA_SOCKADDR_HPP
+#define DROMOZOA_SOCKADDR_HPP
 
 extern "C" {
 #include <lua.h>
 }
 
+#include <sys/socket.h>
+
 namespace dromozoa {
-  int wrap_pipe2(int fd[2], int flags);
-  void close_pipe(int fd[2]);
-  void initialize_pipe(lua_State* L);
+  int new_sockaddr(lua_State* L, const struct sockaddr* address, socklen_t size);
+  const struct sockaddr* get_sockaddr(lua_State* L, int n, socklen_t& size);
+  int open_sockaddr(lua_State* L);
+  void initialize_sockaddr(lua_State* L);
 }
 
 #endif

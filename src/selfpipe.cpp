@@ -39,7 +39,7 @@ namespace dromozoa {
   namespace {
     int impl_install(lua_State* L) {
       if (dromozoa_selfpipe_fd[0] == -1) {
-        if (pipe2(dromozoa_selfpipe_fd, O_CLOEXEC | O_NONBLOCK) == -1) {
+        if (wrap_pipe2(dromozoa_selfpipe_fd, O_CLOEXEC | O_NONBLOCK) == -1) {
           return push_error(L);
         }
       }
