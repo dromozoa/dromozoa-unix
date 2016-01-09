@@ -27,9 +27,10 @@ end
 assert(fd:write("foo\n") == 4)
 assert(fd:shutdown(unix.SHUT_WR))
 while true do
-  local result, message, code = fd:read(4096)
+  local result, message, code = fd:read(256)
   if result and #result > 0 then
-    io.stderr:write(result)
+    assert(result == "bar\n")
+    -- io.stderr:write(result)
   else
     break
   end

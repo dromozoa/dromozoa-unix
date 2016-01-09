@@ -35,10 +35,11 @@ io.stdout:close()
 
 local fd, sa = server:accept(unix.O_CLOEXEC)
 while true do
-  local result, message, code = fd:read(4096)
+  local result, message, code = fd:read(256)
   if result and #result > 0 then
-    io.stderr:write(result)
-    fd:write("bar\n")
+    assert(result == "foo\n")
+    -- io.stderr:write(result)
+    assert(fd:write("bar\n") == 4)
   else
     break
   end
