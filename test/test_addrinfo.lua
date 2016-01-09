@@ -17,7 +17,7 @@
 
 local unix = require "dromozoa.unix"
 
-local addrinfo = assert(unix.getaddrinfo("localhost", "http", { ai_family = unix.AF_INET, ai_socktype = unix.SOCK_STREAM }))
+local addrinfo = assert(unix.getaddrinfo("127.0.0.1", "http", { ai_family = unix.AF_INET, ai_socktype = unix.SOCK_STREAM }))
 assert(#addrinfo == 1)
 
 local ai = addrinfo[1]
