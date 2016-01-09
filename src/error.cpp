@@ -36,11 +36,11 @@ extern "C" {
 namespace dromozoa {
 #ifdef HAVE_STRERROR_R
   namespace {
-    const char* strerror_r_result(const char* result, char*) {
+    const char* wrap_strerror_r_result(const char* result, char*) {
       return result;
     }
 
-    const char* strerror_r_result(int result, char* buffer) {
+    const char* wrap_strerror_r_result(int result, char* buffer) {
       if (result == 0) {
         return buffer;
       } else {
@@ -51,8 +51,8 @@ namespace dromozoa {
       }
     }
 
-    const char* strerror_r(int code, char* buffer, size_t size) {
-      return strerror_r_result(::strerror_r(code, buffer, size), buffer);
+    const char* wrap_strerror_r(int code, char* buffer, size_t size) {
+      return wrap_strerror_r_result(strerror_r(code, buffer, size), buffer);
     }
   }
 #endif
@@ -71,7 +71,7 @@ namespace dromozoa {
       size = size * 2;
       if (char* b = static_cast<char*>(realloc(buffer, size))) {
         buffer = b;
-        what = strerror_r(code, buffer, size);
+        what = wrap_strerror_r(code, buffer, size);
       } else {
         errno = ENOMEM;
       }
@@ -110,7 +110,7 @@ namespace dromozoa {
       size = size * 2;
       if (char* b = static_cast<char*>(realloc(buffer, size))) {
         buffer = b;
-        what = strerror_r(code, buffer, size);
+        what = wrap_strerror_r(code, buffer, size);
       } else {
         errno = ENOMEM;
       }
@@ -137,7 +137,9 @@ namespace dromozoa {
 
   void initialize_error(lua_State* L) {
     DROMOZOA_SET_FIELD(L, EAGAIN);
+    DROMOZOA_SET_FIELD(L, EINPROGRESS);
     DROMOZOA_SET_FIELD(L, EINTR);
+    DROMOZOA_SET_FIELD(L, ENOENT);
     DROMOZOA_SET_FIELD(L, EPIPE);
     DROMOZOA_SET_FIELD(L, EWOULDBLOCK);
   }

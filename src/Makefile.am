@@ -16,6 +16,7 @@
 # along with dromozoa-unix.  If not, see <http://www.gnu.org/licenses/>.
 
 noinst_HEADERS = \
+	addrinfo.hpp \
 	argument_vector.hpp \
 	coe.hpp \
 	environ.hpp \
@@ -26,6 +27,7 @@ noinst_HEADERS = \
 	function.hpp \
 	gettimeofday.hpp \
 	log_level.hpp \
+	nameinfo.hpp \
 	nanosleep.hpp \
 	ndelay.hpp \
 	pathexec.hpp \
@@ -38,6 +40,9 @@ noinst_HEADERS = \
 	set_field.hpp \
 	signal.hpp \
 	signal_mask.hpp \
+	sockaddr.hpp \
+	socket.hpp \
+	socket_fd.hpp \
 	success.hpp \
 	wait.hpp \
 	write.hpp
@@ -46,6 +51,7 @@ luaexec_LTLIBRARIES = unix.la
 
 unix_la_LDFLAGS = -module -avoid-version
 unix_la_SOURCES = \
+	addrinfo.cpp \
 	argument_vector.cpp \
 	coe.cpp \
 	environ.cpp \
@@ -55,6 +61,7 @@ unix_la_SOURCES = \
 	forkexec.cpp \
 	gettimeofday.cpp \
 	log_level.cpp \
+	nameinfo.cpp \
 	nanosleep.cpp \
 	ndelay.cpp \
 	pathexec.cpp \
@@ -65,6 +72,9 @@ unix_la_SOURCES = \
 	set_field.cpp \
 	signal.cpp \
 	signal_mask.cpp \
+	sockaddr.cpp \
+	socket.cpp \
+	socket_fd.cpp \
 	success.cpp \
 	unix.cpp \
 	wait.cpp \

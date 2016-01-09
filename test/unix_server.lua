@@ -17,28 +17,34 @@
 
 local unix = require "dromozoa.unix"
 
-local s = unix.selector()
-assert(s:open(256, unix.O_CLOEXEC))
-
-print(s:get())
-assert(s:add(0, 1))
-assert(unix.fd.ndelay_on(0))
-
--- s:select({ tv_sec = 1, tv_nsec = 0 })
-local done
-repeat
-  local result, message, code = assert(s:select())
-  for i = 1, result do
-    local fd, event = s:event(i)
-    print(fd, event)
-
-    local result, message, code = assert(unix.fd.read(0, 256))
-    io.write(("%q"):format(result))
-    if not result or result == "" then
-      done = true
-    end
+local abstract = 1
+local server = assert(unix.socket(unix.AF_UNIX, unix.SOCK_STREAM))
+local result, message, code = server:bind(unix.sockaddr_un("\0dromozoa-unix/test.sock"))
+if not result then
+  if code == unix.ENOENT then
+    abstract = 0
+    assert(server:bind(unix.sockaddr_un("test.sock")))
+  else
+    assert(result, message, code)
   end
-until done
+end
+assert(server:listen())
+io.stdout:write(abstract, "\n")
+io.stdout:flush()
+io.stdout:close()
 
-assert(s:close())
-print("done")
+local fd, sa = server:accept(unix.O_CLOEXEC)
+while true do
+  local result, message, code = fd:read(256)
+  if result and #result > 0 then
+    assert(result == "foo\n")
+    -- io.stderr:write(result)
+    assert(fd:write("bar\n") == 4)
+  else
+    break
+  end
+end
+assert(fd:close())
+assert(server:close())
+
+os.remove("test.sock")
