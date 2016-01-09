@@ -17,9 +17,13 @@
 
 local unix = require "dromozoa.unix"
 
-local path = ...
+local abstract = ...
 local fd = assert(unix.socket(unix.AF_UNIX, unix.SOCK_STREAM))
-assert(fd:connect(unix.sockaddr_un(path)))
+if abstract:find("^1") then
+  assert(fd:connect(unix.sockaddr_un("\0dromozoa-unix/test.sock")))
+else
+  assert(fd:connect(unix.sockaddr_un("test.sock")))
+end
 assert(fd:write("foo\n") == 4)
 assert(fd:shutdown(unix.SHUT_WR))
 while true do

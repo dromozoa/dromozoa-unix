@@ -26,10 +26,10 @@ local reader, writer = unix.pipe(unix.O_CLOEXEC)
 
 assert(unix.block_signal(unix.SIGCHLD))
 local pid1 = assert(unix.forkexec(path, { arg[-1], "test/server.lua" }, envp, nil, { [1] = writer }))
-local unix_path = assert(reader:read(256))
-print(("%q"):format(unix_path))
+local abstract = assert(reader:read(256))
+print(abstract)
 
-local pid2 = assert(unix.forkexec(path, { arg[-1], "test/client.lua", unix_path }, envp, nil, {}))
+local pid2 = assert(unix.forkexec(path, { arg[-1], "test/client.lua", abstract }, envp, nil, {}))
 
 assert(unix.unblock_signal(unix.SIGCHLD))
 unix.selfpipe.read()

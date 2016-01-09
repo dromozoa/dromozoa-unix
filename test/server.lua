@@ -17,19 +17,19 @@
 
 local unix = require "dromozoa.unix"
 
-local path = "\0dromozoa-unix/test.sock"
+local abstract = 1
 local server = assert(unix.socket(unix.AF_UNIX, unix.SOCK_STREAM))
-local result, message, code = server:bind(unix.sockaddr_un(path))
+local result, message, code = server:bind(unix.sockaddr_un("\0dromozoa-unix/test.sock"))
 if not result then
   if code == unix.ENOENT then
-    path = "test.sock"
-    assert(server:bind(unix.sockaddr_un(path)))
+    abstract = 0
+    assert(server:bind(unix.sockaddr_un("test.sock")))
   else
     assert(result, message, code)
   end
 end
 assert(server:listen())
-io.stdout:write(path)
+io.stdout:write(abstract, "\n")
 io.stdout:flush()
 io.stdout:close()
 
