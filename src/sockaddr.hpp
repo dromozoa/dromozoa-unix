@@ -28,6 +28,7 @@ namespace dromozoa {
   int new_sockaddr(lua_State* L, const struct sockaddr* address, socklen_t size);
   const struct sockaddr* get_sockaddr(lua_State* L, int n, socklen_t& size);
   int open_sockaddr(lua_State* L);
+  void initialize_sockaddr(lua_State* L);
 }
 
 #endif

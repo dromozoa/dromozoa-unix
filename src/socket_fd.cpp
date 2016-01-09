@@ -142,6 +142,15 @@ namespace dromozoa {
         return push_success(L);
       }
     }
+
+    int impl_shutdown(lua_State* L) {
+      int how = luaL_checkinteger(L, 2);
+      if (shutdown(get_fd(L, 1), how) == -1) {
+        return push_error(L);
+      } else {
+        return push_success(L);
+      }
+    }
   }
 
   void initialize_socket_fd(lua_State* L) {
@@ -151,5 +160,6 @@ namespace dromozoa {
     function<impl_listen>::set_field(L, "listen");
     function<impl_accept>::set_field(L, "accept");
     function<impl_connect>::set_field(L, "connect");
+    function<impl_shutdown>::set_field(L, "shutdown");
   }
 }

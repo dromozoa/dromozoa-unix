@@ -221,7 +221,7 @@ namespace dromozoa {
       const char* path = luaL_checkstring(L, 1);
       argument_vector argv(L, 2);
       argument_vector envp(L, 3);
-      const char* chdir = luaL_checkstring(L, 4);
+      const char* chdir = lua_tostring(L, 4);
       int dup2_stdio[3] = { -1, -1, -1 };
       for (int i = 0; i < 3; ++i) {
         lua_pushinteger(L, i);
@@ -246,7 +246,7 @@ namespace dromozoa {
       const char* path = luaL_checkstring(L, 1);
       argument_vector argv(L, 2);
       argument_vector envp(L, 3);
-      const char* chdir = luaL_checkstring(L, 4);
+      const char* chdir = lua_tostring(L, 4);
       pid_t pid1 = -1;
       pid_t pid2 = -1;
       if (forkexec_daemon(path, argv.get(), envp.get(), chdir, pid1, pid2) == -1) {

@@ -74,6 +74,7 @@ namespace dromozoa {
     dromozoa::initialize_nanosleep(L);
     dromozoa::initialize_pipe(L);
     dromozoa::initialize_signal(L);
+    dromozoa::initialize_sockaddr(L);
     dromozoa::initialize_socket(L);
     dromozoa::initialize_wait(L);
 

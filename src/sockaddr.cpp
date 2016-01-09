@@ -97,6 +97,22 @@ namespace dromozoa {
         return 1;
       }
     }
+
+    int impl_sockaddr_un(lua_State* L) {
+      size_t size = 0;
+      const char* path = luaL_checklstring(L, 1, &size);
+      struct sockaddr_un sun = {};
+      sun.sun_family = AF_UNIX;
+      if (size < sizeof(sun.sun_path)) {
+        memcpy(sun.sun_path, path, size);
+        sun.sun_path[size] = '\0';
+        new_sockaddr(L, reinterpret_cast<const struct sockaddr*>(&sun), sizeof(sun));
+        return 1;
+      } else {
+        lua_pushnil(L);
+        return 1;
+      }
+    }
   }
 
   int open_sockaddr(lua_State* L) {
@@ -109,5 +125,9 @@ namespace dromozoa {
     lua_setfield(L, -2, "__index");
     lua_pop(L, 1);
     return 1;
+  }
+
+  void initialize_sockaddr(lua_State* L) {
+    function<impl_sockaddr_un>::set_field(L, "sockaddr_un");
   }
 }
