@@ -38,6 +38,7 @@ extern "C" {
 #include "signal.hpp"
 #include "sockaddr.hpp"
 #include "socket.hpp"
+#include "socket_fd.hpp"
 #include "wait.hpp"
 #include "write.hpp"
 
@@ -50,6 +51,7 @@ namespace dromozoa {
     initialize_ndelay(L);
     initialize_read(L);
     initialize_write(L);
+    initialize_socket_fd(L);
     lua_setfield(L, -2, "fd");
 
     open_selector(L);

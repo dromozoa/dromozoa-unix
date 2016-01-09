@@ -23,6 +23,15 @@ local fd1, fd2 = assert(unix.socketpair(unix.AF_UNIX, unix.SOCK_STREAM))
 assert(fd1:coe())
 assert(fd2:coe())
 
+local sa1 = fd1:getsockname()
+print(sa1:size())
+assert(sa1:family() == unix.AF_UNIX)
+print(("%q"):format(sa1:path()))
+local sa2 = fd1:getpeername()
+print(sa2:size())
+assert(sa2:family() == unix.AF_UNIX)
+print(("%q"):format(sa2:path()))
+
 fd1:write("foo")
 fd1:close()
 

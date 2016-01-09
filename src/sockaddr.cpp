@@ -22,6 +22,8 @@ extern "C" {
 
 #include <stddef.h>
 #include <string.h>
+#include <sys/socket.h>
+#include <sys/un.h>
 
 #include "function.hpp"
 #include "sockaddr.hpp"
@@ -51,20 +53,57 @@ namespace dromozoa {
 
   namespace {
     namespace {
-      const struct sockaddr* get_sockaddr(lua_State* L, int n) {
-        return static_cast<socket_address*>(luaL_checkudata(L, n, "dromozoa.unix.sockaddr"))->address;
+      socklen_t get_size(lua_State* L, int n) {
+        return static_cast<const socket_address*>(luaL_checkudata(L, n, "dromozoa.unix.sockaddr"))->size;
+      }
+
+      const struct sockaddr* get_address(lua_State* L, int n) {
+        return static_cast<const socket_address*>(luaL_checkudata(L, n, "dromozoa.unix.sockaddr"))->address;
       }
     }
 
-    int impl_family(lua_State* L) {
-      lua_pushinteger(L, get_sockaddr(L, 1)->sa_family);
+    int impl_size(lua_State* L) {
+      lua_pushinteger(L, get_size(L, 1));
       return 1;
+    }
+
+    int impl_family(lua_State* L) {
+      lua_pushinteger(L, get_address(L, 1)->sa_family);
+      return 1;
+    }
+
+    int impl_path(lua_State* L) {
+      socklen_t size = 0;
+      const struct sockaddr* address = get_sockaddr(L, 1, size);
+      if (address->sa_family == AF_UNIX) {
+        const struct sockaddr_un* sun = reinterpret_cast<const struct sockaddr_un*>(address);
+        socklen_t n = size - offsetof(struct sockaddr_un, sun_path);
+        if (n > 0) {
+          const char* path = sun->sun_path;
+          ssize_t i = 0;
+          // abstract socket address
+          if (n > 1 && path[0] == '\0' && path[1] != '\0') {
+            i = 1;
+          }
+          for (; i < n && path[i] != '\0'; ++i) {}
+          lua_pushlstring(L, path, i);
+          return 1;
+        } else {
+          lua_pushliteral(L, "");
+          return 1;
+        }
+      } else {
+        lua_pushnil(L);
+        return 1;
+      }
     }
   }
 
   int open_sockaddr(lua_State* L) {
     lua_newtable(L);
+    function<impl_size>::set_field(L, "size");
     function<impl_family>::set_field(L, "family");
+    function<impl_path>::set_field(L, "path");
     luaL_newmetatable(L, "dromozoa.unix.sockaddr");
     lua_pushvalue(L, -2);
     lua_setfield(L, -2, "__index");
