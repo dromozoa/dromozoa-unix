@@ -40,7 +40,7 @@ extern "C" {
 namespace dromozoa {
   namespace {
 #ifdef HAVE_ACCEPT4
-    int impl_accept4(int fd, struct sockaddr* address, socklen_t* size, int flags) {
+    int wrap_accept4(int fd, struct sockaddr* address, socklen_t* size, int flags) {
       int f = 0;
       if (flags & O_CLOEXEC) {
         f |= SOCK_CLOEXEC;
@@ -51,7 +51,7 @@ namespace dromozoa {
       return accept4(fd, address, size, f);
     }
 #else
-    int impl_accept4(int fd, struct sockaddr* address, socklen_t* size, int flags) {
+    int wrap_accept4(int fd, struct sockaddr* address, socklen_t* size, int flags) {
       int result = accept(fd, address, size);
       if (result == -1) {
         return -1;
@@ -123,7 +123,7 @@ namespace dromozoa {
       int flags = luaL_optinteger(L, 2, 0);
       struct sockaddr_storage ss = {};
       socklen_t size = sizeof(ss);
-      int result = impl_accept4(get_fd(L, 1), sockaddr_cast(&ss), &size, flags);
+      int result = wrap_accept4(get_fd(L, 1), sockaddr_cast(&ss), &size, flags);
       if (result == -1) {
         return push_error(L);
       } else {
