@@ -21,9 +21,10 @@ namespace dromozoa {
   int push_success(lua_State* L) {
     if (lua_isuserdata(L, 1)) {
       lua_pushvalue(L, 1);
+      return 1;
     } else {
       lua_pushinteger(L, 0);
+      return 1;
     }
-    return 1;
   }
 }
