@@ -25,3 +25,7 @@ print("egid", unix.getegid())
 print("pid", unix.getpid())
 print("pgrp", unix.getpgrp())
 print("ppid", unix.getppid())
+
+local mask = unix.umask(18) -- 022
+assert(mask == 18)
+assert(unix.umask(mask) == 18)
