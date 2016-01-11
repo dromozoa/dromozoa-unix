@@ -27,4 +27,4 @@ do
   "$lua" "$i"
 done
 
-rm test.txt
+rm -f test.sock test.txt

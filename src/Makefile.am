@@ -43,7 +43,9 @@ noinst_HEADERS = \
 	sockaddr.hpp \
 	socket.hpp \
 	socket_fd.hpp \
+	stat.hpp \
 	success.hpp \
+	unistd.hpp \
 	wait.hpp \
 	write.hpp
 
@@ -75,7 +77,9 @@ unix_la_SOURCES = \
 	sockaddr.cpp \
 	socket.cpp \
 	socket_fd.cpp \
+	stat.cpp \
 	success.cpp \
+	unistd.cpp \
 	unix.cpp \
 	wait.cpp \
 	write.cpp

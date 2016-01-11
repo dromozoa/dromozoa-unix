@@ -15,16 +15,15 @@
 // You should have received a copy of the GNU General Public License
 // along with dromozoa-unix.  If not, see <http://www.gnu.org/licenses/>.
 
-#include "success.hpp"
+#ifndef DROMOZOA_STAT_HPP
+#define DROMOZOA_STAT_HPP
+
+extern "C" {
+#include <lua.h>
+}
 
 namespace dromozoa {
-  int push_success(lua_State* L) {
-    if (lua_isuserdata(L, 1)) {
-      lua_pushvalue(L, 1);
-      return 1;
-    } else {
-      lua_pushinteger(L, 0);
-      return 1;
-    }
-  }
+  void initialize_stat(lua_State* L);
 }
+
+#endif
