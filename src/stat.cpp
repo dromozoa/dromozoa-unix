@@ -15,16 +15,25 @@
 // You should have received a copy of the GNU General Public License
 // along with dromozoa-unix.  If not, see <http://www.gnu.org/licenses/>.
 
-#include "success.hpp"
+extern "C" {
+#include <lua.h>
+#include <lauxlib.h>
+}
+
+#include <sys/stat.h>
+
+#include "function.hpp"
+#include "stat.hpp"
 
 namespace dromozoa {
-  int push_success(lua_State* L) {
-    if (lua_isuserdata(L, 1)) {
-      lua_pushvalue(L, 1);
-      return 1;
-    } else {
-      lua_pushinteger(L, 0);
+  namespace {
+    int impl_umask(lua_State* L) {
+      lua_pushinteger(L, umask(luaL_checkinteger(L, 1)));
       return 1;
     }
+  }
+
+  void initialize_stat(lua_State* L) {
+    function<impl_umask>::set_field(L, "umask");
   }
 }
