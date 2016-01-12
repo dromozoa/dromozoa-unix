@@ -22,10 +22,13 @@ extern "C" {
 
 #include <sys/stat.h>
 
-#include "function.hpp"
+#include "dromozoa/bind.hpp"
+
 #include "stat.hpp"
 
 namespace dromozoa {
+  using bind::function;
+
   namespace {
     int impl_umask(lua_State* L) {
       lua_pushinteger(L, umask(luaL_checkinteger(L, 1)));

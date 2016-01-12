@@ -25,10 +25,10 @@ extern "C" {
 #include "dromozoa/bind.hpp"
 
 #include "error.hpp"
-#include "function.hpp"
 #include "set_field.hpp"
 
 namespace dromozoa {
+  using bind::function;
   using bind::push_success;
 
   namespace {

@@ -32,7 +32,6 @@ extern "C" {
 
 #include "error.hpp"
 #include "fd.hpp"
-#include "function.hpp"
 #include "log_level.hpp"
 #include "selector.hpp"
 
@@ -49,6 +48,7 @@ namespace dromozoa {
 #endif
 
 namespace dromozoa {
+  using bind::function;
   using bind::push_success;
 
   selector::~selector() {}

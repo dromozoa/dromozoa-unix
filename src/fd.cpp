@@ -28,10 +28,10 @@ extern "C" {
 
 #include "error.hpp"
 #include "fd.hpp"
-#include "function.hpp"
 #include "log_level.hpp"
 
 namespace dromozoa {
+  using bind::function;
   using bind::push_success;
 
   int new_fd(lua_State* L, int fd) {

@@ -24,8 +24,9 @@ extern "C" {
 
 #include <vector>
 
+#include "dromozoa/bind.hpp"
+
 #include "addrinfo.hpp"
-#include "function.hpp"
 #include "nameinfo.hpp"
 #include "sockaddr.hpp"
 
@@ -38,6 +39,8 @@ extern "C" {
 #endif
 
 namespace dromozoa {
+  using bind::function;
+
   namespace {
     int impl_getnameinfo(lua_State* L) {
       std::vector<char> nodename(NI_MAXHOST);

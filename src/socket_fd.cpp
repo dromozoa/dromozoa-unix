@@ -33,12 +33,12 @@ extern "C" {
 #include "coe.hpp"
 #include "error.hpp"
 #include "fd.hpp"
-#include "function.hpp"
 #include "ndelay.hpp"
 #include "sockaddr.hpp"
 #include "socket_fd.hpp"
 
 namespace dromozoa {
+  using bind::function;
   using bind::push_success;
 
   namespace {

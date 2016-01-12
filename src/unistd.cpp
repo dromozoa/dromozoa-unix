@@ -23,11 +23,14 @@ extern "C" {
 
 #include <vector>
 
+#include "dromozoa/bind.hpp"
+
 #include "error.hpp"
-#include "function.hpp"
 #include "unistd.hpp"
 
 namespace dromozoa {
+  using bind::function;
+
   namespace {
     int impl_getcwd(lua_State* L) {
       long path_max = pathconf(".", _PC_PATH_MAX);

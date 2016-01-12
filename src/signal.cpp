@@ -25,12 +25,12 @@ extern "C" {
 #include "dromozoa/bind.hpp"
 
 #include "error.hpp"
-#include "function.hpp"
 #include "set_field.hpp"
 #include "signal.hpp"
 #include "signal_mask.hpp"
 
 namespace dromozoa {
+  using bind::function;
   using bind::push_success;
 
   namespace {

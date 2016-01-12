@@ -20,10 +20,13 @@ extern "C" {
 #include <lauxlib.h>
 }
 
+#include "dromozoa/bind.hpp"
+
 #include "log_level.hpp"
-#include "function.hpp"
 
 namespace dromozoa {
+  using bind::function;
+
   namespace {
     lua_Integer log_level = 0;
   }

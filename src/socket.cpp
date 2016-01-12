@@ -17,19 +17,23 @@
 
 extern "C" {
 #include <lua.h>
+#include <lauxlib.h>
 }
 
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <netinet/tcp.h>
 
+#include "dromozoa/bind.hpp"
+
 #include "error.hpp"
 #include "fd.hpp"
-#include "function.hpp"
 #include "set_field.hpp"
 #include "socket.hpp"
 
 namespace dromozoa {
+  using bind::function;
+
   namespace {
     int impl_socket(lua_State* L) {
       int domain = luaL_checkinteger(L, 1);

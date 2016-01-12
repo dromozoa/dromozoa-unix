@@ -25,10 +25,10 @@ extern "C" {
 
 #include "error.hpp"
 #include "fd.hpp"
-#include "function.hpp"
 #include "ndelay.hpp"
 
 namespace dromozoa {
+  using bind::function;
   using bind::push_success;
 
   int ndelay_on(int fd) {

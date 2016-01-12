@@ -17,16 +17,20 @@
 
 extern "C" {
 #include <lua.h>
+#include <lauxlib.h>
 }
 
 #include <netdb.h>
 
+#include "dromozoa/bind.hpp"
+
 #include "addrinfo.hpp"
-#include "function.hpp"
 #include "set_field.hpp"
 #include "sockaddr.hpp"
 
 namespace dromozoa {
+  using bind::function;
+
   int push_addrinfo_error(lua_State* L, int code) {
     lua_pushnil(L);
     if (const char* what = gai_strerror(code)) {

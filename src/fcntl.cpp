@@ -22,13 +22,16 @@ extern "C" {
 
 #include <fcntl.h>
 
+#include "dromozoa/bind.hpp"
+
 #include "error.hpp"
 #include "fcntl.hpp"
 #include "fd.hpp"
-#include "function.hpp"
 #include "set_field.hpp"
 
 namespace dromozoa {
+  using bind::function;
+
   namespace {
     int impl_open(lua_State* L) {
       const char* path = luaL_checkstring(L, 1);

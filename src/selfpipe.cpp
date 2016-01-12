@@ -26,7 +26,6 @@ extern "C" {
 #include "dromozoa/bind.hpp"
 
 #include "error.hpp"
-#include "function.hpp"
 #include "pipe.hpp"
 #include "selfpipe.hpp"
 
@@ -37,6 +36,7 @@ extern "C" void dromozoa_selfpipe_catch(int) {
 }
 
 namespace dromozoa {
+  using bind::function;
   using bind::push_success;
 
   namespace {

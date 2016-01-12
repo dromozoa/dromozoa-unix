@@ -21,12 +21,15 @@ extern "C" {
 
 #include <unistd.h>
 
+#include "dromozoa/bind.hpp"
+
 #include "environ.hpp"
-#include "function.hpp"
 
 extern char** environ;
 
 namespace dromozoa {
+  using bind::function;
+
   namespace {
     int impl_environ(lua_State* L) {
       lua_newtable(L);

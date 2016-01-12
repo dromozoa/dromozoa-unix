@@ -22,12 +22,15 @@ extern "C" {
 
 #include <sys/wait.h>
 
+#include "dromozoa/bind.hpp"
+
 #include "error.hpp"
-#include "function.hpp"
 #include "set_field.hpp"
 #include "wait.hpp"
 
 namespace dromozoa {
+  using bind::function;
+
   namespace {
     int impl_wait(lua_State* L) {
       pid_t pid = luaL_optinteger(L, 1, -1);

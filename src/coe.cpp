@@ -26,9 +26,9 @@ extern "C" {
 #include "coe.hpp"
 #include "error.hpp"
 #include "fd.hpp"
-#include "function.hpp"
 
 namespace dromozoa {
+  using bind::function;
   using bind::push_success;
 
   int coe(int fd) {
