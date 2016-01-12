@@ -17,4 +17,11 @@
 
 ACLOCAL_AMFLAGS = -I m4
 SUBDIRS = bind src
-EXTRA_DIST = .gitignore README.md dromozoa-unix-*.rockspec m4/update test test.sh
+
+EXTRA_DIST = \
+	.gitignore \
+	README.md \
+	dromozoa-unix-*.rockspec \
+	m4/update \
+	test \
+	test.sh
