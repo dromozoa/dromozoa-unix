@@ -32,7 +32,6 @@ extern "C" {
 
 #include "error.hpp"
 #include "fd.hpp"
-#include "log_level.hpp"
 #include "selector.hpp"
 
 #if defined(HAVE_EPOLL_CREATE) || defined(HAVE_EPOLL_CREATE1)
@@ -49,6 +48,7 @@ namespace dromozoa {
 
 namespace dromozoa {
   using bind::function;
+  using bind::get_log_level;
   using bind::push_success;
 
   selector::~selector() {}

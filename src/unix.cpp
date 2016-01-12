@@ -19,6 +19,8 @@ extern "C" {
 #include <lua.h>
 }
 
+#include "dromozoa/bind.hpp"
+
 #include "addrinfo.hpp"
 #include "coe.hpp"
 #include "environ.hpp"
@@ -27,7 +29,6 @@ extern "C" {
 #include "fd.hpp"
 #include "forkexec.hpp"
 #include "gettimeofday.hpp"
-#include "log_level.hpp"
 #include "nameinfo.hpp"
 #include "nanosleep.hpp"
 #include "ndelay.hpp"
@@ -66,13 +67,13 @@ namespace dromozoa {
     initialize_nameinfo(L);
     lua_setfield(L, -2, "sockaddr");
 
+    dromozoa::bind::initialize(L);
     dromozoa::initialize_addrinfo(L);
     dromozoa::initialize_environ(L);
     dromozoa::initialize_error(L);
     dromozoa::initialize_fcntl(L);
     dromozoa::initialize_forkexec(L);
     dromozoa::initialize_gettimeofday(L);
-    dromozoa::initialize_log_level(L);
     dromozoa::initialize_nanosleep(L);
     dromozoa::initialize_pipe(L);
     dromozoa::initialize_signal(L);

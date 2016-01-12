@@ -24,9 +24,7 @@ noinst_HEADERS = \
 	fcntl.hpp \
 	fd.hpp \
 	forkexec.hpp \
-	function.hpp \
 	gettimeofday.hpp \
-	log_level.hpp \
 	nameinfo.hpp \
 	nanosleep.hpp \
 	ndelay.hpp \
@@ -63,7 +61,6 @@ unix_la_SOURCES = \
 	fd.cpp \
 	forkexec.cpp \
 	gettimeofday.cpp \
-	log_level.cpp \
 	nameinfo.cpp \
 	nanosleep.cpp \
 	ndelay.cpp \
