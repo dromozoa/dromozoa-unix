@@ -51,7 +51,9 @@ noinst_HEADERS = \
 
 luaexec_LTLIBRARIES = unix.la
 
-unix_la_LDFLAGS = -module -avoid-version
+unix_la_CPPFLAGS = -I$(top_srcdir)/bind
+unix_la_LDFLAGS = -module -avoid-version -shared
+unix_la_LIBADD = $(top_srcdir)/bind/libdromozoa-bind.la
 unix_la_SOURCES = \
 	addrinfo.cpp \
 	argument_vector.cpp \

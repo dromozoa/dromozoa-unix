@@ -16,5 +16,5 @@
 # along with dromozoa-unix.  If not, see <http://www.gnu.org/licenses/>.
 
 ACLOCAL_AMFLAGS = -I m4
-SUBDIRS = src
+SUBDIRS = bind src
 EXTRA_DIST = .gitignore README.md dromozoa-unix-*.rockspec m4/update test test.sh
