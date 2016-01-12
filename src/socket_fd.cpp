@@ -28,6 +28,8 @@ extern "C" {
 #include <unistd.h>
 #include <sys/socket.h>
 
+#include "dromozoa/bind.hpp"
+
 #include "coe.hpp"
 #include "error.hpp"
 #include "fd.hpp"
@@ -35,9 +37,10 @@ extern "C" {
 #include "ndelay.hpp"
 #include "sockaddr.hpp"
 #include "socket_fd.hpp"
-#include "success.hpp"
 
 namespace dromozoa {
+  using bind::push_success;
+
   namespace {
 #ifdef HAVE_ACCEPT4
     int wrap_accept4(int fd, struct sockaddr* address, socklen_t* size, int flags) {
@@ -103,7 +106,7 @@ namespace dromozoa {
     int impl_bind(lua_State* L) {
       socklen_t size = 0;
       const struct sockaddr* address = get_sockaddr(L, 2, size);
-      if (bind(get_fd(L, 1), address, size) == -1) {
+      if (::bind(get_fd(L, 1), address, size) == -1) {
         return push_error(L);
       } else {
         return push_success(L);

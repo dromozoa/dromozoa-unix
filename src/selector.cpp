@@ -28,11 +28,12 @@ extern "C" {
 
 #include <iostream>
 
+#include "dromozoa/bind.hpp"
+
 #include "error.hpp"
 #include "fd.hpp"
 #include "function.hpp"
 #include "log_level.hpp"
-#include "success.hpp"
 #include "selector.hpp"
 
 #if defined(HAVE_EPOLL_CREATE) || defined(HAVE_EPOLL_CREATE1)
@@ -48,6 +49,8 @@ namespace dromozoa {
 #endif
 
 namespace dromozoa {
+  using bind::push_success;
+
   selector::~selector() {}
 
   namespace {
