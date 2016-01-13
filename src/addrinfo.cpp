@@ -25,11 +25,11 @@ extern "C" {
 #include "dromozoa/bind.hpp"
 
 #include "addrinfo.hpp"
-#include "set_field.hpp"
 #include "sockaddr.hpp"
 
 namespace dromozoa {
   using bind::function;
+  using bind::set_field;
 
   int push_addrinfo_error(lua_State* L, int code) {
     lua_pushnil(L);
@@ -97,21 +97,21 @@ namespace dromozoa {
   void initialize_addrinfo(lua_State* L) {
     function<impl_getaddrinfo>::set_field(L, "getaddrinfo");
 
-    DROMOZOA_SET_FIELD(L, AI_PASSIVE);
-    DROMOZOA_SET_FIELD(L, AI_CANONNAME);
-    DROMOZOA_SET_FIELD(L, AI_NUMERICHOST);
-    DROMOZOA_SET_FIELD(L, AI_NUMERICSERV);
-    DROMOZOA_SET_FIELD(L, AI_V4MAPPED);
-    DROMOZOA_SET_FIELD(L, AI_ALL);
-    DROMOZOA_SET_FIELD(L, AI_ADDRCONFIG);
+    DROMOZOA_BIND_SET_FIELD(L, AI_PASSIVE);
+    DROMOZOA_BIND_SET_FIELD(L, AI_CANONNAME);
+    DROMOZOA_BIND_SET_FIELD(L, AI_NUMERICHOST);
+    DROMOZOA_BIND_SET_FIELD(L, AI_NUMERICSERV);
+    DROMOZOA_BIND_SET_FIELD(L, AI_V4MAPPED);
+    DROMOZOA_BIND_SET_FIELD(L, AI_ALL);
+    DROMOZOA_BIND_SET_FIELD(L, AI_ADDRCONFIG);
 
-    DROMOZOA_SET_FIELD(L, NI_NOFQDN);
-    DROMOZOA_SET_FIELD(L, NI_NUMERICHOST);
-    DROMOZOA_SET_FIELD(L, NI_NAMEREQD);
-    DROMOZOA_SET_FIELD(L, NI_NUMERICSERV);
+    DROMOZOA_BIND_SET_FIELD(L, NI_NOFQDN);
+    DROMOZOA_BIND_SET_FIELD(L, NI_NUMERICHOST);
+    DROMOZOA_BIND_SET_FIELD(L, NI_NAMEREQD);
+    DROMOZOA_BIND_SET_FIELD(L, NI_NUMERICSERV);
 #ifdef NI_NUMERICSCOPE
-    DROMOZOA_SET_FIELD(L, NI_NUMERICSCOPE);
+    DROMOZOA_BIND_SET_FIELD(L, NI_NUMERICSCOPE);
 #endif
-    DROMOZOA_SET_FIELD(L, NI_DGRAM);
+    DROMOZOA_BIND_SET_FIELD(L, NI_DGRAM);
   }
 }

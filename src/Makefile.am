@@ -35,7 +35,6 @@ noinst_HEADERS = \
 	selector_epoll.hpp \
 	selector_kqueue.hpp \
 	selfpipe.hpp \
-	set_field.hpp \
 	signal.hpp \
 	signal_mask.hpp \
 	sockaddr.hpp \
@@ -69,7 +68,6 @@ unix_la_SOURCES = \
 	read.cpp \
 	selector.cpp \
 	selfpipe.cpp \
-	set_field.cpp \
 	signal.cpp \
 	signal_mask.cpp \
 	sockaddr.cpp \

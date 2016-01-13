@@ -25,11 +25,11 @@ extern "C" {
 #include "dromozoa/bind.hpp"
 
 #include "error.hpp"
-#include "set_field.hpp"
 
 namespace dromozoa {
   using bind::function;
   using bind::push_success;
+  using bind::set_field;
 
   namespace {
     int impl_nanosleep(lua_State* L) {

@@ -27,7 +27,6 @@ extern "C" {
 #include "error.hpp"
 #include "fcntl.hpp"
 #include "fd.hpp"
-#include "set_field.hpp"
 
 namespace dromozoa {
   using bind::function;
@@ -49,12 +48,12 @@ namespace dromozoa {
 
   void initialize_fcntl(lua_State* L) {
     function<impl_open>::set_field(L, "open");
-    DROMOZOA_SET_FIELD(L, O_APPEND);
-    DROMOZOA_SET_FIELD(L, O_CLOEXEC);
-    DROMOZOA_SET_FIELD(L, O_CREAT);
-    DROMOZOA_SET_FIELD(L, O_NONBLOCK);
-    DROMOZOA_SET_FIELD(L, O_RDONLY);
-    DROMOZOA_SET_FIELD(L, O_RDWR);
-    DROMOZOA_SET_FIELD(L, O_WRONLY);
+    DROMOZOA_BIND_SET_FIELD(L, O_APPEND);
+    DROMOZOA_BIND_SET_FIELD(L, O_CLOEXEC);
+    DROMOZOA_BIND_SET_FIELD(L, O_CREAT);
+    DROMOZOA_BIND_SET_FIELD(L, O_NONBLOCK);
+    DROMOZOA_BIND_SET_FIELD(L, O_RDONLY);
+    DROMOZOA_BIND_SET_FIELD(L, O_RDWR);
+    DROMOZOA_BIND_SET_FIELD(L, O_WRONLY);
   }
 }

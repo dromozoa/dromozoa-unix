@@ -25,7 +25,6 @@ extern "C" {
 #include "dromozoa/bind.hpp"
 
 #include "error.hpp"
-#include "set_field.hpp"
 #include "wait.hpp"
 
 namespace dromozoa {
@@ -66,8 +65,8 @@ namespace dromozoa {
 
   void initialize_wait(lua_State* L) {
     function<impl_wait>::set_field(L, "wait");
-    DROMOZOA_SET_FIELD(L, WCONTINUED);
-    DROMOZOA_SET_FIELD(L, WNOHANG);
-    DROMOZOA_SET_FIELD(L, WUNTRACED);
+    DROMOZOA_BIND_SET_FIELD(L, WCONTINUED);
+    DROMOZOA_BIND_SET_FIELD(L, WNOHANG);
+    DROMOZOA_BIND_SET_FIELD(L, WUNTRACED);
   }
 }
