@@ -28,7 +28,6 @@ extern "C" {
 #include "fcntl.hpp"
 #include "fd.hpp"
 #include "forkexec.hpp"
-#include "gettimeofday.hpp"
 #include "nameinfo.hpp"
 #include "nanosleep.hpp"
 #include "ndelay.hpp"
@@ -41,6 +40,7 @@ extern "C" {
 #include "socket.hpp"
 #include "socket_fd.hpp"
 #include "stat.hpp"
+#include "sys_time.hpp"
 #include "unistd.hpp"
 #include "wait.hpp"
 #include "write.hpp"
@@ -67,21 +67,21 @@ namespace dromozoa {
     initialize_nameinfo(L);
     lua_setfield(L, -2, "sockaddr");
 
-    dromozoa::bind::initialize(L);
-    dromozoa::initialize_addrinfo(L);
-    dromozoa::initialize_environ(L);
-    dromozoa::initialize_error(L);
-    dromozoa::initialize_fcntl(L);
-    dromozoa::initialize_forkexec(L);
-    dromozoa::initialize_gettimeofday(L);
-    dromozoa::initialize_nanosleep(L);
-    dromozoa::initialize_pipe(L);
-    dromozoa::initialize_signal(L);
-    dromozoa::initialize_sockaddr(L);
-    dromozoa::initialize_socket(L);
-    dromozoa::initialize_stat(L);
-    dromozoa::initialize_unistd(L);
-    dromozoa::initialize_wait(L);
+    bind::initialize(L);
+    initialize_addrinfo(L);
+    initialize_environ(L);
+    initialize_error(L);
+    initialize_fcntl(L);
+    initialize_forkexec(L);
+    initialize_nanosleep(L);
+    initialize_pipe(L);
+    initialize_signal(L);
+    initialize_sockaddr(L);
+    initialize_socket(L);
+    initialize_stat(L);
+    initialize_sys_time(L);
+    initialize_unistd(L);
+    initialize_wait(L);
 
     return 1;
   }
