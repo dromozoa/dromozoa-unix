@@ -21,7 +21,6 @@ extern "C" {
 
 #include "dromozoa/bind.hpp"
 
-#include "addrinfo.hpp"
 #include "coe.hpp"
 #include "environ.hpp"
 #include "error.hpp"
@@ -30,6 +29,7 @@ extern "C" {
 #include "forkexec.hpp"
 #include "nameinfo.hpp"
 #include "ndelay.hpp"
+#include "netdb.hpp"
 #include "netinet.hpp"
 #include "pipe.hpp"
 #include "read.hpp"
@@ -69,11 +69,11 @@ namespace dromozoa {
     lua_setfield(L, -2, "sockaddr");
 
     bind::initialize(L);
-    initialize_addrinfo(L);
     initialize_environ(L);
     initialize_error(L);
     initialize_fcntl(L);
     initialize_forkexec(L);
+    initialize_netdb(L);
     initialize_netinet(L);
     initialize_pipe(L);
     initialize_signal(L);

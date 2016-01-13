@@ -15,8 +15,8 @@
 // You should have received a copy of the GNU General Public License
 // along with dromozoa-unix.  If not, see <http://www.gnu.org/licenses/>.
 
-#ifndef DROMOZOA_ADDRINFO_HPP
-#define DROMOZOA_ADDRINFO_HPP
+#ifndef DROMOZOA_NETDB_HPP
+#define DROMOZOA_NETDB_HPP
 
 extern "C" {
 #include <lua.h>
@@ -24,7 +24,7 @@ extern "C" {
 
 namespace dromozoa {
   int push_addrinfo_error(lua_State* L, int code);
-  void initialize_addrinfo(lua_State* L);
+  void initialize_netdb(lua_State* L);
 }
 
 #endif

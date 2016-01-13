@@ -16,7 +16,6 @@
 # along with dromozoa-unix.  If not, see <http://www.gnu.org/licenses/>.
 
 noinst_HEADERS = \
-	addrinfo.hpp \
 	argument_vector.hpp \
 	coe.hpp \
 	environ.hpp \
@@ -26,6 +25,7 @@ noinst_HEADERS = \
 	forkexec.hpp \
 	nameinfo.hpp \
 	ndelay.hpp \
+	netdb.hpp \
 	netinet.hpp \
 	pathexec.hpp \
 	pipe.hpp \
@@ -52,7 +52,6 @@ unix_la_CPPFLAGS = -I$(top_srcdir)/bind
 unix_la_LDFLAGS = -module -avoid-version -shared
 unix_la_LIBADD = $(top_srcdir)/bind/libdromozoa-bind.la
 unix_la_SOURCES = \
-	addrinfo.cpp \
 	argument_vector.cpp \
 	coe.cpp \
 	environ.cpp \
@@ -62,6 +61,7 @@ unix_la_SOURCES = \
 	forkexec.cpp \
 	nameinfo.cpp \
 	ndelay.cpp \
+	netdb.cpp \
 	netinet.cpp \
 	pathexec.cpp \
 	pipe.cpp \

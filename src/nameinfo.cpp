@@ -26,7 +26,7 @@ extern "C" {
 
 #include "dromozoa/bind.hpp"
 
-#include "addrinfo.hpp"
+#include "netdb.hpp"
 #include "nameinfo.hpp"
 #include "sockaddr.hpp"
 
