@@ -35,7 +35,7 @@ extern "C" {
 #include "fd.hpp"
 #include "ndelay.hpp"
 #include "sockaddr.hpp"
-#include "socket_fd.hpp"
+#include "socket.hpp"
 
 namespace dromozoa {
   using bind::function;
@@ -180,7 +180,7 @@ namespace dromozoa {
     }
   }
 
-  void initialize_socket_fd(lua_State* L) {
+  void initialize_socket(lua_State* L) {
     function<impl_getsockname>::set_field(L, "getsockname");
     function<impl_getpeername>::set_field(L, "getpeername");
     function<impl_bind>::set_field(L, "bind");

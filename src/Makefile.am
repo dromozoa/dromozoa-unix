@@ -36,7 +36,7 @@ noinst_HEADERS = \
 	signal.hpp \
 	signal_mask.hpp \
 	sockaddr.hpp \
-	socket_fd.hpp \
+	socket.hpp \
 	sys_socket.hpp \
 	sys_stat.hpp \
 	sys_time.hpp \
@@ -69,7 +69,7 @@ unix_la_SOURCES = \
 	signal.cpp \
 	signal_mask.cpp \
 	sockaddr.cpp \
-	socket_fd.cpp \
+	socket.cpp \
 	sys_socket.cpp \
 	sys_stat.cpp \
 	sys_time.cpp \

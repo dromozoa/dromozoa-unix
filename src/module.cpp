@@ -36,7 +36,7 @@ extern "C" {
 #include "selfpipe.hpp"
 #include "signal.hpp"
 #include "sockaddr.hpp"
-#include "socket_fd.hpp"
+#include "socket.hpp"
 #include "sys_socket.hpp"
 #include "sys_stat.hpp"
 #include "sys_time.hpp"
@@ -54,7 +54,7 @@ namespace dromozoa {
     initialize_ndelay(L);
     initialize_read(L);
     initialize_write(L);
-    initialize_socket_fd(L);
+    initialize_socket(L);
     lua_setfield(L, -2, "fd");
 
     open_selector(L);
