@@ -18,7 +18,6 @@
 noinst_HEADERS = \
 	argument_vector.hpp \
 	coe.hpp \
-	environ.hpp \
 	error.hpp \
 	fcntl.hpp \
 	fd.hpp \
@@ -54,7 +53,6 @@ unix_la_LIBADD = $(top_srcdir)/bind/libdromozoa-bind.la
 unix_la_SOURCES = \
 	argument_vector.cpp \
 	coe.cpp \
-	environ.cpp \
 	error.cpp \
 	fcntl.cpp \
 	fd.cpp \

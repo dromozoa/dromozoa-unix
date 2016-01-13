@@ -22,7 +22,6 @@ extern "C" {
 #include "dromozoa/bind.hpp"
 
 #include "coe.hpp"
-#include "environ.hpp"
 #include "error.hpp"
 #include "fcntl.hpp"
 #include "fd.hpp"
@@ -69,7 +68,6 @@ namespace dromozoa {
     lua_setfield(L, -2, "sockaddr");
 
     bind::initialize(L);
-    initialize_environ(L);
     initialize_error(L);
     initialize_fcntl(L);
     initialize_forkexec(L);
