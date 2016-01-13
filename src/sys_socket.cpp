@@ -28,7 +28,7 @@ extern "C" {
 
 #include "error.hpp"
 #include "fd.hpp"
-#include "socket.hpp"
+#include "sys_socket.hpp"
 
 namespace dromozoa {
   using bind::function;
@@ -62,7 +62,7 @@ namespace dromozoa {
     }
   }
 
-  void initialize_socket(lua_State* L) {
+  void initialize_sys_socket(lua_State* L) {
     function<impl_socket>::set_field(L, "socket");
     function<impl_socketpair>::set_field(L, "socketpair");
 

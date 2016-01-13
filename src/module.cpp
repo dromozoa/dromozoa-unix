@@ -36,8 +36,8 @@ extern "C" {
 #include "selfpipe.hpp"
 #include "signal.hpp"
 #include "sockaddr.hpp"
-#include "socket.hpp"
 #include "socket_fd.hpp"
+#include "sys_socket.hpp"
 #include "sys_stat.hpp"
 #include "sys_time.hpp"
 #include "sys_wait.hpp"
@@ -76,7 +76,7 @@ namespace dromozoa {
     initialize_pipe(L);
     initialize_signal(L);
     initialize_sockaddr(L);
-    initialize_socket(L);
+    initialize_sys_socket(L);
     initialize_sys_stat(L);
     initialize_sys_time(L);
     initialize_sys_wait(L);

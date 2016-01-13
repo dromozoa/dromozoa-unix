@@ -15,15 +15,15 @@
 // You should have received a copy of the GNU General Public License
 // along with dromozoa-unix.  If not, see <http://www.gnu.org/licenses/>.
 
-#ifndef DROMOZOA_SOCKET_HPP
-#define DROMOZOA_SOCKET_HPP
+#ifndef DROMOZOA_SYS_SOCKET_HPP
+#define DROMOZOA_SYS_SOCKET_HPP
 
 extern "C" {
 #include <lua.h>
 }
 
 namespace dromozoa {
-  void initialize_socket(lua_State* L);
+  void initialize_sys_socket(lua_State* L);
 }
 
 #endif
