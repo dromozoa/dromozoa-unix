@@ -40,9 +40,9 @@ extern "C" {
 #include "socket_fd.hpp"
 #include "sys_stat.hpp"
 #include "sys_time.hpp"
+#include "sys_wait.hpp"
 #include "time.hpp"
 #include "unistd.hpp"
-#include "wait.hpp"
 #include "write.hpp"
 
 namespace dromozoa {
@@ -79,9 +79,9 @@ namespace dromozoa {
     initialize_socket(L);
     initialize_sys_stat(L);
     initialize_sys_time(L);
+    initialize_sys_wait(L);
     initialize_time(L);
     initialize_unistd(L);
-    initialize_wait(L);
 
     return 1;
   }

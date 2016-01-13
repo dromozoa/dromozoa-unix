@@ -25,7 +25,6 @@ extern "C" {
 #include <signal.h>
 #include <stddef.h>
 #include <unistd.h>
-#include <sys/wait.h>
 
 #include <vector>
 

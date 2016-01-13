@@ -40,9 +40,9 @@ noinst_HEADERS = \
 	socket_fd.hpp \
 	sys_stat.hpp \
 	sys_time.hpp \
+	sys_wait.hpp \
 	time.hpp \
 	unistd.hpp \
-	wait.hpp \
 	write.hpp
 
 luaexec_LTLIBRARIES = unix.la
@@ -73,9 +73,9 @@ unix_la_SOURCES = \
 	socket_fd.cpp \
 	sys_stat.cpp \
 	sys_time.cpp \
+	sys_wait.cpp \
 	time.cpp \
 	unistd.cpp \
-	wait.cpp \
 	write.cpp \
 	module.cpp
 
