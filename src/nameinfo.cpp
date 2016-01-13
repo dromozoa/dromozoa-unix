@@ -54,7 +54,7 @@ namespace dromozoa {
         lua_pushstring(L, &servname[0]);
         return 2;
       } else {
-        return push_addrinfo_error(L, code);
+        return push_netdb_error(L, code);
       }
     }
   }

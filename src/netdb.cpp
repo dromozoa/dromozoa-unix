@@ -31,7 +31,7 @@ namespace dromozoa {
   using bind::function;
   using bind::set_field;
 
-  int push_addrinfo_error(lua_State* L, int code) {
+  int push_netdb_error(lua_State* L, int code) {
     lua_pushnil(L);
     if (const char* what = gai_strerror(code)) {
       lua_pushstring(L, what);
@@ -89,7 +89,7 @@ namespace dromozoa {
         freeaddrinfo(result);
         return 1;
       } else {
-        return push_addrinfo_error(L, code);
+        return push_netdb_error(L, code);
       }
     }
   }
