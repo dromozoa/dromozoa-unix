@@ -33,8 +33,8 @@ namespace dromozoa {
   namespace {
     int impl_wait(lua_State* L) {
       pid_t pid = luaL_optinteger(L, 1, -1);
-      int status = 0;
       int options = luaL_optinteger(L, 2, 0);
+      int status = 0;
       pid_t result = waitpid(pid, &status, options);
       if (result == -1) {
         return push_error(L);
