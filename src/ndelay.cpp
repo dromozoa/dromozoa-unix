@@ -21,13 +21,16 @@ extern "C" {
 
 #include <fcntl.h>
 
+#include "dromozoa/bind.hpp"
+
 #include "error.hpp"
 #include "fd.hpp"
-#include "function.hpp"
 #include "ndelay.hpp"
-#include "success.hpp"
 
 namespace dromozoa {
+  using bind::function;
+  using bind::push_success;
+
   int ndelay_on(int fd) {
     int result = fcntl(fd, F_GETFL);
     if (result == -1) {

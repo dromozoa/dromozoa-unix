@@ -19,18 +19,16 @@ extern "C" {
 #include <lua.h>
 }
 
-#include "addrinfo.hpp"
+#include "dromozoa/bind.hpp"
+
 #include "coe.hpp"
-#include "environ.hpp"
 #include "error.hpp"
 #include "fcntl.hpp"
 #include "fd.hpp"
 #include "forkexec.hpp"
-#include "gettimeofday.hpp"
-#include "log_level.hpp"
-#include "nameinfo.hpp"
-#include "nanosleep.hpp"
 #include "ndelay.hpp"
+#include "netdb.hpp"
+#include "netinet.hpp"
 #include "pipe.hpp"
 #include "read.hpp"
 #include "selector.hpp"
@@ -38,10 +36,12 @@ extern "C" {
 #include "signal.hpp"
 #include "sockaddr.hpp"
 #include "socket.hpp"
-#include "socket_fd.hpp"
-#include "stat.hpp"
+#include "sys_socket.hpp"
+#include "sys_stat.hpp"
+#include "sys_time.hpp"
+#include "sys_wait.hpp"
+#include "time.hpp"
 #include "unistd.hpp"
-#include "wait.hpp"
 #include "write.hpp"
 
 namespace dromozoa {
@@ -53,7 +53,7 @@ namespace dromozoa {
     initialize_ndelay(L);
     initialize_read(L);
     initialize_write(L);
-    initialize_socket_fd(L);
+    initialize_socket(L);
     lua_setfield(L, -2, "fd");
 
     open_selector(L);
@@ -63,24 +63,24 @@ namespace dromozoa {
     lua_setfield(L, -2, "selfpipe");
 
     open_sockaddr(L);
-    initialize_nameinfo(L);
+    initialize_getnameinfo(L);
     lua_setfield(L, -2, "sockaddr");
 
-    dromozoa::initialize_addrinfo(L);
-    dromozoa::initialize_environ(L);
-    dromozoa::initialize_error(L);
-    dromozoa::initialize_fcntl(L);
-    dromozoa::initialize_forkexec(L);
-    dromozoa::initialize_gettimeofday(L);
-    dromozoa::initialize_log_level(L);
-    dromozoa::initialize_nanosleep(L);
-    dromozoa::initialize_pipe(L);
-    dromozoa::initialize_signal(L);
-    dromozoa::initialize_sockaddr(L);
-    dromozoa::initialize_socket(L);
-    dromozoa::initialize_stat(L);
-    dromozoa::initialize_unistd(L);
-    dromozoa::initialize_wait(L);
+    bind::initialize(L);
+    initialize_error(L);
+    initialize_fcntl(L);
+    initialize_forkexec(L);
+    initialize_netdb(L);
+    initialize_netinet(L);
+    initialize_pipe(L);
+    initialize_signal(L);
+    initialize_sockaddr(L);
+    initialize_sys_socket(L);
+    initialize_sys_stat(L);
+    initialize_sys_time(L);
+    initialize_sys_wait(L);
+    initialize_time(L);
+    initialize_unistd(L);
 
     return 1;
   }

@@ -26,12 +26,15 @@ extern "C" {
 
 #include <vector>
 
+#include "dromozoa/bind.hpp"
+
 #include "error.hpp"
 #include "fd.hpp"
-#include "function.hpp"
 #include "read.hpp"
 
 namespace dromozoa {
+  using bind::function;
+
   namespace {
     int impl_read(lua_State* L) {
       std::vector<char> buffer(luaL_checkinteger(L, 2));

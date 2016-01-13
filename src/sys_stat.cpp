@@ -1,4 +1,4 @@
-// Copyright (C) 2015,2016 Tomoyuki Fujimori <moyu@dromozoa.com>
+// Copyright (C) 2016 Tomoyuki Fujimori <moyu@dromozoa.com>
 //
 // This file is part of dromozoa-unix.
 //
@@ -17,30 +17,26 @@
 
 extern "C" {
 #include <lua.h>
+#include <lauxlib.h>
 }
 
-#include <sys/time.h>
+#include <sys/stat.h>
 
-#include "error.hpp"
-#include "function.hpp"
-#include "set_field.hpp"
+#include "dromozoa/bind.hpp"
+
+#include "sys_stat.hpp"
 
 namespace dromozoa {
+  using bind::function;
+
   namespace {
-    int impl_gettimeofday(lua_State* L) {
-      struct timeval tv = {};
-      if (gettimeofday(&tv, 0) != -1) {
-        lua_newtable(L);
-        set_field(L, "tv_sec", tv.tv_sec);
-        set_field(L, "tv_usec", tv.tv_usec);
-        return 1;
-      } else {
-        return push_error(L);
-      }
+    int impl_umask(lua_State* L) {
+      lua_pushinteger(L, umask(luaL_checkinteger(L, 1)));
+      return 1;
     }
   }
 
-  void initialize_gettimeofday(lua_State* L) {
-    function<impl_gettimeofday>::set_field(L, "gettimeofday");
+  void initialize_sys_stat(lua_State* L) {
+    function<impl_umask>::set_field(L, "umask");
   }
 }

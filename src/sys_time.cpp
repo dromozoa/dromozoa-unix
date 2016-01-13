@@ -1,4 +1,4 @@
-// Copyright (C) 2016 Tomoyuki Fujimori <moyu@dromozoa.com>
+// Copyright (C) 2015,2016 Tomoyuki Fujimori <moyu@dromozoa.com>
 //
 // This file is part of dromozoa-unix.
 //
@@ -15,15 +15,36 @@
 // You should have received a copy of the GNU General Public License
 // along with dromozoa-unix.  If not, see <http://www.gnu.org/licenses/>.
 
-#ifndef DROMOZOA_NAMEINFO_HPP
-#define DROMOZOA_NAMEINFO_HPP
-
 extern "C" {
 #include <lua.h>
 }
 
-namespace dromozoa {
-  void initialize_nameinfo(lua_State* L);
-}
+#include <sys/time.h>
 
-#endif
+#include "dromozoa/bind.hpp"
+
+#include "error.hpp"
+#include "sys_time.hpp"
+
+namespace dromozoa {
+  using bind::function;
+  using bind::set_field;
+
+  namespace {
+    int impl_gettimeofday(lua_State* L) {
+      struct timeval tv = {};
+      if (gettimeofday(&tv, 0) != -1) {
+        lua_newtable(L);
+        set_field(L, "tv_sec", tv.tv_sec);
+        set_field(L, "tv_usec", tv.tv_usec);
+        return 1;
+      } else {
+        return push_error(L);
+      }
+    }
+  }
+
+  void initialize_sys_time(lua_State* L) {
+    function<impl_gettimeofday>::set_field(L, "gettimeofday");
+  }
+}

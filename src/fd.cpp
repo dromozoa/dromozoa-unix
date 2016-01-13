@@ -24,13 +24,16 @@ extern "C" {
 
 #include <iostream>
 
+#include "dromozoa/bind.hpp"
+
 #include "error.hpp"
 #include "fd.hpp"
-#include "function.hpp"
-#include "log_level.hpp"
-#include "success.hpp"
 
 namespace dromozoa {
+  using bind::function;
+  using bind::get_log_level;
+  using bind::push_success;
+
   int new_fd(lua_State* L, int fd) {
     *static_cast<int*>(lua_newuserdata(L, sizeof(int))) = fd;
     luaL_getmetatable(L, "dromozoa.unix.fd");

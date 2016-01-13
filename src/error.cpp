@@ -30,8 +30,9 @@ extern "C" {
 
 #include <iostream>
 
+#include "dromozoa/bind.hpp"
+
 #include "error.hpp"
-#include "set_field.hpp"
 
 namespace dromozoa {
 #ifdef HAVE_STRERROR_R
@@ -136,11 +137,11 @@ namespace dromozoa {
   }
 
   void initialize_error(lua_State* L) {
-    DROMOZOA_SET_FIELD(L, EAGAIN);
-    DROMOZOA_SET_FIELD(L, EINPROGRESS);
-    DROMOZOA_SET_FIELD(L, EINTR);
-    DROMOZOA_SET_FIELD(L, ENOENT);
-    DROMOZOA_SET_FIELD(L, EPIPE);
-    DROMOZOA_SET_FIELD(L, EWOULDBLOCK);
+    DROMOZOA_BIND_SET_FIELD(L, EAGAIN);
+    DROMOZOA_BIND_SET_FIELD(L, EINPROGRESS);
+    DROMOZOA_BIND_SET_FIELD(L, EINTR);
+    DROMOZOA_BIND_SET_FIELD(L, ENOENT);
+    DROMOZOA_BIND_SET_FIELD(L, EPIPE);
+    DROMOZOA_BIND_SET_FIELD(L, EWOULDBLOCK);
   }
 }

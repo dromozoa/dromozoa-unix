@@ -23,12 +23,31 @@ extern "C" {
 
 #include <vector>
 
+#include "dromozoa/bind.hpp"
+
 #include "error.hpp"
-#include "function.hpp"
 #include "unistd.hpp"
 
+extern char** environ;
+
 namespace dromozoa {
+  using bind::function;
+
   namespace {
+    int impl_environ(lua_State* L) {
+      lua_newtable(L);
+      for (int i = 0; ; ++i) {
+        if (const char* p = environ[i]) {
+          lua_pushinteger(L, i + 1);
+          lua_pushstring(L, p);
+          lua_settable(L, -3);
+        } else {
+          break;
+        }
+      }
+      return 1;
+    }
+
     int impl_getcwd(lua_State* L) {
       long path_max = pathconf(".", _PC_PATH_MAX);
       if (path_max == -1) {
@@ -81,6 +100,7 @@ namespace dromozoa {
   }
 
   void initialize_unistd(lua_State* L) {
+    function<impl_environ>::set_field(L, "environ");
     function<impl_getcwd>::set_field(L, "getcwd");
     function<impl_getuid>::set_field(L, "getuid");
     function<impl_getgid>::set_field(L, "getgid");

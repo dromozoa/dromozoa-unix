@@ -25,12 +25,15 @@ extern "C" {
 
 #include <vector>
 
+#include "dromozoa/bind.hpp"
+
 #include "error.hpp"
 #include "fd.hpp"
-#include "function.hpp"
 #include "write.hpp"
 
 namespace dromozoa {
+  using bind::function;
+
   int impl_write(lua_State* L) {
     size_t size;
     const char* buffer = luaL_checklstring(L, 2, &size);

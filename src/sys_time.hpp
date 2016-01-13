@@ -15,15 +15,15 @@
 // You should have received a copy of the GNU General Public License
 // along with dromozoa-unix.  If not, see <http://www.gnu.org/licenses/>.
 
-#ifndef DROMOZOA_STAT_HPP
-#define DROMOZOA_STAT_HPP
+#ifndef DROMOZOA_SYS_TIME_HPP
+#define DROMOZOA_SYS_TIME_HPP
 
 extern "C" {
 #include <lua.h>
 }
 
 namespace dromozoa {
-  void initialize_stat(lua_State* L);
+  void initialize_sys_time(lua_State* L);
 }
 
 #endif

@@ -15,15 +15,26 @@
 // You should have received a copy of the GNU General Public License
 // along with dromozoa-unix.  If not, see <http://www.gnu.org/licenses/>.
 
-#ifndef DROMOZOA_SOCKET_FD_HPP
-#define DROMOZOA_SOCKET_FD_HPP
-
 extern "C" {
 #include <lua.h>
+#include <lauxlib.h>
 }
+
+#include <netinet/in.h>
+#include <netinet/tcp.h>
+
+#include "dromozoa/bind.hpp"
+
+#include "netinet.hpp"
 
 namespace dromozoa {
-  void initialize_socket_fd(lua_State* L);
+  void initialize_netinet(lua_State* L) {
+    DROMOZOA_BIND_SET_FIELD(L, IPPROTO_IP);
+    DROMOZOA_BIND_SET_FIELD(L, IPPROTO_IPV6);
+    DROMOZOA_BIND_SET_FIELD(L, IPPROTO_ICMP);
+    DROMOZOA_BIND_SET_FIELD(L, IPPROTO_RAW);
+    DROMOZOA_BIND_SET_FIELD(L, IPPROTO_TCP);
+    DROMOZOA_BIND_SET_FIELD(L, IPPROTO_UDP);
+    DROMOZOA_BIND_SET_FIELD(L, TCP_NODELAY);
+  }
 }
-
-#endif
