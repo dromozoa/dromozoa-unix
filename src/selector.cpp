@@ -71,10 +71,10 @@ namespace dromozoa {
 
     int impl_gc(lua_State* L) {
       selector& s = get_selector(L, 1);
+      s.~selector();
       if (get_log_level() > 2) {
         std::cerr << "[dromozoa-unix] delete selector " << &s << std::endl;
       }
-      s.~selector();
       return 0;
     }
 
