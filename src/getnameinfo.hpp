@@ -15,15 +15,15 @@
 // You should have received a copy of the GNU General Public License
 // along with dromozoa-unix.  If not, see <http://www.gnu.org/licenses/>.
 
-#ifndef DROMOZOA_NAMEINFO_HPP
-#define DROMOZOA_NAMEINFO_HPP
+#ifndef DROMOZOA_GETNAMEINFO_HPP
+#define DROMOZOA_GETNAMEINFO_HPP
 
 extern "C" {
 #include <lua.h>
 }
 
 namespace dromozoa {
-  void initialize_nameinfo(lua_State* L);
+  void initialize_getnameinfo(lua_State* L);
 }
 
 #endif

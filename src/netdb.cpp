@@ -94,7 +94,7 @@ namespace dromozoa {
     }
   }
 
-  void initialize_addrinfo(lua_State* L) {
+  void initialize_netdb(lua_State* L) {
     function<impl_getaddrinfo>::set_field(L, "getaddrinfo");
 
     DROMOZOA_BIND_SET_FIELD(L, AI_PASSIVE);

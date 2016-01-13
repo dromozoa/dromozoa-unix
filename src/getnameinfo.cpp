@@ -27,7 +27,7 @@ extern "C" {
 #include "dromozoa/bind.hpp"
 
 #include "netdb.hpp"
-#include "nameinfo.hpp"
+#include "getnameinfo.hpp"
 #include "sockaddr.hpp"
 
 #ifndef NI_MAXHOST
@@ -59,7 +59,7 @@ namespace dromozoa {
     }
   }
 
-  void initialize_nameinfo(lua_State* L) {
+  void initialize_getnameinfo(lua_State* L) {
     function<impl_getnameinfo>::set_field(L, "getnameinfo");
   }
 }

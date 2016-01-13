@@ -27,7 +27,7 @@ extern "C" {
 #include "fcntl.hpp"
 #include "fd.hpp"
 #include "forkexec.hpp"
-#include "nameinfo.hpp"
+#include "getnameinfo.hpp"
 #include "ndelay.hpp"
 #include "netdb.hpp"
 #include "netinet.hpp"
@@ -65,7 +65,7 @@ namespace dromozoa {
     lua_setfield(L, -2, "selfpipe");
 
     open_sockaddr(L);
-    initialize_nameinfo(L);
+    initialize_getnameinfo(L);
     lua_setfield(L, -2, "sockaddr");
 
     bind::initialize(L);
