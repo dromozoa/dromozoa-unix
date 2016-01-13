@@ -24,7 +24,7 @@ extern "C" {
 
 #include "dromozoa/bind.hpp"
 
-#include "stat.hpp"
+#include "sys_stat.hpp"
 
 namespace dromozoa {
   using bind::function;
@@ -36,7 +36,7 @@ namespace dromozoa {
     }
   }
 
-  void initialize_stat(lua_State* L) {
+  void initialize_sys_stat(lua_State* L) {
     function<impl_umask>::set_field(L, "umask");
   }
 }

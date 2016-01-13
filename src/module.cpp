@@ -39,7 +39,7 @@ extern "C" {
 #include "sockaddr.hpp"
 #include "socket.hpp"
 #include "socket_fd.hpp"
-#include "stat.hpp"
+#include "sys_stat.hpp"
 #include "sys_time.hpp"
 #include "unistd.hpp"
 #include "wait.hpp"
@@ -78,7 +78,7 @@ namespace dromozoa {
     initialize_signal(L);
     initialize_sockaddr(L);
     initialize_socket(L);
-    initialize_stat(L);
+    initialize_sys_stat(L);
     initialize_sys_time(L);
     initialize_unistd(L);
     initialize_wait(L);
