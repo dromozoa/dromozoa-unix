@@ -21,8 +21,6 @@ extern "C" {
 }
 
 #include <sys/socket.h>
-#include <netinet/in.h>
-#include <netinet/tcp.h>
 
 #include "dromozoa/bind.hpp"
 
@@ -74,9 +72,6 @@ namespace dromozoa {
     DROMOZOA_BIND_SET_FIELD(L, SOCK_STREAM);
     DROMOZOA_BIND_SET_FIELD(L, SOCK_DGRAM);
 
-    DROMOZOA_BIND_SET_FIELD(L, IPPROTO_TCP);
-    DROMOZOA_BIND_SET_FIELD(L, IPPROTO_UDP);
-
     DROMOZOA_BIND_SET_FIELD(L, SOMAXCONN);
 
     DROMOZOA_BIND_SET_FIELD(L, SHUT_RD);
@@ -88,7 +83,5 @@ namespace dromozoa {
     DROMOZOA_BIND_SET_FIELD(L, SO_RCVBUF);
     DROMOZOA_BIND_SET_FIELD(L, SO_REUSEADDR);
     DROMOZOA_BIND_SET_FIELD(L, SO_SNDBUF);
-
-    DROMOZOA_BIND_SET_FIELD(L, TCP_NODELAY);
   }
 }

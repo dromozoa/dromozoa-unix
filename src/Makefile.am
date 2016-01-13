@@ -26,6 +26,7 @@ noinst_HEADERS = \
 	forkexec.hpp \
 	nameinfo.hpp \
 	ndelay.hpp \
+	netinet.hpp \
 	pathexec.hpp \
 	pipe.hpp \
 	read.hpp \
@@ -61,6 +62,7 @@ unix_la_SOURCES = \
 	forkexec.cpp \
 	nameinfo.cpp \
 	ndelay.cpp \
+	netinet.cpp \
 	pathexec.cpp \
 	pipe.cpp \
 	read.cpp \
