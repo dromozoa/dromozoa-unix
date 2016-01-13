@@ -25,20 +25,22 @@ extern "C" {
 #include <signal.h>
 #include <stddef.h>
 #include <unistd.h>
-#include <sys/wait.h>
 
 #include <vector>
+
+#include "dromozoa/bind.hpp"
 
 #include "argument_vector.hpp"
 #include "error.hpp"
 #include "fd.hpp"
 #include "forkexec.hpp"
-#include "function.hpp"
 #include "pipe.hpp"
 #include "pathexec.hpp"
 #include "signal_mask.hpp"
 
 namespace dromozoa {
+  using bind::function;
+
   namespace {
     void die(int die_fd[2]) {
       int code = errno;

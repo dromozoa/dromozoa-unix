@@ -28,11 +28,10 @@ extern "C" {
 
 #include <iostream>
 
+#include "dromozoa/bind.hpp"
+
 #include "error.hpp"
 #include "fd.hpp"
-#include "function.hpp"
-#include "log_level.hpp"
-#include "success.hpp"
 #include "selector.hpp"
 
 #if defined(HAVE_EPOLL_CREATE) || defined(HAVE_EPOLL_CREATE1)
@@ -48,6 +47,10 @@ namespace dromozoa {
 #endif
 
 namespace dromozoa {
+  using bind::function;
+  using bind::get_log_level;
+  using bind::push_success;
+
   selector::~selector() {}
 
   namespace {
@@ -68,10 +71,10 @@ namespace dromozoa {
 
     int impl_gc(lua_State* L) {
       selector& s = get_selector(L, 1);
+      s.~selector();
       if (get_log_level() > 2) {
         std::cerr << "[dromozoa-unix] delete selector " << &s << std::endl;
       }
-      s.~selector();
       return 0;
     }
 

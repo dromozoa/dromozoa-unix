@@ -18,7 +18,7 @@
 local unix = require "dromozoa.unix"
 local nanosleep = unix.nanosleep
 
-assert(nanosleep({ tv_sec = 0, tv_nsec = 200 }) == 0)
+assert(nanosleep({ tv_sec = 0, tv_nsec = 200 }))
 
 local result, message, code, tv = nanosleep({ tv_sec = -1, tv_nsec = 0 })
 -- print(message, code)

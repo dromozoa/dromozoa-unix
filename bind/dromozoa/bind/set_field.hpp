@@ -1,29 +1,34 @@
 // Copyright (C) 2016 Tomoyuki Fujimori <moyu@dromozoa.com>
 //
-// This file is part of dromozoa-unix.
+// This file is part of dromozoa-bind.
 //
-// dromozoa-unix is free software: you can redistribute it and/or modify
+// dromozoa-bind is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
 // (at your option) any later version.
 //
-// dromozoa-unix is distributed in the hope that it will be useful,
+// dromozoa-bind is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 // GNU General Public License for more details.
 //
 // You should have received a copy of the GNU General Public License
-// along with dromozoa-unix.  If not, see <http://www.gnu.org/licenses/>.
+// along with dromozoa-bind.  If not, see <http://www.gnu.org/licenses/>.
 
-#ifndef DROMOZOA_ENVIRON_HPP
-#define DROMOZOA_ENVIRON_HPP
+#ifndef DROMOZOA_BIND_SET_FIELD_HPP
+#define DROMOZOA_BIND_SET_FIELD_HPP
 
 extern "C" {
-#include <lua.h>
+#include "lua.h"
 }
 
 namespace dromozoa {
-  void initialize_environ(lua_State* L);
+  namespace bind {
+    void set_field(lua_State* L, const char* key, lua_Integer value);
+  }
 }
+
+#define DROMOZOA_BIND_SET_FIELD(L, value) \
+  dromozoa::bind::set_field(L, #value, (value))
 
 #endif

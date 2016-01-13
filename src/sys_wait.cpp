@@ -22,17 +22,19 @@ extern "C" {
 
 #include <sys/wait.h>
 
+#include "dromozoa/bind.hpp"
+
 #include "error.hpp"
-#include "function.hpp"
-#include "set_field.hpp"
-#include "wait.hpp"
+#include "sys_wait.hpp"
 
 namespace dromozoa {
+  using bind::function;
+
   namespace {
     int impl_wait(lua_State* L) {
       pid_t pid = luaL_optinteger(L, 1, -1);
-      int status = 0;
       int options = luaL_optinteger(L, 2, 0);
+      int status = 0;
       pid_t result = waitpid(pid, &status, options);
       if (result == -1) {
         return push_error(L);
@@ -61,10 +63,10 @@ namespace dromozoa {
     }
   }
 
-  void initialize_wait(lua_State* L) {
+  void initialize_sys_wait(lua_State* L) {
     function<impl_wait>::set_field(L, "wait");
-    DROMOZOA_SET_FIELD(L, WCONTINUED);
-    DROMOZOA_SET_FIELD(L, WNOHANG);
-    DROMOZOA_SET_FIELD(L, WUNTRACED);
+    DROMOZOA_BIND_SET_FIELD(L, WCONTINUED);
+    DROMOZOA_BIND_SET_FIELD(L, WNOHANG);
+    DROMOZOA_BIND_SET_FIELD(L, WUNTRACED);
   }
 }

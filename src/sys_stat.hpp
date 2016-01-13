@@ -15,15 +15,15 @@
 // You should have received a copy of the GNU General Public License
 // along with dromozoa-unix.  If not, see <http://www.gnu.org/licenses/>.
 
-#ifndef DROMOZOA_WAIT_HPP
-#define DROMOZOA_WAIT_HPP
+#ifndef DROMOZOA_SYS_STAT_HPP
+#define DROMOZOA_SYS_STAT_HPP
 
 extern "C" {
 #include <lua.h>
 }
 
 namespace dromozoa {
-  void initialize_wait(lua_State* L);
+  void initialize_sys_stat(lua_State* L);
 }
 
 #endif

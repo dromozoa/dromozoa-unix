@@ -15,15 +15,15 @@
 // You should have received a copy of the GNU General Public License
 // along with dromozoa-unix.  If not, see <http://www.gnu.org/licenses/>.
 
-#ifndef DROMOZOA_GETTIMEOFDAY_HPP
-#define DROMOZOA_GETTIMEOFDAY_HPP
+#ifndef DROMOZOA_SYS_WAIT_HPP
+#define DROMOZOA_SYS_WAIT_HPP
 
 extern "C" {
 #include <lua.h>
 }
 
 namespace dromozoa {
-  void initialize_gettimeofday(lua_State* L);
+  void initialize_sys_wait(lua_State* L);
 }
 
 #endif

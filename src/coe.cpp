@@ -21,13 +21,16 @@ extern "C" {
 
 #include <fcntl.h>
 
+#include "dromozoa/bind.hpp"
+
 #include "coe.hpp"
 #include "error.hpp"
 #include "fd.hpp"
-#include "function.hpp"
-#include "success.hpp"
 
 namespace dromozoa {
+  using bind::function;
+  using bind::push_success;
+
   int coe(int fd) {
     int result = fcntl(fd, F_GETFD);
     if (result == -1) {

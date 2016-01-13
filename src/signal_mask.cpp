@@ -23,11 +23,14 @@
 
 #include <iostream>
 
+#include "dromozoa/bind.hpp"
+
 #include "error.hpp"
-#include "log_level.hpp"
 #include "signal_mask.hpp"
 
 namespace dromozoa {
+  using bind::get_log_level;
+
 #ifdef HAVE_PTHREAD
   int signal_mask(int how, const sigset_t* new_mask, sigset_t* old_mask) {
     return pthread_sigmask(how, new_mask, old_mask);

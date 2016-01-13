@@ -28,14 +28,17 @@ extern "C" {
 #include <fcntl.h>
 #include <unistd.h>
 
+#include "dromozoa/bind.hpp"
+
 #include "coe.hpp"
 #include "error.hpp"
 #include "fd.hpp"
-#include "function.hpp"
 #include "ndelay.hpp"
 #include "pipe.hpp"
 
 namespace dromozoa {
+  using bind::function;
+
 #ifdef HAVE_PIPE2
   int wrap_pipe2(int fd[2], int flags) {
     return pipe2(fd, flags);

@@ -22,12 +22,16 @@ extern "C" {
 
 #include <time.h>
 
+#include "dromozoa/bind.hpp"
+
 #include "error.hpp"
-#include "function.hpp"
-#include "set_field.hpp"
-#include "success.hpp"
+#include "time.hpp"
 
 namespace dromozoa {
+  using bind::function;
+  using bind::push_success;
+  using bind::set_field;
+
   namespace {
     int impl_nanosleep(lua_State* L) {
       struct timespec tv1 = {};
@@ -52,7 +56,7 @@ namespace dromozoa {
     }
   }
 
-  void initialize_nanosleep(lua_State* L) {
+  void initialize_time(lua_State* L) {
     function<impl_nanosleep>::set_field(L, "nanosleep");
   }
 }

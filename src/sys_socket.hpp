@@ -15,34 +15,15 @@
 // You should have received a copy of the GNU General Public License
 // along with dromozoa-unix.  If not, see <http://www.gnu.org/licenses/>.
 
-#ifndef DROMOZOA_FUNCTION_HPP
-#define DROMOZOA_FUNCTION_HPP
+#ifndef DROMOZOA_SYS_SOCKET_HPP
+#define DROMOZOA_SYS_SOCKET_HPP
 
 extern "C" {
 #include <lua.h>
-#include <lauxlib.h>
 }
 
-#include <exception>
-
 namespace dromozoa {
-  template <lua_CFunction T>
-  struct function {
-    static int value(lua_State* L) {
-      try {
-        return T(L);
-      } catch (const std::exception& e) {
-        return luaL_error(L, "caught exception: %s", e.what());
-      } catch (...) {
-        return luaL_error(L, "caught exception");
-      }
-    }
-
-    static void set_field(lua_State* L, const char* key) {
-      lua_pushcfunction(L, value);
-      lua_setfield(L, -2, key);
-    }
-  };
+  void initialize_sys_socket(lua_State* L);
 }
 
 #endif

@@ -16,20 +16,15 @@
 # along with dromozoa-unix.  If not, see <http://www.gnu.org/licenses/>.
 
 noinst_HEADERS = \
-	addrinfo.hpp \
 	argument_vector.hpp \
 	coe.hpp \
-	environ.hpp \
 	error.hpp \
 	fcntl.hpp \
 	fd.hpp \
 	forkexec.hpp \
-	function.hpp \
-	gettimeofday.hpp \
-	log_level.hpp \
-	nameinfo.hpp \
-	nanosleep.hpp \
 	ndelay.hpp \
+	netdb.hpp \
+	netinet.hpp \
 	pathexec.hpp \
 	pipe.hpp \
 	read.hpp \
@@ -37,52 +32,50 @@ noinst_HEADERS = \
 	selector_epoll.hpp \
 	selector_kqueue.hpp \
 	selfpipe.hpp \
-	set_field.hpp \
 	signal.hpp \
 	signal_mask.hpp \
 	sockaddr.hpp \
 	socket.hpp \
-	socket_fd.hpp \
-	stat.hpp \
-	success.hpp \
+	sys_socket.hpp \
+	sys_stat.hpp \
+	sys_time.hpp \
+	sys_wait.hpp \
+	time.hpp \
 	unistd.hpp \
-	wait.hpp \
 	write.hpp
 
 luaexec_LTLIBRARIES = unix.la
 
-unix_la_LDFLAGS = -module -avoid-version
+unix_la_CPPFLAGS = -I$(top_srcdir)/bind
+unix_la_LDFLAGS = -module -avoid-version -shared
+unix_la_LIBADD = $(top_srcdir)/bind/libdromozoa-bind.la
 unix_la_SOURCES = \
-	addrinfo.cpp \
 	argument_vector.cpp \
 	coe.cpp \
-	environ.cpp \
 	error.cpp \
 	fcntl.cpp \
 	fd.cpp \
 	forkexec.cpp \
-	gettimeofday.cpp \
-	log_level.cpp \
-	nameinfo.cpp \
-	nanosleep.cpp \
 	ndelay.cpp \
+	netdb.cpp \
+	netinet.cpp \
 	pathexec.cpp \
 	pipe.cpp \
 	read.cpp \
 	selector.cpp \
 	selfpipe.cpp \
-	set_field.cpp \
 	signal.cpp \
 	signal_mask.cpp \
 	sockaddr.cpp \
 	socket.cpp \
-	socket_fd.cpp \
-	stat.cpp \
-	success.cpp \
+	sys_socket.cpp \
+	sys_stat.cpp \
+	sys_time.cpp \
+	sys_wait.cpp \
+	time.cpp \
 	unistd.cpp \
-	unix.cpp \
-	wait.cpp \
-	write.cpp
+	write.cpp \
+	module.cpp
 
 if HAVE_EPOLL
 unix_la_SOURCES += selector_epoll.cpp

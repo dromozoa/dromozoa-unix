@@ -25,10 +25,13 @@ extern "C" {
 #include <sys/socket.h>
 #include <sys/un.h>
 
-#include "function.hpp"
+#include "dromozoa/bind.hpp"
+
 #include "sockaddr.hpp"
 
 namespace dromozoa {
+  using bind::function;
+
   namespace {
     struct socket_address {
       socklen_t size;
