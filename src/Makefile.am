@@ -22,7 +22,6 @@ noinst_HEADERS = \
 	fcntl.hpp \
 	fd.hpp \
 	forkexec.hpp \
-	getnameinfo.hpp \
 	ndelay.hpp \
 	netdb.hpp \
 	netinet.hpp \
@@ -57,7 +56,6 @@ unix_la_SOURCES = \
 	fcntl.cpp \
 	fd.cpp \
 	forkexec.cpp \
-	getnameinfo.cpp \
 	ndelay.cpp \
 	netdb.cpp \
 	netinet.cpp \

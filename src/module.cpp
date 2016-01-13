@@ -26,7 +26,6 @@ extern "C" {
 #include "fcntl.hpp"
 #include "fd.hpp"
 #include "forkexec.hpp"
-#include "getnameinfo.hpp"
 #include "ndelay.hpp"
 #include "netdb.hpp"
 #include "netinet.hpp"

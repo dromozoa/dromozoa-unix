@@ -22,27 +22,37 @@ extern "C" {
 
 #include <netdb.h>
 
+#include <vector>
+
 #include "dromozoa/bind.hpp"
 
 #include "netdb.hpp"
 #include "sockaddr.hpp"
 
+#ifndef NI_MAXHOST
+#define NI_MAXHOST 1025
+#endif
+
+#ifndef NI_MAXSERV
+#define NI_MAXSERV 32
+#endif
+
 namespace dromozoa {
   using bind::function;
   using bind::set_field;
 
-  int push_netdb_error(lua_State* L, int code) {
-    lua_pushnil(L);
-    if (const char* what = gai_strerror(code)) {
-      lua_pushstring(L, what);
-    } else {
-      lua_pushfstring(L, "error number %d", code);
-    }
-    lua_pushinteger(L, code);
-    return 3;
-  }
-
   namespace {
+    int push_netdb_error(lua_State* L, int code) {
+      lua_pushnil(L);
+      if (const char* what = gai_strerror(code)) {
+        lua_pushstring(L, what);
+      } else {
+        lua_pushfstring(L, "error number %d", code);
+      }
+      lua_pushinteger(L, code);
+      return 3;
+    }
+
     int impl_getaddrinfo(lua_State* L) {
       const char* nodename = lua_tostring(L, 1);
       const char* servname = lua_tostring(L, 2);
@@ -92,6 +102,22 @@ namespace dromozoa {
         return push_netdb_error(L, code);
       }
     }
+
+    int impl_getnameinfo(lua_State* L) {
+      std::vector<char> nodename(NI_MAXHOST);
+      std::vector<char> servname(NI_MAXSERV);
+      socklen_t size = 0;
+      const struct sockaddr* address = get_sockaddr(L, 1, size);
+      int flags = luaL_optinteger(L, 2, 0);
+      int code = getnameinfo(address, size, &nodename[0], nodename.size(), &servname[0], servname.size(), flags);
+      if (code == 0) {
+        lua_pushstring(L, &nodename[0]);
+        lua_pushstring(L, &servname[0]);
+        return 2;
+      } else {
+        return push_netdb_error(L, code);
+      }
+    }
   }
 
   void initialize_netdb(lua_State* L) {
@@ -113,5 +139,9 @@ namespace dromozoa {
     DROMOZOA_BIND_SET_FIELD(L, NI_NUMERICSCOPE);
 #endif
     DROMOZOA_BIND_SET_FIELD(L, NI_DGRAM);
+  }
+
+  void initialize_getnameinfo(lua_State* L) {
+    function<impl_getnameinfo>::set_field(L, "getnameinfo");
   }
 }

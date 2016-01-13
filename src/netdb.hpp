@@ -23,8 +23,8 @@ extern "C" {
 }
 
 namespace dromozoa {
-  int push_netdb_error(lua_State* L, int code);
   void initialize_netdb(lua_State* L);
+  void initialize_getnameinfo(lua_State* L);
 }
 
 #endif
