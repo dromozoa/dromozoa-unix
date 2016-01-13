@@ -25,7 +25,6 @@ noinst_HEADERS = \
 	fd.hpp \
 	forkexec.hpp \
 	nameinfo.hpp \
-	nanosleep.hpp \
 	ndelay.hpp \
 	pathexec.hpp \
 	pipe.hpp \
@@ -41,6 +40,7 @@ noinst_HEADERS = \
 	socket_fd.hpp \
 	sys_stat.hpp \
 	sys_time.hpp \
+	time.hpp \
 	unistd.hpp \
 	wait.hpp \
 	write.hpp
@@ -60,7 +60,6 @@ unix_la_SOURCES = \
 	fd.cpp \
 	forkexec.cpp \
 	nameinfo.cpp \
-	nanosleep.cpp \
 	ndelay.cpp \
 	pathexec.cpp \
 	pipe.cpp \
@@ -74,6 +73,7 @@ unix_la_SOURCES = \
 	socket_fd.cpp \
 	sys_stat.cpp \
 	sys_time.cpp \
+	time.cpp \
 	unistd.cpp \
 	wait.cpp \
 	write.cpp \

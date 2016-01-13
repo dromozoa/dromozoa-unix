@@ -15,15 +15,15 @@
 // You should have received a copy of the GNU General Public License
 // along with dromozoa-unix.  If not, see <http://www.gnu.org/licenses/>.
 
-#ifndef DROMOZOA_NANOSLEEP_HPP
-#define DROMOZOA_NANOSLEEP_HPP
+#ifndef DROMOZOA_TIME_HPP
+#define DROMOZOA_TIME_HPP
 
 extern "C" {
 #include <lua.h>
 }
 
 namespace dromozoa {
-  void initialize_nanosleep(lua_State* L);
+  void initialize_time(lua_State* L);
 }
 
 #endif

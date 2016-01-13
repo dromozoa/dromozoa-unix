@@ -25,6 +25,7 @@ extern "C" {
 #include "dromozoa/bind.hpp"
 
 #include "error.hpp"
+#include "time.hpp"
 
 namespace dromozoa {
   using bind::function;
@@ -55,7 +56,7 @@ namespace dromozoa {
     }
   }
 
-  void initialize_nanosleep(lua_State* L) {
+  void initialize_time(lua_State* L) {
     function<impl_nanosleep>::set_field(L, "nanosleep");
   }
 }

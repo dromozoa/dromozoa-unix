@@ -29,7 +29,6 @@ extern "C" {
 #include "fd.hpp"
 #include "forkexec.hpp"
 #include "nameinfo.hpp"
-#include "nanosleep.hpp"
 #include "ndelay.hpp"
 #include "pipe.hpp"
 #include "read.hpp"
@@ -41,6 +40,7 @@ extern "C" {
 #include "socket_fd.hpp"
 #include "sys_stat.hpp"
 #include "sys_time.hpp"
+#include "time.hpp"
 #include "unistd.hpp"
 #include "wait.hpp"
 #include "write.hpp"
@@ -73,13 +73,13 @@ namespace dromozoa {
     initialize_error(L);
     initialize_fcntl(L);
     initialize_forkexec(L);
-    initialize_nanosleep(L);
     initialize_pipe(L);
     initialize_signal(L);
     initialize_sockaddr(L);
     initialize_socket(L);
     initialize_sys_stat(L);
     initialize_sys_time(L);
+    initialize_time(L);
     initialize_unistd(L);
     initialize_wait(L);
 
