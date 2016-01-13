@@ -75,9 +75,9 @@ unix_la_SOURCES = \
 	socket_fd.cpp \
 	stat.cpp \
 	unistd.cpp \
-	unix.cpp \
 	wait.cpp \
-	write.cpp
+	write.cpp \
+	module.cpp
 
 if HAVE_EPOLL
 unix_la_SOURCES += selector_epoll.cpp
