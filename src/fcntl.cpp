@@ -40,8 +40,7 @@ namespace dromozoa {
       if (result == -1) {
         return push_error(L);
       } else {
-        new_fd(L, result);
-        return 1;
+        return new_fd(L, result);
       }
     }
   }
