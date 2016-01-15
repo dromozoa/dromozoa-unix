@@ -17,4 +17,17 @@
 
 local unix = require "dromozoa.unix"
 
+unix.set_raise_error(true)
+
 print(unix.realpath(arg[0]))
+assert(not pcall(unix.realpath, "no such file"))
+
+local tmpdir = unix.mkdtemp("tmp-XXXXXX")
+print(tmpdir)
+assert(os.remove(tmpdir))
+
+local fd, tmpname = unix.mkstemp("tmp-XXXXXX")
+print(tmpname)
+fd:write("foo\n")
+fd:close()
+assert(os.remove(tmpname))
