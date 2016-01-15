@@ -109,8 +109,7 @@ namespace dromozoa {
       if (size < sizeof(sun.sun_path)) {
         memcpy(sun.sun_path, path, size);
         sun.sun_path[size] = '\0';
-        new_sockaddr(L, reinterpret_cast<const struct sockaddr*>(&sun), sizeof(sun));
-        return 1;
+        return new_sockaddr(L, reinterpret_cast<const struct sockaddr*>(&sun), sizeof(sun));
       } else {
         lua_pushnil(L);
         return 1;

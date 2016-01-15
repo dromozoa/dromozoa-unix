@@ -87,8 +87,7 @@ namespace dromozoa {
       if (getsockname(get_fd(L, 1), sockaddr_cast(&ss), &size) == -1) {
         return push_error(L);
       } else {
-        new_sockaddr(L, sockaddr_cast(&ss), size);
-        return 1;
+        return new_sockaddr(L, sockaddr_cast(&ss), size);
       }
     }
 
@@ -98,8 +97,7 @@ namespace dromozoa {
       if (getpeername(get_fd(L, 1), sockaddr_cast(&ss), &size) == -1) {
         return push_error(L);
       } else {
-        new_sockaddr(L, sockaddr_cast(&ss), size);
-        return 1;
+        return new_sockaddr(L, sockaddr_cast(&ss), size);
       }
     }
 
