@@ -33,25 +33,14 @@ extern "C" {
 
 namespace dromozoa {
   using bind::function;
+  using bind::translate_range_i;
+  using bind::translate_range_j;
 
   int impl_write(lua_State* L) {
     size_t size;
     const char* buffer = luaL_checklstring(L, 2, &size);
-    ssize_t i = luaL_optinteger(L, 3, 0);
-    if (i < 0) {
-      i += size;
-      if (i < 0) {
-        i = 0;
-      }
-    } else if (i > 0) {
-      --i;
-    }
-    ssize_t j = luaL_optinteger(L, 4, size);
-    if (j < 0) {
-      j += size + 1;
-    } else if (j > static_cast<ssize_t>(size)) {
-      j = size;
-    }
+    size_t i = translate_range_i(L, 3, size);
+    size_t j = translate_range_j(L, 4, size);
     if (i < j) {
       ssize_t result = write(get_fd(L, 1), buffer + i, j - i);
       if (result == -1) {
