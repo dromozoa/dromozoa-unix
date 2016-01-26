@@ -15,6 +15,7 @@
 -- You should have received a copy of the GNU General Public License
 -- along with dromozoa-unix.  If not, see <http://www.gnu.org/licenses/>.
 
+local json = require "dromozoa.commons.json"
 local unix = require "dromozoa.unix"
 
 assert(unix.get_log_level() == 0)
@@ -51,3 +52,10 @@ end
 collectgarbage()
 collectgarbage()
 unix.fd.write(1, "bar\n")
+
+assert(unix.STDIN_FILENO == 0)
+assert(unix.STDOUT_FILENO == 1)
+assert(unix.STDERR_FILENO == 2)
+
+unix.fd.stderr:write("baz\n")
+-- print(json.encode(unix.fd))

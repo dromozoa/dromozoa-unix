@@ -145,6 +145,12 @@ namespace dromozoa {
     lua_setfield(L, -2, "__index");
     function<impl_gc>::set_field(L, "__gc");
     lua_pop(L, 1);
+    new_fd(L, 0, true);
+    lua_setfield(L, -2, "stdin");
+    new_fd(L, 1, true);
+    lua_setfield(L, -2, "stdout");
+    new_fd(L, 2, true);
+    lua_setfield(L, -2, "stderr");
     return 1;
   }
 }
