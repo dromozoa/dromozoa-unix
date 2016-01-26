@@ -43,3 +43,11 @@ do
   assert(reader:close():get() == -1)
   assert(writer:close():get() == -1)
 end
+
+do
+  local stdout = unix.fd(1, true)
+  stdout:write("foo\n")
+end
+collectgarbage()
+collectgarbage()
+unix.fd.write(1, "bar\n")
