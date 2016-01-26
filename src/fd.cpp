@@ -71,12 +71,16 @@ namespace dromozoa {
 
     int impl_close(lua_State* L) {
       int fd = reset_fd(L, 1);
-      if (close(fd) == -1) {
-        return push_error(L);
-      } else {
-        if (get_log_level() > 2) {
-          std::cerr << "[dromozoa-unix] close fd " << fd << std::endl;
+      if (fd != -1) {
+        if (close(fd) == -1) {
+          return push_error(L);
+        } else {
+          if (get_log_level() > 2) {
+            std::cerr << "[dromozoa-unix] close fd " << fd << std::endl;
+          }
+          return push_success(L);
         }
+      } else {
         return push_success(L);
       }
     }

@@ -17,7 +17,7 @@
 
 local unix = require "dromozoa.unix"
 
-unix.set_log_level(2)
+unix.set_log_level(3)
 unix.set_raise_error(true)
 
 local fd = unix.open("test.lock", unix.bor(unix.O_CREAT, unix.O_WRONLY), 384)

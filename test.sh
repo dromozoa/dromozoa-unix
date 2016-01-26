@@ -27,4 +27,4 @@ do
   "$lua" "$i"
 done
 
-rm -f test.sock test.txt
+rm -f test.lock test.sock test.txt

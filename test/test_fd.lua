@@ -28,13 +28,13 @@ do
   local reader, writer = unix.pipe()
   fd = { reader:coe():ndelay_on():get(), writer:get() }
   assert(reader:close())
-  assert(not reader:close())
+  assert(reader:close())
 end
 collectgarbage()
 collectgarbage()
 
 assert(unix.fd.get(0) == 0)
-assert(not unix.fd.close(-1))
+assert(not unix.fd.close(-2))
 
 do
   local reader, writer = unix.pipe(unix.O_CLOEXEC)
