@@ -55,6 +55,8 @@ namespace dromozoa {
   };
 
   int selector_kqueue::close() {
+    buffer_.clear();
+    result_ = -1;
     int fd = fd_;
     fd_ = -1;
     return ::close(fd);
