@@ -26,6 +26,7 @@ extern "C" {
 #include "fcntl.hpp"
 #include "fd.hpp"
 #include "forkexec.hpp"
+#include "lock.hpp"
 #include "ndelay.hpp"
 #include "netdb.hpp"
 #include "netinet.hpp"
@@ -51,6 +52,7 @@ namespace dromozoa {
 
     open_fd(L);
     initialize_coe(L);
+    initialize_lock(L);
     initialize_ndelay(L);
     initialize_read(L);
     initialize_write(L);

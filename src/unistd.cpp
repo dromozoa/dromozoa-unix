@@ -109,5 +109,9 @@ namespace dromozoa {
     function<impl_getpid>::set_field(L, "getpid");
     function<impl_getpgrp>::set_field(L, "getpgrp");
     function<impl_getppid>::set_field(L, "getppid");
+
+    DROMOZOA_BIND_SET_FIELD(L, STDIN_FILENO);
+    DROMOZOA_BIND_SET_FIELD(L, STDOUT_FILENO);
+    DROMOZOA_BIND_SET_FIELD(L, STDERR_FILENO);
   }
 }

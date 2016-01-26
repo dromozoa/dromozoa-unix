@@ -71,10 +71,24 @@ namespace dromozoa {
 
     int impl_gc(lua_State* L) {
       selector& s = get_selector(L, 1);
-      s.~selector();
-      if (get_log_level() > 2) {
-        std::cerr << "[dromozoa-unix] delete selector " << &s << std::endl;
+      if (s.get() != -1) {
+        if (get_log_level() > 1) {
+          std::cerr << "[dromozoa-unix] selector " << &s << " detected" << std::endl;
+        }
+        if (s.close() == -1) {
+          int code = errno;
+          if (get_log_level() > 0) {
+            std::cerr << "[dromozoa-unix] cannot close selector " << &s << ": ";
+            print_error(std::cerr, code);
+            std::cerr << std::endl;
+          }
+        } else {
+          if (get_log_level() > 2) {
+            std::cerr << "[dromozoa-unix] delete selector " << &s << std::endl;
+          }
+        }
       }
+      s.~selector();
       return 0;
     }
 
@@ -89,8 +103,16 @@ namespace dromozoa {
     }
 
     int impl_close(lua_State* L) {
-      if (get_selector(L, 1).close() == -1) {
-        return push_error(L);
+      selector& s = get_selector(L, 1);
+      if (s.get() != -1) {
+        if (get_log_level() > 2) {
+          std::cerr << "[dromozoa-unix] close selector " << &s << std::endl;
+        }
+        if (s.close() == -1) {
+          return push_error(L);
+        } else {
+          return push_success(L);
+        }
       } else {
         return push_success(L);
       }
