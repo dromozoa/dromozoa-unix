@@ -33,7 +33,11 @@ asio:add(fd)
 coroutine.resume(coroutine.create(function ()
   while true do
     local c = asio:read(fd, 1, 10)
-    print(("%q"):format(c))
+    if c == nil then
+      print("timeout")
+    else
+      print(("%q"):format(c))
+    end
     if c == "" then
       break
     end
