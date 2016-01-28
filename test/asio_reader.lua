@@ -16,7 +16,7 @@
 -- along with dromozoa-unix.  If not, see <http://www.gnu.org/licenses/>.
 
 local unix = require "dromozoa.unix"
-local asio = require "dromozoa.unix.asio"
+local asio = unix.asio
 
 unix.set_log_level(3)
 unix.set_raise_error(true)

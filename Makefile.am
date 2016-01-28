@@ -25,3 +25,6 @@ EXTRA_DIST = \
 	m4/update \
 	test \
 	test.sh
+
+nobase_lua_DATA = \
+	dromozoa/unix/asio.lua

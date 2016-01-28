@@ -55,8 +55,7 @@ function class:read(fd, count, timeout)
   local result = buffer:read(count)
   if result == nil then
     local result = fd:read(1024)
-    -- if result == unix.EAGAIN or result == unix.EWOULDBLOCK then
-    if result == 35 then
+    if result == class.super.EAGAIN or result == class.super.EWOULDBLOCK then
       self:add_pending(fd, 1, timeout)
       return self:read(fd, count, timeout)
     elseif result == "" then
@@ -83,7 +82,7 @@ function class:dispatch()
   while not self.stopped do
     local result = selector:select(timeout)
     print("select", result)
-    -- local now = os.time() -- class.gettimeofday
+    -- local now = class.super.gettimeofday
     local resumes = sequence()
     for i = 1, result do
       local fd, event = selector:event(i)
