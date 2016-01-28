@@ -90,7 +90,7 @@ function class:read(fd, count, timeout)
   local result = buffer:read(count)
   if result == nil then
     local result = fd:read(1024)
-    if result == class.super.EAGAIN or result == class.super.EWOULDBLOCK then
+    if result == class.super.resource_unavailable_try_again then
       if self:add_pending(fd, 1, timeout) == nil then
         return nil
       end

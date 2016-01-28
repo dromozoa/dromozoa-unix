@@ -66,7 +66,7 @@ do
   assert(reader:read(3) == "bar")
   assert(reader:read(3) == "baz")
   local result = reader:read(3)
-  assert(result == unix.EAGAIN or result == unix.EWOULDBLOCK)
+  assert(result == unix.resource_unavailable_try_again)
   writer:write("qux")
   writer:close()
   assert(reader:read(4) == "qux")

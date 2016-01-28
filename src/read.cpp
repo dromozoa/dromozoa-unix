@@ -42,8 +42,7 @@ namespace dromozoa {
       if (result == -1) {
         int code = errno;
         if (code == EAGAIN || code == EWOULDBLOCK) {
-          lua_pushinteger(L, code);
-          return 1;
+          return push_resource_unavailable_try_again(L);
         } else {
           return push_error(L, code);
         }

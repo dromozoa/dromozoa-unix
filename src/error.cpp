@@ -35,6 +35,11 @@ extern "C" {
 #include "error.hpp"
 
 namespace dromozoa {
+  int push_resource_unavailable_try_again(lua_State* L) {
+    lua_pushlightuserdata(L, reinterpret_cast<void*>(EAGAIN));
+    return 1;
+  }
+
 #ifdef HAVE_STRERROR_R
   namespace {
     const char* wrap_strerror_r_result(const char* result, char*) {
@@ -143,5 +148,8 @@ namespace dromozoa {
     DROMOZOA_BIND_SET_FIELD(L, ENOENT);
     DROMOZOA_BIND_SET_FIELD(L, EPIPE);
     DROMOZOA_BIND_SET_FIELD(L, EWOULDBLOCK);
+
+    push_resource_unavailable_try_again(L);
+    lua_setfield(L, -2, "resource_unavailable_try_again");
   }
 }

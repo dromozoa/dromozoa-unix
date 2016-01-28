@@ -16,7 +16,6 @@
 -- along with dromozoa-unix.  If not, see <http://www.gnu.org/licenses/>.
 
 local unix = require "dromozoa.unix"
-local asio = unix.asio
 
 unix.set_log_level(3)
 unix.set_raise_error(true)
@@ -25,7 +24,7 @@ local fd = unix.fd.stdin
 local selector = unix.selector()
 selector:open(1024, unix.O_CLOEXEC)
 
-local asio = asio(selector)
+local asio = unix.asio(selector)
 local fd = unix.fd.stdin
 fd:ndelay_on()
 asio:add(fd)
