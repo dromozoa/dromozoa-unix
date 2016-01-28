@@ -18,6 +18,7 @@
 local pairs = require "dromozoa.commons.pairs"
 local sequence = require "dromozoa.commons.sequence"
 local string_buffer = require "dromozoa.commons.string_buffer"
+local translate_range = require "dromozoa.commons.translate_range"
 
 local function timespec_add(t1, t2)
   local t = t2 % 1
@@ -73,6 +74,11 @@ function class:del(fd)
   return self
 end
 
+function class:stop()
+  self.stopped = true
+  return self
+end
+
 function class:add_pending(fd, event, timeout)
   self.selector:mod(fd, event)
   self.pendings[fd:get()] = {
@@ -105,9 +111,27 @@ function class:read(fd, count, timeout)
   end
 end
 
-function class:stop()
-  self.stopped = true
-  return self
+function class:write(fd, buffer, timeout, size, i, j)
+  if type(timeout) == "number" then
+    timeout = timespec_add(class.timespec_now(), timeout)
+  end
+  if size == nil then
+    size = 0
+  end
+  local min, max = translate_range(#buffer, i, j)
+  local result = fd:write(buffer)
+  if result == 0 or result == class.super.resource_unavailable_try_again then
+    if self:add_pending(fd, 2, timeout) == nil then
+      return nil, size
+    end
+  else
+    size = size + result
+    min = min + result
+    if min > max then
+      return true, size
+    end
+  end
+  return self:write(fd, buffer, timeout, size, min, max)
 end
 
 function class:dispatch()
