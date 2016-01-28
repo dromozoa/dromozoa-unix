@@ -44,7 +44,10 @@ local function timespec_compare(t1, t2)
   end
 end
 
-local class = {}
+local class = {
+  timespec_add = timespec_add;
+  timespec_compare = timespec_compare;
+}
 
 function class.timespec_now()
   local now = class.super.gettimeofday()
