@@ -29,6 +29,8 @@ local selector = unix.selector()
 selector:open(1024, unix.O_CLOEXEC)
 
 local asio = unix.asio(selector)
+asio.selector_timeout = unix.asio.timespec(0.2)
+
 asio:add(reader)
 asio:add(writer)
 

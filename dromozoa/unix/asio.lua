@@ -20,10 +20,23 @@ local sequence = require "dromozoa.commons.sequence"
 local string_buffer = require "dromozoa.commons.string_buffer"
 local translate_range = require "dromozoa.commons.translate_range"
 
+local function timespec(s)
+  local t = s % 1
+  return {
+    tv_sec = s - t;
+    tv_nsec = t * 1000000000 % 1;
+  }
+end
+
 local function timespec_add(t1, t2)
-  local t = t2 % 1
-  local s = t1.tv_sec + t2 - t
-  local n = t1.tv_nsec + t * 1000000000 % 1
+  if type(t1) == "number" then
+    t1 = timespec(t1)
+  end
+  if type(t2) == "number" then
+    t2 = timespec(t2)
+  end
+  local s = t1.tv_sec + t2.tv_sec
+  local n = t1.tv_nsec + t2.tv_nsec
   if n >= 1000000000 then
     s = s + 1
     n = n - 1000000000
@@ -45,6 +58,7 @@ local function timespec_compare(t1, t2)
 end
 
 local class = {
+  timespec = timespec;
   timespec_add = timespec_add;
   timespec_compare = timespec_compare;
 }
@@ -60,8 +74,10 @@ end
 function class.new(selector)
   return {
     selector = selector;
+    selector_timeout = { tv_sec = 1, tv_nsec = 0 };
     pendings = {};
     buffers = {};
+    buffer_size = 1024;
     waitings = {};
     waiting_ref = 0;
   }
@@ -110,7 +126,7 @@ function class:read(fd, count, timeout)
   local buffer = self.buffers[fd:get()]
   local result = buffer:read(count)
   if result == nil then
-    local result = fd:read(1024)
+    local result = fd:read(self.buffer_size)
     if result == class.super.resource_unavailable_try_again then
       if self:add_pending(fd, 1, timeout) == nil then
         return nil
@@ -160,10 +176,9 @@ function class:dispatch()
   local selector = self.selector
   local pendings = self.pendings
   local waitings = self.waitings
-  local timeout = { tv_sec = 0, tv_nsec = 200000000 }
   self.stopped = nil
   while not self.stopped do
-    local result = selector:select(timeout)
+    local result = selector:select(self.selector_timeout)
     local now = class.timespec_now()
     local resumes = sequence()
     for i = 1, result do
