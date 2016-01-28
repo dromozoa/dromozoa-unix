@@ -61,4 +61,16 @@ asio:del(reader)
 asio:del(writer)
 reader:close()
 writer:close()
+
+coroutine.resume(coroutine.create(function ()
+  print("wait")
+  asio:wait(0.2)
+  print("done")
+  asio:stop()
+end))
+
+print("dispatch")
+asio:dispatch()
+print("dispatched")
+
 selector:close()

@@ -59,6 +59,8 @@ function class.new(selector)
     selector = selector;
     pendings = {};
     buffers = {};
+    waitings = {};
+    waiting_ref = 0;
   }
 end
 
@@ -85,6 +87,16 @@ function class:add_pending(fd, event, timeout)
     coroutine = coroutine.running();
     timeout = timeout;
   }
+  return coroutine.yield()
+end
+
+function class:add_waiting(timeout)
+  local ref = self.waiting_ref + 1
+  self.waitings[ref] = {
+    coroutine = coroutine.running();
+    timeout = timeout;
+  }
+  self.waiting_ref = ref
   return coroutine.yield()
 end
 
@@ -134,10 +146,19 @@ function class:write(fd, buffer, timeout, size, i, j)
   return self:write(fd, buffer, timeout, size, min, max)
 end
 
+function class:wait(timeout)
+  if type(timeout) == "number" then
+    timeout = timespec_add(class.timespec_now(), timeout)
+  end
+  return self:add_waiting(timeout)
+end
+
 function class:dispatch()
   local selector = self.selector
   local pendings = self.pendings
-  local timeout = { tv_sec = 1, tv_nsec = 0 }
+  local waitings = self.waitings
+  local timeout = { tv_sec = 0, tv_nsec = 200000000 }
+  self.stopped = nil
   while not self.stopped do
     local result = selector:select(timeout)
     local now = class.timespec_now()
@@ -147,18 +168,26 @@ function class:dispatch()
       local pending = pendings[fd]
       if pending ~= nil then
         pendings[fd] = nil
-        resumes:push({ pending.coroutine, event })
+        pending.event = event
+        resumes:push(pending)
       end
     end
     for fd, pending in pairs(pendings) do
       local timeout = pending.timeout
       if timeout ~= nil and timespec_compare(timeout, now) <= 0 then
         pendings[fd] = nil
-        resumes:push({ pending.coroutine })
+        resumes:push(pending)
+      end
+    end
+    for ref, waiting in pairs(waitings) do
+      local timeout = waiting.timeout
+      if timeout ~= nil and timespec_compare(timeout, now) <= 0 then
+        waitings[ref] = nil
+        resumes:push(waiting)
       end
     end
     for resume in resumes:each() do
-      coroutine.resume(resume[1], resume[2])
+      coroutine.resume(resume.coroutine, resume.event)
     end
   end
 end
