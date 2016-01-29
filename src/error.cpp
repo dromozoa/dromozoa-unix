@@ -21,6 +21,7 @@
 
 extern "C" {
 #include <lua.h>
+#include <lauxlib.h>
 }
 
 #include <errno.h>
@@ -35,6 +36,8 @@ extern "C" {
 #include "error.hpp"
 
 namespace dromozoa {
+  using bind::function;
+
   int push_resource_unavailable_try_again(lua_State* L) {
     lua_pushlightuserdata(L, reinterpret_cast<void*>(EAGAIN));
     return 1;
@@ -63,42 +66,48 @@ namespace dromozoa {
   }
 #endif
 
+  namespace {
+    int push_error_impl(lua_State* L, int code) {
+      char* buffer = 0;
+      size_t size = 32;
+
+      while (true) {
+        const char* what = 0;
+        errno = 0;
+#ifdef HAVE_STRERROR_R
+        size = size * 2;
+        if (char* b = static_cast<char*>(realloc(buffer, size))) {
+          buffer = b;
+          what = wrap_strerror_r(code, buffer, size);
+        } else {
+          errno = ENOMEM;
+        }
+#else
+        what = strerror(code);
+#endif
+
+        if (what && errno == 0) {
+          lua_pushstring(L, what);
+          break;
+#ifdef HAVE_STRERROR_R
+        } else if (errno == ERANGE) {
+          continue;
+#endif
+        } else {
+          lua_pushfstring(L, "error number %d", code);
+          break;
+        }
+      }
+      free(buffer);
+
+      return 1;
+    }
+  }
+
   int push_error(lua_State* L, int code) {
     int save = errno;
-    char* buffer = 0;
-    size_t size = 32;
-
     lua_pushnil(L);
-
-    while (true) {
-      const char* what = 0;
-      errno = 0;
-#ifdef HAVE_STRERROR_R
-      size = size * 2;
-      if (char* b = static_cast<char*>(realloc(buffer, size))) {
-        buffer = b;
-        what = wrap_strerror_r(code, buffer, size);
-      } else {
-        errno = ENOMEM;
-      }
-#else
-      what = strerror(code);
-#endif
-
-      if (what && errno == 0) {
-        lua_pushstring(L, what);
-        break;
-#ifdef HAVE_STRERROR_R
-      } else if (errno == ERANGE) {
-        continue;
-#endif
-      } else {
-        lua_pushfstring(L, "error number %d", code);
-        break;
-      }
-    }
-    free(buffer);
-
+    push_error_impl(L, code);
     lua_pushinteger(L, code);
     errno = save;
     return 3;
@@ -141,7 +150,19 @@ namespace dromozoa {
     errno = save;
   }
 
+  namespace {
+    int impl_strerror(lua_State* L) {
+      int save = errno;
+      int code = luaL_checkinteger(L, 1);
+      push_error_impl(L, code);
+      errno = save;
+      return 1;
+    }
+  }
+
   void initialize_error(lua_State* L) {
+    function<impl_strerror>::set_field(L, "strerror");
+
     DROMOZOA_BIND_SET_FIELD(L, EAGAIN);
     DROMOZOA_BIND_SET_FIELD(L, EINPROGRESS);
     DROMOZOA_BIND_SET_FIELD(L, EINTR);

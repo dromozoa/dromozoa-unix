@@ -23,6 +23,7 @@ local result, message, code = server:bind(unix.sockaddr_un("\0dromozoa-unix/test
 if not result then
   if code == unix.ENOENT then
     abstract = 0
+    os.remove("test.sock")
     assert(server:bind(unix.sockaddr_un("test.sock")))
   else
     assert(result, message, code)
@@ -46,5 +47,3 @@ while true do
 end
 assert(fd:close())
 assert(server:close())
-
-os.remove("test.sock")
