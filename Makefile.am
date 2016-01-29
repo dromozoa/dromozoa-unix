@@ -27,4 +27,5 @@ EXTRA_DIST = \
 	test.sh
 
 nobase_lua_DATA = \
-	dromozoa/unix/asio.lua
+	dromozoa/unix/asio.lua \
+	dromozoa/unix/timespec.lua
