@@ -20,61 +20,21 @@ local sequence = require "dromozoa.commons.sequence"
 local string_buffer = require "dromozoa.commons.string_buffer"
 local translate_range = require "dromozoa.commons.translate_range"
 
-local function timespec(s)
-  local t = s % 1
-  return {
-    tv_sec = s - t;
-    tv_nsec = t * 1000000000 % 1;
-  }
-end
+local class = {}
 
-local function timespec_add(t1, t2)
-  if type(t1) == "number" then
-    t1 = timespec(t1)
-  end
-  if type(t2) == "number" then
-    t2 = timespec(t2)
-  end
-  local s = t1.tv_sec + t2.tv_sec
-  local n = t1.tv_nsec + t2.tv_nsec
-  if n >= 1000000000 then
-    s = s + 1
-    n = n - 1000000000
-  end
-  return {
-    tv_sec = s;
-    tv_nsec = n;
-  }
-end
-
-local function timespec_compare(t1, t2)
-  local s1 = t1.tv_sec
-  local s2 = t2.tv_sec
-  if s1 == s2 then
-    return t1.tv_nsec - t2.tv_nsec
+local function translate_timeout(timeout)
+  if type(timeout) == "number" then
+    local timespec = class.super.timespec
+    return timespec.now() + timespec(timeout)
   else
-    return s1 - s2
+    return timeout
   end
-end
-
-local class = {
-  timespec = timespec;
-  timespec_add = timespec_add;
-  timespec_compare = timespec_compare;
-}
-
-function class.timespec_now()
-  local now = class.super.gettimeofday()
-  return {
-    tv_sec = now.tv_sec;
-    tv_nsec = now.tv_usec * 1000;
-  }
 end
 
 function class.new(selector)
   return {
     selector = selector;
-    selector_timeout = { tv_sec = 1, tv_nsec = 0 };
+    selector_timeout = class.super.timespec(1);
     pendings = {};
     buffers = {};
     buffer_size = 1024;
@@ -120,9 +80,7 @@ function class:add_waiting(timeout)
 end
 
 function class:read(fd, count, timeout)
-  if type(timeout) == "number" then
-    timeout = timespec_add(class.timespec_now(), timeout)
-  end
+  timeout = translate_timeout(timeout)
   local buffer = self.buffers[fd:get()]
   local result = buffer:read(count)
   if result == nil then
@@ -143,9 +101,7 @@ function class:read(fd, count, timeout)
 end
 
 function class:write(fd, buffer, timeout, size, i, j)
-  if type(timeout) == "number" then
-    timeout = timespec_add(class.timespec_now(), timeout)
-  end
+  timeout = translate_timeout(timeout)
   if size == nil then
     size = 0
   end
@@ -166,9 +122,7 @@ function class:write(fd, buffer, timeout, size, i, j)
 end
 
 function class:wait(timeout)
-  if type(timeout) == "number" then
-    timeout = timespec_add(class.timespec_now(), timeout)
-  end
+  timeout = translate_timeout(timeout)
   return self:add_waiting(timeout)
 end
 
@@ -179,7 +133,7 @@ function class:dispatch()
   self.stopped = nil
   while not self.stopped do
     local result = selector:select(self.selector_timeout)
-    local now = class.timespec_now()
+    local now = class.super.timespec.now()
     local resumes = sequence()
     for i = 1, result do
       local fd, event = selector:event(i)
@@ -192,14 +146,14 @@ function class:dispatch()
     end
     for fd, pending in pairs(pendings) do
       local timeout = pending.timeout
-      if timeout ~= nil and timespec_compare(timeout, now) <= 0 then
+      if timeout ~= nil and timeout < now then
         pendings[fd] = nil
         resumes:push(pending)
       end
     end
     for ref, waiting in pairs(waitings) do
       local timeout = waiting.timeout
-      if timeout ~= nil and timespec_compare(timeout, now) <= 0 then
+      if timeout ~= nil and timeout < now then
         waitings[ref] = nil
         resumes:push(waiting)
       end
