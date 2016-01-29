@@ -104,6 +104,27 @@ function class:read(fd, count, timeout)
   end
 end
 
+function class:read_line(fd, delimiter, timeout)
+  timeout = translate_timeout(timeout)
+  local buffer = self.buffers[get_fd(fd)]
+  local line, char = buffer:read_line(delimiter)
+  if line == nil then
+    local result = class.super.fd.read(fd, self.buffer_size)
+    if result == class.super.resource_unavailable_try_again then
+      if self:add_pending(fd, 1, timeout) == nil then
+        return nil
+      end
+    elseif result == "" then
+      buffer:close()
+    else
+      buffer:write(result)
+    end
+    return self:read_line(fd, delimiter, timeout)
+  else
+    return line, char
+  end
+end
+
 function class:write(fd, buffer, timeout, size, i, j)
   timeout = translate_timeout(timeout)
   if size == nil then
