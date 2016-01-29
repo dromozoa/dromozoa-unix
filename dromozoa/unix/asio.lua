@@ -31,6 +31,10 @@ local function translate_timeout(timeout)
   end
 end
 
+local function get_fd(fd)
+  return class.super.fd.get(fd)
+end
+
 function class.new(selector)
   return {
     selector = selector;
@@ -45,13 +49,13 @@ end
 
 function class:add(fd)
   self.selector:add(fd, 0)
-  self.buffers[fd:get()] = string_buffer()
+  self.buffers[get_fd(fd)] = string_buffer()
   return self
 end
 
 function class:del(fd)
   self.selector:del(fd)
-  self.buffers[fd:get()] = nil
+  self.buffers[get_fd(fd)] = nil
   return self
 end
 
@@ -62,7 +66,7 @@ end
 
 function class:add_pending(fd, event, timeout)
   self.selector:mod(fd, event)
-  self.pendings[fd:get()] = {
+  self.pendings[get_fd(fd)] = {
     coroutine = coroutine.running();
     timeout = timeout;
   }
@@ -81,10 +85,10 @@ end
 
 function class:read(fd, count, timeout)
   timeout = translate_timeout(timeout)
-  local buffer = self.buffers[fd:get()]
+  local buffer = self.buffers[get_fd(fd)]
   local result = buffer:read(count)
   if result == nil then
-    local result = fd:read(self.buffer_size)
+    local result = class.super.fd.read(fd, self.buffer_size)
     if result == class.super.resource_unavailable_try_again then
       if self:add_pending(fd, 1, timeout) == nil then
         return nil
@@ -106,7 +110,7 @@ function class:write(fd, buffer, timeout, size, i, j)
     size = 0
   end
   local min, max = translate_range(#buffer, i, j)
-  local result = fd:write(buffer)
+  local result = class.super.fd.write(fd, buffer)
   if result == 0 or result == class.super.resource_unavailable_try_again then
     if self:add_pending(fd, 2, timeout) == nil then
       return nil, size

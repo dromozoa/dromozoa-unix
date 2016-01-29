@@ -75,4 +75,21 @@ print("dispatch")
 asio:dispatch()
 print("dispatched")
 
+unix.fd.ndelay_on(0)
+asio:add(0)
+
+coroutine.resume(coroutine.create(function ()
+  print("reading stdin")
+  assert(asio:read(0, 1, 0.2) == nil)
+  print("timeout")
+  asio:stop()
+end))
+
+print("dispatch")
+asio:dispatch()
+print("dispatched")
+
+unix.fd.ndelay_off(0)
+asio:del(0)
+
 selector:close()
