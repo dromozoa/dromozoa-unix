@@ -22,6 +22,10 @@ local translate_range = require "dromozoa.commons.translate_range"
 
 local class = {}
 
+local function get_fd(fd)
+  return class.super.fd.get(fd)
+end
+
 local function translate_timeout(timeout)
   if type(timeout) == "number" then
     local timespec = class.super.timespec
@@ -29,10 +33,6 @@ local function translate_timeout(timeout)
   else
     return timeout
   end
-end
-
-local function get_fd(fd)
-  return class.super.fd.get(fd)
 end
 
 function class.new(selector)
