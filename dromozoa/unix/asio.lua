@@ -83,6 +83,19 @@ function class:add_waiting(timeout)
   return coroutine.yield()
 end
 
+function class:accept(fd, flags, timeout)
+  timeout = translate_timeout(timeout)
+  local result, sockaddr = class.super.fd.accept(fd, flags)
+  if result == class.super.resource_unavailable_try_again then
+    if self:add_pending(fd, 1, timeout) == nil then
+      return nil
+    end
+    return self:accept(fd, flags, timeout)
+  else
+    return result, sockaddr
+  end
+end
+
 function class:read(fd, count, timeout)
   timeout = translate_timeout(timeout)
   local buffer = self.buffers[get_fd(fd)]
