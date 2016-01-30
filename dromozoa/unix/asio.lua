@@ -85,14 +85,14 @@ end
 
 function class:accept(fd, flags, timeout)
   timeout = translate_timeout(timeout)
-  local result, sockaddr = class.super.fd.accept(fd, flags)
-  if result == class.super.resource_unavailable_try_again then
+  local a, b, c = class.super.fd.accept(fd, flags)
+  if a == class.super.resource_unavailable_try_again then
     if add_pending(self, fd, 1, timeout) == nil then
       return nil
     end
     return self:accept(fd, flags, timeout)
   else
-    return result, sockaddr
+    return a, b, c
   end
 end
 
@@ -105,6 +105,7 @@ function class:connect(fd, address, timeout)
     end
     local unix = self.super
     local code = unix.fd.getsockopt(fd, unix.SOL_SOCKET, unix.SO_ERROR)
+    print("code", code)
     if code == 0 then
       return fd
     else
@@ -214,7 +215,7 @@ function class:dispatch()
     end
     for ref, waiting in pairs(waitings) do
       local timeout = waiting.timeout
-      if timeout ~= nil and timeout < now then
+      if timeout == nil or timeout < now then
         waitings[ref] = nil
         resumes:push(waiting)
       end

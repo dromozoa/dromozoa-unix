@@ -19,7 +19,7 @@ local pairs = require "dromozoa.commons.pairs"
 local unix = require "dromozoa.unix"
 
 unix.set_log_level(3)
-unix.set_raise_error(true)
+-- unix.set_raise_error(true)
 
 local host, serv = ...
 
@@ -39,10 +39,10 @@ fd:ndelay_on()
 asio:add(fd)
 
 coroutine.resume(coroutine.create(function ()
-  asio:wait(0.2)
+  asio:wait()
   print("connect")
-  print("c", asio:connect(fd, ai.ai_addr, 4))
-  print("connected")
+  local a, b, c, d = pcall(asio.connect, asio, fd, ai.ai_addr, 4)
+  print("connected", a, b, c, d)
   asio:del(fd)
   fd:close()
   asio:stop()
