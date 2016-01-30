@@ -37,6 +37,7 @@ extern "C" {
 
 namespace dromozoa {
   using bind::function;
+  using bind::push_success;
 
   int push_resource_unavailable_try_again(lua_State* L) {
     lua_pushlightuserdata(L, reinterpret_cast<void*>(EAGAIN));
@@ -158,21 +159,36 @@ namespace dromozoa {
   namespace {
     int impl_strerror(lua_State* L) {
       int save = errno;
-      int code = luaL_checkinteger(L, 1);
+      int code = luaL_optinteger(L, 1, save);
       push_error_impl(L, code);
       errno = save;
+      return 1;
+    }
+
+    int impl_set_errno(lua_State* L) {
+      int code = luaL_checkinteger(L, 1);
+      errno = code;
+      return push_success(L);
+    }
+
+    int impl_get_errno(lua_State* L) {
+      int code = errno;
+      lua_pushinteger(L, code);
       return 1;
     }
   }
 
   void initialize_error(lua_State* L) {
     function<impl_strerror>::set_field(L, "strerror");
+    function<impl_set_errno>::set_field(L, "set_errno");
+    function<impl_get_errno>::set_field(L, "get_errno");
 
     DROMOZOA_BIND_SET_FIELD(L, EAGAIN);
     DROMOZOA_BIND_SET_FIELD(L, EINPROGRESS);
     DROMOZOA_BIND_SET_FIELD(L, EINTR);
     DROMOZOA_BIND_SET_FIELD(L, ENOENT);
     DROMOZOA_BIND_SET_FIELD(L, EPIPE);
+    DROMOZOA_BIND_SET_FIELD(L, ETIMEDOUT);
     DROMOZOA_BIND_SET_FIELD(L, EWOULDBLOCK);
 
     push_resource_unavailable_try_again(L);
