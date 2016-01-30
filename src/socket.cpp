@@ -144,7 +144,12 @@ namespace dromozoa {
       socklen_t size = 0;
       const struct sockaddr* address = get_sockaddr(L, 2, size);
       if (connect(get_fd(L, 1), address, size) == -1) {
-        return push_error(L);
+        int code = errno;
+        if (code == EINPROGRESS) {
+          return push_operation_in_progress(L);
+        } else {
+          return push_error(L, code);
+        }
       } else {
         return push_success(L);
       }

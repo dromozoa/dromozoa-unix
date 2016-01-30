@@ -96,6 +96,29 @@ function class:accept(fd, flags, timeout)
   end
 end
 
+function class:connect(fd, address, timeout)
+  timeout = translate_timeout(timeout)
+  local result = class.super.fd.connect(fd, address)
+  if result == class.super.operation_in_progress then
+    if self:add_pending(fd, 2, timeout) == nil then
+      return nil
+    end
+    local unix = self.super
+    local code = unix.fd.getsockopt(fd, unix.SOL_SOCKET, unix.SO_ERROR)
+    if code == 0 then
+      return fd
+    else
+      if unix.get_raise_error() then
+        error(unix.strerror(code))
+      else
+        return nil, unix.strerror(code), code
+      end
+    end
+  else
+    return result
+  end
+end
+
 function class:read(fd, count, timeout)
   timeout = translate_timeout(timeout)
   local buffer = self.buffers[get_fd(fd)]
@@ -176,6 +199,7 @@ function class:dispatch()
     for i = 1, result do
       local fd, event = selector:event(i)
       local pending = pendings[fd]
+      assert(pending)
       if pending ~= nil then
         pendings[fd] = nil
         pending.event = event
@@ -197,7 +221,7 @@ function class:dispatch()
       end
     end
     for resume in resumes:each() do
-      coroutine.resume(resume.coroutine, resume.event)
+      assert(coroutine.resume(resume.coroutine, resume.event))
     end
   end
 end

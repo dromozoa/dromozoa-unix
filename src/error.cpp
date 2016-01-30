@@ -43,6 +43,11 @@ namespace dromozoa {
     return 1;
   }
 
+  int push_operation_in_progress(lua_State* L) {
+    lua_pushlightuserdata(L, reinterpret_cast<void*>(EINPROGRESS));
+    return 1;
+  }
+
 #ifdef HAVE_STRERROR_R
   namespace {
     const char* wrap_strerror_r_result(const char* result, char*) {
@@ -172,5 +177,8 @@ namespace dromozoa {
 
     push_resource_unavailable_try_again(L);
     lua_setfield(L, -2, "resource_unavailable_try_again");
+
+    push_operation_in_progress(L);
+    lua_setfield(L, -2, "operation_in_progress");
   }
 }
