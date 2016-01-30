@@ -35,6 +35,25 @@ local function translate_timeout(timeout)
   end
 end
 
+local function add_pending(self, fd, event, timeout)
+  self.selector:mod(fd, event)
+  self.pendings[get_fd(fd)] = {
+    coroutine = coroutine.running();
+    timeout = timeout;
+  }
+  return coroutine.yield()
+end
+
+local function add_waiting(self, timeout)
+  local ref = self.waiting_ref + 1
+  self.waitings[ref] = {
+    coroutine = coroutine.running();
+    timeout = timeout;
+  }
+  self.waiting_ref = ref
+  return coroutine.yield()
+end
+
 function class.new(selector)
   return {
     selector = selector;
@@ -64,30 +83,11 @@ function class:stop()
   return self
 end
 
-function class:add_pending(fd, event, timeout)
-  self.selector:mod(fd, event)
-  self.pendings[get_fd(fd)] = {
-    coroutine = coroutine.running();
-    timeout = timeout;
-  }
-  return coroutine.yield()
-end
-
-function class:add_waiting(timeout)
-  local ref = self.waiting_ref + 1
-  self.waitings[ref] = {
-    coroutine = coroutine.running();
-    timeout = timeout;
-  }
-  self.waiting_ref = ref
-  return coroutine.yield()
-end
-
 function class:accept(fd, flags, timeout)
   timeout = translate_timeout(timeout)
   local result, sockaddr = class.super.fd.accept(fd, flags)
   if result == class.super.resource_unavailable_try_again then
-    if self:add_pending(fd, 1, timeout) == nil then
+    if add_pending(self, fd, 1, timeout) == nil then
       return nil
     end
     return self:accept(fd, flags, timeout)
@@ -100,7 +100,7 @@ function class:connect(fd, address, timeout)
   timeout = translate_timeout(timeout)
   local result = class.super.fd.connect(fd, address)
   if result == class.super.operation_in_progress then
-    if self:add_pending(fd, 2, timeout) == nil then
+    if add_pending(self, fd, 2, timeout) == nil then
       return nil
     end
     local unix = self.super
@@ -126,7 +126,7 @@ function class:read(fd, count, timeout)
   if result == nil then
     local result = class.super.fd.read(fd, self.buffer_size)
     if result == class.super.resource_unavailable_try_again then
-      if self:add_pending(fd, 1, timeout) == nil then
+      if add_pending(self, fd, 1, timeout) == nil then
         return nil
       end
     elseif result == "" then
@@ -147,7 +147,7 @@ function class:read_line(fd, delimiter, timeout)
   if line == nil then
     local result = class.super.fd.read(fd, self.buffer_size)
     if result == class.super.resource_unavailable_try_again then
-      if self:add_pending(fd, 1, timeout) == nil then
+      if add_pending(self, fd, 1, timeout) == nil then
         return nil
       end
     elseif result == "" then
@@ -169,7 +169,7 @@ function class:write(fd, buffer, timeout, size, i, j)
   local min, max = translate_range(#buffer, i, j)
   local result = class.super.fd.write(fd, buffer)
   if result == 0 or result == class.super.resource_unavailable_try_again then
-    if self:add_pending(fd, 2, timeout) == nil then
+    if add_pending(self, fd, 2, timeout) == nil then
       return nil, size
     end
   else
@@ -184,7 +184,7 @@ end
 
 function class:wait(timeout)
   timeout = translate_timeout(timeout)
-  return self:add_waiting(timeout)
+  return add_waiting(self, timeout)
 end
 
 function class:dispatch()
@@ -199,7 +199,6 @@ function class:dispatch()
     for i = 1, result do
       local fd, event = selector:event(i)
       local pending = pendings[fd]
-      assert(pending)
       if pending ~= nil then
         pendings[fd] = nil
         pending.event = event
