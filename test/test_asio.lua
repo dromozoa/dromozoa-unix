@@ -35,6 +35,7 @@ asio:add(reader)
 asio:add(writer)
 
 coroutine.resume(coroutine.create(function ()
+  asio:wait()
   local data = ("x"):rep(65536)
   while true do
     local result, size = asio:write(writer, data, 0.2)

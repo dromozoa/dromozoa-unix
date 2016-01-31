@@ -54,6 +54,12 @@ local function add_waiting(self, timeout)
   return coroutine.yield()
 end
 
+local function timedout()
+  local unix = class.super
+  local code = unix.ETIMEDOUT
+  return nil, unix.strerror(code), code
+end
+
 function class.new(selector)
   return {
     selector = selector;
@@ -61,6 +67,7 @@ function class.new(selector)
     pendings = {};
     buffers = {};
     buffer_size = 1024;
+    writtens = {};
     waitings = {};
     waiting_ref = 0;
   }
@@ -88,20 +95,22 @@ function class:accept(fd, flags, timeout)
   local a, b, c = class.super.fd.accept(fd, flags)
   if a == class.super.resource_unavailable_try_again then
     if add_pending(self, fd, 1, timeout) == nil then
-      return nil
+      return timedout()
     end
     return self:accept(fd, flags, timeout)
-  else
+  elseif a == nil then
     return a, b, c
+  else
+    return a
   end
 end
 
 function class:connect(fd, address, timeout)
   timeout = translate_timeout(timeout)
-  local result = class.super.fd.connect(fd, address)
-  if result == class.super.operation_in_progress then
+  local a, b, c = class.super.fd.connect(fd, address)
+  if a == class.super.operation_in_progress then
     if add_pending(self, fd, 2, timeout) == nil then
-      return nil
+      return timedout()
     end
     local unix = self.super
     local code = unix.fd.getsockopt(fd, unix.SOL_SOCKET, unix.SO_ERROR)
@@ -115,8 +124,10 @@ function class:connect(fd, address, timeout)
         return nil, unix.strerror(code), code
       end
     end
+  elseif a == nil then
+    return a, b, c
   else
-    return result
+    return a
   end
 end
 
@@ -125,15 +136,17 @@ function class:read(fd, count, timeout)
   local buffer = self.buffers[get_fd(fd)]
   local result = buffer:read(count)
   if result == nil then
-    local result = class.super.fd.read(fd, self.buffer_size)
-    if result == class.super.resource_unavailable_try_again then
+    local a, b, c = class.super.fd.read(fd, self.buffer_size)
+    if a == class.super.resource_unavailable_try_again then
       if add_pending(self, fd, 1, timeout) == nil then
-        return nil
+        return timedout()
       end
-    elseif result == "" then
+    elseif a == nil then
+      return a, b, c
+    elseif a == "" then
       buffer:close()
     else
-      buffer:write(result)
+      buffer:write(a)
     end
     return self:read(fd, count, timeout)
   else
@@ -146,15 +159,17 @@ function class:read_line(fd, delimiter, timeout)
   local buffer = self.buffers[get_fd(fd)]
   local line, char = buffer:read_line(delimiter)
   if line == nil then
-    local result = class.super.fd.read(fd, self.buffer_size)
-    if result == class.super.resource_unavailable_try_again then
+    local a, b, c = class.super.fd.read(fd, self.buffer_size)
+    if a == class.super.resource_unavailable_try_again then
       if add_pending(self, fd, 1, timeout) == nil then
         return nil
       end
-    elseif result == "" then
+    elseif a == nil then
+      return a, b, c
+    elseif a == "" then
       buffer:close()
     else
-      buffer:write(result)
+      buffer:write(a)
     end
     return self:read_line(fd, delimiter, timeout)
   else
@@ -168,16 +183,21 @@ function class:write(fd, buffer, timeout, size, i, j)
     size = 0
   end
   local min, max = translate_range(#buffer, i, j)
-  local result = class.super.fd.write(fd, buffer)
-  if result == 0 or result == class.super.resource_unavailable_try_again then
+  local a, b, c = class.super.fd.write(fd, buffer)
+  if a == 0 or a == class.super.resource_unavailable_try_again then
     if add_pending(self, fd, 2, timeout) == nil then
-      return nil, size
+      self.writtens[get_fd(fd)] = size
+      return timedout()
     end
+  elseif a == nil then
+    self.writtens[get_fd(fd)] = size
+    return a, b, c
   else
-    size = size + result
-    min = min + result
+    size = size + a
+    min = min + a
     if min > max then
-      return true, size
+      self.writtens[get_fd(fd)] = size
+      return fd
     end
   end
   return self:write(fd, buffer, timeout, size, min, max)
