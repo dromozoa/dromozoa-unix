@@ -15,13 +15,27 @@
 // You should have received a copy of the GNU General Public License
 // along with dromozoa-unix.  If not, see <http://www.gnu.org/licenses/>.
 
+extern "C" {
+#include <lua.h>
+#include <lauxlib.h>
+}
+
 #include <errno.h>
 #include <stddef.h>
 #include <unistd.h>
 
+#include <vector>
+
+#include "dromozoa/bind.hpp"
+
+#include "argument_vector.hpp"
+#include "error.hpp"
 #include "pathexec.hpp"
 
 namespace dromozoa {
+  using bind::function;
+  using bind::push_success;
+
   namespace {
     inline char* copy(char* p, char c) {
       *p = c;
@@ -121,5 +135,23 @@ namespace dromozoa {
     }
     errno = code;
     return -1;
+  }
+
+  namespace {
+    int impl_pathexec(lua_State* L) {
+      const char* path = luaL_checkstring(L, 1);
+      argument_vector argv(L, 2);
+      argument_vector envp(L, 3);
+      std::vector<char> buffer(pathexec_buffer_size(path, argv.get()));
+      if (pathexec(path, argv.get(), envp.get(), &buffer[0], buffer.size()) == -1) {
+        return push_error(L);
+      } else {
+        return push_success(L);
+      }
+    }
+  }
+
+  void initialize_pathexec(lua_State* L) {
+    function<impl_pathexec>::set_field(L, "pathexec");
   }
 }
