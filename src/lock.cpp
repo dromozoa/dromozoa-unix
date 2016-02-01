@@ -27,6 +27,8 @@ extern "C" {
 #include <sys/file.h>
 #endif
 
+#include <errno.h>
+
 #include "dromozoa/bind.hpp"
 
 #include "error.hpp"
@@ -48,7 +50,12 @@ namespace dromozoa {
 
     int impl_lock_exnb(lua_State* L) {
       if (flock(get_fd(L, 1), LOCK_EX | LOCK_NB) == -1) {
-        return push_error(L);
+        int code = errno;
+        if (code == EWOULDBLOCK) {
+          return push_resource_unavailable_try_again(L);
+        } else {
+          return push_error(L);
+        }
       } else {
         return push_success(L);
       }
