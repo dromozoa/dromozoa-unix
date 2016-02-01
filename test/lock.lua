@@ -17,13 +17,19 @@
 
 local unix = require "dromozoa.unix"
 
-unix.set_log_level(3)
+unix.set_log_level(1)
 unix.set_raise_error(true)
 
-local PATH = os.getenv("PATH")
+local pid = unix.getpid()
 
-local pid1 = unix.forkexec(PATH, { arg[-1], "test/lock.lua" }, unix.environ(), nil, {})
-local pid2 = unix.forkexec(PATH, { arg[-1], "test/lock.lua" }, unix.environ(), nil, {})
-
-unix.wait()
-unix.wait()
+local fd = unix.open("test.lock", unix.bor(unix.O_CREAT, unix.O_WRONLY), 384)
+print(pid, "locking")
+if fd:lock_exnb() == unix.resource_unavailable_try_again then
+  print(pid, "could not lock")
+else
+  print(pid, "locked")
+  unix.nanosleep({ tv_sec = 1, tv_nsec = 0 })
+  print(pid, "unlocking")
+  fd:lock_un()
+  print(pid, "unlocked")
+end
