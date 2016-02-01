@@ -20,6 +20,7 @@ extern "C" {
 #include <lauxlib.h>
 }
 
+#include <errno.h>
 #include <stddef.h>
 #include <unistd.h>
 
@@ -44,7 +45,12 @@ namespace dromozoa {
     if (i < j) {
       ssize_t result = write(get_fd(L, 1), buffer + i, j - i);
       if (result == -1) {
-        return push_error(L);
+        int code = errno;
+        if (code == EAGAIN || code == EWOULDBLOCK) {
+          return push_resource_unavailable_try_again(L);
+        } else {
+          return push_error(L);
+        }
       } else {
         lua_pushinteger(L, result);
         return 1;

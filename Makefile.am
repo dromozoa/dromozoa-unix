@@ -21,7 +21,12 @@ SUBDIRS = bind src
 EXTRA_DIST = \
 	.gitignore \
 	README.md \
+	dromozoa \
 	dromozoa-unix-*.rockspec \
 	m4/update \
 	test \
 	test.sh
+
+nobase_lua_DATA = \
+	dromozoa/unix/asio.lua \
+	dromozoa/unix/timespec.lua

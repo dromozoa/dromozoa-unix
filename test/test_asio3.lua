@@ -17,33 +17,27 @@
 
 local unix = require "dromozoa.unix"
 
-local abstract = 1
-local server = assert(unix.socket(unix.AF_UNIX, unix.SOCK_STREAM))
-local result, message, code = server:bind(unix.sockaddr_un("\0dromozoa-unix/test.sock"))
-if not result then
-  if code == unix.ENOENT then
-    abstract = 0
-    os.remove("test.sock")
-    assert(server:bind(unix.sockaddr_un("test.sock")))
-  else
-    assert(result, message, code)
-  end
-end
-assert(server:listen())
-io.stdout:write(abstract, "\n")
-io.stdout:flush()
-io.stdout:close()
+unix.set_log_level(3)
+unix.set_raise_error(true)
 
-local fd, sa = server:accept(unix.O_CLOEXEC)
-while true do
-  local result, message, code = fd:read(256)
-  if result and #result > 0 then
-    assert(result == "foo\n")
-    -- io.stderr:write(result)
-    assert(fd:write("bar\n") == 4)
-  else
-    break
-  end
+local selector = unix.selector()
+selector:open(1024, unix.O_CLOEXEC)
+
+local asio = unix.asio(selector)
+
+function asio:error(message, level)
+  return nil, message
 end
-assert(fd:close())
-assert(server:close())
+
+coroutine.resume(coroutine.create(function ()
+  asio:wait()
+  print("foo")
+  asio:wait()
+  print("bar")
+  error("baz")
+end))
+
+local a, b = asio:dispatch()
+print(a, b)
+
+selector:close()

@@ -48,7 +48,7 @@ namespace dromozoa {
   }
 
   namespace {
-    int impl_ndealy_on(lua_State* L) {
+    int impl_ndelay_on(lua_State* L) {
       if (ndelay_on(get_fd(L, 1)) == -1) {
         return push_error(L);
       } else {
@@ -56,7 +56,7 @@ namespace dromozoa {
       }
     }
 
-    int impl_ndealy_off(lua_State* L) {
+    int impl_ndelay_off(lua_State* L) {
       if (ndelay_off(get_fd(L, 1)) == -1) {
         return push_error(L);
       } else {
@@ -66,7 +66,7 @@ namespace dromozoa {
   }
 
   void initialize_ndelay(lua_State* L) {
-    function<impl_ndealy_on>::set_field(L, "ndelay_on");
-    function<impl_ndealy_off>::set_field(L, "ndelay_off");
+    function<impl_ndelay_on>::set_field(L, "ndelay_on");
+    function<impl_ndelay_off>::set_field(L, "ndelay_off");
   }
 }

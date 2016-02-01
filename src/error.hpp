@@ -27,6 +27,8 @@ extern "C" {
 #include <iosfwd>
 
 namespace dromozoa {
+  int push_resource_unavailable_try_again(lua_State* L);
+  int push_operation_in_progress(lua_State* L);
   int push_error(lua_State* L, int code = errno);
   void print_error(std::ostream& out, int code = errno);
   void initialize_error(lua_State* L);

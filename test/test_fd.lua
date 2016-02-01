@@ -58,3 +58,18 @@ assert(unix.STDERR_FILENO == 2)
 
 unix.fd.stderr:write("baz\n")
 -- print(json.encode(unix.fd))
+
+do
+  local reader, writer = unix.pipe(unix.bor(unix.O_CLOEXEC, unix.O_NONBLOCK))
+  writer:write("foobarbaz")
+  assert(reader:read(3) == "foo")
+  assert(reader:read(3) == "bar")
+  assert(reader:read(3) == "baz")
+  local result = reader:read(3)
+  assert(result == unix.resource_unavailable_try_again)
+  writer:write("qux")
+  writer:close()
+  assert(reader:read(4) == "qux")
+  assert(reader:read(4) == "")
+  reader:close()
+end

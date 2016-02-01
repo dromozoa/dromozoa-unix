@@ -24,6 +24,7 @@ extern "C" {
 #include <lauxlib.h>
 }
 
+#include <errno.h>
 #include <fcntl.h>
 #include <unistd.h>
 #include <sys/socket.h>
@@ -126,7 +127,12 @@ namespace dromozoa {
       socklen_t size = sizeof(ss);
       int result = wrap_accept4(get_fd(L, 1), sockaddr_cast(&ss), &size, flags);
       if (result == -1) {
-        return push_error(L);
+        int code = errno;
+        if (code == EAGAIN || code == EWOULDBLOCK) {
+          return push_resource_unavailable_try_again(L);
+        } else {
+          return push_error(L, code);
+        }
       } else {
         new_fd(L, result);
         new_sockaddr(L, sockaddr_cast(&ss), size);
@@ -138,7 +144,12 @@ namespace dromozoa {
       socklen_t size = 0;
       const struct sockaddr* address = get_sockaddr(L, 2, size);
       if (connect(get_fd(L, 1), address, size) == -1) {
-        return push_error(L);
+        int code = errno;
+        if (code == EINPROGRESS) {
+          return push_operation_in_progress(L);
+        } else {
+          return push_error(L, code);
+        }
       } else {
         return push_success(L);
       }
