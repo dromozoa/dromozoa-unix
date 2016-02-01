@@ -47,6 +47,24 @@ extern "C" {
 #include "write.hpp"
 
 namespace dromozoa {
+  int open_asio(lua_State* L) {
+    lua_getglobal(L, "require");
+    lua_pushliteral(L, "dromozoa.unix.asio");
+    lua_call(L, 1, 1);
+    lua_pushvalue(L, -2);
+    lua_setfield(L, -2, "super");
+    return 1;
+  }
+
+  int open_timespec(lua_State* L) {
+    lua_getglobal(L, "require");
+    lua_pushliteral(L, "dromozoa.unix.timespec");
+    lua_call(L, 1, 1);
+    lua_pushvalue(L, -2);
+    lua_setfield(L, -2, "super");
+    return 1;
+  }
+
   int open(lua_State* L) {
     lua_newtable(L);
 
@@ -68,6 +86,12 @@ namespace dromozoa {
     open_sockaddr(L);
     initialize_getnameinfo(L);
     lua_setfield(L, -2, "sockaddr");
+
+    open_asio(L);
+    lua_setfield(L, -2, "asio");
+
+    open_timespec(L);
+    lua_setfield(L, -2, "timespec");
 
     bind::initialize(L);
     initialize_error(L);

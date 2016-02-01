@@ -40,7 +40,12 @@ namespace dromozoa {
       std::vector<char> buffer(luaL_checkinteger(L, 2));
       ssize_t result = read(get_fd(L, 1), &buffer[0], buffer.size());
       if (result == -1) {
-        return push_error(L);
+        int code = errno;
+        if (code == EAGAIN || code == EWOULDBLOCK) {
+          return push_resource_unavailable_try_again(L);
+        } else {
+          return push_error(L, code);
+        }
       } else {
         lua_pushlstring(L, &buffer[0], result);
         return 1;

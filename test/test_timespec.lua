@@ -17,33 +17,18 @@
 
 local unix = require "dromozoa.unix"
 
-local abstract = 1
-local server = assert(unix.socket(unix.AF_UNIX, unix.SOCK_STREAM))
-local result, message, code = server:bind(unix.sockaddr_un("\0dromozoa-unix/test.sock"))
-if not result then
-  if code == unix.ENOENT then
-    abstract = 0
-    os.remove("test.sock")
-    assert(server:bind(unix.sockaddr_un("test.sock")))
-  else
-    assert(result, message, code)
-  end
-end
-assert(server:listen())
-io.stdout:write(abstract, "\n")
-io.stdout:flush()
-io.stdout:close()
+local t = unix.timespec(1.25)
+assert(t.tv_sec == 1)
+assert(t.tv_nsec == 250000000)
 
-local fd, sa = server:accept(unix.O_CLOEXEC)
-while true do
-  local result, message, code = fd:read(256)
-  if result and #result > 0 then
-    assert(result == "foo\n")
-    -- io.stderr:write(result)
-    assert(fd:write("bar\n") == 4)
-  else
-    break
-  end
-end
-assert(fd:close())
-assert(server:close())
+local t1 = unix.timespec.now()
+unix.nanosleep(unix.timespec(0.2))
+local t2 = unix.timespec.now()
+assert(t1 == t1)
+assert(t1 < t2)
+
+local t = t2 - t1
+-- print(t:tonumber())
+assert(t.tv_sec == 0)
+assert(100000000 < t.tv_nsec and t.tv_nsec < 300000000)
+assert(t1 + t == t2)

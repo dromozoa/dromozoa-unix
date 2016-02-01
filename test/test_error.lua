@@ -17,33 +17,21 @@
 
 local unix = require "dromozoa.unix"
 
-local abstract = 1
-local server = assert(unix.socket(unix.AF_UNIX, unix.SOCK_STREAM))
-local result, message, code = server:bind(unix.sockaddr_un("\0dromozoa-unix/test.sock"))
-if not result then
-  if code == unix.ENOENT then
-    abstract = 0
-    os.remove("test.sock")
-    assert(server:bind(unix.sockaddr_un("test.sock")))
-  else
-    assert(result, message, code)
-  end
-end
-assert(server:listen())
-io.stdout:write(abstract, "\n")
-io.stdout:flush()
-io.stdout:close()
+local code = unix.get_errno()
 
-local fd, sa = server:accept(unix.O_CLOEXEC)
-while true do
-  local result, message, code = fd:read(256)
-  if result and #result > 0 then
-    assert(result == "foo\n")
-    -- io.stderr:write(result)
-    assert(fd:write("bar\n") == 4)
-  else
-    break
-  end
-end
-assert(fd:close())
-assert(server:close())
+unix.set_errno(0)
+assert(unix.get_errno() == 0)
+print(unix.strerror())
+
+unix.set_errno(unix.ETIMEDOUT)
+assert(unix.get_errno() == unix.ETIMEDOUT)
+print(unix.strerror())
+
+assert(unix.strerror() == unix.strerror(unix.ETIMEDOUT))
+
+-- print(unix.strerror(unix.EAGAIN))
+-- print(unix.strerror(unix.EINPROGRESS))
+-- print(unix.strerror(unix.EINTR))
+-- print(unix.strerror(unix.ENOENT))
+-- print(unix.strerror(unix.EPIPE))
+-- print(unix.strerror(unix.EWOULDBLOCK))

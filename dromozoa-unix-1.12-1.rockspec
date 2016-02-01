@@ -1,7 +1,7 @@
 package = "dromozoa-unix"
-version = "1.11-1"
+version = "1.12-1"
 source = {
-  url = "https://github.com/dromozoa/dromozoa-unix/releases/download/v1.11/dromozoa-unix-1.11.tar.gz";
+  url = "https://github.com/dromozoa/dromozoa-unix/releases/download/v1.12/dromozoa-unix-1.12.tar.gz";
 }
 description = {
   summary = "Lua bindings for UNIX system interface";
@@ -9,8 +9,11 @@ description = {
   homepage = "https://github.com/dromozoa/dromozoa-unix/";
   maintainer = "Tomoyuki Fujimori <moyu@dromozoa.com>";
 }
+dependencies = {
+  "dromozoa-commons";
+}
 build = {
   type = "command";
   build_command = "env CPPFLAGS='-I$(LUA_INCDIR)' CXXFLAGS='-Wall -W -Wno-missing-field-initializers $(CFLAGS)' LDFLAGS='-L$(LUA_LIBDIR)' LUA='$(LUA_BINDIR)/$(LUA)' ./configure --prefix='$(PREFIX)' && make clean && make";
-  install_command = "make luaexecdir='$(LIBDIR)/dromozoa' install";
+  install_command = "make luadir='$(LUADIR)' luaexecdir='$(LIBDIR)/dromozoa' install";
 }
