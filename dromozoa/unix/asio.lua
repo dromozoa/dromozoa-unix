@@ -16,7 +16,7 @@
 -- along with dromozoa-unix.  If not, see <http://www.gnu.org/licenses/>.
 
 local pairs = require "dromozoa.commons.pairs"
-local sequence = require "dromozoa.commons.sequence"
+local queue = require "dromozoa.commons.queue"
 local string_buffer = require "dromozoa.commons.string_buffer"
 local translate_range = require "dromozoa.commons.translate_range"
 
@@ -70,6 +70,7 @@ function class.new(selector)
     writtens = {};
     waitings = {};
     waiting_ref = 0;
+    resumes = queue();
   }
 end
 
@@ -114,7 +115,6 @@ function class:connect(fd, address, timeout)
     end
     local unix = self.super
     local code = unix.fd.getsockopt(fd, unix.SOL_SOCKET, unix.SO_ERROR)
-    print("code", code)
     if code == 0 then
       return fd
     else
@@ -203,20 +203,28 @@ function class:write(fd, buffer, timeout, size, i, j)
   return self:write(fd, buffer, timeout, size, min, max)
 end
 
+function class:written(fd)
+  return self.writtens[get_fd(fd)]
+end
+
 function class:wait(timeout)
   timeout = translate_timeout(timeout)
   return add_waiting(self, timeout)
+end
+
+function class:error(message, level)
+  return error(message, level)
 end
 
 function class:dispatch()
   local selector = self.selector
   local pendings = self.pendings
   local waitings = self.waitings
+  local resumes = self.resumes
   self.stopped = nil
   while not self.stopped do
     local result = selector:select(self.selector_timeout)
     local now = class.super.timespec.now()
-    local resumes = sequence()
     for i = 1, result do
       local fd, event = selector:event(i)
       local pending = pendings[fd]
@@ -240,8 +248,17 @@ function class:dispatch()
         resumes:push(waiting)
       end
     end
-    for resume in resumes:each() do
-      assert(coroutine.resume(resume.coroutine, resume.event))
+    while true do
+      local resume = resumes:front()
+      if resume == nil then
+        break
+      else
+        resumes:pop()
+        local result, message = coroutine.resume(resume.coroutine, resume.event)
+        if not result then
+          return self:error(message, 2)
+        end
+      end
     end
   end
 end

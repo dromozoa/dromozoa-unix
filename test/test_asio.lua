@@ -38,8 +38,8 @@ coroutine.resume(coroutine.create(function ()
   asio:wait()
   local data = ("x"):rep(65536)
   while true do
-    local result, size = asio:write(writer, data, 0.2)
-    print(result, size)
+    local a, b, c = asio:write(writer, data, 0.2)
+    print("written", a, b, c, asio:written(writer))
     if result == nil then
       break
     end
