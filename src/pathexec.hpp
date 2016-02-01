@@ -18,6 +18,10 @@
 #ifndef DROMOZOA_PATHEXEC_HPP
 #define DROMOZOA_PATHEXEC_HPP
 
+extern "C" {
+#include <lua.h>
+}
+
 #include <stddef.h>
 
 namespace dromozoa {
@@ -30,6 +34,7 @@ namespace dromozoa {
       const char* const* envp,
       char* buffer,
       size_t size);
+  void initialize_pathexec(lua_State* L);
 }
 
 #endif
