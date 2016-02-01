@@ -30,6 +30,7 @@ extern "C" {
 #include "ndelay.hpp"
 #include "netdb.hpp"
 #include "netinet.hpp"
+#include "pathexec.hpp"
 #include "pipe.hpp"
 #include "read.hpp"
 #include "selector.hpp"
@@ -99,6 +100,7 @@ namespace dromozoa {
     initialize_forkexec(L);
     initialize_netdb(L);
     initialize_netinet(L);
+    initialize_pathexec(L);
     initialize_pipe(L);
     initialize_signal(L);
     initialize_sockaddr(L);
