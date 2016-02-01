@@ -21,6 +21,7 @@ SUBDIRS = bind src
 EXTRA_DIST = \
 	.gitignore \
 	README.md \
+	dromozoa \
 	dromozoa-unix-*.rockspec \
 	m4/update \
 	test \
