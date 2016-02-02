@@ -29,13 +29,12 @@ function asio:error(message, level)
   return nil, message
 end
 
-coroutine.resume(coroutine.create(function ()
-  asio:wait()
+asio:resume(function ()
   print("foo")
   asio:wait()
   print("bar")
   error("baz")
-end))
+end)
 
 local a, b = asio:dispatch()
 print(a, b)
