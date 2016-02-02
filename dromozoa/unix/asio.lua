@@ -212,6 +212,12 @@ function class:wait(timeout)
   return add_waiting(self, timeout)
 end
 
+function class:resume(f)
+  return self.resumes:push({
+    coroutine = coroutine.create(f);
+  })
+end
+
 function class:error(message, level)
   return error(message, level)
 end
@@ -223,6 +229,18 @@ function class:dispatch()
   local resumes = self.resumes
   self.stopped = nil
   while not self.stopped do
+    while true do
+      local resume = resumes:front()
+      if resume == nil then
+        break
+      else
+        resumes:pop()
+        local result, message = coroutine.resume(resume.coroutine, resume.event)
+        if not result then
+          return self:error(message, 2)
+        end
+      end
+    end
     local result = selector:select(self.selector_timeout)
     local now = class.super.timespec.now()
     for i = 1, result do
@@ -246,18 +264,6 @@ function class:dispatch()
       if timeout == nil or timeout < now then
         waitings[ref] = nil
         resumes:push(waiting)
-      end
-    end
-    while true do
-      local resume = resumes:front()
-      if resume == nil then
-        break
-      else
-        resumes:pop()
-        local result, message = coroutine.resume(resume.coroutine, resume.event)
-        if not result then
-          return self:error(message, 2)
-        end
       end
     end
   end
