@@ -47,7 +47,7 @@ repeat
   -- print("select", a, b, c)
   assert(unix.block_signal(unix.SIGCHLD))
 
-  if a then
+  if a and a ~= unix.interrupted then
     if a == 0 then
       -- print("timeout")
     else

@@ -32,6 +32,8 @@ extern "C" {
 #include "error.hpp"
 #include "pathexec.hpp"
 
+extern char** environ;
+
 namespace dromozoa {
   using bind::function;
   using bind::push_success;
@@ -83,6 +85,10 @@ namespace dromozoa {
   }
 
   int pathexec(const char* path, const char* const* argv, const char* const* envp, char* buffer, size_t size) {
+    if (!envp) {
+      envp = environ;
+    }
+
     const char* command = argv[0];
     size_t i = 0;
     for (; command[i] != '\0'; ++i) {
@@ -140,6 +146,7 @@ namespace dromozoa {
   namespace {
     int impl_pathexec(lua_State* L) {
       const char* path = luaL_checkstring(L, 1);
+      luaL_checktype(L, 2, LUA_TTABLE);
       argument_vector argv(L, 2);
       argument_vector envp(L, 3);
       std::vector<char> buffer(pathexec_buffer_size(path, argv.get()));

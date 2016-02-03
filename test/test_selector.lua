@@ -17,23 +17,25 @@
 
 local unix = require "dromozoa.unix"
 
-local t = unix.timespec(1.25)
-assert(t.tv_sec == 1)
-assert(t.tv_nsec == 250000000)
+unix.set_log_level(2)
+unix.set_raise_error(true)
+unix.selfpipe.install()
+unix.block_signal(unix.SIGCHLD)
 
-local t1 = unix.timespec.now()
-unix.nanosleep(unix.timespec(0.2))
-local t2 = unix.timespec.now()
-assert(t1 == t1)
-assert(t1 < t2)
+local PATH = os.getenv("PATH")
 
-local t = t2 - t1
--- print(t:tonumber())
-assert(t.tv_sec == 0)
-assert(100000000 < t.tv_nsec and t.tv_nsec < 300000000)
-assert(t1 + t == t2)
+local selector = unix.selector():open(1, unix.O_CLOEXEC)
+selector:add(unix.selfpipe.get(), 1)
 
-local t1 = unix.timespec({ tv_sec = 1, tv_nsec = 0 })
-local t2 = unix.timespec({ tv_sec = 1, tv_nsec = 1 })
-assert(t1 <= t1)
-assert(t1 <= t2)
+local pid = unix.forkexec(PATH, { "sleep", "1" })
+assert(unix.wait(-1, unix.WNOHANG) == 0)
+unix.unblock_signal(unix.SIGCHLD)
+assert("select", selector:select(unix.timespec(3)) == unix.interrupted)
+assert("select", selector:select(unix.timespec(3)) == 1)
+unix.block_signal(unix.SIGCHLD)
+assert("selfpipe", unix.selfpipe.read() == 1)
+assert(unix.wait(-1, unix.WNOHANG) == pid)
+
+selector:del(unix.selfpipe.get())
+selector:close()
+unix.selfpipe.uninstall()
