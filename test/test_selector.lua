@@ -21,6 +21,6 @@ unix.set_raise_error(true)
 
 local PATH = os.getenv("PATH")
 
-local pid = unix.forkexec(PATH, { "sleep", "1" }, nil, nil, {})
+local pid = unix.forkexec(PATH, { "sleep", "1" })
 print(pid)
 print(unix.wait())
