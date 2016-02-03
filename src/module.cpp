@@ -32,6 +32,7 @@ extern "C" {
 #include "netinet.hpp"
 #include "pathexec.hpp"
 #include "pipe.hpp"
+#include "process.hpp"
 #include "read.hpp"
 #include "selector.hpp"
 #include "selfpipe.hpp"
@@ -77,6 +78,9 @@ namespace dromozoa {
     initialize_write(L);
     initialize_socket(L);
     lua_setfield(L, -2, "fd");
+
+    open_process(L);
+    lua_setfield(L, -2, "process");
 
     open_selector(L);
     lua_setfield(L, -2, "selector");

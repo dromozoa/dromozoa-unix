@@ -64,7 +64,7 @@ namespace dromozoa {
       return pid;
     }
 
-    void forkexec(
+    void forkexec_impl(
         const char* path,
         const char* const* argv,
         const char* const* envp,
@@ -126,42 +126,42 @@ namespace dromozoa {
       pathexec(path, argv, envp, buffer, size);
       die(die_fd);
     }
+  }
 
-    int forkexec(
-        const char* path,
-        const char* const* argv,
-        const char* const* envp,
-        const char* chdir,
-        const int* dup2_stdio,
-        pid_t& pid) {
-      pid = -1;
+  int forkexec(
+      const char* path,
+      const char* const* argv,
+      const char* const* envp,
+      const char* chdir,
+      const int* dup2_stdio,
+      pid_t& pid) {
+    pid = -1;
 
-      std::vector<char> buffer(pathexec_buffer_size(path, argv));
+    std::vector<char> buffer(pathexec_buffer_size(path, argv));
 
-      scoped_signal_mask scoped_mask;
-      if (scoped_mask.block_all_signals() == -1) {
-        return -1;
-      }
-      int die_fd[] = { -1, -1 };
-      if (wrap_pipe2(die_fd, O_CLOEXEC) == -1) {
-        return -1;
-      }
+    scoped_signal_mask scoped_mask;
+    if (scoped_mask.block_all_signals() == -1) {
+      return -1;
+    }
+    int die_fd[] = { -1, -1 };
+    if (wrap_pipe2(die_fd, O_CLOEXEC) == -1) {
+      return -1;
+    }
 
-      pid = fork();
-      if (pid == -1) {
-        close_pipe(die_fd);
-        return -1;
-      } else if (pid == 0) {
-        forkexec(path, argv, envp, chdir, dup2_stdio, false, die_fd, &buffer[0], buffer.size());
-      }
+    pid = fork();
+    if (pid == -1) {
+      close_pipe(die_fd);
+      return -1;
+    } else if (pid == 0) {
+      forkexec_impl(path, argv, envp, chdir, dup2_stdio, false, die_fd, &buffer[0], buffer.size());
+    }
 
-      int code = read_die(die_fd);
-      if (code == 0) {
-        return 0;
-      } else {
-        errno = code;
-        return -1;
-      }
+    int code = read_die(die_fd);
+    if (code == 0) {
+      return 0;
+    } else {
+      errno = code;
+      return -1;
     }
   }
 
@@ -204,7 +204,7 @@ namespace dromozoa {
       if (pid == -1) {
         die(die_fd);
       } else if (pid == 0) {
-        forkexec(path, argv, envp, chdir, 0, true, die_fd, &buffer[0], buffer.size());
+        forkexec_impl(path, argv, envp, chdir, 0, true, die_fd, &buffer[0], buffer.size());
       }
       write(pid_fd[1], &pid, sizeof(pid));
       _exit(0);

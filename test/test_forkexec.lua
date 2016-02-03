@@ -24,7 +24,9 @@ local reader, writer = unix.pipe(unix.O_CLOEXEC)
 local path = os.getenv("PATH")
 local envp = unix.environ()
 
-local pid = assert(unix.forkexec(path, { "ls", "-l" }, envp, "/", { [1] = writer }))
+local process = unix.process()
+assert(process:forkexec(path, { "ls", "-l" }, envp, "/", { [1] = writer }))
+local pid = process[1]
 -- print(pid)
 writer:close()
 while true do
@@ -37,7 +39,9 @@ end
 assert(unix.wait() == pid)
 reader:close()
 
-local result, message, code, pid = unix.forkexec(path, { "no such command" }, envp, "/", {})
+local process = unix.process()
+local result, message, code = process:forkexec(path, { "no such command" })
+local pid = process[1]
 -- print(message, code, pid)
 assert(unix.wait() == pid)
 
