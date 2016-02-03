@@ -22,6 +22,8 @@ extern "C" {
 #include <lua.h>
 }
 
+#include <sys/types.h>
+
 namespace dromozoa {
   int forkexec(
       const char* path,
