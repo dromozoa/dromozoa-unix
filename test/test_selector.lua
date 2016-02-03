@@ -17,10 +17,18 @@
 
 local unix = require "dromozoa.unix"
 
+unix.set_log_level(2)
 unix.set_raise_error(true)
+unix.selfpipe.install()
 
 local PATH = os.getenv("PATH")
 
+local selector = unix.selector():open(1, unix.O_CLOEXEC)
+
 local pid = unix.forkexec(PATH, { "sleep", "1" })
+selector:select()
+
+
+
 print(pid)
 print(unix.wait())
