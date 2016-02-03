@@ -45,12 +45,16 @@ local pid = process[1]
 -- print(message, code, pid)
 assert(unix.wait() == pid)
 
-local pid1, pid2 = assert(unix.forkexec_daemon(path, { "sleep", "60" }, envp, "/"))
+local process = unix.process()
+assert(process:forkexec_daemon(path, { "sleep", "60" }, envp, "/"))
+local pid1, pid2 = process[1], process[2]
 -- print(pid1, pid2)
 assert(unix.wait() == pid1)
 assert(unix.kill(pid2, 0))
 assert(unix.kill(pid2))
 
-local result, message, code, pid1, pid2 = unix.forkexec_daemon(path, { "no such command" }, envp, "/")
+local process = unix.process()
+local result, message, code = process:forkexec_daemon(path, { "no such command" })
+local pid1, pid2 = process[1], process[2]
 -- print(message, code, pid1, pid2)
 assert(unix.wait() == pid1)

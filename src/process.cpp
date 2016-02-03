@@ -73,11 +73,39 @@ namespace dromozoa {
         return push_success(L);
       }
     }
+
+    int impl_forkexec_daemon(lua_State* L) {
+      const char* path = luaL_checkstring(L, 2);
+      luaL_checktype(L, 3, LUA_TTABLE);
+      argument_vector argv(L, 3);
+      argument_vector envp(L, 4);
+      const char* chdir = lua_tostring(L, 5);
+      pid_t pid1 = -1;
+      pid_t pid2 = -1;
+      int result = forkexec_daemon(path, argv.get(), envp.get(), chdir, pid1, pid2);
+      int code = errno;
+      if (pid1 != -1) {
+        lua_pushinteger(L, 1);
+        lua_pushinteger(L, pid1);
+        lua_settable(L, 1);
+      }
+      if (pid2 != -1) {
+        lua_pushinteger(L, 2);
+        lua_pushinteger(L, pid2);
+        lua_settable(L, 1);
+      }
+      if (result == -1) {
+        return push_error(L, code);
+      } else {
+        return push_success(L);
+      }
+    }
   }
 
   int open_process(lua_State* L) {
     lua_newtable(L);
     function<impl_forkexec>::set_field(L, "forkexec");
+    function<impl_forkexec_daemon>::set_field(L, "forkexec_daemon");
     lua_newtable(L);
     function<impl_new>::set_field(L, "__call");
     lua_setmetatable(L, -2);
