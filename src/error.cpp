@@ -49,6 +49,11 @@ namespace dromozoa {
     return 1;
   }
 
+  int push_interrupted(lua_State* L) {
+    lua_pushlightuserdata(L, reinterpret_cast<void*>(EINTR));
+    return 1;
+  }
+
 #ifdef HAVE_STRERROR_R
   namespace {
     const char* wrap_strerror_r_result(const char* result, char*) {
@@ -196,5 +201,8 @@ namespace dromozoa {
 
     push_operation_in_progress(L);
     lua_setfield(L, -2, "operation_in_progress");
+
+    push_interrupted(L);
+    lua_setfield(L, -2, "interrupted");
   }
 }

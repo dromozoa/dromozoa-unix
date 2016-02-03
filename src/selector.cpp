@@ -24,6 +24,7 @@ extern "C" {
 #include <lauxlib.h>
 }
 
+#include <errno.h>
 #include <time.h>
 
 #include <iostream>
@@ -167,7 +168,12 @@ namespace dromozoa {
         result = get_selector(L, 1).select(&tv);
       }
       if (result == -1) {
-        return push_error(L);
+        int code = errno;
+        if (code == EINTR) {
+          return push_interrupted(L);
+        } else {
+          return push_error(L);
+        }
       } else {
         lua_pushinteger(L, result);
         return 1;

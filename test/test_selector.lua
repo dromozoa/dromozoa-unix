@@ -20,15 +20,22 @@ local unix = require "dromozoa.unix"
 unix.set_log_level(2)
 unix.set_raise_error(true)
 unix.selfpipe.install()
+unix.block_signal(unix.SIGCHLD)
 
 local PATH = os.getenv("PATH")
 
 local selector = unix.selector():open(1, unix.O_CLOEXEC)
+selector:add(unix.selfpipe.get(), 1)
 
 local pid = unix.forkexec(PATH, { "sleep", "1" })
-selector:select()
+assert(unix.wait(-1, unix.WNOHANG) == 0)
+unix.unblock_signal(unix.SIGCHLD)
+assert("select", selector:select(unix.timespec(3)) == unix.interrupted)
+assert("select", selector:select(unix.timespec(3)) == 1)
+unix.block_signal(unix.SIGCHLD)
+assert("selfpipe", unix.selfpipe.read() == 1)
+assert(unix.wait(-1, unix.WNOHANG) == pid)
 
-
-
-print(pid)
-print(unix.wait())
+selector:del(unix.selfpipe.get())
+selector:close()
+unix.selfpipe.uninstall()
