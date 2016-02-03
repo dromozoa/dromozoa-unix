@@ -23,6 +23,20 @@ extern "C" {
 }
 
 namespace dromozoa {
+  int forkexec(
+      const char* path,
+      const char* const* argv,
+      const char* const* envp,
+      const char* chdir,
+      const int* dup2_stdio,
+      pid_t& pid);
+  int forkexec_daemon(
+      const char* path,
+      const char* const* argv,
+      const char* const* envp,
+      const char* chdir,
+      pid_t& pid1,
+      pid_t& pid2);
   void initialize_forkexec(lua_State* L);
 }
 
