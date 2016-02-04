@@ -15,11 +15,6 @@
 // You should have received a copy of the GNU General Public License
 // along with dromozoa-unix.  If not, see <http://www.gnu.org/licenses/>.
 
-extern "C" {
-#include <lua.h>
-#include <lauxlib.h>
-}
-
 #include <errno.h>
 #include <fcntl.h>
 #include <signal.h>
@@ -30,9 +25,6 @@ extern "C" {
 
 #include "dromozoa/bind.hpp"
 
-#include "argument_vector.hpp"
-#include "error.hpp"
-#include "fd.hpp"
 #include "forkexec.hpp"
 #include "pipe.hpp"
 #include "pathexec.hpp"
@@ -218,60 +210,5 @@ namespace dromozoa {
       errno = code;
       return -1;
     }
-  }
-
-  namespace {
-    int impl_forkexec(lua_State* L) {
-      const char* path = luaL_checkstring(L, 1);
-      luaL_checktype(L, 2, LUA_TTABLE);
-      argument_vector argv(L, 2);
-      argument_vector envp(L, 3);
-      const char* chdir = lua_tostring(L, 4);
-      int dup2_stdio[3] = { -1, -1, -1 };
-      if (lua_istable(L, 5)) {
-        for (int i = 0; i < 3; ++i) {
-          lua_pushinteger(L, i);
-          lua_gettable(L, 5);
-          if (!lua_isnil(L, -1)) {
-            dup2_stdio[i] = get_fd(L, -1);
-          }
-          lua_pop(L, 1);
-        }
-      }
-      pid_t pid = -1;
-      if (forkexec(path, argv.get(), envp.get(), chdir, dup2_stdio, pid) == -1) {
-        int result = push_error(L);
-        lua_pushinteger(L, pid);
-        return result + 1;
-      } else {
-        lua_pushinteger(L, pid);
-        return 1;
-      }
-    }
-
-    int impl_forkexec_daemon(lua_State* L) {
-      const char* path = luaL_checkstring(L, 1);
-      luaL_checktype(L, 2, LUA_TTABLE);
-      argument_vector argv(L, 2);
-      argument_vector envp(L, 3);
-      const char* chdir = lua_tostring(L, 4);
-      pid_t pid1 = -1;
-      pid_t pid2 = -1;
-      if (forkexec_daemon(path, argv.get(), envp.get(), chdir, pid1, pid2) == -1) {
-        int result = push_error(L);
-        lua_pushinteger(L, pid1);
-        lua_pushinteger(L, pid2);
-        return result + 2;
-      } else {
-        lua_pushinteger(L, pid1);
-        lua_pushinteger(L, pid2);
-        return 2;
-      }
-    }
-  }
-
-  void initialize_forkexec(lua_State* L) {
-    function<impl_forkexec>::set_field(L, "forkexec");
-    function<impl_forkexec_daemon>::set_field(L, "forkexec_daemon");
   }
 }

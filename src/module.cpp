@@ -25,7 +25,6 @@ extern "C" {
 #include "error.hpp"
 #include "fcntl.hpp"
 #include "fd.hpp"
-#include "forkexec.hpp"
 #include "lock.hpp"
 #include "ndelay.hpp"
 #include "netdb.hpp"
@@ -101,7 +100,6 @@ namespace dromozoa {
     bind::initialize(L);
     initialize_error(L);
     initialize_fcntl(L);
-    initialize_forkexec(L);
     initialize_netdb(L);
     initialize_netinet(L);
     initialize_pathexec(L);

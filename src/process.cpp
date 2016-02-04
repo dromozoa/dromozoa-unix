@@ -21,7 +21,6 @@ extern "C" {
 }
 
 #include <errno.h>
-#include <unistd.h>
 
 #include "dromozoa/bind.hpp"
 
