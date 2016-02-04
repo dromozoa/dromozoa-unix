@@ -27,7 +27,7 @@ local PATH = os.getenv("PATH")
 local selector = unix.selector():open(1, unix.O_CLOEXEC)
 selector:add(unix.selfpipe.get(), 1)
 
-local pid = unix.forkexec(PATH, { "sleep", "1" })
+local pid = assert(unix.process():forkexec(PATH, { "sleep", "1" }))[1]
 assert(unix.wait(-1, unix.WNOHANG) == 0)
 unix.unblock_signal(unix.SIGCHLD)
 assert("select", selector:select(unix.timespec(3)) == unix.interrupted)

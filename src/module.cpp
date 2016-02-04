@@ -25,13 +25,13 @@ extern "C" {
 #include "error.hpp"
 #include "fcntl.hpp"
 #include "fd.hpp"
-#include "forkexec.hpp"
 #include "lock.hpp"
 #include "ndelay.hpp"
 #include "netdb.hpp"
 #include "netinet.hpp"
 #include "pathexec.hpp"
 #include "pipe.hpp"
+#include "process.hpp"
 #include "read.hpp"
 #include "selector.hpp"
 #include "selfpipe.hpp"
@@ -78,6 +78,9 @@ namespace dromozoa {
     initialize_socket(L);
     lua_setfield(L, -2, "fd");
 
+    open_process(L);
+    lua_setfield(L, -2, "process");
+
     open_selector(L);
     lua_setfield(L, -2, "selector");
 
@@ -97,7 +100,6 @@ namespace dromozoa {
     bind::initialize(L);
     initialize_error(L);
     initialize_fcntl(L);
-    initialize_forkexec(L);
     initialize_netdb(L);
     initialize_netinet(L);
     initialize_pathexec(L);

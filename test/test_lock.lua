@@ -17,13 +17,13 @@
 
 local unix = require "dromozoa.unix"
 
-unix.set_log_level(3)
+unix.set_log_level(2)
 unix.set_raise_error(true)
 
 local PATH = os.getenv("PATH")
 
-local pid1 = unix.forkexec(PATH, { arg[-1], "test/lock.lua" }, unix.environ(), nil, {})
-local pid2 = unix.forkexec(PATH, { arg[-1], "test/lock.lua" }, unix.environ(), nil, {})
+unix.process():forkexec(PATH, { arg[-1], "test/lock.lua" })
+unix.process():forkexec(PATH, { arg[-1], "test/lock.lua" })
 
 unix.wait()
 unix.wait()

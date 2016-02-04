@@ -28,6 +28,7 @@ noinst_HEADERS = \
 	netinet.hpp \
 	pathexec.hpp \
 	pipe.hpp \
+	process.hpp \
 	read.hpp \
 	selector.hpp \
 	selector_epoll.hpp \
@@ -64,6 +65,7 @@ unix_la_SOURCES = \
 	netinet.cpp \
 	pathexec.cpp \
 	pipe.cpp \
+	process.cpp \
 	read.cpp \
 	selector.cpp \
 	selfpipe.cpp \
