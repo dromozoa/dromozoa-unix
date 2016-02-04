@@ -26,10 +26,9 @@ local function get_fd(fd)
   return class.super.fd.get(fd)
 end
 
-local function translate_timeout(timeout)
+local function translate_timeout(self, timeout)
   if type(timeout) == "number" then
-    local timespec = class.super.timespec
-    return timespec.now() + timespec(timeout)
+    return self.current_time + class.super.timespec(timeout)
   else
     return timeout
   end
@@ -55,9 +54,8 @@ local function add_waiting(self, timeout)
 end
 
 local function timedout()
-  local unix = class.super
-  local code = unix.ETIMEDOUT
-  return nil, unix.strerror(code), code
+  local code = class.super.ETIMEDOUT
+  return nil, class.super.strerror(code), code
 end
 
 function class.new(selector)
@@ -92,7 +90,7 @@ function class:stop()
 end
 
 function class:accept(fd, flags, timeout)
-  timeout = translate_timeout(timeout)
+  timeout = translate_timeout(self, timeout)
   local a, b, c = class.super.fd.accept(fd, flags)
   if a == class.super.resource_unavailable_try_again then
     if add_pending(self, fd, 1, timeout) == nil then
@@ -107,7 +105,7 @@ function class:accept(fd, flags, timeout)
 end
 
 function class:connect(fd, address, timeout)
-  timeout = translate_timeout(timeout)
+  timeout = translate_timeout(self, timeout)
   local a, b, c = class.super.fd.connect(fd, address)
   if a == class.super.operation_in_progress then
     if add_pending(self, fd, 2, timeout) == nil then
@@ -132,7 +130,7 @@ function class:connect(fd, address, timeout)
 end
 
 function class:read(fd, count, timeout)
-  timeout = translate_timeout(timeout)
+  timeout = translate_timeout(self, timeout)
   local buffer = self.buffers[get_fd(fd)]
   local result = buffer:read(count)
   if result == nil then
@@ -155,7 +153,7 @@ function class:read(fd, count, timeout)
 end
 
 function class:read_line(fd, delimiter, timeout)
-  timeout = translate_timeout(timeout)
+  timeout = translate_timeout(self, timeout)
   local buffer = self.buffers[get_fd(fd)]
   local line, char = buffer:read_line(delimiter)
   if line == nil then
@@ -178,7 +176,7 @@ function class:read_line(fd, delimiter, timeout)
 end
 
 function class:write(fd, buffer, timeout, size, i, j)
-  timeout = translate_timeout(timeout)
+  timeout = translate_timeout(self, timeout)
   if size == nil then
     size = 0
   end
@@ -208,7 +206,7 @@ function class:written(fd)
 end
 
 function class:wait(timeout)
-  timeout = translate_timeout(timeout)
+  timeout = translate_timeout(self, timeout)
   return add_waiting(self, timeout)
 end
 
@@ -228,6 +226,7 @@ function class:dispatch()
   local waitings = self.waitings
   local resumes = self.resumes
   self.stopped = nil
+  self.current_time = class.super.timespec.now()
   while not self.stopped do
     while true do
       local resume = resumes:front()
@@ -242,26 +241,29 @@ function class:dispatch()
       end
     end
     local result = selector:select(self.selector_timeout)
-    local now = class.super.timespec.now()
-    for i = 1, result do
-      local fd, event = selector:event(i)
-      local pending = pendings[fd]
-      if pending ~= nil then
-        pendings[fd] = nil
-        pending.event = event
-        resumes:push(pending)
+    local current_time = class.super.timespec.now()
+    self.current_time = current_time
+    if result ~= class.super.interruputed then
+      for i = 1, result do
+        local fd, event = selector:event(i)
+        local pending = pendings[fd]
+        if pending ~= nil then
+          pendings[fd] = nil
+          pending.event = event
+          resumes:push(pending)
+        end
       end
     end
     for fd, pending in pairs(pendings) do
       local timeout = pending.timeout
-      if timeout ~= nil and timeout < now then
+      if timeout ~= nil and timeout <= current_time then
         pendings[fd] = nil
         resumes:push(pending)
       end
     end
     for ref, waiting in pairs(waitings) do
       local timeout = waiting.timeout
-      if timeout == nil or timeout < now then
+      if timeout == nil or timeout <= current_time then
         waitings[ref] = nil
         resumes:push(waiting)
       end
