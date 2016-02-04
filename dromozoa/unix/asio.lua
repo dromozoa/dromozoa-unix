@@ -54,9 +54,8 @@ local function add_waiting(self, timeout)
 end
 
 local function timedout()
-  local unix = class.super
-  local code = unix.ETIMEDOUT
-  return nil, unix.strerror(code), code
+  local code = class.super.ETIMEDOUT
+  return nil, class.super.strerror(code), code
 end
 
 function class.new(selector)
@@ -131,7 +130,7 @@ function class:connect(fd, address, timeout)
 end
 
 function class:read(fd, count, timeout)
-  timeout = translate_timeout(timeout)
+  timeout = translate_timeout(self, timeout)
   local buffer = self.buffers[get_fd(fd)]
   local result = buffer:read(count)
   if result == nil then
@@ -154,7 +153,7 @@ function class:read(fd, count, timeout)
 end
 
 function class:read_line(fd, delimiter, timeout)
-  timeout = translate_timeout(timeout)
+  timeout = translate_timeout(self, timeout)
   local buffer = self.buffers[get_fd(fd)]
   local line, char = buffer:read_line(delimiter)
   if line == nil then
@@ -177,7 +176,7 @@ function class:read_line(fd, delimiter, timeout)
 end
 
 function class:write(fd, buffer, timeout, size, i, j)
-  timeout = translate_timeout(timeout)
+  timeout = translate_timeout(self, timeout)
   if size == nil then
     size = 0
   end
@@ -207,7 +206,7 @@ function class:written(fd)
 end
 
 function class:wait(timeout)
-  timeout = translate_timeout(timeout)
+  timeout = translate_timeout(self, timeout)
   return add_waiting(self, timeout)
 end
 
@@ -244,25 +243,27 @@ function class:dispatch()
     local result = selector:select(self.selector_timeout)
     local current_time = class.super.timespec.now()
     self.current_time = current_time
-    for i = 1, result do
-      local fd, event = selector:event(i)
-      local pending = pendings[fd]
-      if pending ~= nil then
-        pendings[fd] = nil
-        pending.event = event
-        resumes:push(pending)
+    if result ~= class.super.interruputed then
+      for i = 1, result do
+        local fd, event = selector:event(i)
+        local pending = pendings[fd]
+        if pending ~= nil then
+          pendings[fd] = nil
+          pending.event = event
+          resumes:push(pending)
+        end
       end
     end
     for fd, pending in pairs(pendings) do
       local timeout = pending.timeout
-      if timeout ~= nil and timeout < current_time then
+      if timeout ~= nil and timeout <= current_time then
         pendings[fd] = nil
         resumes:push(pending)
       end
     end
     for ref, waiting in pairs(waitings) do
       local timeout = waiting.timeout
-      if timeout == nil or timeout < current_time then
+      if timeout == nil or timeout <= current_time then
         waitings[ref] = nil
         resumes:push(waiting)
       end
