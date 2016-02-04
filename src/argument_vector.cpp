@@ -26,27 +26,33 @@ extern "C" {
 
 namespace dromozoa {
   argument_vector::argument_vector(lua_State* L, int n) {
-    for (int i = 1; ; ++i) {
-      lua_pushinteger(L, i);
-      lua_gettable(L, n);
-      if (const char* p = lua_tostring(L, -1)) {
-        str_.push_back(p);
-        lua_pop(L, 1);
-      } else {
-        lua_pop(L, 1);
-        break;
+    if (lua_istable(L, n)) {
+      for (int i = 1; ; ++i) {
+        lua_pushinteger(L, i);
+        lua_gettable(L, n);
+        if (const char* p = lua_tostring(L, -1)) {
+          str_.push_back(p);
+          lua_pop(L, 1);
+        } else {
+          lua_pop(L, 1);
+          break;
+        }
       }
+      ptr_.reserve(str_.size() + 1);
+      std::vector<std::string>::const_iterator i = str_.begin();
+      std::vector<std::string>::const_iterator end = str_.end();
+      for (; i != end; ++i) {
+        ptr_.push_back((*i).c_str());
+      }
+      ptr_.push_back(0);
     }
-    ptr_.reserve(str_.size() + 1);
-    std::vector<std::string>::const_iterator i = str_.begin();
-    std::vector<std::string>::const_iterator end = str_.end();
-    for (; i != end; ++i) {
-      ptr_.push_back((*i).c_str());
-    }
-    ptr_.push_back(0);
   }
 
   const char* const* argument_vector::get() const {
-    return &ptr_[0];
+    if (ptr_.empty()) {
+      return 0;
+    } else {
+      return &ptr_[0];
+    }
   }
 }

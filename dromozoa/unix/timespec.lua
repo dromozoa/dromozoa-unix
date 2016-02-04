@@ -103,6 +103,16 @@ function metatable:__lt(that)
   end
 end
 
+function metatable:__le(that)
+  local s1 = self.tv_sec
+  local s2 = that.tv_sec
+  if s1 == s2 then
+    return self.tv_nsec <= that.tv_nsec
+  else
+    return s1 <= s2
+  end
+end
+
 function metatable:__tostring()
   return self:tostring()
 end

@@ -18,19 +18,24 @@
 local unix = require "dromozoa.unix"
 
 unix.set_log_level(2)
+unix.set_raise_error(true)
+unix.selfpipe.install()
+unix.block_signal(unix.SIGCHLD)
 
-local path = os.getenv("PATH")
-local envp = unix.environ()
+local PATH = os.getenv("PATH")
 
-local fd = assert(unix.open("test.txt", unix.O_WRONLY + unix.O_CREAT + unix.O_CLOEXEC, 438)) -- 0666
-fd:write("foo\n")
+local selector = unix.selector():open(1, unix.O_CLOEXEC)
+selector:add(unix.selfpipe.get(), 1)
 
-local pid = assert(unix.process():forkexec(path, { "ls", "-l" }, envp, "/", { [1] = fd, [2] = fd }))[1]
-local a, b, c = unix.wait()
--- print(a, b, c)
-assert(a == pid)
-assert(b == "exit")
-assert(c == 0)
+local pid = assert(unix.process():forkexec(PATH, { "sleep", "1" }))[1]
+assert(unix.wait(-1, unix.WNOHANG) == 0)
+unix.unblock_signal(unix.SIGCHLD)
+assert("select", selector:select(unix.timespec(3)) == unix.interrupted)
+assert("select", selector:select(unix.timespec(3)) == 1)
+unix.block_signal(unix.SIGCHLD)
+assert("selfpipe", unix.selfpipe.read() == 1)
+assert(unix.wait(-1, unix.WNOHANG) == pid)
 
-fd:write("bar\n")
-fd:close()
+selector:del(unix.selfpipe.get())
+selector:close()
+unix.selfpipe.uninstall()

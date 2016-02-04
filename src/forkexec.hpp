@@ -18,12 +18,23 @@
 #ifndef DROMOZOA_FORKEXEC_HPP
 #define DROMOZOA_FORKEXEC_HPP
 
-extern "C" {
-#include <lua.h>
-}
+#include <sys/types.h>
 
 namespace dromozoa {
-  void initialize_forkexec(lua_State* L);
+  int forkexec(
+      const char* path,
+      const char* const* argv,
+      const char* const* envp,
+      const char* chdir,
+      const int* dup2_stdio,
+      pid_t& pid);
+  int forkexec_daemon(
+      const char* path,
+      const char* const* argv,
+      const char* const* envp,
+      const char* chdir,
+      pid_t& pid1,
+      pid_t& pid2);
 }
 
 #endif

@@ -15,24 +15,15 @@
 // You should have received a copy of the GNU General Public License
 // along with dromozoa-unix.  If not, see <http://www.gnu.org/licenses/>.
 
-#ifndef DROMOZOA_ERROR_HPP
-#define DROMOZOA_ERROR_HPP
+#ifndef DROMOZOA_PROCESS_HPP
+#define DROMOZOA_PROCESS_HPP
 
 extern "C" {
 #include <lua.h>
 }
 
-#include <errno.h>
-
-#include <iosfwd>
-
 namespace dromozoa {
-  int push_resource_unavailable_try_again(lua_State* L);
-  int push_operation_in_progress(lua_State* L);
-  int push_interrupted(lua_State* L);
-  int push_error(lua_State* L, int code = errno);
-  void print_error(std::ostream& out, int code = errno);
-  void initialize_error(lua_State* L);
+  int open_process(lua_State* L);
 }
 
 #endif
