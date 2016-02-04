@@ -19,5 +19,5 @@ local unix = require "dromozoa.unix"
 
 unix.set_raise_error(true)
 
-local pid = unix.forkexec(os.getenv("PATH"), { arg[-1], "test/pathexec.lua", "ls", "-l" }, unix.environ(), nil, {})
+local pid = assert(unix.process():forkexec(os.getenv("PATH"), { arg[-1], "test/pathexec.lua", "ls", "-l" }))[1]
 assert(unix.wait() == pid)

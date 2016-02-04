@@ -32,12 +32,8 @@ local selector = unix.selector()
 assert(selector:open(256, unix.O_CLOEXEC))
 selector:add(unix.selfpipe.get(), 1)
 
--- local pid1 = assert(unix.forkexec(path, { "echo", "foo" }, envp, "/", {}))
--- local pid2 = assert(unix.forkexec(path, { "echo", "bar" }, envp, "/", {}))
--- local pid1 = assert(unix.forkexec(path, { "sleep", "7" }, envp, "/", {}))
--- local pid2 = assert(unix.forkexec(path, { "sleep", "3" }, envp, "/", {}))
-local pid1 = assert(unix.forkexec(path, { "sh", "-c", ":" }, envp, "/", {}))
-local pid2 = assert(unix.forkexec(path, { "sh", "-c", ":" }, envp, "/", {}))
+local pid1 = assert(unix.process():forkexec(path, { "sh", "-c", ":" }))[1]
+local pid2 = assert(unix.process():forkexec(path, { "sh", "-c", ":" }))[1]
 -- print(pid1, pid2)
 
 local n = 0
