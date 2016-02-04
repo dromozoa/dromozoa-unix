@@ -20,8 +20,8 @@ local unix = require "dromozoa.unix"
 unix.set_log_level(3)
 unix.set_raise_error(true)
 
--- local reader, writer = unix.pipe(unix.bor(unix.O_CLOEXEC, unix.O_NONBLOCK))
-local reader, writer = unix.socketpair(unix.AF_UNIX, unix.SOCK_STREAM)
+local reader, writer = unix.pipe(unix.bor(unix.O_CLOEXEC, unix.O_NONBLOCK))
+-- local reader, writer = unix.socketpair(unix.AF_UNIX, unix.SOCK_STREAM)
 reader:ndelay_on()
 writer:ndelay_on()
 
@@ -34,10 +34,10 @@ asio.selector_timeout = unix.timespec(0.2)
 asio:add(reader)
 asio:add(writer)
 
-coroutine.resume(coroutine.create(function ()
-  asio:wait()
+asio:resume(function ()
   local data = ("x"):rep(65536)
   while true do
+    print("write")
     local a, b, c = asio:write(writer, data, 0.2)
     print("written", a, b, c, asio:written(writer))
     if result == nil then
@@ -55,7 +55,7 @@ coroutine.resume(coroutine.create(function ()
   end
   print(size)
   asio:stop()
-end))
+end)
 
 print("dispatch")
 asio:dispatch()
@@ -65,12 +65,12 @@ asio:del(writer)
 reader:close()
 writer:close()
 
-coroutine.resume(coroutine.create(function ()
+asio:resume(function ()
   print("wait")
   asio:wait(0.2)
   print("done")
   asio:stop()
-end))
+end)
 
 print("dispatch")
 asio:dispatch()
@@ -79,12 +79,12 @@ print("dispatched")
 unix.fd.ndelay_on(0)
 asio:add(0)
 
-coroutine.resume(coroutine.create(function ()
+asio:resume(function ()
   print("reading stdin")
   assert(asio:read(0, 1, 0.2) == nil)
   print("timeout")
   asio:stop()
-end))
+end)
 
 print("dispatch")
 asio:dispatch()
