@@ -31,7 +31,7 @@ asio.selector_timeout = unix.timespec(0.1)
 asio:add(reader)
 asio:add(writer)
 
-coroutine.resume(coroutine.create(function ()
+asio:resume(function ()
   for i = 1, 10 do
     local line, char = asio:read_line(reader)
     print("read", line)
@@ -42,9 +42,9 @@ coroutine.resume(coroutine.create(function ()
   asio:del(reader)
   reader:close()
   asio:stop()
-end))
+end)
 
-coroutine.resume(coroutine.create(function ()
+asio:resume(function ()
   for i = 1, 10 do
     asio:wait(0.2)
     asio:write(writer, i .. "\n")
@@ -52,7 +52,7 @@ coroutine.resume(coroutine.create(function ()
   end
   asio:del(writer)
   writer:close()
-end))
+end)
 
 asio:dispatch()
 
