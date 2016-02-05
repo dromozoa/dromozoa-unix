@@ -227,7 +227,7 @@ function class:dispatch()
   local resumes = self.resumes
   self.stopped = nil
   self.current_time = class.super.timespec.now()
-  while not self.stopped do
+  while true do
     while true do
       local resume = resumes:front()
       if resume == nil then
@@ -239,6 +239,9 @@ function class:dispatch()
           return self:error(message, 2)
         end
       end
+    end
+    if self.stopped then
+      break
     end
     local result = selector:select(self.selector_timeout)
     local current_time = class.super.timespec.now()
