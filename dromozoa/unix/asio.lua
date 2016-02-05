@@ -58,6 +58,11 @@ local function timedout()
   return nil, class.super.strerror(code), code
 end
 
+local function closed()
+  local code = class.super.EPIPE
+  return nil, class.super.strerror(code), code
+end
+
 function class.new(selector)
   return {
     selector = selector;
@@ -211,6 +216,8 @@ function class:write(fd, buffer, timeout, size, i, j)
       self.writtens[get_fd(fd)] = size
       return timedout()
     end
+  elseif a == class.super.broken_pipe then
+    return closed()
   elseif a == nil then
     self.writtens[get_fd(fd)] = size
     return a, b, c
