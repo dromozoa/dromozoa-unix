@@ -48,6 +48,8 @@ namespace dromozoa {
         int code = errno;
         if (code == EAGAIN || code == EWOULDBLOCK) {
           return push_resource_unavailable_try_again(L);
+        } else if (code == EPIPE) {
+          return push_broken_pipe(L);
         } else {
           return push_error(L);
         }
