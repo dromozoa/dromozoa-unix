@@ -100,7 +100,7 @@ function class:accept(fd, flags, timeout)
   elseif a == nil then
     return a, b, c
   else
-    return a
+    return a, b
   end
 end
 
@@ -175,6 +175,30 @@ function class:read_line(fd, delimiter, timeout)
   end
 end
 
+function class:read_some(fd, count, timeout)
+  timeout = translate_timeout(self, timeout)
+  local buffer = self.buffers[get_fd(fd)]
+  local size = buffer.size
+  if size == 0 then
+    local a, b, c = class.super.fd.read(fd, count)
+    if a == class.super.resource_unavailable_try_again then
+      if add_pending(self, fd, 1, timeout) == nil then
+        return timedout()
+      end
+      return self:read_some(fd, count, timeout)
+    elseif a == nil then
+      return a, b, c
+    else
+      return a
+    end
+  else
+    if size < count then
+      return buffer:read(size)
+    end
+      return buffer:read(count)
+  end
+end
+
 function class:write(fd, buffer, timeout, size, i, j)
   timeout = translate_timeout(self, timeout)
   if size == nil then
@@ -236,7 +260,7 @@ function class:dispatch()
         resumes:pop()
         local result, message = coroutine.resume(resume.coroutine, resume.event)
         if not result then
-          return self:error(message, 2)
+          return self:error(message, 1)
         end
       end
     end
