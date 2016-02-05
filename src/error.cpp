@@ -59,6 +59,11 @@ namespace dromozoa {
     return 1;
   }
 
+  int push_timed_out(lua_State* L) {
+    lua_pushlightuserdata(L, reinterpret_cast<void*>(ETIMEDOUT));
+    return 1;
+  }
+
 #ifdef HAVE_STRERROR_R
   namespace {
     const char* wrap_strerror_r_result(const char* result, char*) {
@@ -212,5 +217,8 @@ namespace dromozoa {
 
     push_broken_pipe(L);
     lua_setfield(L, -2, "broken_pipe");
+
+    push_timed_out(L);
+    lua_setfield(L, -2, "timed_out");
   }
 }

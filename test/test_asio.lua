@@ -40,18 +40,18 @@ asio:resume(function ()
     print("write")
     local a, b, c = asio:write(writer, data, 0.2)
     print("written", a, b, c, asio:written(writer))
-    if result == nil then
+    if a == unix.timed_out then
       break
     end
   end
   local size = 0
   while true do
-    local result = asio:read(reader, 16, 0.2)
-    -- print(result)
-    if result == nil then
+    local a, b, c = asio:read(reader, 16, 0.2)
+    -- print(a)
+    if a == unix.timed_out then
       break
     end
-    size = size + #result
+    size = size + #a
   end
   print(size)
   asio:stop()
@@ -81,7 +81,7 @@ asio:add(0)
 
 asio:resume(function ()
   print("reading stdin")
-  assert(asio:read(0, 1, 0.2) == nil)
+  assert(asio:read(0, 1, 0.2) == unix.timed_out)
   print("timeout")
   asio:stop()
 end)
