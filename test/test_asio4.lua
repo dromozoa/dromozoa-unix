@@ -17,7 +17,7 @@
 
 local unix = require "dromozoa.unix"
 
-unix.set_log_level(3)
+unix.set_log_level(2)
 unix.set_raise_error(true)
 
 local reader, writer = unix.socketpair(unix.AF_UNIX, unix.SOCK_STREAM)
@@ -33,6 +33,10 @@ asio:add(writer)
 asio:resume(function ()
   asio:write(writer, "0123456789")
   assert(asio:read_some(reader, 4, 1) == "0123")
+  assert(asio:read_some(reader, 4, 1) == "4567")
+  assert(asio:read_some(reader, 4, 1) == "89")
+  asio:write(writer, "0123456789")
+  assert(asio:read(reader, 4, 1) == "0123")
   assert(asio:read_some(reader, 4, 1) == "4567")
   assert(asio:read_some(reader, 4, 1) == "89")
   asio:stop()
