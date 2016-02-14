@@ -73,7 +73,9 @@ namespace dromozoa {
         }
         return result;
       } while (false);
+      int code = errno;
       close(result);
+      errno = code;
       return -1;
     }
 #endif
