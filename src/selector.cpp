@@ -42,9 +42,6 @@ namespace dromozoa {
 }
 #elif defined(HAVE_KQUEUE)
 #include "selector_kqueue.hpp"
-namespace dromozoa {
-  typedef selector_kqueue selector_impl;
-}
 #endif
 
 namespace dromozoa {
@@ -52,16 +49,14 @@ namespace dromozoa {
   using bind::get_log_level;
   using bind::push_success;
 
-  selector::~selector() {}
-
   namespace {
     selector& get_selector(lua_State* L, int n) {
       return *static_cast<selector*>(luaL_checkudata(L, n, "dromozoa.unix.selector"));
     }
 
     int impl_new(lua_State* L) {
-      selector* s = static_cast<selector*>(lua_newuserdata(L, sizeof(selector_impl)));
-      new(s) selector_impl();
+      selector* s = static_cast<selector*>(lua_newuserdata(L, sizeof(selector)));
+      new(s) selector();
       luaL_getmetatable(L, "dromozoa.unix.selector");
       lua_setmetatable(L, -2);
       if (get_log_level() > 2) {

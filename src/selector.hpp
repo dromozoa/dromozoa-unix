@@ -22,22 +22,7 @@ extern "C" {
 #include <lua.h>
 }
 
-#include <time.h>
-
 namespace dromozoa {
-  class selector {
-  public:
-    virtual ~selector();
-    virtual int open(int size, int flags) = 0;
-    virtual int close() = 0;
-    virtual int get() const = 0;
-    virtual int add(int fd, int event) = 0;
-    virtual int mod(int fd, int event) = 0;
-    virtual int del(int fd) = 0;
-    virtual int select(const struct timespec* timeout) = 0;
-    virtual int event(int i, int& fd, int& event) const = 0;
-  };
-
   int open_selector(lua_State* L);
 }
 
