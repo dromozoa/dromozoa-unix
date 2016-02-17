@@ -23,6 +23,7 @@ extern "C" {
 }
 
 namespace dromozoa {
+  int open_selector(int size, int flags);
   int open_selector(lua_State* L);
 }
 

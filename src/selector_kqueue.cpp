@@ -24,35 +24,38 @@
 #include <sys/time.h>
 
 #include "coe.hpp"
+#include "selector.hpp"
 #include "selector_kqueue.hpp"
 
 namespace dromozoa {
-  selector::selector() : fd_(-1), result_(-1) {}
-
-  selector::~selector() {
-    if (fd_ != -1) {
-      close();
-    }
-  }
-
-  int selector::open(int size, int flags) {
-    buffer_.resize(size);
-
+  int open_selector(int size, int flags) {
     int fd = kqueue();
     if (fd == -1) {
       return -1;
     }
-
     if (flags & O_CLOEXEC) {
       if (coe(fd) == -1) {
         ::close(fd);
         return -1;
       }
     }
+    return fd;
+  }
 
-    fd_ = fd;
-    return 0;
-  };
+  selector::selector(int fd, int size) : fd_(fd), result_(-1) {
+    try {
+      buffer_.resize(size);
+    } catch (...) {
+      close();
+      throw;
+    }
+  }
+
+  selector::~selector() {
+    if (fd_ != -1) {
+      close();
+    }
+  }
 
   int selector::close() {
     buffer_.clear();

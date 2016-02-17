@@ -28,9 +28,8 @@
 namespace dromozoa {
   class selector {
   public:
-    selector();
+    selector(int fd, int size);
     ~selector();
-    int open(int size, int flags);
     int close();
     int get() const;
     int add(int fd, int event);

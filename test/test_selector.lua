@@ -24,7 +24,7 @@ unix.block_signal(unix.SIGCHLD)
 
 local PATH = os.getenv("PATH")
 
-local selector = unix.selector():open(1, unix.O_CLOEXEC)
+local selector = unix.selector(1, unix.O_CLOEXEC)
 selector:add(unix.selfpipe.get(), 1)
 
 local pid = assert(unix.process():forkexec(PATH, { "sleep", "1" }))[1]

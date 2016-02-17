@@ -28,8 +28,7 @@ assert(unix.selfpipe.get() ~= -1)
 local path = os.getenv("PATH")
 local envp = unix.environ()
 
-local selector = unix.selector()
-assert(selector:open(256, unix.O_CLOEXEC))
+local selector = unix.selector(256, unix.O_CLOEXEC)
 selector:add(unix.selfpipe.get(), 1)
 
 local pid1 = assert(unix.process():forkexec(path, { "sh", "-c", ":" }))[1]
