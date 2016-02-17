@@ -22,7 +22,7 @@ unix.set_log_level(2)
 local path = os.getenv("PATH")
 local envp = unix.environ()
 
-local fd = assert(unix.open("test.txt", unix.O_WRONLY + unix.O_CREAT + unix.O_CLOEXEC, 438)) -- 0666
+local fd = assert(unix.open("test.txt", unix.O_WRONLY + unix.O_CREAT + unix.O_CLOEXEC))
 fd:write("foo\n")
 
 local pid = assert(unix.process():forkexec(path, { "ls", "-l" }, envp, "/", { [1] = fd, [2] = fd }))[1]
