@@ -23,27 +23,24 @@
 
 #include <vector>
 
-#include "selector.hpp"
-
 namespace dromozoa {
-  class selector_epoll : public selector {
+  class selector {
   public:
-    selector_epoll();
-    virtual ~selector_epoll();
-    virtual int open(int size, int flags);
-    virtual int close();
-    virtual int get() const;
-    virtual int add(int fd, int event);
-    virtual int mod(int fd, int event);
-    virtual int del(int fd);
-    virtual int select(const struct timespec* timeout);
-    virtual int event(int i, int& fd, int& event) const;
+    selector(int fd, int size);
+    ~selector();
+    int close();
+    int get() const;
+    int add(int fd, int event);
+    int mod(int fd, int event);
+    int del(int fd);
+    int select(const struct timespec* timeout);
+    int event(int i, int& fd, int& event) const;
   private:
     int fd_;
     int result_;
     std::vector<struct epoll_event> buffer_;
-    selector_epoll(const selector_epoll&);
-    selector_epoll& operator=(const selector_epoll&);
+    selector(const selector&);
+    selector& operator=(const selector&);
   };
 }
 

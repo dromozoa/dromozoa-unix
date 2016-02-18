@@ -25,17 +25,7 @@
 #include "selector_epoll.hpp"
 
 namespace dromozoa {
-  selector_epoll::selector_epoll() : fd_(-1), result_(-1) {}
-
-  selector_epoll::~selector_epoll() {
-    if (fd_ != -1) {
-      close();
-    }
-  }
-
-  int selector_epoll::open(int size, int flags) {
-    buffer_.resize(size);
-
+  int open_selector(int size, int flags) {
 #ifdef HAVE_EPOLL_CREATE1
     int f = 0;
     if (flags & O_CLOEXEC) {
@@ -52,17 +42,30 @@ namespace dromozoa {
     }
     if (flags & O_CLOEXEC) {
       if (coe(fd) == -1) {
-        ::close(fd);
+        close(fd);
         return -1;
       }
     }
 #endif
+    return fd;
+  }
 
-    fd_ = fd;
-    return 0;
-  };
+  selector::selector(int fd, int size) : fd_(fd), result_(-1) {
+    try {
+      buffer_.resize(size);
+    } catch (...) {
+      close();
+      throw;
+    }
+  }
 
-  int selector_epoll::close() {
+  selector::~selector() {
+    if (fd_ != -1) {
+      close();
+    }
+  }
+
+  int selector::close() {
     buffer_.clear();
     result_ = -1;
     int fd = fd_;
@@ -70,11 +73,11 @@ namespace dromozoa {
     return ::close(fd);
   }
 
-  int selector_epoll::get() const {
+  int selector::get() const {
     return fd_;
   }
 
-  int selector_epoll::add(int fd, int event) {
+  int selector::add(int fd, int event) {
     struct epoll_event ev = {};
     ev.data.fd = fd;
     if (event & 1) {
@@ -86,7 +89,7 @@ namespace dromozoa {
     return epoll_ctl(fd_, EPOLL_CTL_ADD, fd, &ev);
   }
 
-  int selector_epoll::mod(int fd, int event) {
+  int selector::mod(int fd, int event) {
     struct epoll_event ev = {};
     ev.data.fd = fd;
     if (event & 1) {
@@ -98,12 +101,12 @@ namespace dromozoa {
     return epoll_ctl(fd_, EPOLL_CTL_MOD, fd, &ev);
   }
 
-  int selector_epoll::del(int fd) {
+  int selector::del(int fd) {
     struct epoll_event ev = {};
     return epoll_ctl(fd_, EPOLL_CTL_DEL, fd, &ev);
   }
 
-  int selector_epoll::select(const struct timespec* timeout) {
+  int selector::select(const struct timespec* timeout) {
     int t = -1;
     if (timeout) {
       t = timeout->tv_sec * 1000 + timeout->tv_nsec / 1000000;
@@ -112,7 +115,7 @@ namespace dromozoa {
     return result_;
   }
 
-  int selector_epoll::event(int i, int& fd, int& event) const {
+  int selector::event(int i, int& fd, int& event) const {
     if (0 <= i && i < result_) {
       const struct epoll_event& ev = buffer_[i];
       fd = ev.data.fd;

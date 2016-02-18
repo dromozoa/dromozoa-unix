@@ -37,9 +37,6 @@ extern "C" {
 
 #if defined(HAVE_EPOLL_CREATE) || defined(HAVE_EPOLL_CREATE1)
 #include "selector_epoll.hpp"
-namespace dromozoa {
-  typedef selector_epoll selector_impl;
-}
 #elif defined(HAVE_KQUEUE)
 #include "selector_kqueue.hpp"
 #endif

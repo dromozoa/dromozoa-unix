@@ -28,14 +28,14 @@
 #include "selector_kqueue.hpp"
 
 namespace dromozoa {
-  int open_selector(int size, int flags) {
+  int open_selector(int, int flags) {
     int fd = kqueue();
     if (fd == -1) {
       return -1;
     }
     if (flags & O_CLOEXEC) {
       if (coe(fd) == -1) {
-        ::close(fd);
+        close(fd);
         return -1;
       }
     }
