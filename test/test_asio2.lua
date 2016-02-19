@@ -22,8 +22,7 @@ unix.set_raise_error(true)
 
 local reader, writer = unix.pipe(unix.bor(unix.O_CLOEXEC, unix.O_NONBLOCK))
 
-local selector = unix.selector()
-selector:open(1024, unix.O_CLOEXEC)
+local selector = unix.selector(1024, unix.O_CLOEXEC)
 
 local asio = unix.asio(selector)
 asio.selector_timeout = unix.timespec(0.1)

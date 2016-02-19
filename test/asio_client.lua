@@ -23,8 +23,7 @@ unix.set_log_level(3)
 
 local host, serv = ...
 
-local selector = unix.selector()
-selector:open(1024, unix.O_CLOEXEC)
+local selector = unix.selector(1024, unix.O_CLOEXEC)
 
 local asio = unix.asio(selector)
 print(asio.selector_timeout)

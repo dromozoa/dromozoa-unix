@@ -24,7 +24,7 @@ local reader, writer = unix.socketpair(unix.AF_UNIX, unix.SOCK_STREAM)
 reader:ndelay_on()
 writer:ndelay_on()
 
-local selector = unix.selector():open(16, unix.O_CLOEXEC)
+local selector = unix.selector(16, unix.O_CLOEXEC)
 local asio = unix.asio(selector)
 
 asio:add(reader)

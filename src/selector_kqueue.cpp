@@ -24,37 +24,40 @@
 #include <sys/time.h>
 
 #include "coe.hpp"
+#include "selector.hpp"
 #include "selector_kqueue.hpp"
 
 namespace dromozoa {
-  selector_kqueue::selector_kqueue() : fd_(-1), result_(-1) {}
+  int open_selector(int, int flags) {
+    int fd = kqueue();
+    if (fd == -1) {
+      return -1;
+    }
+    if (flags & O_CLOEXEC) {
+      if (coe(fd) == -1) {
+        close(fd);
+        return -1;
+      }
+    }
+    return fd;
+  }
 
-  selector_kqueue::~selector_kqueue() {
+  selector::selector(int fd, int size) : fd_(fd), result_(-1) {
+    try {
+      buffer_.resize(size);
+    } catch (...) {
+      close();
+      throw;
+    }
+  }
+
+  selector::~selector() {
     if (fd_ != -1) {
       close();
     }
   }
 
-  int selector_kqueue::open(int size, int flags) {
-    buffer_.resize(size);
-
-    int fd = kqueue();
-    if (fd == -1) {
-      return -1;
-    }
-
-    if (flags & O_CLOEXEC) {
-      if (coe(fd) == -1) {
-        ::close(fd);
-        return -1;
-      }
-    }
-
-    fd_ = fd;
-    return 0;
-  };
-
-  int selector_kqueue::close() {
+  int selector::close() {
     buffer_.clear();
     result_ = -1;
     int fd = fd_;
@@ -62,11 +65,11 @@ namespace dromozoa {
     return ::close(fd);
   }
 
-  int selector_kqueue::get() const {
+  int selector::get() const {
     return fd_;
   }
 
-  int selector_kqueue::add(int fd, int event) {
+  int selector::add(int fd, int event) {
     struct kevent kev[2];
     if (event & 1) {
       EV_SET(kev, fd, EVFILT_READ, EV_ADD | EV_ENABLE, 0, 0, 0);
@@ -81,7 +84,7 @@ namespace dromozoa {
     return kevent(fd_, kev, 2, 0, 0, 0);
   }
 
-  int selector_kqueue::mod(int fd, int event) {
+  int selector::mod(int fd, int event) {
     struct kevent kev[2];
     if (event & 1) {
       EV_SET(kev, fd, EVFILT_READ, EV_ENABLE, 0, 0, 0);
@@ -96,19 +99,19 @@ namespace dromozoa {
     return kevent(fd_, kev, 2, 0, 0, 0);
   }
 
-  int selector_kqueue::del(int fd) {
+  int selector::del(int fd) {
     struct kevent kev[2];
     EV_SET(kev, fd, EVFILT_READ, EV_DELETE, 0, 0, 0);
     EV_SET(kev + 1, fd, EVFILT_WRITE, EV_DELETE, 0, 0, 0);
     return kevent(fd_, kev, 2, 0, 0, 0);
   }
 
-  int selector_kqueue::select(const struct timespec* timeout) {
+  int selector::select(const struct timespec* timeout) {
     result_ = kevent(fd_, 0, 0, &buffer_[0], buffer_.size(), timeout);
     return result_;
   }
 
-  int selector_kqueue::event(int i, int& fd, int& event) const {
+  int selector::event(int i, int& fd, int& event) const {
     if (0 <= i && i < result_) {
       const struct kevent& kev = buffer_[i];
       fd = kev.ident;

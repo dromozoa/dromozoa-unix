@@ -37,14 +37,8 @@ extern "C" {
 
 #if defined(HAVE_EPOLL_CREATE) || defined(HAVE_EPOLL_CREATE1)
 #include "selector_epoll.hpp"
-namespace dromozoa {
-  typedef selector_epoll selector_impl;
-}
 #elif defined(HAVE_KQUEUE)
 #include "selector_kqueue.hpp"
-namespace dromozoa {
-  typedef selector_kqueue selector_impl;
-}
 #endif
 
 namespace dromozoa {
@@ -52,16 +46,20 @@ namespace dromozoa {
   using bind::get_log_level;
   using bind::push_success;
 
-  selector::~selector() {}
-
   namespace {
     selector& get_selector(lua_State* L, int n) {
       return *static_cast<selector*>(luaL_checkudata(L, n, "dromozoa.unix.selector"));
     }
 
     int impl_new(lua_State* L) {
-      selector* s = static_cast<selector*>(lua_newuserdata(L, sizeof(selector_impl)));
-      new(s) selector_impl();
+      int size = luaL_checkinteger(L, 2);
+      int flags = luaL_optinteger(L, 3, 0);
+      int fd = open_selector(size, flags);
+      if (fd == -1) {
+        return push_error(L);
+      }
+      selector* s = static_cast<selector*>(lua_newuserdata(L, sizeof(selector)));
+      new(s) selector(fd, size);
       luaL_getmetatable(L, "dromozoa.unix.selector");
       lua_setmetatable(L, -2);
       if (get_log_level() > 2) {
@@ -91,16 +89,6 @@ namespace dromozoa {
       }
       s.~selector();
       return 0;
-    }
-
-    int impl_open(lua_State* L) {
-      int size = luaL_checkinteger(L, 2);
-      int flags = luaL_optinteger(L, 3, 0);
-      if (get_selector(L, 1).open(size, flags) == -1) {
-        return push_error(L);
-      } else {
-        return push_success(L);
-      }
     }
 
     int impl_close(lua_State* L) {
@@ -196,7 +184,6 @@ namespace dromozoa {
 
   int open_selector(lua_State* L) {
     lua_newtable(L);
-    function<impl_open>::set_field(L, "open");
     function<impl_close>::set_field(L, "close");
     function<impl_get>::set_field(L, "get");
     function<impl_add>::set_field(L, "add");
