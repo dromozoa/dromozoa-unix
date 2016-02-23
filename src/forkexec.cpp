@@ -23,11 +23,11 @@
 
 #include <vector>
 
-#include "dromozoa/bind.hpp"
+#include <dromozoa/bind.hpp>
+#include <dromozoa/pathexec.hpp>
 
 #include "forkexec.hpp"
 #include "pipe.hpp"
-#include "pathexec.hpp"
 #include "signal_mask.hpp"
 
 namespace dromozoa {
