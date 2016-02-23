@@ -15,18 +15,10 @@
 # You should have received a copy of the GNU General Public License
 # along with dromozoa-unix.  If not, see <http://www.gnu.org/licenses/>.
 
-ACLOCAL_AMFLAGS = -I m4
-SUBDIRS = bind src/lib src
+noinst_LTLIBRARIES = libdromozoa-unix.la
 
-EXTRA_DIST = \
-	.gitignore \
-	README.md \
-	dromozoa \
-	dromozoa-unix-*.rockspec \
-	m4/update \
-	test \
-	test.sh
-
-nobase_lua_DATA = \
-	dromozoa/unix/asio.lua \
-	dromozoa/unix/timespec.lua
+libdromozoa_unix_la_CPPFLAGS = -I$(top_srcdir)/include
+libdromozoa_unix_la_LDFLAGS = -static
+libdromozoa_unix_la_SOURCES = \
+	coe.cpp \
+	file_descriptor.cpp

@@ -15,15 +15,16 @@
 // You should have received a copy of the GNU General Public License
 // along with dromozoa-unix.  If not, see <http://www.gnu.org/licenses/>.
 
-#ifndef COE_HPP
-#define COE_HPP
+#include <fcntl.h>
 
-extern "C" {
-#include <lua.h>
-}
+#include <dromozoa/coe.hpp>
 
 namespace dromozoa {
-  void initialize_coe(lua_State* L);
+  int coe(int fd) {
+    int result = fcntl(fd, F_GETFD);
+    if (result == -1) {
+      return -1;
+    }
+    return fcntl(fd, F_SETFD, result | FD_CLOEXEC);
+  }
 }
-
-#endif

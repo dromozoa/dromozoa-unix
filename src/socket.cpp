@@ -29,7 +29,8 @@ extern "C" {
 #include <unistd.h>
 #include <sys/socket.h>
 
-#include "dromozoa/bind.hpp"
+#include <dromozoa/bind.hpp>
+#include <dromozoa/coe.hpp>
 
 #include "coe.hpp"
 #include "error.hpp"

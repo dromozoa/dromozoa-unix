@@ -23,6 +23,8 @@
 #include <sys/event.h>
 #include <sys/time.h>
 
+#include <dromozoa/coe.hpp>
+
 #include "coe.hpp"
 #include "selector.hpp"
 #include "selector_kqueue.hpp"

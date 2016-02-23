@@ -15,15 +15,11 @@
 // You should have received a copy of the GNU General Public License
 // along with dromozoa-unix.  If not, see <http://www.gnu.org/licenses/>.
 
-#ifndef COE_HPP
-#define COE_HPP
-
-extern "C" {
-#include <lua.h>
-}
+#ifndef DROMOZOA_COE_HPP
+#define DROMOZOA_COE_HPP
 
 namespace dromozoa {
-  void initialize_coe(lua_State* L);
+  int coe(int fd);
 }
 
 #endif

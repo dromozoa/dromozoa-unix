@@ -15,15 +15,24 @@
 // You should have received a copy of the GNU General Public License
 // along with dromozoa-unix.  If not, see <http://www.gnu.org/licenses/>.
 
-#ifndef COE_HPP
-#define COE_HPP
-
-extern "C" {
-#include <lua.h>
-}
+#ifndef DROMOZOA_FILE_DESCRIPTOR_HPP
+#define DROMOZOA_FILE_DESCRIPTOR_HPP
 
 namespace dromozoa {
-  void initialize_coe(lua_State* L);
+  class file_descriptor {
+  public:
+    explicit file_descriptor(int fd = -1);
+    ~file_descriptor();
+    int close();
+    int release();
+    bool valid() const;
+    int get() const;
+    void swap(file_descriptor& that);
+  private:
+    int fd_;
+    file_descriptor(const file_descriptor&);
+    file_descriptor& operator=(const file_descriptor&);
+  };
 }
 
 #endif

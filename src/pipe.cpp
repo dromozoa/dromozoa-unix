@@ -28,7 +28,8 @@ extern "C" {
 #include <fcntl.h>
 #include <unistd.h>
 
-#include "dromozoa/bind.hpp"
+#include <dromozoa/bind.hpp>
+#include <dromozoa/coe.hpp>
 
 #include "coe.hpp"
 #include "error.hpp"

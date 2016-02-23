@@ -21,6 +21,8 @@
 #include <unistd.h>
 #include <sys/epoll.h>
 
+#include <dromozoa/coe.hpp>
+
 #include "coe.hpp"
 #include "selector_epoll.hpp"
 

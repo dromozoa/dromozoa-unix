@@ -21,7 +21,8 @@ extern "C" {
 
 #include <fcntl.h>
 
-#include "dromozoa/bind.hpp"
+#include <dromozoa/bind.hpp>
+#include <dromozoa/coe.hpp>
 
 #include "coe.hpp"
 #include "error.hpp"
@@ -30,14 +31,6 @@ extern "C" {
 namespace dromozoa {
   using bind::function;
   using bind::push_success;
-
-  int coe(int fd) {
-    int result = fcntl(fd, F_GETFD);
-    if (result == -1) {
-      return -1;
-    }
-    return fcntl(fd, F_SETFD, result | FD_CLOEXEC);
-  }
 
   namespace {
     int impl_coe(lua_State* L) {
