@@ -22,12 +22,12 @@ extern "C" {
 
 #include <errno.h>
 
-#include "dromozoa/bind.hpp"
+#include <dromozoa/bind.hpp>
+#include <dromozoa/forkexec.hpp>
 
 #include "argument_vector.hpp"
 #include "error.hpp"
 #include "fd.hpp"
-#include "forkexec.hpp"
 
 namespace dromozoa {
   using bind::function;

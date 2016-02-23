@@ -23,16 +23,13 @@
 
 #include <vector>
 
-#include <dromozoa/bind.hpp>
+#include <dromozoa/forkexec.hpp>
 #include <dromozoa/pathexec.hpp>
 
-#include "forkexec.hpp"
-#include "pipe.hpp"
-#include "signal_mask.hpp"
+#include "../pipe.hpp"
+#include "../signal_mask.hpp"
 
 namespace dromozoa {
-  using bind::function;
-
   namespace {
     void die(int die_fd[2]) {
       int code = errno;

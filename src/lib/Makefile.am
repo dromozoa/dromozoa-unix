@@ -22,5 +22,6 @@ libdromozoa_unix_la_LDFLAGS = -static
 libdromozoa_unix_la_SOURCES = \
 	coe.cpp \
 	file_descriptor.cpp \
+	forkexec.cpp \
 	ndelay.cpp \
 	pathexec.cpp

@@ -21,7 +21,6 @@ noinst_HEADERS = \
 	error.hpp \
 	fcntl.hpp \
 	fd.hpp \
-	forkexec.hpp \
 	lock.hpp \
 	ndelay.hpp \
 	netdb.hpp \
@@ -60,7 +59,6 @@ unix_la_SOURCES = \
 	error.cpp \
 	fcntl.cpp \
 	fd.cpp \
-	forkexec.cpp \
 	lock.cpp \
 	ndelay.cpp \
 	netdb.cpp \
