@@ -15,15 +15,24 @@
 // You should have received a copy of the GNU General Public License
 // along with dromozoa-unix.  If not, see <http://www.gnu.org/licenses/>.
 
-#ifndef NDELAY_HPP
-#define NDELAY_HPP
+#include <fcntl.h>
 
-extern "C" {
-#include <lua.h>
-}
+#include <dromozoa/ndelay.hpp>
 
 namespace dromozoa {
-  void initialize_ndelay(lua_State* L);
-}
+  int ndelay_on(int fd) {
+    int result = fcntl(fd, F_GETFL);
+    if (result == -1) {
+      return -1;
+    }
+    return fcntl(fd, F_SETFL, result | O_NONBLOCK);
+  }
 
-#endif
+  int ndelay_off(int fd) {
+    int result = fcntl(fd, F_GETFL);
+    if (result == -1) {
+      return -1;
+    }
+    return fcntl(fd, F_SETFL, result & ~O_NONBLOCK);
+  }
+}

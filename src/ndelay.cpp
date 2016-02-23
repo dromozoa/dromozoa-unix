@@ -21,7 +21,8 @@ extern "C" {
 
 #include <fcntl.h>
 
-#include "dromozoa/bind.hpp"
+#include <dromozoa/bind.hpp>
+#include <dromozoa/ndelay.hpp>
 
 #include "error.hpp"
 #include "fd.hpp"
@@ -30,22 +31,6 @@ extern "C" {
 namespace dromozoa {
   using bind::function;
   using bind::push_success;
-
-  int ndelay_on(int fd) {
-    int result = fcntl(fd, F_GETFL);
-    if (result == -1) {
-      return -1;
-    }
-    return fcntl(fd, F_SETFL, result | O_NONBLOCK);
-  }
-
-  int ndelay_off(int fd) {
-    int result = fcntl(fd, F_GETFL);
-    if (result == -1) {
-      return -1;
-    }
-    return fcntl(fd, F_SETFL, result & ~O_NONBLOCK);
-  }
 
   namespace {
     int impl_ndelay_on(lua_State* L) {

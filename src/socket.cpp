@@ -31,6 +31,7 @@ extern "C" {
 
 #include <dromozoa/bind.hpp>
 #include <dromozoa/coe.hpp>
+#include <dromozoa/ndelay.hpp>
 
 #include "coe.hpp"
 #include "error.hpp"

@@ -15,15 +15,12 @@
 // You should have received a copy of the GNU General Public License
 // along with dromozoa-unix.  If not, see <http://www.gnu.org/licenses/>.
 
-#ifndef NDELAY_HPP
-#define NDELAY_HPP
-
-extern "C" {
-#include <lua.h>
-}
+#ifndef DROMOZOA_NDELAY_HPP
+#define DROMOZOA_NDELAY_HPP
 
 namespace dromozoa {
-  void initialize_ndelay(lua_State* L);
+  int ndelay_on(int fd);
+  int ndelay_off(int fd);
 }
 
 #endif
