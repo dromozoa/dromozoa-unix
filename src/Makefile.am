@@ -34,7 +34,6 @@ noinst_HEADERS = \
 	selector_kqueue.hpp \
 	selfpipe.hpp \
 	signal.hpp \
-	signal_mask.hpp \
 	sockaddr.hpp \
 	socket.hpp \
 	stdlib.hpp \
@@ -70,7 +69,6 @@ unix_la_SOURCES = \
 	selector.cpp \
 	selfpipe.cpp \
 	signal.cpp \
-	signal_mask.cpp \
 	sockaddr.cpp \
 	socket.cpp \
 	stdlib.cpp \

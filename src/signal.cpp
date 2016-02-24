@@ -22,11 +22,11 @@ extern "C" {
 
 #include <signal.h>
 
-#include "dromozoa/bind.hpp"
+#include <dromozoa/bind.hpp>
+#include <dromozoa/signal_mask.hpp>
 
 #include "error.hpp"
 #include "signal.hpp"
-#include "signal_mask.hpp"
 
 namespace dromozoa {
   using bind::function;

@@ -23,8 +23,6 @@ extern "C" {
 }
 
 namespace dromozoa {
-  int wrap_pipe2(int fd[2], int flags);
-  void close_pipe(int fd[2]);
   void initialize_pipe(lua_State* L);
 }
 

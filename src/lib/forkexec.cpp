@@ -25,9 +25,8 @@
 
 #include <dromozoa/forkexec.hpp>
 #include <dromozoa/pathexec.hpp>
-
-#include "../pipe.hpp"
-#include "../signal_mask.hpp"
+#include <dromozoa/pipe.hpp>
+#include <dromozoa/signal_mask.hpp>
 
 namespace dromozoa {
   namespace {
@@ -133,7 +132,7 @@ namespace dromozoa {
       return -1;
     }
     int die_fd[] = { -1, -1 };
-    if (wrap_pipe2(die_fd, O_CLOEXEC) == -1) {
+    if (compat_pipe2(die_fd, O_CLOEXEC) == -1) {
       return -1;
     }
 
@@ -171,11 +170,11 @@ namespace dromozoa {
       return -1;
     }
     int die_fd[] = { -1, -1 };
-    if (wrap_pipe2(die_fd, O_CLOEXEC) == -1) {
+    if (compat_pipe2(die_fd, O_CLOEXEC) == -1) {
       return -1;
     }
     int pid_fd[] = { -1, -1 };
-    if (wrap_pipe2(pid_fd, O_CLOEXEC) == -1) {
+    if (compat_pipe2(pid_fd, O_CLOEXEC) == -1) {
       close_pipe(die_fd);
       return -1;
     }

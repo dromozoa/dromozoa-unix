@@ -25,4 +25,5 @@ libdromozoa_unix_la_SOURCES = \
 	forkexec.cpp \
 	ndelay.cpp \
 	pathexec.cpp \
-	pipe.cpp
+	pipe.cpp \
+	signal_mask.cpp

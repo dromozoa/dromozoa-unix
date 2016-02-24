@@ -23,14 +23,9 @@
 
 #include <iostream>
 
-#include "dromozoa/bind.hpp"
-
-#include "error.hpp"
-#include "signal_mask.hpp"
+#include <dromozoa/signal_mask.hpp>
 
 namespace dromozoa {
-  using bind::get_log_level;
-
 #ifdef HAVE_PTHREAD
   int signal_mask(int how, const sigset_t* new_mask, sigset_t* old_mask) {
     return pthread_sigmask(how, new_mask, old_mask);
@@ -46,12 +41,11 @@ namespace dromozoa {
   scoped_signal_mask::~scoped_signal_mask() {
     if (masked_) {
       if (signal_mask(SIG_SETMASK, &mask_, 0) == -1) {
-        int code = errno;
-        if (get_log_level() > 0) {
-          std::cerr << "[dromozoa-unix] cannot reset signal mask: ";
-          print_error(std::cerr, code);
-          std::cerr << std::endl;
-        }
+        // [TODO]
+        // int code = errno;
+        // std::cerr << "[dromozoa-unix] cannot reset signal mask: ";
+        // print_error(std::cerr, code);
+        // std::cerr << std::endl;
       }
     }
   }

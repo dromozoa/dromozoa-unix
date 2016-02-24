@@ -23,10 +23,10 @@ extern "C" {
 #include <signal.h>
 #include <unistd.h>
 
-#include "dromozoa/bind.hpp"
+#include <dromozoa/bind.hpp>
+#include <dromozoa/pipe.hpp>
 
 #include "error.hpp"
-#include "pipe.hpp"
 #include "selfpipe.hpp"
 
 static int dromozoa_selfpipe_fd[2] = { -1, -1 };
@@ -42,7 +42,7 @@ namespace dromozoa {
   namespace {
     int impl_install(lua_State* L) {
       if (dromozoa_selfpipe_fd[0] == -1) {
-        if (wrap_pipe2(dromozoa_selfpipe_fd, O_CLOEXEC | O_NONBLOCK) == -1) {
+        if (compat_pipe2(dromozoa_selfpipe_fd, O_CLOEXEC | O_NONBLOCK) == -1) {
           return push_error(L);
         }
       }
