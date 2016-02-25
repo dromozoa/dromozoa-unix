@@ -29,11 +29,11 @@
 
 namespace dromozoa {
 #ifdef HAVE_PIPE2
-  int wrap_pipe2(int fd[2], int flags) {
+  int compat_pipe2(int fd[2], int flags) {
     return pipe2(fd, flags);
   }
 #else
-  int wrap_pipe2(int fd[2], int flags) {
+  int compat_pipe2(int fd[2], int flags) {
     if (pipe(fd) == -1) {
       return -1;
     }

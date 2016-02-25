@@ -26,6 +26,7 @@
 #include <dromozoa/forkexec.hpp>
 #include <dromozoa/pathexec.hpp>
 #include <dromozoa/pipe.hpp>
+#include <dromozoa/sigmask.hpp>
 #include <dromozoa/signal_mask.hpp>
 
 namespace dromozoa {
@@ -107,7 +108,7 @@ namespace dromozoa {
       if (sigemptyset(&mask) == -1) {
         die(die_fd);
       }
-      if (signal_mask(SIG_SETMASK, &mask, 0) == -1) {
+      if (compat_sigmask(SIG_SETMASK, &mask, 0) == -1) {
         die(die_fd);
       }
 

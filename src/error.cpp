@@ -31,7 +31,8 @@ extern "C" {
 
 #include <iostream>
 
-#include "dromozoa/bind.hpp"
+#include <dromozoa/bind.hpp>
+#include <dromozoa/strerror.hpp>
 
 #include "error.hpp"
 
@@ -64,71 +65,11 @@ namespace dromozoa {
     return 1;
   }
 
-#ifdef HAVE_STRERROR_R
-  namespace {
-    const char* wrap_strerror_r_result(const char* result, char*) {
-      return result;
-    }
-
-    const char* wrap_strerror_r_result(int result, char* buffer) {
-      if (result == 0) {
-        return buffer;
-      } else {
-        if (result != -1) {
-          errno = result;
-        }
-        return 0;
-      }
-    }
-
-    const char* wrap_strerror_r(int code, char* buffer, size_t size) {
-      return wrap_strerror_r_result(strerror_r(code, buffer, size), buffer);
-    }
-  }
-#endif
-
-  namespace {
-    int push_error_impl(lua_State* L, int code) {
-      char* buffer = 0;
-      size_t size = 32;
-
-      while (true) {
-        const char* what = 0;
-        errno = 0;
-#ifdef HAVE_STRERROR_R
-        size = size * 2;
-        if (char* b = static_cast<char*>(realloc(buffer, size))) {
-          buffer = b;
-          what = wrap_strerror_r(code, buffer, size);
-        } else {
-          errno = ENOMEM;
-        }
-#else
-        what = strerror(code);
-#endif
-
-        if (what && errno == 0) {
-          lua_pushstring(L, what);
-          break;
-#ifdef HAVE_STRERROR_R
-        } else if (errno == ERANGE) {
-          continue;
-#endif
-        } else {
-          lua_pushfstring(L, "error number %d", code);
-          break;
-        }
-      }
-      free(buffer);
-
-      return 1;
-    }
-  }
-
   int push_error(lua_State* L, int code) {
     int save = errno;
+    std::string message = compat_strerror(code);
     lua_pushnil(L);
-    push_error_impl(L, code);
+    lua_pushlstring(L, message.c_str(), message.size());
     lua_pushinteger(L, code);
     errno = save;
     return 3;
@@ -136,38 +77,7 @@ namespace dromozoa {
 
   void print_error(std::ostream& out, int code) {
     int save = errno;
-    char* buffer = 0;
-    size_t size = 32;
-
-    while (true) {
-      const char* what = 0;
-      errno = 0;
-#ifdef HAVE_STRERROR_R
-      size = size * 2;
-      if (char* b = static_cast<char*>(realloc(buffer, size))) {
-        buffer = b;
-        what = wrap_strerror_r(code, buffer, size);
-      } else {
-        errno = ENOMEM;
-      }
-#else
-      what = strerror(code);
-#endif
-
-      if (what && errno == 0) {
-        out << what;
-        break;
-#ifdef HAVE_STRERROR_R
-      } else if (errno == ERANGE) {
-        continue;
-#endif
-      } else {
-        out << "error number " << code;
-        break;
-      }
-    }
-    free(buffer);
-
+    out << compat_strerror(code);
     errno = save;
   }
 
@@ -175,7 +85,8 @@ namespace dromozoa {
     int impl_strerror(lua_State* L) {
       int save = errno;
       int code = luaL_optinteger(L, 1, save);
-      push_error_impl(L, code);
+      std::string message = compat_strerror(code);
+      lua_pushlstring(L, message.c_str(), message.size());
       errno = save;
       return 1;
     }

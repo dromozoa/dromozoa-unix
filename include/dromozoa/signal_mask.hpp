@@ -21,8 +21,6 @@
 #include <signal.h>
 
 namespace dromozoa {
-  int signal_mask(int how, const sigset_t* new_mask, sigset_t* old_mask);
-
   class scoped_signal_mask {
   public:
     scoped_signal_mask();

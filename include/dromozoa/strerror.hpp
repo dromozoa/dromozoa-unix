@@ -15,37 +15,13 @@
 // You should have received a copy of the GNU General Public License
 // along with dromozoa-unix.  If not, see <http://www.gnu.org/licenses/>.
 
-#include <signal.h>
+#ifndef DROMOZOA_STRERROR_HPP
+#define DROMOZOA_STRERROR_HPP
 
-#include <iostream>
-
-#include <dromozoa/sigmask.hpp>
-#include <dromozoa/signal_mask.hpp>
+#include <string>
 
 namespace dromozoa {
-  scoped_signal_mask::scoped_signal_mask() : masked_() {}
-
-  scoped_signal_mask::~scoped_signal_mask() {
-    if (masked_) {
-      if (compat_sigmask(SIG_SETMASK, &mask_, 0) == -1) {
-        // [TODO]
-        // int code = errno;
-        // std::cerr << "[dromozoa-unix] cannot reset signal mask: ";
-        // print_error(std::cerr, code);
-        // std::cerr << std::endl;
-      }
-    }
-  }
-
-  int scoped_signal_mask::block_all_signals() {
-    sigset_t mask;
-    if (sigfillset(&mask) == -1) {
-      return -1;
-    }
-    if (compat_sigmask(SIG_BLOCK, &mask, &mask_) == -1) {
-      return -1;
-    }
-    masked_ = true;
-    return 0;
-  }
+  std::string compat_strerror(int code);
 }
+
+#endif

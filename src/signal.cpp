@@ -23,7 +23,7 @@ extern "C" {
 #include <signal.h>
 
 #include <dromozoa/bind.hpp>
-#include <dromozoa/signal_mask.hpp>
+#include <dromozoa/sigmask.hpp>
 
 #include "error.hpp"
 #include "signal.hpp"
@@ -77,7 +77,7 @@ namespace dromozoa {
           return push_error(L);
         }
       }
-      if (signal_mask(SIG_BLOCK, &mask, 0) == -1) {
+      if (compat_sigmask(SIG_BLOCK, &mask, 0) == -1) {
         return push_error(L);
       } else {
         return push_success(L);
@@ -98,7 +98,7 @@ namespace dromozoa {
           return push_error(L);
         }
       }
-      if (signal_mask(SIG_UNBLOCK, &mask, 0) == -1) {
+      if (compat_sigmask(SIG_UNBLOCK, &mask, 0) == -1) {
         return push_error(L);
       } else {
         return push_success(L);
