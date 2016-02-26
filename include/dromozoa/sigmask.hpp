@@ -22,6 +22,15 @@
 
 namespace dromozoa {
   int compat_sigmask(int how, const sigset_t* new_mask, sigset_t* old_mask);
+  class sigmask_saver {
+  public:
+    explicit sigmask_saver(const sigset_t& mask);
+    ~sigmask_saver();
+  private:
+    sigset_t mask_;
+    sigmask_saver(const sigmask_saver&);
+    sigmask_saver& operator=(const sigmask_saver&);
+  };
 }
 
 #endif

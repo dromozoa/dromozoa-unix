@@ -15,33 +15,21 @@
 // You should have received a copy of the GNU General Public License
 // along with dromozoa-unix.  If not, see <http://www.gnu.org/licenses/>.
 
-#ifdef HAVE_CONFIG_H
-#include "config.h"
-#endif
+#ifndef DROMOZOA_UNEXPECTED_HPP
+#define DROMOZOA_UNEXPECTED_HPP
 
-#include <errno.h>
-#include <signal.h>
-
-#include <dromozoa/sigmask.hpp>
-#include <dromozoa/strerror.hpp>
-#include <dromozoa/unexpected.hpp>
+#include <string>
 
 namespace dromozoa {
-#ifdef HAVE_PTHREAD
-  int compat_sigmask(int how, const sigset_t* new_mask, sigset_t* old_mask) {
-    return pthread_sigmask(how, new_mask, old_mask);
-  }
-#else
-  int compat_sigmask(int how, const sigset_t* new_mask, sigset_t* old_mask) {
-    return sigprocmask(how, new_mask, old_mask);
-  }
-#endif
-
-  sigmask_saver::sigmask_saver(const sigset_t& mask) : mask_(mask) {}
-
-  sigmask_saver::~sigmask_saver() {
-    if (compat_sigmask(SIG_SETMASK, &mask_, 0) == -1) {
-      DROMOZOA_UNEXPECTED(compat_strerror(errno));
-    }
-  }
+  typedef void (*unexpected_handler)(const char* what, const char* file, int line, const char* function);
+  void unexpected_noop(const char* what, const char* file, int line, const char* function);
+  void unexpected_cerr(const char* what, const char* file, int line, const char* function);
+  void set_unexpected(unexpected_handler handler);
+  void unexpected(const char* what, const char* file, int line, const char* function);
+  void unexpected(const std::string& what, const char* file, int line, const char* function);
 }
+
+#define DROMOZOA_UNEXPECTED(what) \
+  dromozoa::unexpected(what, __FILE__, __LINE__, __func__)
+
+#endif

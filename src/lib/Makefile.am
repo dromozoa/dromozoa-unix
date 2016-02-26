@@ -28,4 +28,5 @@ libdromozoa_unix_la_SOURCES = \
 	pipe.cpp \
 	sigmask.cpp \
 	signal_mask.cpp \
-	strerror.cpp
+	strerror.cpp \
+	unexpected.cpp
