@@ -15,18 +15,11 @@
 # You should have received a copy of the GNU General Public License
 # along with dromozoa-unix.  If not, see <http://www.gnu.org/licenses/>.
 
-ACLOCAL_AMFLAGS = -I m4
-SUBDIRS = bind src/lib src test/lib
+TESTS = $(check_PROGRAMS)
 
-EXTRA_DIST = \
-	.gitignore \
-	README.md \
-	dromozoa \
-	dromozoa-unix-*.rockspec \
-	m4/update \
-	test \
-	test.sh
+check_PROGRAMS = \
+	test_unexpected.exe
 
-nobase_lua_DATA = \
-	dromozoa/unix/asio.lua \
-	dromozoa/unix/timespec.lua
+test_unexpected_exe_CPPFLAGS = -I$(top_srcdir)/include
+test_unexpected_exe_LDADD = $(top_builddir)/src/lib/libdromozoa-unix.la
+test_unexpected_exe_SOURCES = test_unexpected.cpp
