@@ -15,9 +15,8 @@
 // You should have received a copy of the GNU General Public License
 // along with dromozoa-unix.  If not, see <http://www.gnu.org/licenses/>.
 
-#ifdef HAVE_CONFIG_H
-#include "config.h"
-#endif
+#include <stdlib.h>
+#include <string.h>
 
 #include <sstream>
 #include <string>
@@ -25,7 +24,6 @@
 #include <dromozoa/strerror.hpp>
 
 namespace dromozoa {
-#ifdef HAVE_STRERROR_R
   const char* compat_strerror_r_result(const char* result, char*) {
     return result;
   }
@@ -48,50 +46,37 @@ namespace dromozoa {
   std::string compat_strerror(int code) {
     int save = errno;
     errno = 0;
-    std::string result;
 
-    char* buffer = 0;
-    size_t size = 32;
-    while (true) {
-      if (char* b = static_cast<char*>(realloc(buffer, size))) {
-        buffer = b;
-        if (const char* what = compat_strerror_r(code, buffer, size)) {
-          result = what;
-        } else if (errno == ERANGE) {
-          continue;
+    try {
+      std::string what;
+
+      char* buffer = 0;
+      size_t size = 16;
+      while (true) {
+        size = size * 2;
+        if (char* result = static_cast<char*>(realloc(buffer, size))) {
+          buffer = result;
+          if (const char* result = compat_strerror_r(code, buffer, size)) {
+            what = result;
+          } else if (errno == ERANGE) {
+            continue;
+          }
         }
+        break;
       }
-      break;
-    }
-    free(buffer);
+      free(buffer);
 
-    if (result.empty()) {
-      std::ostringstream out;
-      out << "error number " << code;
-      result = out.str();
-    }
+      if (what.empty()) {
+        std::ostringstream out;
+        out << "error number " << code;
+        what = out.str();
+      }
 
-    errno = save;
-    return result;
+      errno = save;
+      return what;
+    } catch (...) {
+      errno = save;
+      throw;
+    }
   }
-#else
-  std::string compat_strerror(int code) {
-    int save = errno;
-    errno = 0;
-    std::string result;
-
-    if (const char* what = strerror(code)) {
-      result = what;
-    }
-
-    if (result.empty()) {
-      std::ostringstream out;
-      out << "error number " << code;
-      result = out.str();
-    }
-
-    errno = save;
-    return result;
-  }
-#endif
 }
