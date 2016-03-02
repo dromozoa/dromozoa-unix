@@ -18,10 +18,15 @@
 TESTS = $(check_PROGRAMS)
 
 check_PROGRAMS = \
+	test_pathexec.exe \
 	test_pipe.exe \
 	test_sigmask.exe \
 	test_strerror.exe \
 	test_unexpected.exe
+
+test_pathexec_exe_CPPFLAGS = -I$(top_srcdir)/include
+test_pathexec_exe_LDADD = $(top_builddir)/src/lib/libdromozoa-unix.la
+test_pathexec_exe_SOURCES = test_pathexec.cpp
 
 test_pipe_exe_CPPFLAGS = -I$(top_srcdir)/include
 test_pipe_exe_LDADD = $(top_builddir)/src/lib/libdromozoa-unix.la
