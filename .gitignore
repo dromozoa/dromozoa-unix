@@ -1,11 +1,11 @@
-*.deps
 *.in
 *.la
-*.libs
 *.lo
 *.o
 *.swp
 *~
+.deps
+.libs
 /INSTALL
 /aclocal.m4
 /autom4te.cache
