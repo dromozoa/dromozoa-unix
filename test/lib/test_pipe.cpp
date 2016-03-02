@@ -18,6 +18,8 @@
 #include <assert.h>
 #include <fcntl.h>
 
+#include <iostream>
+
 #include <dromozoa/pipe.hpp>
 
 void assert_coe_and_ndelay_on(int fd) {
@@ -34,8 +36,7 @@ int main(int, char*[]) {
   int fd[2] = { -1, -1 };
 
   assert(dromozoa::compat_pipe2(fd, O_CLOEXEC | O_NONBLOCK) != -1);
-  assert(fd[0] == 3);
-  assert(fd[1] == 4);
+  std::cout << fd[0] << ", " << fd[1] << "\n";
   assert_coe_and_ndelay_on(fd[0]);
   assert_coe_and_ndelay_on(fd[1]);
   dromozoa::close_pipe(fd);
@@ -43,8 +44,6 @@ int main(int, char*[]) {
   assert(fd[1] == -1);
 
   assert(dromozoa::compat_pipe2(fd, O_CLOEXEC) != -1);
-  assert(fd[0] == 3);
-  assert(fd[1] == 4);
   assert_coe_and_ndelay_off(fd[0]);
   assert_coe_and_ndelay_off(fd[1]);
   dromozoa::close_pipe(fd);
