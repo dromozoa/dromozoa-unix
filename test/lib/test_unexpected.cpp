@@ -17,7 +17,6 @@
 
 #include <assert.h>
 
-#include <iostream>
 #include <string>
 
 #include <dromozoa/unexpected.hpp>
@@ -25,7 +24,7 @@
 void handler(const char* what, const char* file, int line, const char* function) {
   assert(std::string(what) == "test2");
   assert(std::string(file).find("test_unexpected.cpp") != std::string::npos);
-  assert(line == 35);
+  assert(line == 34);
   assert(std::string(function).find("main") != std::string::npos);
 }
 

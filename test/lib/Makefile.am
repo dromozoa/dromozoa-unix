@@ -18,8 +18,13 @@
 TESTS = $(check_PROGRAMS)
 
 check_PROGRAMS = \
+	test_pipe.exe \
 	test_strerror.exe \
 	test_unexpected.exe
+
+test_pipe_exe_CPPFLAGS = -I$(top_srcdir)/include
+test_pipe_exe_LDADD = $(top_builddir)/src/lib/libdromozoa-unix.la
+test_pipe_exe_SOURCES = test_pipe.cpp
 
 test_strerror_exe_CPPFLAGS = -I$(top_srcdir)/include
 test_strerror_exe_LDADD = $(top_builddir)/src/lib/libdromozoa-unix.la

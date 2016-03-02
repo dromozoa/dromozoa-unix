@@ -62,11 +62,11 @@ namespace dromozoa {
 #endif
 
   void close_pipe(int fd[2]) {
-    int code = errno;
+    int save = errno;
     close(fd[0]);
     close(fd[1]);
     fd[0] = -1;
     fd[1] = -1;
-    errno = code;
+    errno = save;
   }
 }
