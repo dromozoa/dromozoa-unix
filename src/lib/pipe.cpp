@@ -24,49 +24,51 @@
 #include <unistd.h>
 
 #include <dromozoa/coe.hpp>
+#include <dromozoa/file_descriptor.hpp>
 #include <dromozoa/ndelay.hpp>
 #include <dromozoa/pipe.hpp>
 
 namespace dromozoa {
 #ifdef HAVE_PIPE2
-  int compat_pipe2(int fd[2], int flags) {
-    return pipe2(fd, flags);
+  int compat_pipe2(int pipe_fd[2], int flags) {
+    return pipe2(pipe_fd, flags);
   }
 #else
-  int compat_pipe2(int fd[2], int flags) {
+  int compat_pipe2(int pipe_fd[2], int flags) {
+    int fd[2] = { -1, -1 };
     if (pipe(fd) == -1) {
       return -1;
     }
-    do {
-      if (flags & O_CLOEXEC) {
-        if (coe(fd[0]) == -1) {
-          break;
-        }
-        if (coe(fd[1]) == -1) {
-          break;
-        }
+    file_descriptor fd0(fd[0]);
+    file_descriptor fd1(fd[1]);
+    if (flags & O_CLOEXEC) {
+      if (coe(fd0.get()) == -1) {
+        return -1;
       }
-      if (flags & O_NONBLOCK) {
-        if (ndelay_on(fd[0]) == -1) {
-          break;
-        }
-        if (ndelay_on(fd[1]) == -1) {
-          break;
-        }
+      if (coe(fd1.get()) == -1) {
+        return -1;
       }
-      return 0;
-    } while (false);
-    close_pipe(fd);
-    return -1;
+    }
+    if (flags & O_NONBLOCK) {
+      if (ndelay_on(fd0.get()) == -1) {
+        return -1;
+      }
+      if (ndelay_on(fd1.get()) == -1) {
+        return -1;
+      }
+    }
+    pipe_fd[0] = fd0.release();
+    pipe_fd[1] = fd1.release();
+    return 0;
   }
 #endif
 
-  void close_pipe(int fd[2]) {
+  void close_pipe(int pipe_fd[2]) {
     int save = errno;
-    close(fd[0]);
-    close(fd[1]);
-    fd[0] = -1;
-    fd[1] = -1;
+    close(pipe_fd[0]);
+    close(pipe_fd[1]);
+    pipe_fd[0] = -1;
+    pipe_fd[1] = -1;
     errno = save;
   }
 }
