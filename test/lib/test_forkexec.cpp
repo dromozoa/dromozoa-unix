@@ -19,10 +19,12 @@
 #include <errno.h>
 #include <signal.h>
 #include <stdlib.h>
+#include <unistd.h>
 #include <sys/wait.h>
 
 #include <iostream>
 #include <sstream>
+#include <string>
 
 #include <dromozoa/forkexec.hpp>
 #include <dromozoa/sigmask.hpp>
@@ -40,6 +42,7 @@ void test_forkexec1() {
   pid_t pid = -1;
   assert(dromozoa::forkexec(path, argv, 0, 0, 0, pid) == 0);
   assert(pid != -1);
+  std::cout << pid << "\n";
   int status;
   assert(waitpid(-1, &status, 0) == pid);
   assert(WIFEXITED(status) && WEXITSTATUS(status) == 0);
@@ -52,6 +55,7 @@ void test_forkexec2() {
   assert(dromozoa::forkexec(path, argv, 0, 0, 0, pid) == -1);
   assert(pid != -1);
   assert(errno == ENOENT);
+  std::cout << pid << "\n";
   int status;
   assert(waitpid(-1, &status, 0) == pid);
   assert(WIFEXITED(status) && WEXITSTATUS(status) == 1);
@@ -72,17 +76,19 @@ void test_forkexec_daemon() {
   assert(kill(pid2, SIGTERM) == 0);
 }
 
-int main(int, char*[]) {
+int main(int argc, char* argv[]) {
   sigset_t mask;
   assert(sigemptyset(&mask) == 0);
   assert(sigaddset(&mask, SIGCHLD) == 0);
   assert(dromozoa::compat_sigmask(SIG_BLOCK, &mask, 0) == 0);
   assert_sigmask();
-  test_forkexec1();
+
+  std::cout << getpid() << "\n";
+  // test_forkexec1();
   assert_sigmask();
   test_forkexec2();
   assert_sigmask();
-  test_forkexec_daemon();
+  // test_forkexec_daemon();
   assert_sigmask();
   return 0;
 }
