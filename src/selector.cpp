@@ -61,7 +61,7 @@ namespace dromozoa {
         return push_error(L);
       }
       selector_impl* s = static_cast<selector_impl*>(lua_newuserdata(L, sizeof(selector_impl)));
-      new(s) selector_impl(fd, size);
+      new(s) selector_impl(fd.release(), size);
       luaL_getmetatable(L, "dromozoa.unix.selector");
       lua_setmetatable(L, -2);
       if (get_log_level() > 2) {

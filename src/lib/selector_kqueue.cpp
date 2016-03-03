@@ -22,7 +22,7 @@
 #include <dromozoa/selector_kqueue.hpp>
 
 namespace dromozoa {
-  int selector_kqueue::open(size_t size, int flags) {
+  int selector_kqueue::open(size_t, int flags) {
     file_descriptor fd(kqueue());
     if (!fd.valid()) {
       return -1;
@@ -35,8 +35,7 @@ namespace dromozoa {
     return fd.release();
   }
 
-  selector_kqueue::selector_kqueue(file_descriptor& fd, size_t size) : result_(-1)  {
-    fd_.swap(fd);
+  selector_kqueue::selector_kqueue(int fd, size_t size) : fd_(fd), result_(-1)  {
     buffer_.resize(size);
   }
 
