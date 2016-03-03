@@ -27,7 +27,6 @@
 #include <dromozoa/pathexec.hpp>
 #include <dromozoa/pipe.hpp>
 #include <dromozoa/sigmask.hpp>
-#include <dromozoa/signal_mask.hpp>
 
 namespace dromozoa {
   namespace {
@@ -125,13 +124,18 @@ namespace dromozoa {
       const int* dup2_stdio,
       pid_t& pid) {
     pid = -1;
-
     std::vector<char> buffer(pathexec_buffer_size(path, argv));
 
-    scoped_signal_mask scoped_mask;
-    if (scoped_mask.block_all_signals() == -1) {
+    sigset_t mask1;
+    sigset_t mask2;
+    if (sigfillset(&mask1) == -1) {
       return -1;
     }
+    if (compat_sigmask(SIG_SETMASK, &mask1, &mask2) == -1) {
+      return -1;
+    }
+    sigmask_saver save_mask(mask2);
+
     int die_fd[] = { -1, -1 };
     if (compat_pipe2(die_fd, O_CLOEXEC) == -1) {
       return -1;
@@ -163,13 +167,18 @@ namespace dromozoa {
       pid_t& pid2) {
     pid1 = -1;
     pid2 = -1;
-
     std::vector<char> buffer(pathexec_buffer_size(path, argv));
 
-    scoped_signal_mask scoped_mask;
-    if (scoped_mask.block_all_signals() == -1) {
+    sigset_t mask1;
+    sigset_t mask2;
+    if (sigfillset(&mask1) == -1) {
       return -1;
     }
+    if (compat_sigmask(SIG_SETMASK, &mask1, &mask2) == -1) {
+      return -1;
+    }
+    sigmask_saver save_mask(mask2);
+
     int die_fd[] = { -1, -1 };
     if (compat_pipe2(die_fd, O_CLOEXEC) == -1) {
       return -1;

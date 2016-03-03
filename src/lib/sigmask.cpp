@@ -22,6 +22,8 @@
 #include <errno.h>
 #include <signal.h>
 
+#include <iostream>
+
 #include <dromozoa/sigmask.hpp>
 #include <dromozoa/strerror.hpp>
 #include <dromozoa/unexpected.hpp>

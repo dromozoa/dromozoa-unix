@@ -16,12 +16,25 @@
 // along with dromozoa-unix.  If not, see <http://www.gnu.org/licenses/>.
 
 #include <assert.h>
+#include <errno.h>
+#include <signal.h>
 #include <stdlib.h>
 #include <sys/wait.h>
 
-#include <dromozoa/forkexec.hpp>
+#include <iostream>
+#include <sstream>
 
-void test_forkexec() {
+#include <dromozoa/forkexec.hpp>
+#include <dromozoa/sigmask.hpp>
+
+void assert_sigmask() {
+  sigset_t mask;
+  assert(dromozoa::compat_sigmask(SIG_BLOCK, 0, &mask) == 0);
+  assert(sigismember(&mask, SIGCHLD));
+  assert(!sigismember(&mask, SIGTERM));
+}
+
+void test_forkexec1() {
   const char* path = getenv("PATH");
   const char* argv[] = { "env", 0 };
   pid_t pid = -1;
@@ -32,7 +45,44 @@ void test_forkexec() {
   assert(WIFEXITED(status) && WEXITSTATUS(status) == 0);
 }
 
+void test_forkexec2() {
+  const char* path = getenv("PATH");
+  const char* argv[] = { "no such command", 0 };
+  pid_t pid = -1;
+  assert(dromozoa::forkexec(path, argv, 0, 0, 0, pid) == -1);
+  assert(pid != -1);
+  assert(errno == ENOENT);
+  int status;
+  assert(waitpid(-1, &status, 0) == pid);
+  assert(WIFEXITED(status) && WEXITSTATUS(status) == 1);
+}
+
+void test_forkexec_daemon() {
+  const char* path = getenv("PATH");
+  const char* argv[] = { "sleep", "42", 0 };
+  pid_t pid1 = -1;
+  pid_t pid2 = -1;
+  assert(dromozoa::forkexec_daemon(path, argv, 0, "/", pid1, pid2) == 0);
+  assert(pid1 != -1);
+  assert(pid2 != -1);
+  std::cout << pid1 << " " << pid2 << "\n";
+  int status;
+  assert(waitpid(-1, &status, 0) == pid1);
+  assert(WIFEXITED(status) && WEXITSTATUS(status) == 0);
+  assert(kill(pid2, SIGTERM) == 0);
+}
+
 int main(int, char*[]) {
-  test_forkexec();
+  sigset_t mask;
+  assert(sigemptyset(&mask) == 0);
+  assert(sigaddset(&mask, SIGCHLD) == 0);
+  assert(dromozoa::compat_sigmask(SIG_BLOCK, &mask, 0) == 0);
+  assert_sigmask();
+  test_forkexec1();
+  assert_sigmask();
+  test_forkexec2();
+  assert_sigmask();
+  test_forkexec_daemon();
+  assert_sigmask();
   return 0;
 }

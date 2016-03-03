@@ -27,6 +27,5 @@ libdromozoa_unix_la_SOURCES = \
 	pathexec.cpp \
 	pipe.cpp \
 	sigmask.cpp \
-	signal_mask.cpp \
 	strerror.cpp \
 	unexpected.cpp
