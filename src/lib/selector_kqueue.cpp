@@ -19,6 +19,7 @@
 #include <fcntl.h>
 
 #include <dromozoa/coe.hpp>
+#include <dromozoa/file_descriptor.hpp>
 #include <dromozoa/selector_kqueue.hpp>
 
 namespace dromozoa {
@@ -107,7 +108,7 @@ namespace dromozoa {
       }
       return 0;
     } else {
-      errno = ERANGE;
+      errno = EINVAL;
       return -1;
     }
   }

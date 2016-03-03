@@ -15,6 +15,7 @@
 // You should have received a copy of the GNU General Public License
 // along with dromozoa-unix.  If not, see <http://www.gnu.org/licenses/>.
 
+#include <errno.h>
 #include <stdlib.h>
 #include <string.h>
 
