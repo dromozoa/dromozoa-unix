@@ -18,12 +18,17 @@
 TESTS = $(check_PROGRAMS)
 
 check_PROGRAMS = \
+	test_argument_vector.exe \
 	test_forkexec.exe \
 	test_pathexec.exe \
 	test_pipe.exe \
 	test_sigmask.exe \
 	test_strerror.exe \
 	test_unexpected.exe
+
+test_argument_vector_exe_CPPFLAGS = -I$(top_srcdir)/include
+test_argument_vector_exe_LDADD = $(top_builddir)/src/lib/libdromozoa-unix.la
+test_argument_vector_exe_SOURCES = test_argument_vector.cpp
 
 test_forkexec_exe_CPPFLAGS = -I$(top_srcdir)/include
 test_forkexec_exe_LDADD = $(top_builddir)/src/lib/libdromozoa-unix.la
