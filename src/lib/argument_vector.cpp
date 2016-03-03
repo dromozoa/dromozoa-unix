@@ -15,28 +15,36 @@
 // You should have received a copy of the GNU General Public License
 // along with dromozoa-unix.  If not, see <http://www.gnu.org/licenses/>.
 
-extern "C" {
-#include <lua.h>
-}
+#include <string>
+#include <vector>
 
-#include "argument_vector.hpp"
+#include <dromozoa/argument_vector.hpp>
 
 namespace dromozoa {
-  argument_vector make_argument_vector(lua_State* L, int n) {
-    argument_vector argv;
-    if (lua_istable(L, n)) {
-      for (int i = 1; ; ++i) {
-        lua_pushinteger(L, i);
-        lua_gettable(L, n);
-        if (const char* p = lua_tostring(L, -1)) {
-          argv.push_back(p);
-          lua_pop(L, 1);
-        } else {
-          lua_pop(L, 1);
-          break;
+  void argument_vector::push_back(const char* value) {
+    str_.push_back(value);
+    ptr_.clear();
+  }
+
+  void argument_vector::push_back(const std::string& value) {
+    str_.push_back(value);
+    ptr_.clear();
+  }
+
+  const char* const* argument_vector::get() {
+    if (str_.empty()) {
+      return 0;
+    } else {
+      if (ptr_.empty()) {
+        ptr_.reserve(str_.size() + 1);
+        std::vector<std::string>::const_iterator i = str_.begin();
+        std::vector<std::string>::const_iterator end = str_.end();
+        for (; i != end; ++i) {
+          ptr_.push_back((*i).c_str());
         }
+        ptr_.push_back(0);
       }
+      return &ptr_[0];
     }
-    return argv;
   }
 }

@@ -15,27 +15,17 @@
 // You should have received a copy of the GNU General Public License
 // along with dromozoa-unix.  If not, see <http://www.gnu.org/licenses/>.
 
-#ifndef DROMOZOA_ARGUMENT_VECTOR_HPP
-#define DROMOZOA_ARGUMENT_VECTOR_HPP
+#ifndef ARGUMENT_VECTOR_HPP
+#define ARGUMENT_VECTOR_HPP
 
 extern "C" {
 #include <lua.h>
 }
 
-#include <string>
-#include <vector>
+#include <dromozoa/argument_vector.hpp>
 
 namespace dromozoa {
-  class argument_vector {
-  public:
-    argument_vector(lua_State* L, int n);
-    const char* const* get() const;
-  private:
-    std::vector<std::string> str_;
-    std::vector<const char*> ptr_;
-    argument_vector(const argument_vector&);
-    argument_vector& operator=(const argument_vector&);
-  };
+  argument_vector make_argument_vector(lua_State* L, int n);
 }
 
 #endif

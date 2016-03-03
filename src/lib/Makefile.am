@@ -20,6 +20,7 @@ noinst_LTLIBRARIES = libdromozoa-unix.la
 libdromozoa_unix_la_CPPFLAGS = -I$(top_srcdir)/include
 libdromozoa_unix_la_LDFLAGS = -static
 libdromozoa_unix_la_SOURCES = \
+	argument_vector.cpp \
 	coe.cpp \
 	file_descriptor.cpp \
 	forkexec.cpp \

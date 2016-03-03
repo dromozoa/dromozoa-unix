@@ -44,8 +44,8 @@ namespace dromozoa {
     int impl_forkexec(lua_State* L) {
       const char* path = luaL_checkstring(L, 2);
       luaL_checktype(L, 3, LUA_TTABLE);
-      argument_vector argv(L, 3);
-      argument_vector envp(L, 4);
+      argument_vector argv = make_argument_vector(L, 3);
+      argument_vector envp = make_argument_vector(L, 4);
       const char* chdir = lua_tostring(L, 5);
       int dup2_stdio[3] = { -1, -1, -1 };
       if (lua_istable(L, 6)) {
@@ -76,8 +76,8 @@ namespace dromozoa {
     int impl_forkexec_daemon(lua_State* L) {
       const char* path = luaL_checkstring(L, 2);
       luaL_checktype(L, 3, LUA_TTABLE);
-      argument_vector argv(L, 3);
-      argument_vector envp(L, 4);
+      argument_vector argv = make_argument_vector(L, 3);
+      argument_vector envp = make_argument_vector(L, 4);
       const char* chdir = lua_tostring(L, 5);
       pid_t pid1 = -1;
       pid_t pid2 = -1;
