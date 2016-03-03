@@ -23,6 +23,7 @@ libdromozoa_unix_la_SOURCES = \
 	coe.cpp \
 	file_descriptor.cpp \
 	forkexec.cpp \
+	lock.cpp \
 	ndelay.cpp \
 	pathexec.cpp \
 	pipe.cpp \

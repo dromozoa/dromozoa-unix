@@ -15,21 +15,14 @@
 // You should have received a copy of the GNU General Public License
 // along with dromozoa-unix.  If not, see <http://www.gnu.org/licenses/>.
 
-#ifdef HAVE_CONFIG_H
-#include "config.h"
-#endif
-
 extern "C" {
 #include <lua.h>
 }
 
-#ifdef HAVE_FLOCK
-#include <sys/file.h>
-#endif
-
 #include <errno.h>
 
-#include "dromozoa/bind.hpp"
+#include <dromozoa/bind.hpp>
+#include <dromozoa/lock.hpp>
 
 #include "error.hpp"
 #include "fd.hpp"
@@ -39,9 +32,8 @@ namespace dromozoa {
   using bind::push_success;
 
   namespace {
-#ifdef HAVE_FLOCK
     int impl_lock_ex(lua_State* L) {
-      if (flock(get_fd(L, 1), LOCK_EX) == -1) {
+      if (lock_ex(get_fd(L, 1)) == -1) {
         return push_error(L);
       } else {
         return push_success(L);
@@ -49,7 +41,7 @@ namespace dromozoa {
     }
 
     int impl_lock_exnb(lua_State* L) {
-      if (flock(get_fd(L, 1), LOCK_EX | LOCK_NB) == -1) {
+      if (lock_exnb(get_fd(L, 1)) == -1) {
         int code = errno;
         if (code == EWOULDBLOCK) {
           return push_resource_unavailable_try_again(L);
@@ -62,13 +54,12 @@ namespace dromozoa {
     }
 
     int impl_lock_un(lua_State* L) {
-      if (flock(get_fd(L, 1), LOCK_UN) == -1) {
+      if (lock_un(get_fd(L, 1)) == -1) {
         return push_error(L);
       } else {
         return push_success(L);
       }
     }
-#endif
   }
 
   void initialize_lock(lua_State* L) {

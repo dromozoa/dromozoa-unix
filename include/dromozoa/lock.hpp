@@ -15,15 +15,13 @@
 // You should have received a copy of the GNU General Public License
 // along with dromozoa-unix.  If not, see <http://www.gnu.org/licenses/>.
 
-#ifndef LOCK_HPP
-#define LOCK_HPP
-
-extern "C" {
-#include <lua.h>
-}
+#ifndef DROMOZOA_LOCK_HPP
+#define DROMOZOA_LOCK_HPP
 
 namespace dromozoa {
-  void initialize_lock(lua_State* L);
+  int lock_ex(int fd);
+  int lock_exnb(int fd);
+  int lock_un(int fd);
 }
 
 #endif
