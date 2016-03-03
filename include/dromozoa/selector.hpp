@@ -15,16 +15,28 @@
 // You should have received a copy of the GNU General Public License
 // along with dromozoa-unix.  If not, see <http://www.gnu.org/licenses/>.
 
-#ifndef SELECTOR_HPP
-#define SELECTOR_HPP
+#ifndef DROMOZOA_SELECTOR_HPP
+#define DROMOZOA_SELECTOR_HPP
 
-extern "C" {
-#include <lua.h>
-}
+#include <time.h>
 
 namespace dromozoa {
-  int open_selector(int size, int flags);
-  int open_selector(lua_State* L);
+  enum {
+    SELECTOR_READ = 1,
+    SELECTOR_WRITE = 2,
+  };
+
+  class selector {
+  public:
+    virtual ~selector() = 0;
+    virtual int close() = 0;
+    virtual bool valid() const = 0;
+    virtual int add(int fd, int event) = 0;
+    virtual int mod(int fd, int event) = 0;
+    virtual int del(int fd) = 0;
+    virtual int select(const struct timespec* timeout) = 0;
+    virtual int event(int i, int& fd, int& event) const = 0;
+  };
 }
 
 #endif

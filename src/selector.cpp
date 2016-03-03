@@ -29,16 +29,18 @@ extern "C" {
 
 #include <iostream>
 
-#include "dromozoa/bind.hpp"
+#include <dromozoa/bind.hpp>
+#include <dromozoa/selector.hpp>
 
 #include "error.hpp"
 #include "fd.hpp"
 #include "selector.hpp"
 
 #if defined(HAVE_EPOLL_CREATE) || defined(HAVE_EPOLL_CREATE1)
-#include "selector_epoll.hpp"
+#include <dromozoa/selector_epoll.hpp>
 #elif defined(HAVE_KQUEUE)
-#include "selector_kqueue.hpp"
+#include <dromozoa/selector_kqueue.hpp>
+typedef dromozoa::selector_kqueue selector_impl;
 #endif
 
 namespace dromozoa {
@@ -52,14 +54,14 @@ namespace dromozoa {
     }
 
     int impl_new(lua_State* L) {
-      int size = luaL_checkinteger(L, 2);
+      size_t size = luaL_checkinteger(L, 2);
       int flags = luaL_optinteger(L, 3, 0);
-      int fd = open_selector(size, flags);
-      if (fd == -1) {
+      file_descriptor fd(selector_impl::open(size, flags));
+      if (!fd.valid()) {
         return push_error(L);
       }
-      selector* s = static_cast<selector*>(lua_newuserdata(L, sizeof(selector)));
-      new(s) selector(fd, size);
+      selector_impl* s = static_cast<selector_impl*>(lua_newuserdata(L, sizeof(selector_impl)));
+      new(s) selector_impl(fd, size);
       luaL_getmetatable(L, "dromozoa.unix.selector");
       lua_setmetatable(L, -2);
       if (get_log_level() > 2) {
@@ -70,7 +72,7 @@ namespace dromozoa {
 
     int impl_gc(lua_State* L) {
       selector& s = get_selector(L, 1);
-      if (s.get() != -1) {
+      if (s.valid()) {
         if (get_log_level() > 1) {
           std::cerr << "[dromozoa-unix] selector " << &s << " detected" << std::endl;
         }
@@ -93,7 +95,7 @@ namespace dromozoa {
 
     int impl_close(lua_State* L) {
       selector& s = get_selector(L, 1);
-      if (s.get() != -1) {
+      if (s.valid()) {
         if (get_log_level() > 2) {
           std::cerr << "[dromozoa-unix] close selector " << &s << std::endl;
         }
@@ -107,10 +109,10 @@ namespace dromozoa {
       }
     }
 
-    int impl_get(lua_State* L) {
-      lua_pushinteger(L, get_selector(L, 1).get());
-      return 1;
-    }
+    // int impl_get(lua_State* L) {
+    //   lua_pushinteger(L, get_selector(L, 1).get());
+    //   return 1;
+    // }
 
     int impl_add(lua_State* L) {
       int fd = get_fd(L, 2);
@@ -185,7 +187,7 @@ namespace dromozoa {
   int open_selector(lua_State* L) {
     lua_newtable(L);
     function<impl_close>::set_field(L, "close");
-    function<impl_get>::set_field(L, "get");
+    // function<impl_get>::set_field(L, "get");
     function<impl_add>::set_field(L, "add");
     function<impl_mod>::set_field(L, "mod");
     function<impl_del>::set_field(L, "del");

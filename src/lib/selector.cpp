@@ -15,16 +15,8 @@
 // You should have received a copy of the GNU General Public License
 // along with dromozoa-unix.  If not, see <http://www.gnu.org/licenses/>.
 
-#ifndef SELECTOR_HPP
-#define SELECTOR_HPP
-
-extern "C" {
-#include <lua.h>
-}
+#include <dromozoa/selector.hpp>
 
 namespace dromozoa {
-  int open_selector(int size, int flags);
-  int open_selector(lua_State* L);
+  selector::~selector() {}
 }
-
-#endif

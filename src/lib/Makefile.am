@@ -28,6 +28,14 @@ libdromozoa_unix_la_SOURCES = \
 	ndelay.cpp \
 	pathexec.cpp \
 	pipe.cpp \
+	selector.cpp \
 	sigmask.cpp \
 	strerror.cpp \
 	unexpected.cpp
+
+if HAVE_EPOLL
+libdromozoa_unix_la_SOURCES += selector_epoll.cpp
+endif
+if HAVE_KQUEUE
+libdromozoa_unix_la_SOURCES += selector_kqueue.cpp
+endif

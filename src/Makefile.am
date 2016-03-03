@@ -30,8 +30,6 @@ noinst_HEADERS = \
 	process.hpp \
 	read.hpp \
 	selector.hpp \
-	selector_epoll.hpp \
-	selector_kqueue.hpp \
 	selfpipe.hpp \
 	signal.hpp \
 	sockaddr.hpp \
@@ -80,10 +78,3 @@ unix_la_SOURCES = \
 	unistd.cpp \
 	write.cpp \
 	module.cpp
-
-if HAVE_EPOLL
-unix_la_SOURCES += selector_epoll.cpp
-endif
-if HAVE_KQUEUE
-unix_la_SOURCES += selector_kqueue.cpp
-endif
