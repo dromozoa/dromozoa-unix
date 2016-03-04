@@ -22,8 +22,8 @@ unix.set_raise_error(true)
 
 local PATH = os.getenv("PATH")
 
-unix.process():forkexec(PATH, { arg[-1], "test/lock.lua" })
-unix.process():forkexec(PATH, { arg[-1], "test/lock.lua" })
+unix.process():forkexec(PATH, { arg[-1], "test/lua/lock.lua" })
+unix.process():forkexec(PATH, { arg[-1], "test/lua/lock.lua" })
 
 unix.wait()
 unix.wait()

@@ -17,27 +17,7 @@
 
 local unix = require "dromozoa.unix"
 
-assert(unix.selfpipe.install())
+unix.set_raise_error(true)
 
-local path = os.getenv("PATH")
-local envp = unix.environ()
-
-local reader, writer = unix.pipe(unix.O_CLOEXEC)
-
-assert(unix.block_signal(unix.SIGCHLD))
-local pid1 = assert(unix.process():forkexec(path, { arg[-1], "test/unix_server.lua" }, envp, nil, { [1] = writer }))[1]
-local abstract = assert(reader:read(256))
--- print(abstract)
-
-local pid2 = assert(unix.process():forkexec(path, { arg[-1], "test/unix_client.lua", abstract }, envp, nil, {}))[1]
-
-assert(unix.unblock_signal(unix.SIGCHLD))
-unix.selfpipe.read()
-assert(unix.block_signal(unix.SIGCHLD))
-
-local result = assert(unix.wait())
-assert(result == pid1 or result == pid2)
-local result = assert(unix.wait())
-assert(result == pid1 or result == pid2)
-
-assert(unix.selfpipe.uninstall())
+local pid = assert(unix.process():forkexec(os.getenv("PATH"), { arg[-1], "test/lua/pathexec.lua", "ls", "-l" }))[1]
+assert(unix.wait() == pid)
