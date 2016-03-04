@@ -69,6 +69,38 @@ namespace dromozoa {
         return code;
       }
 
+      int open_pid() {
+        int pid_fd[] = { -1, -1 };
+        if (compat_pipe2(pid_fd, O_CLOEXEC) == -1) {
+          return -1;
+        }
+        file_descriptor(pid_fd[0]).swap(pid_fd0_);
+        file_descriptor(pid_fd[1]).swap(pid_fd1_);
+        return 0;
+      }
+
+      int close_pid_reader() {
+        return pid_fd0_.close();
+      }
+
+      int close_pid_writer() {
+        return pid_fd1_.close();
+      }
+
+      void write_pid(pid_t pid) {
+        write(pid_fd1_.get(), &pid, sizeof(pid));
+        pid_fd1_.close();
+        this->~forkexec_impl2();
+        _exit(0);
+      }
+
+      pid_t read_pid() {
+        pid_t pid = -1;
+        read(pid_fd0_.get(), &pid, sizeof(pid));
+        pid_fd0_.close();
+        return pid;
+      }
+
       void forkexec(
           const char* path,
           const char* const* argv,
@@ -133,6 +165,8 @@ namespace dromozoa {
       std::vector<char> buffer_;
       file_descriptor die_fd0_;
       file_descriptor die_fd1_;
+      file_descriptor pid_fd0_;
+      file_descriptor pid_fd1_;
       file_descriptor null_fd_;
     };
 
@@ -231,8 +265,6 @@ namespace dromozoa {
     pid = -1;
     forkexec_impl2 forkexec_impl(path, argv);
 
-    // std::vector<char> buffer(pathexec_buffer_size(path, argv));
-
     sigset_t mask1;
     sigset_t mask2;
     if (sigfillset(&mask1) == -1) {
@@ -243,14 +275,9 @@ namespace dromozoa {
     }
     sigmask_saver save_mask(mask2);
 
-    // int die_fd[] = { -1, -1 };
-    // if (compat_pipe2(die_fd, O_CLOEXEC) == -1) {
-    //   return -1;
-    // }
-    // file_descriptor die_fd0(die_fd[0]);
-    // file_descriptor die_fd1(die_fd[1]);
-
-    forkexec_impl.open_die();
+    if (forkexec_impl.open_die() == -1) {
+      return -1;
+    }
 
     pid = fork();
     if (pid == -1) {
@@ -258,11 +285,8 @@ namespace dromozoa {
     } else if (pid == 0) {
       forkexec_impl.close_die_reader();
       forkexec_impl.forkexec(path, argv, envp, chdir, dup2_stdio, false);
-      // die_fd0.close();
-      // forkexec_impl(path, argv, envp, chdir, dup2_stdio, false, die_fd1, &buffer[0], buffer.size());
     }
     forkexec_impl.close_die_writer();
-    // die_fd1.close();
 
     int code = forkexec_impl.read_die();
     if (code == 0) {
@@ -282,7 +306,7 @@ namespace dromozoa {
       pid_t& pid2) {
     pid1 = -1;
     pid2 = -1;
-    std::vector<char> buffer(pathexec_buffer_size(path, argv));
+    forkexec_impl2 forkexec_impl(path, argv);
 
     sigset_t mask1;
     sigset_t mask2;
@@ -294,48 +318,36 @@ namespace dromozoa {
     }
     sigmask_saver save_mask(mask2);
 
-    int die_fd[] = { -1, -1 };
-    if (compat_pipe2(die_fd, O_CLOEXEC) == -1) {
+    if (forkexec_impl.open_die() == -1) {
       return -1;
     }
-    file_descriptor die_fd0(die_fd[0]);
-    file_descriptor die_fd1(die_fd[1]);
-
-    int pid_fd[] = { -1, -1 };
-    if (compat_pipe2(pid_fd, O_CLOEXEC) == -1) {
+    if (forkexec_impl.open_pid() == -1) {
       return -1;
     }
-    file_descriptor pid_fd0(pid_fd[0]);
-    file_descriptor pid_fd1(pid_fd[1]);
 
     pid1 = fork();
     if (pid1 == -1) {
       return -1;
     } else if (pid1 == 0) {
-      die_fd0.close();
-      pid_fd0.close();
+      forkexec_impl.close_die_reader();
+      forkexec_impl.close_pid_reader();
       if (setsid() == -1) {
-        pid_fd1.close();
-        die(die_fd1);
+        forkexec_impl.die();
       }
-      pid_t pid = fork();
-      if (pid == -1) {
-        pid_fd1.close();
-        die(die_fd1);
-      } else if (pid == 0) {
-        pid_fd1.close();
-        forkexec_impl(path, argv, envp, chdir, 0, true, die_fd1, &buffer[0], buffer.size());
+      pid_t pid2 = fork();
+      if (pid2 == -1) {
+        forkexec_impl.die();
+      } else if (pid2 == 0) {
+        forkexec_impl.close_pid_writer();
+        forkexec_impl.forkexec(path, argv, envp, chdir, 0, true);
       }
-      write(pid_fd[1], &pid, sizeof(pid));
-      die_fd1.close();
-      pid_fd1.close();
-      _exit(0);
+      forkexec_impl.write_pid(pid2);
     }
-    die_fd1.close();
-    pid_fd1.close();
+    forkexec_impl.close_die_writer();
+    forkexec_impl.close_pid_writer();
 
-    int code = read_die(die_fd0);
-    pid2 = read_pid(pid_fd0);
+    int code = forkexec_impl.read_die();
+    pid2 = forkexec_impl.read_pid();
     if (code == 0) {
       return 0;
     } else {
