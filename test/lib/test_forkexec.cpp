@@ -76,7 +76,7 @@ void test_forkexec_daemon() {
   assert(kill(pid2, SIGTERM) == 0);
 }
 
-int main(int argc, char* argv[]) {
+int main(int, char*[]) {
   sigset_t mask;
   assert(sigemptyset(&mask) == 0);
   assert(sigaddset(&mask, SIGCHLD) == 0);
@@ -84,11 +84,11 @@ int main(int argc, char* argv[]) {
   assert_sigmask();
 
   std::cout << getpid() << "\n";
-  // test_forkexec1();
+  test_forkexec1();
   assert_sigmask();
   test_forkexec2();
   assert_sigmask();
-  // test_forkexec_daemon();
+  test_forkexec_daemon();
   assert_sigmask();
   return 0;
 }

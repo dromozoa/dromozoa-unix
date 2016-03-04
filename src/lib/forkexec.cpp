@@ -87,7 +87,7 @@ namespace dromozoa {
         return pid_fd1_.close();
       }
 
-      void write_pid(pid_t pid) {
+      void quit(pid_t pid) {
         write(pid_fd1_.get(), &pid, sizeof(pid));
         pid_fd1_.close();
         this->~forkexec_impl2();
@@ -257,7 +257,7 @@ namespace dromozoa {
         forkexec_impl.close_pid_writer();
         forkexec_impl.forkexec(path, argv, envp, chdir, 0, true);
       }
-      forkexec_impl.write_pid(pid2);
+      forkexec_impl.quit(pid2);
     }
     forkexec_impl.close_die_writer();
     forkexec_impl.close_pid_writer();
