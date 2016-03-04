@@ -18,7 +18,6 @@
 #include <errno.h>
 #include <fcntl.h>
 #include <signal.h>
-#include <stddef.h>
 #include <unistd.h>
 
 #include <vector>
@@ -31,10 +30,9 @@
 
 namespace dromozoa {
   namespace {
-    class forkexec_impl2 {
+    class forkexec_impl {
     public:
-      forkexec_impl2(const char* path, const char* const* argv)
-        : buffer_(pathexec_buffer_size(path, argv)) {}
+      forkexec_impl(const char* path, const char* const* argv) : buffer_(pathexec_buffer_size(path, argv)) {}
 
       int open_die() {
         int die_fd[] = { -1, -1 };
@@ -58,7 +56,7 @@ namespace dromozoa {
         int code = errno;
         write(die_fd1_.get(), &code, sizeof(code));
         die_fd1_.close();
-        this->~forkexec_impl2();
+        this->~forkexec_impl();
         _exit(1);
       }
 
@@ -90,7 +88,7 @@ namespace dromozoa {
       void quit(pid_t pid) {
         write(pid_fd1_.get(), &pid, sizeof(pid));
         pid_fd1_.close();
-        this->~forkexec_impl2();
+        this->~forkexec_impl();
         _exit(0);
       }
 
@@ -169,6 +167,17 @@ namespace dromozoa {
       file_descriptor pid_fd1_;
       file_descriptor null_fd_;
     };
+
+    int block_all_signals(sigset_t& old_mask) {
+      sigset_t new_mask;
+      if (sigfillset(&new_mask) == -1) {
+        return -1;
+      }
+      if (compat_sigmask(SIG_BLOCK, &new_mask, &old_mask) == -1) {
+        return -1;
+      }
+      return 0;
+    }
   }
 
   int forkexec(
@@ -179,17 +188,13 @@ namespace dromozoa {
       const int* dup2_stdio,
       pid_t& pid) {
     pid = -1;
-    forkexec_impl2 forkexec_impl(path, argv);
+    forkexec_impl forkexec_impl(path, argv);
 
-    sigset_t mask1;
-    sigset_t mask2;
-    if (sigfillset(&mask1) == -1) {
+    sigset_t mask;
+    if (block_all_signals(mask) == -1) {
       return -1;
     }
-    if (compat_sigmask(SIG_SETMASK, &mask1, &mask2) == -1) {
-      return -1;
-    }
-    sigmask_saver save_mask(mask2);
+    sigmask_saver save_mask(mask);
 
     if (forkexec_impl.open_die() == -1) {
       return -1;
@@ -222,17 +227,13 @@ namespace dromozoa {
       pid_t& pid2) {
     pid1 = -1;
     pid2 = -1;
-    forkexec_impl2 forkexec_impl(path, argv);
+    forkexec_impl forkexec_impl(path, argv);
 
-    sigset_t mask1;
-    sigset_t mask2;
-    if (sigfillset(&mask1) == -1) {
+    sigset_t mask;
+    if (block_all_signals(mask) == -1) {
       return -1;
     }
-    if (compat_sigmask(SIG_SETMASK, &mask1, &mask2) == -1) {
-      return -1;
-    }
-    sigmask_saver save_mask(mask2);
+    sigmask_saver save_mask(mask);
 
     if (forkexec_impl.open_die() == -1) {
       return -1;
@@ -250,14 +251,14 @@ namespace dromozoa {
       if (setsid() == -1) {
         forkexec_impl.die();
       }
-      pid_t pid2 = fork();
-      if (pid2 == -1) {
+      pid_t pid = fork();
+      if (pid == -1) {
         forkexec_impl.die();
-      } else if (pid2 == 0) {
+      } else if (pid == 0) {
         forkexec_impl.close_pid_writer();
         forkexec_impl.forkexec(path, argv, envp, chdir, 0, true);
       }
-      forkexec_impl.quit(pid2);
+      forkexec_impl.quit(pid);
     }
     forkexec_impl.close_die_writer();
     forkexec_impl.close_pid_writer();

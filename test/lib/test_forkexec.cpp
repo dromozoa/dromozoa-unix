@@ -61,7 +61,7 @@ void test_forkexec2() {
   assert(WIFEXITED(status) && WEXITSTATUS(status) == 1);
 }
 
-void test_forkexec_daemon() {
+void test_forkexec_daemon1() {
   const char* path = getenv("PATH");
   const char* argv[] = { "sleep", "42", 0 };
   pid_t pid1 = -1;
@@ -76,6 +76,21 @@ void test_forkexec_daemon() {
   assert(kill(pid2, SIGTERM) == 0);
 }
 
+void test_forkexec_daemon2() {
+  const char* path = getenv("PATH");
+  const char* argv[] = { "no such command", 0 };
+  pid_t pid1 = -1;
+  pid_t pid2 = -1;
+  assert(dromozoa::forkexec_daemon(path, argv, 0, "/", pid1, pid2) == -1);
+  assert(pid1 != -1);
+  assert(pid2 != -1);
+  assert(errno = ENOENT);
+  std::cout << pid1 << " " << pid2 << "\n";
+  int status;
+  assert(waitpid(-1, &status, 0) == pid1);
+  assert(WIFEXITED(status) && WEXITSTATUS(status) == 0);
+}
+
 int main(int, char*[]) {
   sigset_t mask;
   assert(sigemptyset(&mask) == 0);
@@ -88,7 +103,9 @@ int main(int, char*[]) {
   assert_sigmask();
   test_forkexec2();
   assert_sigmask();
-  test_forkexec_daemon();
+  test_forkexec_daemon1();
+  assert_sigmask();
+  test_forkexec_daemon2();
   assert_sigmask();
   return 0;
 }
