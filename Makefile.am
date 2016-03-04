@@ -16,7 +16,7 @@
 # along with dromozoa-unix.  If not, see <http://www.gnu.org/licenses/>.
 
 ACLOCAL_AMFLAGS = -I m4
-SUBDIRS = bind src/lib src test/lib
+SUBDIRS = bind src/lib src/lua test/lib
 
 EXTRA_DIST = \
 	.gitignore \
