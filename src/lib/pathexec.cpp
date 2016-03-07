@@ -16,7 +16,6 @@
 // along with dromozoa-unix.  If not, see <http://www.gnu.org/licenses/>.
 
 #include <errno.h>
-#include <stddef.h>
 #include <unistd.h>
 
 #include <dromozoa/pathexec.hpp>

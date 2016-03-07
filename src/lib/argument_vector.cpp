@@ -15,9 +15,6 @@
 // You should have received a copy of the GNU General Public License
 // along with dromozoa-unix.  If not, see <http://www.gnu.org/licenses/>.
 
-#include <string>
-#include <vector>
-
 #include <dromozoa/argument_vector.hpp>
 
 namespace dromozoa {
