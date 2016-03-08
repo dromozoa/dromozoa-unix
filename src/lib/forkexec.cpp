@@ -32,8 +32,6 @@ namespace dromozoa {
   namespace {
     class forkexec_impl {
     public:
-      forkexec_impl(const char* path, const char* const* argv) : buffer_(pathexec_buffer_size(path, argv)) {}
-
       int open_die() {
         int die_fd[] = { -1, -1 };
         if (compat_pipe2(die_fd, O_CLOEXEC) == -1) {
@@ -105,7 +103,9 @@ namespace dromozoa {
           const char* const* envp,
           const char* chdir,
           const int* dup2_stdio,
-          bool dup2_null) {
+          bool dup2_null,
+          char* buffer,
+          size_t size) {
         if (chdir) {
           if (::chdir(chdir) == -1) {
             die();
@@ -155,12 +155,11 @@ namespace dromozoa {
           die();
         }
 
-        pathexec(path, argv, envp, &buffer_[0], buffer_.size());
+        pathexec(path, argv, envp, buffer, size);
         die();
       }
 
     private:
-      std::vector<char> buffer_;
       file_descriptor die_fd0_;
       file_descriptor die_fd1_;
       file_descriptor pid_fd0_;
@@ -188,7 +187,8 @@ namespace dromozoa {
       const int* dup2_stdio,
       pid_t& pid) {
     pid = -1;
-    forkexec_impl forkexec_impl(path, argv);
+    std::vector<char> buffer(pathexec_buffer_size(path, argv));
+    forkexec_impl forkexec_impl;
 
     sigset_t mask;
     if (block_all_signals(mask) == -1) {
@@ -205,7 +205,7 @@ namespace dromozoa {
       return -1;
     } else if (pid == 0) {
       forkexec_impl.close_die_reader();
-      forkexec_impl.forkexec(path, argv, envp, chdir, dup2_stdio, false);
+      forkexec_impl.forkexec(path, argv, envp, chdir, dup2_stdio, false, &buffer[0], buffer.size());
     }
     forkexec_impl.close_die_writer();
 
@@ -227,7 +227,8 @@ namespace dromozoa {
       pid_t& pid2) {
     pid1 = -1;
     pid2 = -1;
-    forkexec_impl forkexec_impl(path, argv);
+    std::vector<char> buffer(pathexec_buffer_size(path, argv));
+    forkexec_impl forkexec_impl;
 
     sigset_t mask;
     if (block_all_signals(mask) == -1) {
@@ -256,7 +257,7 @@ namespace dromozoa {
         forkexec_impl.die();
       } else if (pid == 0) {
         forkexec_impl.close_pid_writer();
-        forkexec_impl.forkexec(path, argv, envp, chdir, 0, true);
+        forkexec_impl.forkexec(path, argv, envp, chdir, 0, true, &buffer[0], buffer.size());
       }
       forkexec_impl.quit(pid);
     }
