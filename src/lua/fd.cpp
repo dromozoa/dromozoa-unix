@@ -87,11 +87,7 @@ namespace dromozoa {
     int impl_close(lua_State* L) {
       int result = -1;
       if (lua_isuserdata(L, 1)) {
-        file_descriptor* data = static_cast<file_descriptor*>(luaL_testudata(L, 1, "dromozoa.unix.fd.ref"));
-        if (!data) {
-          data = static_cast<file_descriptor*>(luaL_checkudata(L, 1, "dromozoa.unix.fd"));
-        }
-        result = data->close();
+        result = get_file_descriptor(L, 1)->close();
       } else {
         result = file_descriptor(luaL_checkinteger(L, 1)).close();
       }
@@ -103,11 +99,7 @@ namespace dromozoa {
     }
 
     int impl_gc(lua_State* L) {
-      file_descriptor* data = static_cast<file_descriptor*>(luaL_testudata(L, 1, "dromozoa.unix.fd.ref"));
-      if (!data) {
-        data = static_cast<file_descriptor*>(luaL_checkudata(L, 1, "dromozoa.unix.fd"));
-      }
-      data->~file_descriptor();
+      get_file_descriptor(L, 1)->~file_descriptor();
       return 0;
     }
   }

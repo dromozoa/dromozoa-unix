@@ -147,11 +147,7 @@ namespace dromozoa {
           null_fd_.close();
         }
 
-        sigset_t mask;
-        if (sigemptyset(&mask) == -1) {
-          die();
-        }
-        if (compat_sigmask(SIG_SETMASK, &mask, 0) == -1) {
+        if (sigmask_unblock_all_signals() == -1) {
           die();
         }
 
@@ -166,17 +162,6 @@ namespace dromozoa {
       file_descriptor pid_fd1_;
       file_descriptor null_fd_;
     };
-
-    int block_all_signals(sigset_t& old_mask) {
-      sigset_t new_mask;
-      if (sigfillset(&new_mask) == -1) {
-        return -1;
-      }
-      if (compat_sigmask(SIG_BLOCK, &new_mask, &old_mask) == -1) {
-        return -1;
-      }
-      return 0;
-    }
   }
 
   int forkexec(
@@ -191,7 +176,7 @@ namespace dromozoa {
     forkexec_impl forkexec_impl;
 
     sigset_t mask;
-    if (block_all_signals(mask) == -1) {
+    if (sigmask_block_all_signals(&mask) == -1) {
       return -1;
     }
     sigmask_saver save_mask(mask);
@@ -231,7 +216,7 @@ namespace dromozoa {
     forkexec_impl forkexec_impl;
 
     sigset_t mask;
-    if (block_all_signals(mask) == -1) {
+    if (sigmask_block_all_signals(&mask) == -1) {
       return -1;
     }
     sigmask_saver save_mask(mask);

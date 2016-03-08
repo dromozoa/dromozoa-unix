@@ -39,6 +39,28 @@ namespace dromozoa {
   }
 #endif
 
+  int sigmask_block_all_signals(sigset_t* old_mask) {
+    sigset_t new_mask;
+    if (sigfillset(&new_mask) == -1) {
+      return -1;
+    }
+    if (compat_sigmask(SIG_SETMASK, &new_mask, old_mask) == -1) {
+      return -1;
+    }
+    return 0;
+  }
+
+  int sigmask_unblock_all_signals(sigset_t* old_mask) {
+    sigset_t new_mask;
+    if (sigemptyset(&new_mask) == -1) {
+      return -1;
+    }
+    if (compat_sigmask(SIG_SETMASK, &new_mask, old_mask) == -1) {
+      return -1;
+    }
+    return 0;
+  }
+
   sigmask_saver::sigmask_saver(const sigset_t& mask) : mask_(mask) {}
 
   sigmask_saver::~sigmask_saver() {

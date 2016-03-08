@@ -20,7 +20,7 @@
 
 #include <dromozoa/sigmask.hpp>
 
-int main(int, char*[]) {
+void test_sigmask1() {
   sigset_t mask1;
   sigset_t mask2;
   sigemptyset(&mask1);
@@ -38,5 +38,18 @@ int main(int, char*[]) {
 
   assert(sigismember(&mask1, SIGCHLD));
   assert(!sigismember(&mask2, SIGCHLD));
+}
+
+void test_sigmask2() {
+  sigset_t mask;
+  assert(dromozoa::sigmask_block_all_signals(&mask) != -1);
+  assert(!sigismember(&mask, SIGCHLD));
+  assert(dromozoa::sigmask_unblock_all_signals(&mask) != -1);
+  assert(sigismember(&mask, SIGCHLD));
+}
+
+int main(int, char*[]) {
+  test_sigmask1();
+  test_sigmask2();
   return 0;
 }
