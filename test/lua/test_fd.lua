@@ -28,7 +28,7 @@ do
   local reader, writer = unix.pipe()
   fd = { reader:coe():ndelay_on():get(), writer:get() }
   assert(reader:close())
-  assert(reader:close())
+  assert(reader:close() == nil)
 end
 collectgarbage()
 collectgarbage()
