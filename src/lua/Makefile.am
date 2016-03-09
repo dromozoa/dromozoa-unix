@@ -19,7 +19,6 @@ noinst_HEADERS = \
 	argument_vector.hpp \
 	error.hpp \
 	fd.hpp \
-	lock.hpp \
 	ndelay.hpp \
 	netdb.hpp \
 	netinet.hpp \

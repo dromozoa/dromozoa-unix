@@ -15,22 +15,13 @@
 // You should have received a copy of the GNU General Public License
 // along with dromozoa-unix.  If not, see <http://www.gnu.org/licenses/>.
 
-extern "C" {
-#include <lua.h>
-}
-
 #include <errno.h>
 
-#include <dromozoa/bind.hpp>
 #include <dromozoa/lock.hpp>
 
-#include "error.hpp"
-#include "fd.hpp"
+#include "common.hpp"
 
 namespace dromozoa {
-  using bind::function;
-  using bind::push_success;
-
   namespace {
     int impl_lock_ex(lua_State* L) {
       if (lock_ex(get_fd(L, 1)) == -1) {
