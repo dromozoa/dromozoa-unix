@@ -26,6 +26,7 @@
 #include <dromozoa/file_descriptor.hpp>
 #include <dromozoa/ndelay.hpp>
 #include <dromozoa/pipe.hpp>
+#include <dromozoa/sigmask.hpp>
 
 namespace dromozoa {
 #ifdef HAVE_PIPE2
@@ -34,12 +35,19 @@ namespace dromozoa {
   }
 #else
   int compat_pipe2(int pipe_fd[2], int flags) {
+    sigset_t mask;
+    if (sigmask_block_all_signals(&mask)) {
+      return -1;
+    }
+    sigmask_saver save_mask(mask);
+
     int fd[2] = { -1, -1 };
     if (pipe(fd) == -1) {
       return -1;
     }
     file_descriptor fd0(fd[0]);
     file_descriptor fd1(fd[1]);
+
     if (flags & O_CLOEXEC) {
       if (coe(fd0.get()) == -1) {
         return -1;
@@ -48,6 +56,7 @@ namespace dromozoa {
         return -1;
       }
     }
+
     if (flags & O_NONBLOCK) {
       if (ndelay_on(fd0.get()) == -1) {
         return -1;
@@ -56,6 +65,7 @@ namespace dromozoa {
         return -1;
       }
     }
+
     pipe_fd[0] = fd0.release();
     pipe_fd[1] = fd1.release();
     return 0;
