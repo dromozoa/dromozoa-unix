@@ -23,6 +23,7 @@ extern "C" {
 #include <unistd.h>
 
 #include <iostream>
+#include <new>
 
 #include <dromozoa/bind.hpp>
 #include <dromozoa/file_descriptor.hpp>

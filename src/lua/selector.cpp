@@ -28,6 +28,7 @@ extern "C" {
 #include <time.h>
 
 #include <iostream>
+#include <new>
 
 #include <dromozoa/bind.hpp>
 #include <dromozoa/selector.hpp>

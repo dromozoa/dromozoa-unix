@@ -25,24 +25,19 @@ extern "C" {
 #include <sys/socket.h>
 #include <sys/un.h>
 
-#include "dromozoa/bind.hpp"
+#include <new>
+
+#include <dromozoa/bind.hpp>
+#include <dromozoa/socket_address.hpp>
 
 #include "sockaddr.hpp"
 
 namespace dromozoa {
   using bind::function;
 
-  namespace {
-    struct socket_address {
-      socklen_t size;
-      struct sockaddr address[1];
-    };
-  }
-
   int new_sockaddr(lua_State* L, const struct sockaddr* address, socklen_t size) {
-    socket_address* data = static_cast<socket_address*>(lua_newuserdata(L, offsetof(socket_address, address) + size));
-    data->size = size;
-    memcpy(data->address, address, size);
+    socket_address* data = static_cast<socket_address*>(lua_newuserdata(L, sizeof(socket_address)));
+    new(data) socket_address(address, size);
     luaL_getmetatable(L, "dromozoa.unix.sockaddr");
     lua_setmetatable(L, -2);
     return 1;
@@ -50,18 +45,18 @@ namespace dromozoa {
 
   const sockaddr* get_sockaddr(lua_State* L, int n, socklen_t& size) {
     socket_address* data = static_cast<socket_address*>(luaL_checkudata(L, n, "dromozoa.unix.sockaddr"));
-    size = data->size;
-    return data->address;
+    size = data->size();
+    return data->get();
   }
 
   namespace {
     namespace {
       socklen_t get_size(lua_State* L, int n) {
-        return static_cast<const socket_address*>(luaL_checkudata(L, n, "dromozoa.unix.sockaddr"))->size;
+        return static_cast<const socket_address*>(luaL_checkudata(L, n, "dromozoa.unix.sockaddr"))->size();
       }
 
       const struct sockaddr* get_address(lua_State* L, int n) {
-        return static_cast<const socket_address*>(luaL_checkudata(L, n, "dromozoa.unix.sockaddr"))->address;
+        return static_cast<const socket_address*>(luaL_checkudata(L, n, "dromozoa.unix.sockaddr"))->get();
       }
     }
 
