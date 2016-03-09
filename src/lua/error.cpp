@@ -75,12 +75,6 @@ namespace dromozoa {
     return 3;
   }
 
-  void print_error(std::ostream& out, int code) {
-    int save = errno;
-    out << compat_strerror(code);
-    errno = save;
-  }
-
   namespace {
     int impl_strerror(lua_State* L) {
       int save = errno;

@@ -73,47 +73,18 @@ namespace dromozoa {
 
     int impl_gc(lua_State* L) {
       selector& s = get_selector(L, 1);
-      if (s.valid()) {
-        if (get_log_level() > 1) {
-          std::cerr << "[dromozoa-unix] selector " << &s << " detected" << std::endl;
-        }
-        if (s.close() == -1) {
-          int code = errno;
-          if (get_log_level() > 0) {
-            std::cerr << "[dromozoa-unix] cannot close selector " << &s << ": ";
-            print_error(std::cerr, code);
-            std::cerr << std::endl;
-          }
-        } else {
-          if (get_log_level() > 2) {
-            std::cerr << "[dromozoa-unix] delete selector " << &s << std::endl;
-          }
-        }
-      }
       s.~selector();
       return 0;
     }
 
     int impl_close(lua_State* L) {
       selector& s = get_selector(L, 1);
-      if (s.valid()) {
-        if (get_log_level() > 2) {
-          std::cerr << "[dromozoa-unix] close selector " << &s << std::endl;
-        }
-        if (s.close() == -1) {
-          return push_error(L);
-        } else {
-          return push_success(L);
-        }
+      if (s.close() == -1) {
+        return push_error(L);
       } else {
         return push_success(L);
       }
     }
-
-    // int impl_get(lua_State* L) {
-    //   lua_pushinteger(L, get_selector(L, 1).get());
-    //   return 1;
-    // }
 
     int impl_add(lua_State* L) {
       int fd = get_fd(L, 2);
@@ -188,7 +159,6 @@ namespace dromozoa {
   int open_selector(lua_State* L) {
     lua_newtable(L);
     function<impl_close>::set_field(L, "close");
-    // function<impl_get>::set_field(L, "get");
     function<impl_add>::set_field(L, "add");
     function<impl_mod>::set_field(L, "mod");
     function<impl_del>::set_field(L, "del");

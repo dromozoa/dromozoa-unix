@@ -33,7 +33,6 @@ namespace dromozoa {
   int push_broken_pipe(lua_State* L);
   int push_timed_out(lua_State* L);
   int push_error(lua_State* L, int code = errno);
-  void print_error(std::ostream& out, int code = errno);
   void initialize_error(lua_State* L);
 }
 
