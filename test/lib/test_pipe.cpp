@@ -17,6 +17,7 @@
 
 #include <assert.h>
 #include <fcntl.h>
+#include <unistd.h>
 
 #include <iostream>
 
@@ -39,16 +40,14 @@ int main(int, char*[]) {
   std::cout << fd[0] << ", " << fd[1] << "\n";
   assert_coe_and_ndelay_on(fd[0]);
   assert_coe_and_ndelay_on(fd[1]);
-  dromozoa::close_pipe(fd);
-  assert(fd[0] == -1);
-  assert(fd[1] == -1);
+  assert(close(fd[0]) != -1);
+  assert(close(fd[1]) != -1);
 
   assert(dromozoa::compat_pipe2(fd, O_CLOEXEC) != -1);
   assert_coe_and_ndelay_off(fd[0]);
   assert_coe_and_ndelay_off(fd[1]);
-  dromozoa::close_pipe(fd);
-  assert(fd[0] == -1);
-  assert(fd[1] == -1);
+  assert(close(fd[0]) != -1);
+  assert(close(fd[1]) != -1);
 
   return 0;
 }

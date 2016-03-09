@@ -24,6 +24,7 @@ extern "C" {
 #include <unistd.h>
 
 #include <dromozoa/bind.hpp>
+#include <dromozoa/file_descriptor.hpp>
 #include <dromozoa/pipe.hpp>
 
 #include "error.hpp"
@@ -56,7 +57,10 @@ namespace dromozoa {
     }
 
     int impl_uninstall(lua_State* L) {
-      close_pipe(dromozoa_selfpipe_fd);
+      file_descriptor(dromozoa_selfpipe_fd[0]).close();
+      file_descriptor(dromozoa_selfpipe_fd[1]).close();
+      dromozoa_selfpipe_fd[0] = -1;
+      dromozoa_selfpipe_fd[1] = -1;
       struct sigaction sa = {};
       sa.sa_handler = SIG_DFL;
       if (sigaction(SIGCHLD, &sa, 0) == -1) {

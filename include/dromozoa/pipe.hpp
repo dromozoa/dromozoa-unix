@@ -20,7 +20,6 @@
 
 namespace dromozoa {
   int compat_pipe2(int pipe_fd[2], int flags);
-  void close_pipe(int pipe_fd[2]);
 }
 
 #endif

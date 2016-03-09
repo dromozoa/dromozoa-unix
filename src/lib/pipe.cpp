@@ -19,7 +19,6 @@
 #include "config.h"
 #endif
 
-#include <errno.h>
 #include <fcntl.h>
 #include <unistd.h>
 
@@ -62,13 +61,4 @@ namespace dromozoa {
     return 0;
   }
 #endif
-
-  void close_pipe(int pipe_fd[2]) {
-    int save = errno;
-    close(pipe_fd[0]);
-    close(pipe_fd[1]);
-    pipe_fd[0] = -1;
-    pipe_fd[1] = -1;
-    errno = save;
-  }
 }
