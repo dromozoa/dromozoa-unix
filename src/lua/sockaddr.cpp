@@ -52,44 +52,14 @@ namespace dromozoa {
     return static_cast<socket_address*>(luaL_checkudata(L, n, "dromozoa.unix.sockaddr"));
   }
 
-
-/*
-  int new_sockaddr(lua_State* L, const struct sockaddr* address, socklen_t size) {
-    socket_address* data = static_cast<socket_address*>(lua_newuserdata(L, sizeof(socket_address)));
-    new(data) socket_address(address, size);
-    luaL_getmetatable(L, "dromozoa.unix.sockaddr");
-    lua_setmetatable(L, -2);
-    return 1;
-  }
-
-  const sockaddr* get_sockaddr(lua_State* L, int n, socklen_t& size) {
-    socket_address* data = static_cast<socket_address*>(luaL_checkudata(L, n, "dromozoa.unix.sockaddr"));
-    size = data->size();
-    return data->get();
-  }
-*/
-
   namespace {
-/*
-    namespace {
-      socklen_t get_size(lua_State* L, int n) {
-        return static_cast<const socket_address*>(luaL_checkudata(L, n, "dromozoa.unix.sockaddr"))->size();
-      }
-
-      const struct sockaddr* get_address(lua_State* L, int n) {
-        return static_cast<const socket_address*>(luaL_checkudata(L, n, "dromozoa.unix.sockaddr"))->get();
-      }
-    }
-*/
     int impl_size(lua_State* L) {
-      const socket_address* self = get_sockaddr(L, 1);
-      lua_pushinteger(L, self->size());
+      lua_pushinteger(L, get_sockaddr(L, 1)->size());
       return 1;
     }
 
     int impl_family(lua_State* L) {
-      const socket_address* self = get_sockaddr(L, 1);
-      lua_pushinteger(L, self->family());
+      lua_pushinteger(L, get_sockaddr(L, 1)->family());
       return 1;
     }
 
