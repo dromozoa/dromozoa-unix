@@ -21,9 +21,10 @@ extern "C" {
 
 #include "dromozoa/bind.hpp"
 
-#include "coe.hpp"
+#include "common.hpp"
+#include "module.hpp"
+
 #include "error.hpp"
-#include "fcntl.hpp"
 #include "fd.hpp"
 #include "lock.hpp"
 #include "ndelay.hpp"

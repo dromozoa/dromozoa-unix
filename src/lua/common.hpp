@@ -20,11 +20,21 @@
 
 extern "C" {
 #include <lua.h>
+#include <lauxlib.h>
 }
 
+#include <dromozoa/bind.hpp>
 #include <errno.h>
 
 namespace dromozoa {
+  using bind::function;
+  using bind::push_success;
+
+  int push_resource_unavailable_try_again(lua_State* L);
+  int push_operation_in_progress(lua_State* L);
+  int push_interrupted(lua_State* L);
+  int push_broken_pipe(lua_State* L);
+  int push_timed_out(lua_State* L);
   int push_error(lua_State* L, int code = errno);
   int new_fd(lua_State* L, int fd, bool ref = false);
   int get_fd(lua_State* L, int n);

@@ -17,9 +17,7 @@
 
 noinst_HEADERS = \
 	argument_vector.hpp \
-	coe.hpp \
 	error.hpp \
-	fcntl.hpp \
 	fd.hpp \
 	lock.hpp \
 	ndelay.hpp \

@@ -23,6 +23,8 @@ extern "C" {
 }
 
 namespace dromozoa {
+  void initialize_coe(lua_State* L);
+  void initialize_fcntl(lua_State* L);
 }
 
 #endif

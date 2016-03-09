@@ -22,9 +22,9 @@ extern "C" {
 #include <lua.h>
 }
 
+#include "common.hpp"
+
 namespace dromozoa {
-  int new_fd(lua_State* L, int fd, bool ref = false);
-  int get_fd(lua_State* L, int n);
   int open_fd(lua_State* L);
 }
 

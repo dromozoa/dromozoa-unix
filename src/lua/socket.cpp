@@ -33,10 +33,8 @@ extern "C" {
 #include <dromozoa/coe.hpp>
 #include <dromozoa/ndelay.hpp>
 
-#include "coe.hpp"
 #include "error.hpp"
 #include "fd.hpp"
-#include "ndelay.hpp"
 #include "sockaddr.hpp"
 #include "socket.hpp"
 

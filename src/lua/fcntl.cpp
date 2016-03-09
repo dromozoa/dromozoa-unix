@@ -15,22 +15,11 @@
 // You should have received a copy of the GNU General Public License
 // along with dromozoa-unix.  If not, see <http://www.gnu.org/licenses/>.
 
-extern "C" {
-#include <lua.h>
-#include <lauxlib.h>
-}
-
 #include <fcntl.h>
 
-#include "dromozoa/bind.hpp"
-
-#include "error.hpp"
-#include "fcntl.hpp"
-#include "fd.hpp"
+#include "common.hpp"
 
 namespace dromozoa {
-  using bind::function;
-
   namespace {
     int impl_open(lua_State* L) {
       const char* path = luaL_checkstring(L, 1);
