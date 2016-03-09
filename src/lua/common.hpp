@@ -23,6 +23,8 @@ extern "C" {
 #include <lauxlib.h>
 }
 
+#include <sys/socket.h>
+
 #include <dromozoa/bind.hpp>
 #include <errno.h>
 
@@ -36,6 +38,7 @@ namespace dromozoa {
   int push_broken_pipe(lua_State* L);
   int push_timed_out(lua_State* L);
   int push_error(lua_State* L, int code = errno);
+
   int new_fd(lua_State* L, int fd, bool ref = false);
   int get_fd(lua_State* L, int n);
 }

@@ -26,6 +26,9 @@ namespace dromozoa {
   void initialize_coe(lua_State* L);
   void initialize_fcntl(lua_State* L);
   void initialize_lock(lua_State* L);
+  void initialize_ndelay(lua_State* L);
+  void initialize_netdb(lua_State* L);
+  void initialize_getnameinfo(lua_State* L);
 }
 
 #endif

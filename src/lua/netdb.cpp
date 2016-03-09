@@ -15,18 +15,11 @@
 // You should have received a copy of the GNU General Public License
 // along with dromozoa-unix.  If not, see <http://www.gnu.org/licenses/>.
 
-extern "C" {
-#include <lua.h>
-#include <lauxlib.h>
-}
-
 #include <netdb.h>
 
 #include <vector>
 
-#include "dromozoa/bind.hpp"
-
-#include "netdb.hpp"
+#include "common.hpp"
 #include "sockaddr.hpp"
 
 #ifndef NI_MAXHOST

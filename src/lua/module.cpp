@@ -26,8 +26,6 @@ extern "C" {
 
 #include "error.hpp"
 #include "fd.hpp"
-#include "ndelay.hpp"
-#include "netdb.hpp"
 #include "netinet.hpp"
 #include "pathexec.hpp"
 #include "pipe.hpp"
