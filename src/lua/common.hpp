@@ -15,109 +15,19 @@
 // You should have received a copy of the GNU General Public License
 // along with dromozoa-unix.  If not, see <http://www.gnu.org/licenses/>.
 
+#ifndef COMMON_HPP
+#define COMMON_HPP
+
 extern "C" {
 #include <lua.h>
 }
 
-#include "dromozoa/bind.hpp"
-
-#include "coe.hpp"
-#include "error.hpp"
-#include "fcntl.hpp"
-#include "fd.hpp"
-#include "lock.hpp"
-#include "ndelay.hpp"
-#include "netdb.hpp"
-#include "netinet.hpp"
-#include "pathexec.hpp"
-#include "pipe.hpp"
-#include "process.hpp"
-#include "read.hpp"
-#include "selector.hpp"
-#include "selfpipe.hpp"
-#include "signal.hpp"
-#include "sockaddr.hpp"
-#include "socket.hpp"
-#include "stdlib.hpp"
-#include "sys_socket.hpp"
-#include "sys_stat.hpp"
-#include "sys_time.hpp"
-#include "sys_wait.hpp"
-#include "time.hpp"
-#include "unistd.hpp"
-#include "write.hpp"
+#include <errno.h>
 
 namespace dromozoa {
-  int open_asio(lua_State* L) {
-    lua_getglobal(L, "require");
-    lua_pushliteral(L, "dromozoa.unix.asio");
-    lua_call(L, 1, 1);
-    lua_pushvalue(L, -2);
-    lua_setfield(L, -2, "super");
-    return 1;
-  }
-
-  int open_timespec(lua_State* L) {
-    lua_getglobal(L, "require");
-    lua_pushliteral(L, "dromozoa.unix.timespec");
-    lua_call(L, 1, 1);
-    lua_pushvalue(L, -2);
-    lua_setfield(L, -2, "super");
-    return 1;
-  }
-
-  int open(lua_State* L) {
-    lua_newtable(L);
-
-    open_fd(L);
-    initialize_coe(L);
-    initialize_lock(L);
-    initialize_ndelay(L);
-    initialize_read(L);
-    initialize_write(L);
-    initialize_socket(L);
-    lua_setfield(L, -2, "fd");
-
-    open_process(L);
-    lua_setfield(L, -2, "process");
-
-    open_selector(L);
-    lua_setfield(L, -2, "selector");
-
-    open_selfpipe(L);
-    lua_setfield(L, -2, "selfpipe");
-
-    open_sockaddr(L);
-    initialize_getnameinfo(L);
-    lua_setfield(L, -2, "sockaddr");
-
-    open_asio(L);
-    lua_setfield(L, -2, "asio");
-
-    open_timespec(L);
-    lua_setfield(L, -2, "timespec");
-
-    bind::initialize(L);
-    initialize_error(L);
-    initialize_fcntl(L);
-    initialize_netdb(L);
-    initialize_netinet(L);
-    initialize_pathexec(L);
-    initialize_pipe(L);
-    initialize_signal(L);
-    initialize_sockaddr(L);
-    initialize_stdlib(L);
-    initialize_sys_socket(L);
-    initialize_sys_stat(L);
-    initialize_sys_time(L);
-    initialize_sys_wait(L);
-    initialize_time(L);
-    initialize_unistd(L);
-
-    return 1;
-  }
+  int push_error(lua_State* L, int code = errno);
+  int new_fd(lua_State* L, int fd, bool ref = false);
+  int get_fd(lua_State* L, int n);
 }
 
-extern "C" int luaopen_dromozoa_unix(lua_State* L) {
-  return dromozoa::open(L);
-}
+#endif

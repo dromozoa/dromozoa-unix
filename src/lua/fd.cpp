@@ -110,24 +110,6 @@ namespace dromozoa {
     }
   }
 
-  /*
-    local class = {}
-    function class:get() end;
-    function class:close() end;
-
-    local metatable = {}
-    function metatable:__call()
-
-    setmetatable(class, metatable)
-
-    local dromozoa_unix_fd = {}
-    dromozoa_unix_fd.__index = class
-    function dromozoa_unix_fd:__gc()
-
-    local dromozoa_unix_fd_ref = {}
-    dromozoa_unix_fd_ref.__index = class
-
-   */
   int open_fd(lua_State* L) {
     lua_newtable(L);
     function<impl_get>::set_field(L, "get");
