@@ -27,7 +27,6 @@ noinst_HEADERS = \
 	selector.hpp \
 	selfpipe.hpp \
 	signal.hpp \
-	sockaddr.hpp \
 	socket.hpp \
 	stdlib.hpp \
 	sys_socket.hpp \

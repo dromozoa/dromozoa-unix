@@ -20,7 +20,6 @@
 #include <vector>
 
 #include "common.hpp"
-#include "sockaddr.hpp"
 
 #ifndef NI_MAXHOST
 #define NI_MAXHOST 1025
@@ -99,10 +98,9 @@ namespace dromozoa {
     int impl_getnameinfo(lua_State* L) {
       std::vector<char> nodename(NI_MAXHOST);
       std::vector<char> servname(NI_MAXSERV);
-      socklen_t size = 0;
-      const struct sockaddr* address = get_sockaddr(L, 1, size);
+      const socket_address* address = get_sockaddr(L, 1);
       int flags = luaL_optinteger(L, 2, 0);
-      int code = getnameinfo(address, size, &nodename[0], nodename.size(), &servname[0], servname.size(), flags);
+      int code = getnameinfo(address->get(), address->size(), &nodename[0], nodename.size(), &servname[0], servname.size(), flags);
       if (code == 0) {
         lua_pushstring(L, &nodename[0]);
         lua_pushstring(L, &servname[0]);

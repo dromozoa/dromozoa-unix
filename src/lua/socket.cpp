@@ -33,9 +33,9 @@ extern "C" {
 #include <dromozoa/coe.hpp>
 #include <dromozoa/ndelay.hpp>
 
+#include "common.hpp"
 #include "error.hpp"
 #include "fd.hpp"
-#include "sockaddr.hpp"
 #include "socket.hpp"
 
 namespace dromozoa {
@@ -105,9 +105,8 @@ namespace dromozoa {
     }
 
     int impl_bind(lua_State* L) {
-      socklen_t size = 0;
-      const struct sockaddr* address = get_sockaddr(L, 2, size);
-      if (::bind(get_fd(L, 1), address, size) == -1) {
+      const socket_address* address = get_sockaddr(L, 2);
+      if (::bind(get_fd(L, 1), address->get(), address->size()) == -1) {
         return push_error(L);
       } else {
         return push_success(L);
@@ -143,9 +142,8 @@ namespace dromozoa {
     }
 
     int impl_connect(lua_State* L) {
-      socklen_t size = 0;
-      const struct sockaddr* address = get_sockaddr(L, 2, size);
-      if (connect(get_fd(L, 1), address, size) == -1) {
+      const socket_address* address = get_sockaddr(L, 2);
+      if (connect(get_fd(L, 1), address->get(), address->size()) == -1) {
         int code = errno;
         if (code == EINPROGRESS) {
           return push_operation_in_progress(L);

@@ -34,7 +34,6 @@ extern "C" {
 #include "selector.hpp"
 #include "selfpipe.hpp"
 #include "signal.hpp"
-#include "sockaddr.hpp"
 #include "socket.hpp"
 #include "stdlib.hpp"
 #include "sys_socket.hpp"
