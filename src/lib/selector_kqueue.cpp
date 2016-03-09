@@ -21,18 +21,27 @@
 #include <dromozoa/coe.hpp>
 #include <dromozoa/file_descriptor.hpp>
 #include <dromozoa/selector_kqueue.hpp>
+#include <dromozoa/sigmask.hpp>
 
 namespace dromozoa {
   int selector_kqueue::open(size_t, int flags) {
+    sigset_t mask;
+    if (sigmask_block_all_signals(&mask) == -1) {
+      return -1;
+    }
+    sigmask_saver save_mask(mask);
+
     file_descriptor fd(kqueue());
     if (!fd.valid()) {
       return -1;
     }
+
     if (flags & O_CLOEXEC) {
       if (coe(fd.get()) == -1) {
         return -1;
       }
     }
+
     return fd.release();
   }
 

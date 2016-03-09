@@ -23,6 +23,7 @@
 
 #include <dromozoa/coe.hpp>
 #include <dromozoa/selector_epoll.hpp>
+#include <dromozoa/sigmask.hpp>
 
 namespace dromozoa {
 #ifdef HAVE_EPOLL_CREATE1
@@ -31,23 +32,27 @@ namespace dromozoa {
     if (flags & O_CLOEXEC) {
       f |= EPOLL_CLOEXEC;
     }
-    file_descriptor fd(epoll_create1(f));
-    if (!fd.valid()) {
-      return -1;
-    }
-    return fd.release();
+    return epoll_create1(f);
   }
 #else
   int selector_epoll::open(size_t size, int flags) {
+    sigset_t mask;
+    if (sigmask_block_all_signals(&mask) == -1) {
+      return -1;
+    }
+    sigmask_saver save_mask(mask);
+
     file_descriptor fd(epoll_create(size));
     if (!fd.valid()) {
       return -1;
     }
+
     if (flags & O_CLOEXEC) {
       if (coe(fd.get()) == -1) {
         return -1;
       }
     }
+
     return fd.release();
   }
 #endif
