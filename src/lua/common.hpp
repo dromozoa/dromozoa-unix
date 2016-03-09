@@ -33,6 +33,7 @@ extern "C" {
 namespace dromozoa {
   using bind::function;
   using bind::push_success;
+  using bind::set_field;
 
   int push_resource_unavailable_try_again(lua_State* L);
   int push_operation_in_progress(lua_State* L);
@@ -44,6 +45,7 @@ namespace dromozoa {
   int new_fd(lua_State* L, int fd, bool ref = false);
   int get_fd(lua_State* L, int n);
 
+  int new_sockaddr(lua_State*L, const socket_address& address);
   int new_sockaddr(lua_State*L, const struct sockaddr* address, socklen_t size);
   const socket_address* get_sockaddr(lua_State* L, int n);
 }

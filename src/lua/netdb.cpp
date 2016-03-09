@@ -30,9 +30,6 @@
 #endif
 
 namespace dromozoa {
-  using bind::function;
-  using bind::set_field;
-
   namespace {
     int push_netdb_error(lua_State* L, int code) {
       lua_pushnil(L);

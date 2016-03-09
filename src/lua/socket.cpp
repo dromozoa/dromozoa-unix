@@ -80,27 +80,21 @@ namespace dromozoa {
     }
 #endif
 
-    struct sockaddr* sockaddr_cast(struct sockaddr_storage* address) {
-      return reinterpret_cast<struct sockaddr*>(address);
-    }
-
     int impl_getsockname(lua_State* L) {
-      struct sockaddr_storage ss = {};
-      socklen_t size = sizeof(ss);
-      if (getsockname(get_fd(L, 1), sockaddr_cast(&ss), &size) == -1) {
+      socket_address address;
+      if (getsockname(get_fd(L, 1), address.get(), address.size_ptr()) == -1) {
         return push_error(L);
       } else {
-        return new_sockaddr(L, sockaddr_cast(&ss), size);
+        return new_sockaddr(L, address);
       }
     }
 
     int impl_getpeername(lua_State* L) {
-      struct sockaddr_storage ss = {};
-      socklen_t size = sizeof(ss);
-      if (getpeername(get_fd(L, 1), sockaddr_cast(&ss), &size) == -1) {
+      socket_address address;
+      if (getpeername(get_fd(L, 1), address.get(), address.size_ptr()) == -1) {
         return push_error(L);
       } else {
-        return new_sockaddr(L, sockaddr_cast(&ss), size);
+        return new_sockaddr(L, address);
       }
     }
 
@@ -124,9 +118,8 @@ namespace dromozoa {
 
     int impl_accept(lua_State* L) {
       int flags = luaL_optinteger(L, 2, 0);
-      struct sockaddr_storage ss = {};
-      socklen_t size = sizeof(ss);
-      int result = wrap_accept4(get_fd(L, 1), sockaddr_cast(&ss), &size, flags);
+      socket_address address;
+      int result = wrap_accept4(get_fd(L, 1), address.get(), address.size_ptr(), flags);
       if (result == -1) {
         int code = errno;
         if (code == EAGAIN || code == EWOULDBLOCK) {
@@ -136,7 +129,7 @@ namespace dromozoa {
         }
       } else {
         new_fd(L, result);
-        new_sockaddr(L, sockaddr_cast(&ss), size);
+        new_sockaddr(L, address);
         return 2;
       }
     }

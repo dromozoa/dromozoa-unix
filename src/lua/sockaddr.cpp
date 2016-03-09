@@ -32,6 +32,14 @@ extern "C" {
 #include "common.hpp"
 
 namespace dromozoa {
+  int new_sockaddr(lua_State* L, const socket_address& address) {
+    socket_address* self = static_cast<socket_address*>(lua_newuserdata(L, sizeof(socket_address)));
+    new(self) socket_address(address);
+    luaL_getmetatable(L, "dromozoa.unix.sockaddr");
+    lua_setmetatable(L, -2);
+    return 1;
+  }
+
   int new_sockaddr(lua_State* L, const struct sockaddr* address, socklen_t size) {
     socket_address* self = static_cast<socket_address*>(lua_newuserdata(L, sizeof(socket_address)));
     new(self) socket_address(address, size);
