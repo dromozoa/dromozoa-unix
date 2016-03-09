@@ -56,11 +56,17 @@ namespace dromozoa {
 
   namespace {
     file_descriptor* get_file_descriptor(lua_State* L, int n) {
-      if (file_descriptor* data = static_cast<file_descriptor*>(luaL_testudata(L, n, "dromozoa.unix.fd.ref"))) {
-        return data;
-      } else {
-        return static_cast<file_descriptor*>(luaL_checkudata(L, n, "dromozoa.unix.fd"));
+      const char* name = "dromozoa.unix.fd";
+      if (lua_touserdata(L, n)) {
+        if (lua_getmetatable(L, n)) {
+          luaL_getmetatable(L, "dromozoa.unix.fd.ref");
+          if (lua_rawequal(L, -1, -2)) {
+            name = "dromozoa.unix.fd.ref";
+          }
+          lua_pop(L, 2);
+        }
       }
+      return static_cast<file_descriptor*>(luaL_checkudata(L, n, name));
     }
   }
 
