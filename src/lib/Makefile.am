@@ -30,6 +30,7 @@ libdromozoa_unix_la_SOURCES = \
 	pipe.cpp \
 	selector.cpp \
 	sigmask.cpp \
+	socket_address.cpp \
 	strerror.cpp \
 	unexpected.cpp
 

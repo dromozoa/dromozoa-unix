@@ -23,6 +23,7 @@ check_PROGRAMS = \
 	test_pathexec.exe \
 	test_pipe.exe \
 	test_sigmask.exe \
+	test_socket_address.exe \
 	test_strerror.exe \
 	test_unexpected.exe
 
@@ -45,6 +46,10 @@ test_pipe_exe_SOURCES = test_pipe.cpp
 test_sigmask_exe_CPPFLAGS = -I$(top_srcdir)/include
 test_sigmask_exe_LDADD = $(top_builddir)/src/lib/libdromozoa-unix.la
 test_sigmask_exe_SOURCES = test_sigmask.cpp
+
+test_socket_address_exe_CPPFLAGS = -I$(top_srcdir)/include
+test_socket_address_exe_LDADD = $(top_builddir)/src/lib/libdromozoa-unix.la
+test_socket_address_exe_SOURCES = test_socket_address.cpp
 
 test_strerror_exe_CPPFLAGS = -I$(top_srcdir)/include
 test_strerror_exe_LDADD = $(top_builddir)/src/lib/libdromozoa-unix.la
