@@ -20,8 +20,18 @@
 #include <dromozoa/socket_address.hpp>
 
 namespace dromozoa {
+  socket_address::socket_address() : address_(), size_(sizeof(address_)) {}
+
   socket_address::socket_address(const struct sockaddr* address, socklen_t size) : address_(), size_(size) {
     memmove(&address_, address, size);
+  }
+
+  struct sockaddr* socket_address::get() {
+    return reinterpret_cast<struct sockaddr*>(&address_);
+  }
+
+  socklen_t* socket_address::size_ptr() {
+    return &size_;
   }
 
   const struct sockaddr* socket_address::get() const {

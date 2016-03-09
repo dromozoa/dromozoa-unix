@@ -23,7 +23,10 @@
 namespace dromozoa {
   class socket_address {
   public:
+    socket_address();
     socket_address(const struct sockaddr* address, socklen_t size);
+    struct sockaddr* get();
+    socklen_t* size_ptr();
     const struct sockaddr* get() const;
     socklen_t size() const;
     sa_family_t family() const;

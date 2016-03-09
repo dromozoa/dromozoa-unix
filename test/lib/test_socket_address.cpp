@@ -32,11 +32,18 @@ int main(int, char*[]) {
   sin.sin_port = htons(80);
   in_addr_t in_addr = inet_addr("127.0.0.1");
   memmove(&sin.sin_addr, &in_addr, sizeof(sin.sin_addr));
-  dromozoa::socket_address socket_address(reinterpret_cast<const struct sockaddr*>(&sin), sizeof(sin));
+  dromozoa::socket_address socket_address1(reinterpret_cast<const struct sockaddr*>(&sin), sizeof(sin));
+
+  dromozoa::socket_address socket_address2;
+  assert(socket_address2.get());
+  assert(socket_address2.size() == sizeof(struct sockaddr_storage));
+  assert(socket_address2.family() == 0);
+
+  socket_address2 = socket_address1;
 
   char nodename[NI_MAXHOST];
   char servname[NI_MAXSERV];
-  assert(getnameinfo(socket_address.get(), socket_address.size(), nodename, NI_MAXHOST, servname, NI_MAXSERV, NI_NUMERICHOST | NI_NUMERICSERV) == 0);
+  assert(getnameinfo(socket_address2.get(), socket_address2.size(), nodename, NI_MAXHOST, servname, NI_MAXSERV, NI_NUMERICHOST | NI_NUMERICSERV) == 0);
 
   assert(std::string(nodename) == "127.0.0.1");
   assert(std::string(servname) == "80");
