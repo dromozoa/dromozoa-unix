@@ -15,27 +15,13 @@
 // You should have received a copy of the GNU General Public License
 // along with dromozoa-unix.  If not, see <http://www.gnu.org/licenses/>.
 
-extern "C" {
-#include <lua.h>
-#include <lauxlib.h>
-}
-
-#include <unistd.h>
-
-#include <iostream>
 #include <new>
 
-#include <dromozoa/bind.hpp>
 #include <dromozoa/file_descriptor.hpp>
 
-#include "error.hpp"
-#include "fd.hpp"
+#include "common.hpp"
 
 namespace dromozoa {
-  using bind::function;
-  using bind::get_log_level;
-  using bind::push_success;
-
   int new_fd(lua_State* L, int fd, bool ref) {
     file_descriptor* data = static_cast<file_descriptor*>(lua_newuserdata(L, sizeof(file_descriptor)));
     new(data) file_descriptor(fd);
@@ -45,13 +31,6 @@ namespace dromozoa {
       luaL_getmetatable(L, "dromozoa.unix.fd");
     }
     lua_setmetatable(L, -2);
-    if (get_log_level() > 2) {
-      if (ref) {
-        std::cerr << "[dromozoa-unix] new fd-ref " << fd << std::endl;
-      } else {
-        std::cerr << "[dromozoa-unix] new fd " << fd << std::endl;
-      }
-    }
     return 1;
   }
 

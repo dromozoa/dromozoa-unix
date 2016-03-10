@@ -25,7 +25,6 @@ extern "C" {
 #include "module.hpp"
 
 #include "error.hpp"
-#include "fd.hpp"
 #include "read.hpp"
 #include "selector.hpp"
 #include "selfpipe.hpp"

@@ -22,15 +22,10 @@ extern "C" {
 
 #include <sys/socket.h>
 
-#include "dromozoa/bind.hpp"
-
-#include "error.hpp"
-#include "fd.hpp"
+#include "common.hpp"
 #include "sys_socket.hpp"
 
 namespace dromozoa {
-  using bind::function;
-
   namespace {
     int impl_socket(lua_State* L) {
       int domain = luaL_checkinteger(L, 1);

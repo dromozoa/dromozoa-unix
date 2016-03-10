@@ -17,7 +17,6 @@
 
 noinst_HEADERS = \
 	error.hpp \
-	fd.hpp \
 	read.hpp \
 	selector.hpp \
 	selfpipe.hpp \

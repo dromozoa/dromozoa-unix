@@ -26,10 +26,7 @@ extern "C" {
 
 #include <vector>
 
-#include "dromozoa/bind.hpp"
-
-#include "error.hpp"
-#include "fd.hpp"
+#include "common.hpp"
 #include "write.hpp"
 
 namespace dromozoa {

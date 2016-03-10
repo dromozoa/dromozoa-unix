@@ -34,8 +34,6 @@ extern "C" {
 #include <dromozoa/ndelay.hpp>
 
 #include "common.hpp"
-#include "error.hpp"
-#include "fd.hpp"
 #include "socket.hpp"
 
 namespace dromozoa {

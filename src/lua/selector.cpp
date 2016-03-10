@@ -33,8 +33,7 @@ extern "C" {
 #include <dromozoa/bind.hpp>
 #include <dromozoa/selector.hpp>
 
-#include "error.hpp"
-#include "fd.hpp"
+#include "common.hpp"
 #include "selector.hpp"
 
 #if defined(HAVE_EPOLL_CREATE) || defined(HAVE_EPOLL_CREATE1)
