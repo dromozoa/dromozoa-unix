@@ -15,26 +15,14 @@
 // You should have received a copy of the GNU General Public License
 // along with dromozoa-unix.  If not, see <http://www.gnu.org/licenses/>.
 
-extern "C" {
-#include <lua.h>
-#include <lauxlib.h>
-}
-
 #include <vector>
 
-#include <dromozoa/bind.hpp>
 #include <dromozoa/pathexec.hpp>
 
+#include "common.hpp"
 #include "argument_vector.hpp"
-#include "error.hpp"
-#include "pathexec.hpp"
-
-extern char** environ;
 
 namespace dromozoa {
-  using bind::function;
-  using bind::push_success;
-
   namespace {
     int impl_pathexec(lua_State* L) {
       const char* path = luaL_checkstring(L, 1);

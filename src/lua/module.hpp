@@ -30,6 +30,8 @@ namespace dromozoa {
   void initialize_ndelay(lua_State* L);
   void initialize_netdb(lua_State* L);
   void initialize_getnameinfo(lua_State* L);
+  void initialize_netinet(lua_State* L);
+  void initialize_pathexec(lua_State* L);
   void initialize_sockaddr(lua_State* L);
 }
 

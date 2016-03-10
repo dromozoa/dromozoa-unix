@@ -15,17 +15,10 @@
 // You should have received a copy of the GNU General Public License
 // along with dromozoa-unix.  If not, see <http://www.gnu.org/licenses/>.
 
-extern "C" {
-#include <lua.h>
-#include <lauxlib.h>
-}
-
 #include <netinet/in.h>
 #include <netinet/tcp.h>
 
-#include "dromozoa/bind.hpp"
-
-#include "netinet.hpp"
+#include "common.hpp"
 
 namespace dromozoa {
   void initialize_netinet(lua_State* L) {

@@ -19,8 +19,6 @@ noinst_HEADERS = \
 	argument_vector.hpp \
 	error.hpp \
 	fd.hpp \
-	netinet.hpp \
-	pathexec.hpp \
 	pipe.hpp \
 	process.hpp \
 	read.hpp \
