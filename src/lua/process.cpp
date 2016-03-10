@@ -15,24 +15,14 @@
 // You should have received a copy of the GNU General Public License
 // along with dromozoa-unix.  If not, see <http://www.gnu.org/licenses/>.
 
-extern "C" {
-#include <lua.h>
-#include <lauxlib.h>
-}
-
 #include <errno.h>
 
-#include <dromozoa/bind.hpp>
 #include <dromozoa/forkexec.hpp>
 
+#include "common.hpp"
 #include "argument_vector.hpp"
-#include "error.hpp"
-#include "fd.hpp"
 
 namespace dromozoa {
-  using bind::function;
-  using bind::push_success;
-
   namespace {
     int impl_new(lua_State* L) {
       lua_newtable(L);

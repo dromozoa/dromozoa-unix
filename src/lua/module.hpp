@@ -24,6 +24,7 @@ extern "C" {
 
 namespace dromozoa {
   int open_sockaddr(lua_State* L);
+  int open_process(lua_State* L);
   void initialize_coe(lua_State* L);
   void initialize_fcntl(lua_State* L);
   void initialize_lock(lua_State* L);
