@@ -25,7 +25,6 @@ extern "C" {
 #include "module.hpp"
 
 #include "error.hpp"
-#include "read.hpp"
 #include "selector.hpp"
 #include "selfpipe.hpp"
 #include "signal.hpp"
@@ -37,7 +36,6 @@ extern "C" {
 #include "sys_wait.hpp"
 #include "time.hpp"
 #include "unistd.hpp"
-#include "write.hpp"
 
 namespace dromozoa {
   int open_asio(lua_State* L) {

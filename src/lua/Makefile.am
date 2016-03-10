@@ -17,7 +17,6 @@
 
 noinst_HEADERS = \
 	error.hpp \
-	read.hpp \
 	selector.hpp \
 	selfpipe.hpp \
 	signal.hpp \
@@ -28,8 +27,7 @@ noinst_HEADERS = \
 	sys_time.hpp \
 	sys_wait.hpp \
 	time.hpp \
-	unistd.hpp \
-	write.hpp
+	unistd.hpp
 
 luaexec_LTLIBRARIES = unix.la
 

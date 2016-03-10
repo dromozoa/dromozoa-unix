@@ -36,6 +36,8 @@ namespace dromozoa {
   void initialize_pathexec(lua_State* L);
   void initialize_sockaddr(lua_State* L);
   void initialize_pipe(lua_State* L);
+  void initialize_read(lua_State* L);
+  void initialize_write(lua_State* L);
 }
 
 #endif

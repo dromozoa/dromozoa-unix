@@ -15,11 +15,6 @@
 // You should have received a copy of the GNU General Public License
 // along with dromozoa-unix.  If not, see <http://www.gnu.org/licenses/>.
 
-extern "C" {
-#include <lua.h>
-#include <lauxlib.h>
-}
-
 #include <errno.h>
 #include <stddef.h>
 #include <unistd.h>
@@ -27,13 +22,8 @@ extern "C" {
 #include <vector>
 
 #include "common.hpp"
-#include "write.hpp"
 
 namespace dromozoa {
-  using bind::function;
-  using bind::translate_range_i;
-  using bind::translate_range_j;
-
   int impl_write(lua_State* L) {
     size_t size;
     const char* buffer = luaL_checklstring(L, 2, &size);

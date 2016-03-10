@@ -35,6 +35,8 @@ namespace dromozoa {
   using bind::function;
   using bind::push_success;
   using bind::set_field;
+  using bind::translate_range_i;
+  using bind::translate_range_j;
 
   int push_resource_unavailable_try_again(lua_State* L);
   int push_operation_in_progress(lua_State* L);
