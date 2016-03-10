@@ -22,6 +22,7 @@ check_PROGRAMS = \
 	test_forkexec.exe \
 	test_pathexec.exe \
 	test_pipe.exe \
+	test_selfpipe.exe \
 	test_sigmask.exe \
 	test_socket_address.exe \
 	test_strerror.exe \
@@ -38,6 +39,10 @@ test_forkexec_exe_SOURCES = test_forkexec.cpp
 test_pathexec_exe_CPPFLAGS = -I$(top_srcdir)/include
 test_pathexec_exe_LDADD = $(top_builddir)/src/lib/libdromozoa-unix.la
 test_pathexec_exe_SOURCES = test_pathexec.cpp
+
+test_selfpipe_exe_CPPFLAGS = -I$(top_srcdir)/include
+test_selfpipe_exe_LDADD = $(top_builddir)/src/lib/libdromozoa-unix.la
+test_selfpipe_exe_SOURCES = test_selfpipe.cpp
 
 test_pipe_exe_CPPFLAGS = -I$(top_srcdir)/include
 test_pipe_exe_LDADD = $(top_builddir)/src/lib/libdromozoa-unix.la

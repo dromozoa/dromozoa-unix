@@ -29,6 +29,7 @@ libdromozoa_unix_la_SOURCES = \
 	pathexec.cpp \
 	pipe.cpp \
 	selector.cpp \
+	selfpipe.cpp \
 	sigmask.cpp \
 	socket_address.cpp \
 	strerror.cpp \
