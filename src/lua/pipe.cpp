@@ -15,21 +15,11 @@
 // You should have received a copy of the GNU General Public License
 // along with dromozoa-unix.  If not, see <http://www.gnu.org/licenses/>.
 
-extern "C" {
-#include <lua.h>
-#include <lauxlib.h>
-}
-
-#include <dromozoa/bind.hpp>
 #include <dromozoa/pipe.hpp>
 
-#include "error.hpp"
-#include "fd.hpp"
-#include "pipe.hpp"
+#include "common.hpp"
 
 namespace dromozoa {
-  using bind::function;
-
   namespace {
     int impl_pipe(lua_State* L) {
       int flags = luaL_optinteger(L, 1, 0);

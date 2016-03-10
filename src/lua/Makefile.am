@@ -19,7 +19,6 @@ noinst_HEADERS = \
 	argument_vector.hpp \
 	error.hpp \
 	fd.hpp \
-	pipe.hpp \
 	process.hpp \
 	read.hpp \
 	selector.hpp \
