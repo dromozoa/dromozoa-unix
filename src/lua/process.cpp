@@ -20,7 +20,6 @@
 #include <dromozoa/forkexec.hpp>
 
 #include "common.hpp"
-#include "argument_vector.hpp"
 
 namespace dromozoa {
   namespace {

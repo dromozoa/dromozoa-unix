@@ -15,11 +15,7 @@
 // You should have received a copy of the GNU General Public License
 // along with dromozoa-unix.  If not, see <http://www.gnu.org/licenses/>.
 
-extern "C" {
-#include <lua.h>
-}
-
-#include "argument_vector.hpp"
+#include "common.hpp"
 
 namespace dromozoa {
   argument_vector make_argument_vector(lua_State* L, int n) {

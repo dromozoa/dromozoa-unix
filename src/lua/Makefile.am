@@ -16,7 +16,6 @@
 # along with dromozoa-unix.  If not, see <http://www.gnu.org/licenses/>.
 
 noinst_HEADERS = \
-	argument_vector.hpp \
 	error.hpp \
 	fd.hpp \
 	read.hpp \
