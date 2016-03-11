@@ -39,6 +39,7 @@ namespace dromozoa {
   void initialize_read(lua_State* L);
   void initialize_signal(lua_State* L);
   void initialize_sockaddr(lua_State* L);
+  void initialize_socket(lua_State* L);
   void initialize_write(lua_State* L);
 }
 

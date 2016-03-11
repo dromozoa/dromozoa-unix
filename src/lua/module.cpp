@@ -26,7 +26,6 @@ extern "C" {
 
 #include "error.hpp"
 #include "selector.hpp"
-#include "socket.hpp"
 #include "stdlib.hpp"
 #include "sys_socket.hpp"
 #include "sys_stat.hpp"

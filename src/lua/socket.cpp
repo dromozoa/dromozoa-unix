@@ -34,7 +34,6 @@ extern "C" {
 #include <dromozoa/ndelay.hpp>
 
 #include "common.hpp"
-#include "socket.hpp"
 
 namespace dromozoa {
   using bind::function;
