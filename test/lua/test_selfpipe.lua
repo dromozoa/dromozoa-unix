@@ -20,7 +20,7 @@ local unix = require "dromozoa.unix"
 assert(unix.block_signal())
 assert(unix.ignore_signal(unix.SIGPIPE))
 assert(unix.selfpipe.get() == -1)
-assert(unix.selfpipe.install())
+assert(unix.selfpipe.open())
 assert(unix.selfpipe.get() ~= -1)
 
 -- unix.set_log_level(3)

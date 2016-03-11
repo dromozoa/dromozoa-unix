@@ -23,46 +23,22 @@ extern "C" {
 #include <signal.h>
 #include <unistd.h>
 
-#include <dromozoa/bind.hpp>
-#include <dromozoa/file_descriptor.hpp>
-#include <dromozoa/pipe.hpp>
+#include <dromozoa/selfpipe.hpp>
 
-#include "error.hpp"
-
-static int dromozoa_selfpipe_fd[2] = { -1, -1 };
-
-extern "C" void dromozoa_selfpipe_catch(int) {
-  write(dromozoa_selfpipe_fd[1], "", 1);
-}
+#include "common.hpp"
 
 namespace dromozoa {
-  using bind::function;
-  using bind::push_success;
-
   namespace {
-    int impl_install(lua_State* L) {
-      if (dromozoa_selfpipe_fd[0] == -1) {
-        if (compat_pipe2(dromozoa_selfpipe_fd, O_CLOEXEC | O_NONBLOCK) == -1) {
-          return push_error(L);
-        }
-      }
-      struct sigaction sa = {};
-      sa.sa_handler = dromozoa_selfpipe_catch;
-      if (sigaction(SIGCHLD, &sa, 0) == -1) {
+    int impl_open(lua_State* L) {
+      if (selfpipe_open() == -1) {
         return push_error(L);
       } else {
         return push_success(L);
       }
     }
 
-    int impl_uninstall(lua_State* L) {
-      file_descriptor(dromozoa_selfpipe_fd[0]).close();
-      file_descriptor(dromozoa_selfpipe_fd[1]).close();
-      dromozoa_selfpipe_fd[0] = -1;
-      dromozoa_selfpipe_fd[1] = -1;
-      struct sigaction sa = {};
-      sa.sa_handler = SIG_DFL;
-      if (sigaction(SIGCHLD, &sa, 0) == -1) {
+    int impl_close(lua_State* L) {
+      if (selfpipe_close() == -1) {
         return push_error(L);
       } else {
         return push_success(L);
@@ -70,25 +46,20 @@ namespace dromozoa {
     }
 
     int impl_get(lua_State* L) {
-      lua_pushinteger(L, dromozoa_selfpipe_fd[0]);
+      lua_pushinteger(L, selfpipe_get());
       return 1;
     }
 
     int impl_read(lua_State* L) {
-      int count = 0;
-      char c;
-      while (read(dromozoa_selfpipe_fd[0], &c, 1) == 1) {
-        ++count;
-      }
-      lua_pushinteger(L, count);
+      lua_pushinteger(L, selfpipe_read());
       return 1;
     }
   }
 
   int open_selfpipe(lua_State* L) {
     lua_newtable(L);
-    function<impl_install>::set_field(L, "install");
-    function<impl_uninstall>::set_field(L, "uninstall");
+    function<impl_open>::set_field(L, "open");
+    function<impl_close>::set_field(L, "close");
     function<impl_get>::set_field(L, "get");
     function<impl_read>::set_field(L, "read");
     return 1;

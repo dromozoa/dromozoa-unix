@@ -19,7 +19,7 @@ local unix = require "dromozoa.unix"
 
 unix.set_log_level(2)
 unix.set_raise_error(true)
-unix.selfpipe.install()
+unix.selfpipe.open()
 unix.block_signal(unix.SIGCHLD)
 
 local PATH = os.getenv("PATH")
@@ -38,4 +38,4 @@ assert(unix.wait(-1, unix.WNOHANG) == pid)
 
 selector:del(unix.selfpipe.get())
 selector:close()
-unix.selfpipe.uninstall()
+unix.selfpipe.close()

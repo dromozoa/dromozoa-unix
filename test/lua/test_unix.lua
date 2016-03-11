@@ -17,7 +17,7 @@
 
 local unix = require "dromozoa.unix"
 
-assert(unix.selfpipe.install())
+assert(unix.selfpipe.open())
 
 local path = os.getenv("PATH")
 local envp = unix.environ()
@@ -40,4 +40,4 @@ assert(result == pid1 or result == pid2)
 local result = assert(unix.wait())
 assert(result == pid1 or result == pid2)
 
-assert(unix.selfpipe.uninstall())
+assert(unix.selfpipe.close())
