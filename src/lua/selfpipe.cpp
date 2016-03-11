@@ -28,7 +28,6 @@ extern "C" {
 #include <dromozoa/pipe.hpp>
 
 #include "error.hpp"
-#include "selfpipe.hpp"
 
 static int dromozoa_selfpipe_fd[2] = { -1, -1 };
 

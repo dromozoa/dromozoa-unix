@@ -26,7 +26,6 @@ extern "C" {
 
 #include "error.hpp"
 #include "selector.hpp"
-#include "selfpipe.hpp"
 #include "signal.hpp"
 #include "socket.hpp"
 #include "stdlib.hpp"

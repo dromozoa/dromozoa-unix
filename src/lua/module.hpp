@@ -24,19 +24,20 @@ extern "C" {
 
 namespace dromozoa {
   int open_fd(lua_State* L);
-  int open_sockaddr(lua_State* L);
   int open_process(lua_State* L);
+  int open_selfpipe(lua_State* L);
+  int open_sockaddr(lua_State* L);
   void initialize_coe(lua_State* L);
   void initialize_fcntl(lua_State* L);
+  void initialize_getnameinfo(lua_State* L);
   void initialize_lock(lua_State* L);
   void initialize_ndelay(lua_State* L);
   void initialize_netdb(lua_State* L);
-  void initialize_getnameinfo(lua_State* L);
   void initialize_netinet(lua_State* L);
   void initialize_pathexec(lua_State* L);
-  void initialize_sockaddr(lua_State* L);
   void initialize_pipe(lua_State* L);
   void initialize_read(lua_State* L);
+  void initialize_sockaddr(lua_State* L);
   void initialize_write(lua_State* L);
 }
 
