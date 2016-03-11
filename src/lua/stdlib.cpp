@@ -27,11 +27,8 @@ extern "C" {
 #include <vector>
 
 #include "common.hpp"
-#include "stdlib.hpp"
 
 namespace dromozoa {
-  using bind::function;
-
   namespace {
     int impl_realpath(lua_State* L) {
 #ifdef PATH_MAX

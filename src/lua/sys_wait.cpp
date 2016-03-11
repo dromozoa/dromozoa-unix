@@ -15,21 +15,11 @@
 // You should have received a copy of the GNU General Public License
 // along with dromozoa-unix.  If not, see <http://www.gnu.org/licenses/>.
 
-extern "C" {
-#include <lua.h>
-#include <lauxlib.h>
-}
-
 #include <sys/wait.h>
 
-#include "dromozoa/bind.hpp"
-
-#include "error.hpp"
-#include "sys_wait.hpp"
+#include "common.hpp"
 
 namespace dromozoa {
-  using bind::function;
-
   namespace {
     int impl_wait(lua_State* L) {
       pid_t pid = luaL_optinteger(L, 1, -1);

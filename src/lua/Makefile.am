@@ -15,17 +15,6 @@
 # You should have received a copy of the GNU General Public License
 # along with dromozoa-unix.  If not, see <http://www.gnu.org/licenses/>.
 
-noinst_HEADERS = \
-	error.hpp \
-	selector.hpp \
-	stdlib.hpp \
-	sys_socket.hpp \
-	sys_stat.hpp \
-	sys_time.hpp \
-	sys_wait.hpp \
-	time.hpp \
-	unistd.hpp
-
 luaexec_LTLIBRARIES = unix.la
 
 unix_la_CPPFLAGS = -I$(top_srcdir)/bind -I$(top_srcdir)/include

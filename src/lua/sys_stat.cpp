@@ -15,16 +15,9 @@
 // You should have received a copy of the GNU General Public License
 // along with dromozoa-unix.  If not, see <http://www.gnu.org/licenses/>.
 
-extern "C" {
-#include <lua.h>
-#include <lauxlib.h>
-}
-
 #include <sys/stat.h>
 
-#include "dromozoa/bind.hpp"
-
-#include "sys_stat.hpp"
+#include "common.hpp"
 
 namespace dromozoa {
   using bind::function;

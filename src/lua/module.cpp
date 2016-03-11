@@ -15,24 +15,8 @@
 // You should have received a copy of the GNU General Public License
 // along with dromozoa-unix.  If not, see <http://www.gnu.org/licenses/>.
 
-extern "C" {
-#include <lua.h>
-}
-
-#include "dromozoa/bind.hpp"
-
 #include "common.hpp"
 #include "module.hpp"
-
-#include "error.hpp"
-#include "selector.hpp"
-#include "stdlib.hpp"
-#include "sys_socket.hpp"
-#include "sys_stat.hpp"
-#include "sys_time.hpp"
-#include "sys_wait.hpp"
-#include "time.hpp"
-#include "unistd.hpp"
 
 namespace dromozoa {
   int open_asio(lua_State* L) {

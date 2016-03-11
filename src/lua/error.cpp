@@ -34,8 +34,6 @@ extern "C" {
 #include <dromozoa/bind.hpp>
 #include <dromozoa/strerror.hpp>
 
-#include "error.hpp"
-
 namespace dromozoa {
   using bind::function;
   using bind::push_success;

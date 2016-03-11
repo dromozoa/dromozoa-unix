@@ -15,23 +15,11 @@
 // You should have received a copy of the GNU General Public License
 // along with dromozoa-unix.  If not, see <http://www.gnu.org/licenses/>.
 
-extern "C" {
-#include <lua.h>
-#include <lauxlib.h>
-}
-
 #include <time.h>
 
-#include "dromozoa/bind.hpp"
-
-#include "error.hpp"
-#include "time.hpp"
+#include "common.hpp"
 
 namespace dromozoa {
-  using bind::function;
-  using bind::push_success;
-  using bind::set_field;
-
   namespace {
     int impl_nanosleep(lua_State* L) {
       struct timespec tv1 = {};

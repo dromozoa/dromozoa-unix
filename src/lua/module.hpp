@@ -18,16 +18,14 @@
 #ifndef MODULE_HPP
 #define MODULE_HPP
 
-extern "C" {
-#include <lua.h>
-}
-
 namespace dromozoa {
   int open_fd(lua_State* L);
   int open_process(lua_State* L);
+  int open_selector(lua_State* L);
   int open_selfpipe(lua_State* L);
   int open_sockaddr(lua_State* L);
   void initialize_coe(lua_State* L);
+  void initialize_error(lua_State* L);
   void initialize_fcntl(lua_State* L);
   void initialize_getnameinfo(lua_State* L);
   void initialize_lock(lua_State* L);
@@ -40,7 +38,14 @@ namespace dromozoa {
   void initialize_signal(lua_State* L);
   void initialize_sockaddr(lua_State* L);
   void initialize_socket(lua_State* L);
+  void initialize_stdlib(lua_State* L);
   void initialize_write(lua_State* L);
+  void initialize_time(lua_State* L);
+  void initialize_unistd(lua_State* L);
+  void initialize_sys_socket(lua_State* L);
+  void initialize_sys_stat(lua_State* L);
+  void initialize_sys_time(lua_State* L);
+  void initialize_sys_wait(lua_State* L);
 }
 
 #endif

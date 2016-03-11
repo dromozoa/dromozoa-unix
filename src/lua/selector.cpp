@@ -34,7 +34,6 @@ extern "C" {
 #include <dromozoa/selector.hpp>
 
 #include "common.hpp"
-#include "selector.hpp"
 
 #if defined(HAVE_EPOLL_CREATE) || defined(HAVE_EPOLL_CREATE1)
 #include <dromozoa/selector_epoll.hpp>

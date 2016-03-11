@@ -23,16 +23,11 @@ extern "C" {
 
 #include <vector>
 
-#include "dromozoa/bind.hpp"
-
-#include "error.hpp"
-#include "unistd.hpp"
+#include "common.hpp"
 
 extern char** environ;
 
 namespace dromozoa {
-  using bind::function;
-
   namespace {
     int impl_environ(lua_State* L) {
       lua_newtable(L);

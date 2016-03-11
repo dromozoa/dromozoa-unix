@@ -15,15 +15,9 @@
 // You should have received a copy of the GNU General Public License
 // along with dromozoa-unix.  If not, see <http://www.gnu.org/licenses/>.
 
-extern "C" {
-#include <lua.h>
-#include <lauxlib.h>
-}
-
 #include <sys/socket.h>
 
 #include "common.hpp"
-#include "sys_socket.hpp"
 
 namespace dromozoa {
   namespace {

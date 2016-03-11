@@ -21,15 +21,9 @@ extern "C" {
 
 #include <sys/time.h>
 
-#include "dromozoa/bind.hpp"
-
-#include "error.hpp"
-#include "sys_time.hpp"
+#include "common.hpp"
 
 namespace dromozoa {
-  using bind::function;
-  using bind::set_field;
-
   namespace {
     int impl_gettimeofday(lua_State* L) {
       struct timeval tv = {};
