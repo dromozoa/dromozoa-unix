@@ -15,68 +15,19 @@
 // You should have received a copy of the GNU General Public License
 // along with dromozoa-unix.  If not, see <http://www.gnu.org/licenses/>.
 
-#ifdef HAVE_CONFIG_H
-#include "config.h"
-#endif
-
-extern "C" {
-#include <lua.h>
-#include <lauxlib.h>
-}
-
 #include <errno.h>
 #include <fcntl.h>
 #include <unistd.h>
 #include <sys/socket.h>
 
-#include <dromozoa/bind.hpp>
 #include <dromozoa/coe.hpp>
 #include <dromozoa/ndelay.hpp>
+#include <dromozoa/accept.hpp>
 
 #include "common.hpp"
 
 namespace dromozoa {
-  using bind::function;
-  using bind::push_success;
-
   namespace {
-#ifdef HAVE_ACCEPT4
-    int wrap_accept4(int fd, struct sockaddr* address, socklen_t* size, int flags) {
-      int f = 0;
-      if (flags & O_CLOEXEC) {
-        f |= SOCK_CLOEXEC;
-      }
-      if (flags & O_NONBLOCK) {
-        f |= SOCK_NONBLOCK;
-      }
-      return accept4(fd, address, size, f);
-    }
-#else
-    int wrap_accept4(int fd, struct sockaddr* address, socklen_t* size, int flags) {
-      int result = accept(fd, address, size);
-      if (result == -1) {
-        return -1;
-      }
-      do {
-        if (flags & O_CLOEXEC) {
-          if (coe(result) == -1) {
-            break;
-          }
-        }
-        if (flags & O_NONBLOCK) {
-          if (ndelay_on(result) == -1) {
-            break;
-          }
-        }
-        return result;
-      } while (false);
-      int code = errno;
-      close(result);
-      errno = code;
-      return -1;
-    }
-#endif
-
     int impl_getsockname(lua_State* L) {
       socket_address address;
       if (getsockname(get_fd(L, 1), address.get(), address.size_ptr()) == -1) {
@@ -116,7 +67,7 @@ namespace dromozoa {
     int impl_accept(lua_State* L) {
       int flags = luaL_optinteger(L, 2, 0);
       socket_address address;
-      int result = wrap_accept4(get_fd(L, 1), address.get(), address.size_ptr(), flags);
+      int result = compat_accept4(get_fd(L, 1), address.get(), address.size_ptr(), flags);
       if (result == -1) {
         int code = errno;
         if (code == EAGAIN || code == EWOULDBLOCK) {
