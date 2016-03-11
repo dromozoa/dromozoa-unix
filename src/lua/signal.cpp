@@ -22,16 +22,11 @@ extern "C" {
 
 #include <signal.h>
 
-#include <dromozoa/bind.hpp>
 #include <dromozoa/sigmask.hpp>
 
-#include "error.hpp"
-#include "signal.hpp"
+#include "common.hpp"
 
 namespace dromozoa {
-  using bind::function;
-  using bind::push_success;
-
   namespace {
     int impl_kill(lua_State* L) {
       pid_t pid = luaL_checkinteger(L, 1);

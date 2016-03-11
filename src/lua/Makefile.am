@@ -18,7 +18,6 @@
 noinst_HEADERS = \
 	error.hpp \
 	selector.hpp \
-	signal.hpp \
 	socket.hpp \
 	stdlib.hpp \
 	sys_socket.hpp \
