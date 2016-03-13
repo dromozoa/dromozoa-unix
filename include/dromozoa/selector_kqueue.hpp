@@ -30,6 +30,8 @@
 #include <dromozoa/selector.hpp>
 
 namespace dromozoa {
+  extern const int SELECTOR_CLOEXEC;
+
   class selector_kqueue : public selector {
   public:
     static int open(size_t size, int flags);

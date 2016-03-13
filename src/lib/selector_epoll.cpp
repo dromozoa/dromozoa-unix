@@ -27,14 +27,14 @@
 
 namespace dromozoa {
 #ifdef HAVE_EPOLL_CREATE1
+  const int SELECTOR_CLOEXEC = EPOLL_CLOEXEC;
+
   int selector_epoll::open(size_t, int flags) {
-    int f = 0;
-    if (flags & O_CLOEXEC) {
-      f |= EPOLL_CLOEXEC;
-    }
-    return epoll_create1(f);
+    return epoll_create1(flags);
   }
 #else
+  const int SELECTOR_CLOEXEC = O_CLOEXEC;
+
   int selector_epoll::open(size_t size, int flags) {
     sigset_t mask;
     if (sigmask_block_all_signals(&mask) == -1) {
@@ -47,7 +47,7 @@ namespace dromozoa {
       return -1;
     }
 
-    if (flags & O_CLOEXEC) {
+    if (flags & SELECTOR_CLOEXEC) {
       if (coe(fd.get()) == -1) {
         return -1;
       }

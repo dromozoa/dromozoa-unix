@@ -24,6 +24,8 @@
 #include <dromozoa/sigmask.hpp>
 
 namespace dromozoa {
+  const int SELECTOR_CLOEXEC = O_CLOEXEC;
+
   int selector_kqueue::open(size_t, int flags) {
     sigset_t mask;
     if (sigmask_block_all_signals(&mask) == -1) {
@@ -36,7 +38,7 @@ namespace dromozoa {
       return -1;
     }
 
-    if (flags & O_CLOEXEC) {
+    if (flags & SELECTOR_CLOEXEC) {
       if (coe(fd.get()) == -1) {
         return -1;
       }
