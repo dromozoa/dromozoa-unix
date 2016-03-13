@@ -23,12 +23,12 @@ libdromozoa_unix_la_SOURCES = \
 	argument_vector.cpp \
 	coe.cpp \
 	compat_accept4.cpp \
+	compat_pipe2.cpp \
 	file_descriptor.cpp \
 	forkexec.cpp \
 	lock.cpp \
 	ndelay.cpp \
 	pathexec.cpp \
-	pipe.cpp \
 	selector.cpp \
 	selfpipe.cpp \
 	sigmask.cpp \

@@ -19,9 +19,9 @@ TESTS = $(check_PROGRAMS)
 
 check_PROGRAMS = \
 	test_argument_vector.exe \
+	test_compat_pipe2.exe \
 	test_forkexec.exe \
 	test_pathexec.exe \
-	test_pipe.exe \
 	test_selfpipe.exe \
 	test_sigmask.exe \
 	test_socket_address.exe \
@@ -31,6 +31,10 @@ check_PROGRAMS = \
 test_argument_vector_exe_CPPFLAGS = -I$(top_srcdir)/include
 test_argument_vector_exe_LDADD = $(top_builddir)/src/lib/libdromozoa-unix.la
 test_argument_vector_exe_SOURCES = test_argument_vector.cpp
+
+test_compat_pipe2_exe_CPPFLAGS = -I$(top_srcdir)/include
+test_compat_pipe2_exe_LDADD = $(top_builddir)/src/lib/libdromozoa-unix.la
+test_compat_pipe2_exe_SOURCES = test_compat_pipe2.cpp
 
 test_forkexec_exe_CPPFLAGS = -I$(top_srcdir)/include
 test_forkexec_exe_LDADD = $(top_builddir)/src/lib/libdromozoa-unix.la
@@ -43,10 +47,6 @@ test_pathexec_exe_SOURCES = test_pathexec.cpp
 test_selfpipe_exe_CPPFLAGS = -I$(top_srcdir)/include
 test_selfpipe_exe_LDADD = $(top_builddir)/src/lib/libdromozoa-unix.la
 test_selfpipe_exe_SOURCES = test_selfpipe.cpp
-
-test_pipe_exe_CPPFLAGS = -I$(top_srcdir)/include
-test_pipe_exe_LDADD = $(top_builddir)/src/lib/libdromozoa-unix.la
-test_pipe_exe_SOURCES = test_pipe.cpp
 
 test_sigmask_exe_CPPFLAGS = -I$(top_srcdir)/include
 test_sigmask_exe_LDADD = $(top_builddir)/src/lib/libdromozoa-unix.la

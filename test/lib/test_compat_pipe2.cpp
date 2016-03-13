@@ -21,7 +21,7 @@
 
 #include <iostream>
 
-#include <dromozoa/pipe.hpp>
+#include <dromozoa/compat_pipe2.hpp>
 
 void assert_coe_and_ndelay_on(int fd) {
   assert(fcntl(fd, F_GETFD) & FD_CLOEXEC);

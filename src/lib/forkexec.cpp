@@ -22,10 +22,10 @@
 
 #include <vector>
 
+#include <dromozoa/compat_pipe2.hpp>
 #include <dromozoa/file_descriptor.hpp>
 #include <dromozoa/forkexec.hpp>
 #include <dromozoa/pathexec.hpp>
-#include <dromozoa/pipe.hpp>
 #include <dromozoa/sigmask.hpp>
 
 namespace dromozoa {

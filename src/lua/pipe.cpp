@@ -15,7 +15,7 @@
 // You should have received a copy of the GNU General Public License
 // along with dromozoa-unix.  If not, see <http://www.gnu.org/licenses/>.
 
-#include <dromozoa/pipe.hpp>
+#include <dromozoa/compat_pipe2.hpp>
 
 #include "common.hpp"
 

@@ -23,9 +23,9 @@
 #include <unistd.h>
 
 #include <dromozoa/coe.hpp>
+#include <dromozoa/compat_pipe2.hpp>
 #include <dromozoa/file_descriptor.hpp>
 #include <dromozoa/ndelay.hpp>
-#include <dromozoa/pipe.hpp>
 #include <dromozoa/sigmask.hpp>
 
 namespace dromozoa {
