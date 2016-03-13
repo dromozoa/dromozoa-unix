@@ -24,18 +24,19 @@
 #include <dromozoa/pipe.hpp>
 #include <dromozoa/selfpipe.hpp>
 
-static int dromozoa_selfpipe_reader = -1;
-static int dromozoa_selfpipe_writer = -1;
+namespace dromozoa {
+  namespace {
+    int reader = -1;
+    int writer = -1;
+    struct sigaction save_sa;
+  }
+}
 
 extern "C" void dromozoa_selfpipe_trigger(int) {
-  write(dromozoa_selfpipe_writer, "", 1);
+  write(dromozoa::writer, "", 1);
 }
 
 namespace dromozoa {
-  namespace {
-    struct sigaction save_sa;
-  }
-
   int selfpipe_open() {
     if (selfpipe_valid()) {
       errno = 0;
@@ -55,8 +56,8 @@ namespace dromozoa {
       return -1;
     }
 
-    dromozoa_selfpipe_reader = fd0.release();
-    dromozoa_selfpipe_writer = fd1.release();
+    reader = fd0.release();
+    writer = fd1.release();
     return 0;
   }
 
@@ -66,10 +67,10 @@ namespace dromozoa {
       return -1;
     }
 
-    file_descriptor fd0(dromozoa_selfpipe_reader);
-    file_descriptor fd1(dromozoa_selfpipe_writer);
-    dromozoa_selfpipe_reader = -1;
-    dromozoa_selfpipe_writer = -1;
+    file_descriptor fd0(reader);
+    file_descriptor fd1(writer);
+    reader = -1;
+    writer = -1;
 
     if (sigaction(SIGCHLD, &save_sa, 0) == -1) {
       return -1;
@@ -84,17 +85,17 @@ namespace dromozoa {
   }
 
   bool selfpipe_valid() {
-    return dromozoa_selfpipe_reader != -1;
+    return reader != -1;
   }
 
   int selfpipe_get() {
-    return dromozoa_selfpipe_reader;
+    return reader;
   }
 
   int selfpipe_read() {
     int count = 0;
     char c;
-    while (read(dromozoa_selfpipe_reader, &c, 1) == 1) {
+    while (read(reader, &c, 1) == 1) {
       ++count;
     }
     return count;
