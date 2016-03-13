@@ -18,6 +18,7 @@
 #ifndef DROMOZOA_SELECTOR_EPOLL_HPP
 #define DROMOZOA_SELECTOR_EPOLL_HPP
 
+#include <stddef.h>
 #include <time.h>
 #include <sys/epoll.h>
 

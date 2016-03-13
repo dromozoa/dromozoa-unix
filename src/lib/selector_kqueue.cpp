@@ -19,7 +19,6 @@
 #include <fcntl.h>
 
 #include <dromozoa/coe.hpp>
-#include <dromozoa/file_descriptor.hpp>
 #include <dromozoa/selector_kqueue.hpp>
 #include <dromozoa/sigmask.hpp>
 

@@ -17,8 +17,6 @@
 
 #include <errno.h>
 #include <fcntl.h>
-#include <time.h>
-#include <unistd.h>
 #include <sys/epoll.h>
 
 #include <dromozoa/coe.hpp>
@@ -26,15 +24,17 @@
 #include <dromozoa/sigmask.hpp>
 
 namespace dromozoa {
-#ifdef HAVE_EPOLL_CREATE1
+#ifdef EPOLL_CLOEXEC
   const int SELECTOR_CLOEXEC = EPOLL_CLOEXEC;
+#else
+  const int SELECTOR_CLOEXEC = O_CLOEXEC;
+#endif
 
+#ifdef HAVE_EPOLL_CREATE1
   int selector_epoll::open(size_t, int flags) {
     return epoll_create1(flags);
   }
 #else
-  const int SELECTOR_CLOEXEC = O_CLOEXEC;
-
   int selector_epoll::open(size_t size, int flags) {
     sigset_t mask;
     if (sigmask_block_all_signals(&mask) == -1) {

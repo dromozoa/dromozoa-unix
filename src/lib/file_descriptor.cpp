@@ -20,6 +20,8 @@
 #include <dromozoa/file_descriptor.hpp>
 
 namespace dromozoa {
+  file_descriptor::file_descriptor() : fd_(-1) {}
+
   file_descriptor::file_descriptor(int fd) : fd_(fd) {}
 
   file_descriptor::~file_descriptor() {

@@ -21,7 +21,8 @@
 namespace dromozoa {
   class file_descriptor {
   public:
-    explicit file_descriptor(int fd = -1);
+    file_descriptor();
+    explicit file_descriptor(int fd);
     ~file_descriptor();
     int close();
     int release();
