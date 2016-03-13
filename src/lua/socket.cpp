@@ -21,8 +21,8 @@
 #include <sys/socket.h>
 
 #include <dromozoa/coe.hpp>
+#include <dromozoa/compat_accept4.hpp>
 #include <dromozoa/ndelay.hpp>
-#include <dromozoa/accept.hpp>
 
 #include "common.hpp"
 

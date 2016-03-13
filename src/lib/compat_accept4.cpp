@@ -21,43 +21,42 @@
 
 #include <fcntl.h>
 
-#include <dromozoa/accept.hpp>
 #include <dromozoa/coe.hpp>
+#include <dromozoa/compat_accept4.hpp>
 #include <dromozoa/file_descriptor.hpp>
 #include <dromozoa/ndelay.hpp>
 #include <dromozoa/sigmask.hpp>
 
 namespace dromozoa {
 #ifdef HAVE_ACCEPT4
-  int compat_accept4(int server_fd, struct sockaddr* address, socklen_t* size_ptr, int flags) {
-    int f = 0;
-    if (flags & O_CLOEXEC) {
-      f |= SOCK_CLOEXEC;
-    }
-    if (flags & O_NONBLOCK) {
-      f |= SOCK_NONBLOCK;
-    }
-    return accept4(server_fd, address, size_ptr, f);
+  const int COMPAT_SOCK_CLOEXEC = SOCK_CLOEXEC;
+  const int COMPAT_SOCK_NONBLOCK = SOCK_NONBLOCK;
+
+  int compat_accept4(int socket, struct sockaddr* address, socklen_t* size_ptr, int flags) {
+    return accept4(socket, address, size_ptr, flags);
   }
 #else
-  int compat_accept4(int server_fd, struct sockaddr* address, socklen_t* size_ptr, int flags) {
+  const int COMPAT_SOCK_CLOEXEC = O_CLOEXEC;
+  const int COMPAT_SOCK_NONBLOCK = O_NONBLOCK;
+
+  int compat_accept4(int socket, struct sockaddr* address, socklen_t* size_ptr, int flags) {
     sigset_t mask;
     if (sigmask_block_all_signals(&mask) == -1) {
       return -1;
     }
     sigmask_saver save_mask(mask);
 
-    file_descriptor fd(accept(server_fd, address, size_ptr));
+    file_descriptor fd(accept(socket, address, size_ptr));
     if (!fd.valid()) {
       return -1;
     }
 
-    if (flags & O_CLOEXEC) {
+    if (flags & COMPAT_SOCK_CLOEXEC) {
       if (coe(fd.get()) == -1) {
         return -1;
       }
     }
-    if (flags & O_NONBLOCK) {
+    if (flags & COMPAT_SOCK_NONBLOCK) {
       if (ndelay_on(fd.get()) == -1) {
         return -1;
       }
