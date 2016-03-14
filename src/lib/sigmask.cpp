@@ -24,8 +24,8 @@
 
 #include <iostream>
 
+#include <dromozoa/compat_strerror.hpp>
 #include <dromozoa/sigmask.hpp>
-#include <dromozoa/strerror.hpp>
 #include <dromozoa/unexpected.hpp>
 
 namespace dromozoa {

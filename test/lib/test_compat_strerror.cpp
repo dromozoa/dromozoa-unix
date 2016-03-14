@@ -19,7 +19,7 @@
 
 #include <iostream>
 
-#include <dromozoa/strerror.hpp>
+#include <dromozoa/compat_strerror.hpp>
 
 int main(int, char*[]) {
   std::cerr << dromozoa::compat_strerror(ENOENT) << "\n";

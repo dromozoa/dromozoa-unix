@@ -20,12 +20,12 @@ TESTS = $(check_PROGRAMS)
 check_PROGRAMS = \
 	test_argument_vector.exe \
 	test_compat_pipe2.exe \
+	test_compat_strerror.exe \
 	test_forkexec.exe \
 	test_pathexec.exe \
 	test_selfpipe.exe \
 	test_sigmask.exe \
 	test_socket_address.exe \
-	test_strerror.exe \
 	test_unexpected.exe
 
 test_argument_vector_exe_CPPFLAGS = -I$(top_srcdir)/include
@@ -56,9 +56,9 @@ test_socket_address_exe_CPPFLAGS = -I$(top_srcdir)/include
 test_socket_address_exe_LDADD = $(top_builddir)/src/lib/libdromozoa-unix.la
 test_socket_address_exe_SOURCES = test_socket_address.cpp
 
-test_strerror_exe_CPPFLAGS = -I$(top_srcdir)/include
-test_strerror_exe_LDADD = $(top_builddir)/src/lib/libdromozoa-unix.la
-test_strerror_exe_SOURCES = test_strerror.cpp
+test_compat_strerror_exe_CPPFLAGS = -I$(top_srcdir)/include
+test_compat_strerror_exe_LDADD = $(top_builddir)/src/lib/libdromozoa-unix.la
+test_compat_strerror_exe_SOURCES = test_compat_strerror.cpp
 
 test_unexpected_exe_CPPFLAGS = -I$(top_srcdir)/include
 test_unexpected_exe_LDADD = $(top_builddir)/src/lib/libdromozoa-unix.la

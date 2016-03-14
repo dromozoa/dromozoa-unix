@@ -32,7 +32,7 @@ extern "C" {
 #include <iostream>
 
 #include <dromozoa/bind.hpp>
-#include <dromozoa/strerror.hpp>
+#include <dromozoa/compat_strerror.hpp>
 
 namespace dromozoa {
   using bind::function;

@@ -22,7 +22,7 @@
 #include <sstream>
 #include <string>
 
-#include <dromozoa/strerror.hpp>
+#include <dromozoa/compat_strerror.hpp>
 
 namespace dromozoa {
   const char* compat_strerror_r_result(const char* result, char*) {
