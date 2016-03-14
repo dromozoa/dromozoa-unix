@@ -18,6 +18,7 @@
 #include <assert.h>
 #include <signal.h>
 
+#include <dromozoa/compat_sigmask.hpp>
 #include <dromozoa/sigmask.hpp>
 
 void test_sigmask1() {

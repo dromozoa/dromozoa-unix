@@ -15,30 +15,14 @@
 // You should have received a copy of the GNU General Public License
 // along with dromozoa-unix.  If not, see <http://www.gnu.org/licenses/>.
 
-#ifdef HAVE_CONFIG_H
-#include "config.h"
-#endif
-
 #include <errno.h>
-#include <signal.h>
-
-#include <iostream>
 
 #include <dromozoa/compat_strerror.hpp>
+#include <dromozoa/compat_sigmask.hpp>
 #include <dromozoa/sigmask.hpp>
 #include <dromozoa/unexpected.hpp>
 
 namespace dromozoa {
-#ifdef HAVE_PTHREAD
-  int compat_sigmask(int how, const sigset_t* new_mask, sigset_t* old_mask) {
-    return pthread_sigmask(how, new_mask, old_mask);
-  }
-#else
-  int compat_sigmask(int how, const sigset_t* new_mask, sigset_t* old_mask) {
-    return sigprocmask(how, new_mask, old_mask);
-  }
-#endif
-
   int sigmask_block_all_signals(sigset_t* old_mask) {
     sigset_t new_mask;
     if (sigfillset(&new_mask) == -1) {

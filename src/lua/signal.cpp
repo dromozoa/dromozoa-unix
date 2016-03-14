@@ -22,6 +22,7 @@ extern "C" {
 
 #include <signal.h>
 
+#include <dromozoa/compat_sigmask.hpp>
 #include <dromozoa/sigmask.hpp>
 
 #include "common.hpp"

@@ -26,8 +26,8 @@
 #include <sstream>
 #include <string>
 
+#include <dromozoa/compat_sigmask.hpp>
 #include <dromozoa/forkexec.hpp>
-#include <dromozoa/sigmask.hpp>
 
 void assert_sigmask() {
   sigset_t mask;

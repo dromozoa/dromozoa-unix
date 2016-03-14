@@ -15,24 +15,13 @@
 // You should have received a copy of the GNU General Public License
 // along with dromozoa-unix.  If not, see <http://www.gnu.org/licenses/>.
 
-#ifndef DROMOZOA_SIGMASK_HPP
-#define DROMOZOA_SIGMASK_HPP
+#ifndef DROMOZOA_COMPAT_SIGMASK_HPP
+#define DROMOZOA_COMPAT_SIGMASK_HPP
 
 #include <signal.h>
 
 namespace dromozoa {
-  int sigmask_block_all_signals(sigset_t* old_mask = 0);
-  int sigmask_unblock_all_signals(sigset_t* old_mask = 0);
-
-  class sigmask_saver {
-  public:
-    explicit sigmask_saver(const sigset_t& mask);
-    ~sigmask_saver();
-  private:
-    sigset_t mask_;
-    sigmask_saver(const sigmask_saver&);
-    sigmask_saver& operator=(const sigmask_saver&);
-  };
+  int compat_sigmask(int how, const sigset_t* new_mask, sigset_t* old_mask = 0);
 }
 
 #endif

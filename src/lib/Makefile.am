@@ -24,6 +24,7 @@ libdromozoa_unix_la_SOURCES = \
 	coe.cpp \
 	compat_accept4.cpp \
 	compat_pipe2.cpp \
+	compat_sigmask.cpp \
 	compat_strerror.cpp \
 	file_descriptor.cpp \
 	forkexec.cpp \
