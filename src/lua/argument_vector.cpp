@@ -19,13 +19,13 @@
 
 namespace dromozoa {
   argument_vector make_argument_vector(lua_State* L, int n) {
-    argument_vector argv;
+    argument_vector result;
     if (lua_istable(L, n)) {
       for (int i = 1; ; ++i) {
         lua_pushinteger(L, i);
         lua_gettable(L, n);
         if (const char* p = lua_tostring(L, -1)) {
-          argv.push_back(p);
+          result.push_back(p);
           lua_pop(L, 1);
         } else {
           lua_pop(L, 1);
@@ -33,6 +33,6 @@ namespace dromozoa {
         }
       }
     }
-    return argv;
+    return result;
   }
 }

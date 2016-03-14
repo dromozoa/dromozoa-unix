@@ -50,8 +50,8 @@ namespace dromozoa {
   int new_fd(lua_State* L, int fd, bool ref = false);
   int get_fd(lua_State* L, int n);
 
-  int new_sockaddr(lua_State*L, const socket_address& address);
-  int new_sockaddr(lua_State*L, const struct sockaddr* address, socklen_t size);
+  int new_sockaddr(lua_State* L, const socket_address& address);
+  int new_sockaddr(lua_State* L, const struct sockaddr* address, socklen_t size);
   const socket_address* get_sockaddr(lua_State* L, int n);
 
   int open_selector(int size, int flags);
