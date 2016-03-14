@@ -144,7 +144,7 @@ namespace dromozoa {
           null_fd_.close();
         }
 
-        if (sigmask_unblock_all_signals() == -1) {
+        if (sigmask_unblock_all_signals(0) == -1) {
           die();
         }
 

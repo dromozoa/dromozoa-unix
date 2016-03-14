@@ -21,8 +21,8 @@
 #include <signal.h>
 
 namespace dromozoa {
-  int sigmask_block_all_signals(sigset_t* old_mask = 0);
-  int sigmask_unblock_all_signals(sigset_t* old_mask = 0);
+  int sigmask_block_all_signals(sigset_t* old_mask);
+  int sigmask_unblock_all_signals(sigset_t* old_mask);
 
   class sigmask_saver {
   public:

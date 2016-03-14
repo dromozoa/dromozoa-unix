@@ -21,7 +21,7 @@
 #include <signal.h>
 
 namespace dromozoa {
-  int compat_sigmask(int how, const sigset_t* new_mask, sigset_t* old_mask = 0);
+  int compat_sigmask(int how, const sigset_t* new_mask, sigset_t* old_mask);
 }
 
 #endif
