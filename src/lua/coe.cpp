@@ -31,6 +31,6 @@ namespace dromozoa {
   }
 
   void initialize_coe(lua_State* L) {
-    function<impl_coe>::set_field(L, "coe");
+    set_field(L, "coe", function<impl_coe>());
   }
 }

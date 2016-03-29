@@ -23,30 +23,18 @@
 
 namespace dromozoa {
   int new_fd(lua_State* L, int fd, bool ref) {
-    file_descriptor* data = static_cast<file_descriptor*>(lua_newuserdata(L, sizeof(file_descriptor)));
-    new(data) file_descriptor(fd);
+    new(new_userdata<file_descriptor>(L)) file_descriptor(fd);
     if (ref) {
-      luaL_getmetatable(L, "dromozoa.unix.fd.ref");
+      set_metatable(L, "dromozoa.unix.fd.ref");
     } else {
-      luaL_getmetatable(L, "dromozoa.unix.fd");
+      set_metatable(L, "dromozoa.unix.fd");
     }
-    lua_setmetatable(L, -2);
     return 1;
   }
 
   namespace {
     file_descriptor* get_file_descriptor(lua_State* L, int n) {
-      const char* name = "dromozoa.unix.fd";
-      if (lua_touserdata(L, n)) {
-        if (lua_getmetatable(L, n)) {
-          luaL_getmetatable(L, "dromozoa.unix.fd.ref");
-          if (lua_rawequal(L, -1, -2)) {
-            name = "dromozoa.unix.fd.ref";
-          }
-          lua_pop(L, 2);
-        }
-      }
-      return static_cast<file_descriptor*>(luaL_checkudata(L, n, name));
+      return check_userdata<file_descriptor>(L, n, "dromozoa.unix.fd.ref", "dromozoa.unix.fd");
     }
   }
 
@@ -92,22 +80,12 @@ namespace dromozoa {
 
   int open_fd(lua_State* L) {
     lua_newtable(L);
-    function<impl_get>::set_field(L, "get");
-    function<impl_close>::set_field(L, "close");
-    lua_newtable(L);
-    function<impl_new>::set_field(L, "__call");
-    lua_setmetatable(L, -2);
+    set_field(L, "get", function<impl_get>());
+    set_field(L, "close", function<impl_close>());
+    set_metafield(L, "__call", function<impl_new>());
 
-    luaL_newmetatable(L, "dromozoa.unix.fd.ref");
-    lua_pushvalue(L, -2);
-    lua_setfield(L, -2, "__index");
-    lua_pop(L, 1);
-
-    luaL_newmetatable(L, "dromozoa.unix.fd");
-    lua_pushvalue(L, -2);
-    lua_setfield(L, -2, "__index");
-    function<impl_gc>::set_field(L, "__gc");
-    lua_pop(L, 1);
+    new_metatable(L, "dromozoa.unix.fd.ref");
+    new_metatable(L, "dromozoa.unix.fd", function<impl_gc>());
 
     new_fd(L, 0, true);
     lua_setfield(L, -2, "stdin");

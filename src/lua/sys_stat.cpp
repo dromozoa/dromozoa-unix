@@ -20,8 +20,6 @@
 #include "common.hpp"
 
 namespace dromozoa {
-  using bind::function;
-
   namespace {
     int impl_umask(lua_State* L) {
       lua_pushinteger(L, umask(luaL_checkinteger(L, 1)));

@@ -17,11 +17,8 @@
 
 local unix = require "dromozoa.unix"
 
--- unix.set_log_level(3)
-unix.set_raise_error(true)
-
 print(unix.realpath(arg[0]))
-assert(not pcall(unix.realpath, "no such file"))
+assert(not unix.realpath("no such file"))
 
 local tmpdir = unix.mkdtemp("tmp-XXXXXX")
 print(tmpdir)

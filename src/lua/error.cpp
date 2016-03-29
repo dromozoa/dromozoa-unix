@@ -31,13 +31,11 @@ extern "C" {
 
 #include <iostream>
 
-#include <dromozoa/bind.hpp>
 #include <dromozoa/compat_strerror.hpp>
 
-namespace dromozoa {
-  using bind::function;
-  using bind::push_success;
+#include "common.hpp"
 
+namespace dromozoa {
   int push_resource_unavailable_try_again(lua_State* L) {
     lua_pushlightuserdata(L, reinterpret_cast<void*>(EAGAIN));
     return 1;
@@ -97,17 +95,17 @@ namespace dromozoa {
   }
 
   void initialize_error(lua_State* L) {
-    function<impl_strerror>::set_field(L, "strerror");
-    function<impl_set_errno>::set_field(L, "set_errno");
-    function<impl_get_errno>::set_field(L, "get_errno");
+    set_field(L, "strerror", function<impl_strerror>());
+    set_field(L, "set_errno", function<impl_set_errno>());
+    set_field(L, "get_errno", function<impl_get_errno>());
 
-    DROMOZOA_BIND_SET_FIELD(L, EAGAIN);
-    DROMOZOA_BIND_SET_FIELD(L, EINPROGRESS);
-    DROMOZOA_BIND_SET_FIELD(L, EINTR);
-    DROMOZOA_BIND_SET_FIELD(L, ENOENT);
-    DROMOZOA_BIND_SET_FIELD(L, EPIPE);
-    DROMOZOA_BIND_SET_FIELD(L, ETIMEDOUT);
-    DROMOZOA_BIND_SET_FIELD(L, EWOULDBLOCK);
+    DROMOZOA_SET_FIELD(L, EAGAIN);
+    DROMOZOA_SET_FIELD(L, EINPROGRESS);
+    DROMOZOA_SET_FIELD(L, EINTR);
+    DROMOZOA_SET_FIELD(L, ENOENT);
+    DROMOZOA_SET_FIELD(L, EPIPE);
+    DROMOZOA_SET_FIELD(L, ETIMEDOUT);
+    DROMOZOA_SET_FIELD(L, EWOULDBLOCK);
 
     push_resource_unavailable_try_again(L);
     lua_setfield(L, -2, "resource_unavailable_try_again");

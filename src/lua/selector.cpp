@@ -44,10 +44,6 @@ typedef dromozoa::selector_kqueue selector_impl;
 #endif
 
 namespace dromozoa {
-  using bind::function;
-  using bind::get_log_level;
-  using bind::push_success;
-
   namespace {
     selector& get_selector(lua_State* L, int n) {
       return *static_cast<selector*>(luaL_checkudata(L, n, "dromozoa.unix.selector"));
@@ -64,9 +60,9 @@ namespace dromozoa {
       new(s) selector_impl(fd.release(), size);
       luaL_getmetatable(L, "dromozoa.unix.selector");
       lua_setmetatable(L, -2);
-      if (get_log_level() > 2) {
-        std::cerr << "[dromozoa-unix] new selector " << s << std::endl;
-      }
+      // if (get_log_level() > 2) {
+      //   std::cerr << "[dromozoa-unix] new selector " << s << std::endl;
+      // }
       return 1;
     }
 

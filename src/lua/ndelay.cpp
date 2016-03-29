@@ -39,7 +39,7 @@ namespace dromozoa {
   }
 
   void initialize_ndelay(lua_State* L) {
-    function<impl_ndelay_on>::set_field(L, "ndelay_on");
-    function<impl_ndelay_off>::set_field(L, "ndelay_off");
+    set_field(L, "ndelay_on", function<impl_ndelay_on>());
+    set_field(L, "ndelay_off", function<impl_ndelay_off>());
   }
 }

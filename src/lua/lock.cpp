@@ -54,8 +54,8 @@ namespace dromozoa {
   }
 
   void initialize_lock(lua_State* L) {
-    function<impl_lock_ex>::set_field(L, "lock_ex");
-    function<impl_lock_exnb>::set_field(L, "lock_exnb");
-    function<impl_lock_un>::set_field(L, "lock_un");
+    set_field(L, "lock_ex", function<impl_lock_ex>());
+    set_field(L, "lock_exnb", function<impl_lock_exnb>());
+    set_field(L, "lock_un", function<impl_lock_un>());
   }
 }

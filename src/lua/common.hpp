@@ -23,7 +23,6 @@ extern "C" {
 #include <lauxlib.h>
 }
 
-
 #include <errno.h>
 #include <sys/socket.h>
 
@@ -31,10 +30,12 @@ extern "C" {
 #include <dromozoa/argument_vector.hpp>
 #include <dromozoa/socket_address.hpp>
 
+#include "bind.hpp"
+
 namespace dromozoa {
-  using bind::function;
+  // using bind::function;
   using bind::push_success;
-  using bind::set_field;
+  // using bind::set_field;
   using bind::translate_range_i;
   using bind::translate_range_j;
 
