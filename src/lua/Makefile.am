@@ -15,18 +15,38 @@
 # You should have received a copy of the GNU General Public License
 # along with dromozoa-unix.  If not, see <http://www.gnu.org/licenses/>.
 
-ACLOCAL_AMFLAGS = -I m4
-SUBDIRS = bind src/lib src/lua test/lib
+luaexec_LTLIBRARIES = unix.la
 
-EXTRA_DIST = \
-	.gitignore \
-	README.md \
-	dromozoa \
-	dromozoa-unix-*.rockspec \
-	m4/update \
-	test \
-	test.sh
-
-nobase_lua_DATA = \
-	dromozoa/unix/asio.lua \
-	dromozoa/unix/timespec.lua
+unix_la_CPPFLAGS = -I$(top_srcdir)/bind -I$(top_srcdir)/include
+unix_la_LDFLAGS = -module -avoid-version -shared
+unix_la_LIBADD = \
+	$(top_srcdir)/bind/libdromozoa-bind.la \
+	$(top_srcdir)/src/lib/libdromozoa-unix.la
+unix_la_SOURCES = \
+	argument_vector.cpp \
+	coe.cpp \
+	error.cpp \
+	fcntl.cpp \
+	fd.cpp \
+	lock.cpp \
+	ndelay.cpp \
+	netdb.cpp \
+	netinet.cpp \
+	pathexec.cpp \
+	pipe.cpp \
+	process.cpp \
+	read.cpp \
+	selector.cpp \
+	selfpipe.cpp \
+	signal.cpp \
+	sockaddr.cpp \
+	socket.cpp \
+	stdlib.cpp \
+	sys_socket.cpp \
+	sys_stat.cpp \
+	sys_time.cpp \
+	sys_wait.cpp \
+	time.cpp \
+	unistd.cpp \
+	write.cpp \
+	module.cpp

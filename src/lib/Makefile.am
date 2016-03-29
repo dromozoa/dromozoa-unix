@@ -1,6 +1,4 @@
-#! /bin/sh -e
-
-# Copyright (C) 2015 Tomoyuki Fujimori <moyu@dromozoa.com>
+# Copyright (C) 2016 Tomoyuki Fujimori <moyu@dromozoa.com>
 #
 # This file is part of dromozoa-unix.
 #
@@ -17,14 +15,31 @@
 # You should have received a copy of the GNU General Public License
 # along with dromozoa-unix.  If not, see <http://www.gnu.org/licenses/>.
 
-case x$1 in
-  x) lua=lua;;
-  *) lua=$1;;
-esac
+noinst_LTLIBRARIES = libdromozoa-unix.la
 
-for i in test/lua/test*.lua
-do
-  "$lua" "$i"
-done
+libdromozoa_unix_la_CPPFLAGS = -I$(top_srcdir)/include
+libdromozoa_unix_la_LDFLAGS = -static
+libdromozoa_unix_la_SOURCES = \
+	argument_vector.cpp \
+	coe.cpp \
+	compat_accept4.cpp \
+	compat_pipe2.cpp \
+	compat_sigmask.cpp \
+	compat_strerror.cpp \
+	file_descriptor.cpp \
+	forkexec.cpp \
+	lock.cpp \
+	ndelay.cpp \
+	pathexec.cpp \
+	selector.cpp \
+	selfpipe.cpp \
+	sigmask.cpp \
+	socket_address.cpp \
+	unexpected.cpp
 
-rm -f test.lock test.sock test.txt
+if HAVE_EPOLL
+libdromozoa_unix_la_SOURCES += selector_epoll.cpp
+endif
+if HAVE_KQUEUE
+libdromozoa_unix_la_SOURCES += selector_kqueue.cpp
+endif
