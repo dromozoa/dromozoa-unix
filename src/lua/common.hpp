@@ -27,6 +27,7 @@ extern "C" {
 #include <sys/socket.h>
 
 #include <dromozoa/bind.hpp>
+#include <dromozoa/luacxx.hpp>
 #include <dromozoa/argument_vector.hpp>
 #include <dromozoa/socket_address.hpp>
 

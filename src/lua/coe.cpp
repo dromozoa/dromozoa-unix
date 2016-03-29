@@ -15,22 +15,28 @@
 // You should have received a copy of the GNU General Public License
 // along with dromozoa-unix.  If not, see <http://www.gnu.org/licenses/>.
 
+#include <errno.h>
+
 #include <dromozoa/coe.hpp>
+#include <dromozoa/compat_strerror.hpp>
 
 #include "common.hpp"
 
 namespace dromozoa {
   namespace {
-    int impl_coe(lua_State* L) {
-      if (coe(get_fd(L, 1)) == -1) {
-        return push_error(L);
+    void impl_coe(luaX_State& LX) {
+      if (coe(get_fd(LX.get(), 1)) == -1) {
+        // push_failure(LX);
+        LX.push(luaX_nil).push(compat_strerror(errno)).push(errno);
       } else {
-        return push_success(L);
+        // push_success(LX);
+        LX.push_value(1);
       }
     }
   }
 
   void initialize_coe(lua_State* L) {
-    set_field(L, "coe", function<impl_coe>());
+    luaX_State(L)
+      .set_table("coe", impl_coe);
   }
 }
