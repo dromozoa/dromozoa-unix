@@ -21,17 +21,16 @@
 
 namespace dromozoa {
   namespace {
-    void impl_coe(luaX_State_Unix& LX) {
-      if (coe(get_fd(LX.get(), 1)) == -1) {
-        LX.push_failure();
+    void impl_coe(lua_State* L) {
+      if (coe(get_fd(L, 1)) == -1) {
+        push_error(L);
       } else {
-        LX.push_success();
+        luaX_push_success(L);
       }
     }
   }
 
   void initialize_coe(lua_State* L) {
-    luaX_State_Unix(L)
-      .set_table("coe", impl_coe);
+    luaX_set_table(L, "coe", impl_coe);
   }
 }
