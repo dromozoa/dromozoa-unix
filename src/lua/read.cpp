@@ -42,6 +42,6 @@ namespace dromozoa {
   }
 
   void initialize_read(lua_State* L) {
-    luaX_set_table(L, "read", impl_read);
+    luaX_set_field(L, "read", impl_read);
   }
 }

@@ -31,6 +31,6 @@ namespace dromozoa {
   }
 
   void initialize_coe(lua_State* L) {
-    luaX_set_table(L, "coe", impl_coe);
+    luaX_set_field(L, "coe", impl_coe);
   }
 }
