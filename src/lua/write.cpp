@@ -24,33 +24,31 @@
 #include "common.hpp"
 
 namespace dromozoa {
-  int impl_write(lua_State* L) {
+  void impl_write(lua_State* L) {
     size_t size;
     const char* buffer = luaL_checklstring(L, 2, &size);
-    size_t i = translate_range_i(L, 3, size);
-    size_t j = translate_range_j(L, 4, size);
+    size_t i = luaX_range_i(L, 3, size);
+    size_t j = luaX_range_j(L, 4, size);
     if (i < j) {
       ssize_t result = write(get_fd(L, 1), buffer + i, j - i);
       if (result == -1) {
         int code = errno;
         if (code == EAGAIN || code == EWOULDBLOCK) {
-          return push_resource_unavailable_try_again(L);
+          push_resource_unavailable_try_again(L);
         } else if (code == EPIPE) {
-          return push_broken_pipe(L);
+          push_broken_pipe(L);
         } else {
-          return push_error(L);
+          push_error(L);
         }
       } else {
         lua_pushinteger(L, result);
-        return 1;
       }
     } else {
       lua_pushinteger(L, 0);
-      return 1;
     }
   }
 
   void initialize_write(lua_State* L) {
-    function<impl_write>::set_field(L, "write");
+    luaX_set_field(L, "write", impl_write);
   }
 }

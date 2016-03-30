@@ -58,8 +58,9 @@ assert(reader:close())
 
 local reader, writer = unix.pipe(unix.O_NONBLOCK);
 
-local result = reader:read(1)
-assert(result == unix.resource_unavailable_try_again)
+local a, b, c = reader:read(1)
+assert(a == nil)
+assert(c == unix.EAGAIN or c == unix.EWOULDBLOCK)
 assert(reader:close())
 local result = writer:write("foo")
 assert(result == unix.broken_pipe)

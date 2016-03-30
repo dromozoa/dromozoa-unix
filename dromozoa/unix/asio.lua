@@ -138,12 +138,14 @@ function class:read(fd, count, timeout)
   local result = buffer:read(count)
   if result == nil then
     local a, b, c = class.super.fd.read(fd, self.buffer_size)
-    if a == class.super.resource_unavailable_try_again then
-      if add_pending(self, fd, 1, timeout) == nil then
-        return timedout()
+    if a == nil then
+      if c == class.super.EAGAIN or c == class.super.EWOULDBLOCK then
+        if add_pending(self, fd, 1, timeout) == nil then
+          return timedout()
+        end
+      else
+        return a, b, c
       end
-    elseif a == nil then
-      return a, b, c
     elseif a == "" then
       buffer:close()
     else
@@ -161,12 +163,14 @@ function class:read_line(fd, delimiter, timeout)
   local line, char = buffer:read_line(delimiter)
   if line == nil then
     local a, b, c = class.super.fd.read(fd, self.buffer_size)
-    if a == class.super.resource_unavailable_try_again then
-      if add_pending(self, fd, 1, timeout) == nil then
-        return nil
+    if a == nil then
+      if c == class.super.EAGAIN or c == class.super.EWOULDBLOCK then
+        if add_pending(self, fd, 1, timeout) == nil then
+          return timedout()
+        end
+      else
+        return a, b, c
       end
-    elseif a == nil then
-      return a, b, c
     elseif a == "" then
       buffer:close()
     else
