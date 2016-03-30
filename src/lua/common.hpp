@@ -29,6 +29,7 @@ extern "C" {
 #include <dromozoa/bind.hpp>
 #include <dromozoa/luacxx.hpp>
 #include <dromozoa/argument_vector.hpp>
+#include <dromozoa/compat_strerror.hpp>
 #include <dromozoa/socket_address.hpp>
 
 #include "bind.hpp"
@@ -39,6 +40,25 @@ namespace dromozoa {
   // using bind::set_field;
   using bind::translate_range_i;
   using bind::translate_range_j;
+
+  class luaX_State_Unix : public luaX_State {
+  public:
+    explicit luaX_State_Unix(lua_State* L);
+
+    luaX_State_Unix& push_failure(int code = errno) {
+      push(luaX_nil, compat_strerror(code), code);
+      return *this;
+    }
+  };
+
+  namespace luacxx {
+    inline int luaX_closure(lua_State* L, void (*function)(luaX_State_Unix&)) {
+      int top = lua_gettop(L);
+      luaX_State_Unix LX(L);
+      function(LX);
+      return lua_gettop(L) - top;
+    }
+  }
 
   int push_resource_unavailable_try_again(lua_State* L);
   int push_operation_in_progress(lua_State* L);

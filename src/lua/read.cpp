@@ -25,24 +25,24 @@
 
 namespace dromozoa {
   namespace {
-    int impl_read(lua_State* L) {
-      std::vector<char> buffer(luaL_checkinteger(L, 2));
-      ssize_t result = read(get_fd(L, 1), &buffer[0], buffer.size());
+    void impl_read(luaX_State_Unix& LX) {
+      std::vector<char> buffer(luaL_checkinteger(LX.get(), 2));
+      ssize_t result = read(get_fd(LX.get(), 1), &buffer[0], buffer.size());
       if (result == -1) {
         int code = errno;
         if (code == EAGAIN || code == EWOULDBLOCK) {
-          return push_resource_unavailable_try_again(L);
+          push_resource_unavailable_try_again(LX.get());
         } else {
-          return push_error(L, code);
+          LX.push_failure(code);
         }
       } else {
-        lua_pushlstring(L, &buffer[0], result);
-        return 1;
+        lua_pushlstring(LX.get(), &buffer[0], result);
       }
     }
   }
 
   void initialize_read(lua_State* L) {
-    function<impl_read>::set_field(L, "read");
+    luaX_State_Unix(L)
+      .set_table("read", impl_read);
   }
 }
