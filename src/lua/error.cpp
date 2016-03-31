@@ -95,17 +95,17 @@ namespace dromozoa {
   }
 
   void initialize_error(lua_State* L) {
-    set_field(L, "strerror", function<impl_strerror>());
-    set_field(L, "set_errno", function<impl_set_errno>());
-    set_field(L, "get_errno", function<impl_get_errno>());
+    luaX_set_field(L, "strerror", impl_strerror);
+    luaX_set_field(L, "set_errno", impl_set_errno);
+    luaX_set_field(L, "get_errno", impl_get_errno);
 
-    DROMOZOA_SET_FIELD(L, EAGAIN);
-    DROMOZOA_SET_FIELD(L, EINPROGRESS);
-    DROMOZOA_SET_FIELD(L, EINTR);
-    DROMOZOA_SET_FIELD(L, ENOENT);
-    DROMOZOA_SET_FIELD(L, EPIPE);
-    DROMOZOA_SET_FIELD(L, ETIMEDOUT);
-    DROMOZOA_SET_FIELD(L, EWOULDBLOCK);
+    luaX_set_field(L, "EAGAIN", EAGAIN);
+    luaX_set_field(L, "EINPROGRESS", EINPROGRESS);
+    luaX_set_field(L, "EINTR", EINTR);
+    luaX_set_field(L, "ENOENT", ENOENT);
+    luaX_set_field(L, "EPIPE", EPIPE);
+    luaX_set_field(L, "ETIMEDOUT", ETIMEDOUT);
+    luaX_set_field(L, "EWOULDBLOCK", EWOULDBLOCK);
 
     push_resource_unavailable_try_again(L);
     lua_setfield(L, -2, "resource_unavailable_try_again");

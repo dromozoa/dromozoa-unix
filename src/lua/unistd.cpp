@@ -91,18 +91,18 @@ namespace dromozoa {
   }
 
   void initialize_unistd(lua_State* L) {
-    function<impl_environ>::set_field(L, "environ");
-    function<impl_getcwd>::set_field(L, "getcwd");
-    function<impl_getuid>::set_field(L, "getuid");
-    function<impl_getgid>::set_field(L, "getgid");
-    function<impl_geteuid>::set_field(L, "geteuid");
-    function<impl_getegid>::set_field(L, "getegid");
-    function<impl_getpid>::set_field(L, "getpid");
-    function<impl_getpgrp>::set_field(L, "getpgrp");
-    function<impl_getppid>::set_field(L, "getppid");
+    luaX_set_field(L, "environ", impl_environ);
+    luaX_set_field(L, "getcwd", impl_getcwd);
+    luaX_set_field(L, "getuid", impl_getuid);
+    luaX_set_field(L, "getgid", impl_getgid);
+    luaX_set_field(L, "geteuid", impl_geteuid);
+    luaX_set_field(L, "getegid", impl_getegid);
+    luaX_set_field(L, "getpid", impl_getpid);
+    luaX_set_field(L, "getpgrp", impl_getpgrp);
+    luaX_set_field(L, "getppid", impl_getppid);
 
-    DROMOZOA_BIND_SET_FIELD(L, STDIN_FILENO);
-    DROMOZOA_BIND_SET_FIELD(L, STDOUT_FILENO);
-    DROMOZOA_BIND_SET_FIELD(L, STDERR_FILENO);
+    luaX_set_field(L, "STDIN_FILENO", STDIN_FILENO);
+    luaX_set_field(L, "STDOUT_FILENO", STDOUT_FILENO);
+    luaX_set_field(L, "STDERR_FILENO", STDERR_FILENO);
   }
 }

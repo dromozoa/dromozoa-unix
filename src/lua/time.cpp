@@ -37,14 +37,14 @@ namespace dromozoa {
       } else {
         int result = push_error(L);
         lua_newtable(L);
-        set_field(L, "tv_sec", tv2.tv_sec);
-        set_field(L, "tv_nsec", tv2.tv_nsec);
+        luaX_set_field(L, "tv_sec", tv2.tv_sec);
+        luaX_set_field(L, "tv_nsec", tv2.tv_nsec);
         return result + 1;
       }
     }
   }
 
   void initialize_time(lua_State* L) {
-    function<impl_nanosleep>::set_field(L, "nanosleep");
+    luaX_set_field(L, "nanosleep", impl_nanosleep);
   }
 }

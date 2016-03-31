@@ -103,37 +103,37 @@ namespace dromozoa {
   }
 
   void initialize_signal(lua_State* L) {
-    function<impl_kill>::set_field(L, "kill");
-    function<impl_default_signal>::set_field(L, "default_signal");
-    function<impl_ignore_signal>::set_field(L, "ignore_signal");
-    function<impl_block_signal>::set_field(L, "block_signal");
-    function<impl_unblock_signal>::set_field(L, "unblock_signal");
+    luaX_set_field(L, "kill", impl_kill);
+    luaX_set_field(L, "default_signal", impl_default_signal);
+    luaX_set_field(L, "ignore_signal", impl_ignore_signal);
+    luaX_set_field(L, "block_signal", impl_block_signal);
+    luaX_set_field(L, "unblock_signal", impl_unblock_signal);
 
-    DROMOZOA_BIND_SET_FIELD(L, SIGABRT);
-    DROMOZOA_BIND_SET_FIELD(L, SIGALRM);
-    DROMOZOA_BIND_SET_FIELD(L, SIGBUS);
-    DROMOZOA_BIND_SET_FIELD(L, SIGCHLD);
-    DROMOZOA_BIND_SET_FIELD(L, SIGCONT);
-    DROMOZOA_BIND_SET_FIELD(L, SIGFPE);
-    DROMOZOA_BIND_SET_FIELD(L, SIGHUP);
-    DROMOZOA_BIND_SET_FIELD(L, SIGILL);
-    DROMOZOA_BIND_SET_FIELD(L, SIGINT);
-    DROMOZOA_BIND_SET_FIELD(L, SIGKILL);
-    DROMOZOA_BIND_SET_FIELD(L, SIGPIPE);
-    DROMOZOA_BIND_SET_FIELD(L, SIGQUIT);
-    DROMOZOA_BIND_SET_FIELD(L, SIGSEGV);
-    DROMOZOA_BIND_SET_FIELD(L, SIGSTOP);
-    DROMOZOA_BIND_SET_FIELD(L, SIGTERM);
-    DROMOZOA_BIND_SET_FIELD(L, SIGTSTP);
-    DROMOZOA_BIND_SET_FIELD(L, SIGTTIN);
-    DROMOZOA_BIND_SET_FIELD(L, SIGTTOU);
-    DROMOZOA_BIND_SET_FIELD(L, SIGUSR1);
-    DROMOZOA_BIND_SET_FIELD(L, SIGUSR2);
-    DROMOZOA_BIND_SET_FIELD(L, SIGSYS);
-    DROMOZOA_BIND_SET_FIELD(L, SIGTRAP);
-    DROMOZOA_BIND_SET_FIELD(L, SIGURG);
-    DROMOZOA_BIND_SET_FIELD(L, SIGVTALRM);
-    DROMOZOA_BIND_SET_FIELD(L, SIGXCPU);
-    DROMOZOA_BIND_SET_FIELD(L, SIGXFSZ);
+    luaX_set_field(L, "SIGABRT", SIGABRT);
+    luaX_set_field(L, "SIGALRM", SIGALRM);
+    luaX_set_field(L, "SIGBUS", SIGBUS);
+    luaX_set_field(L, "SIGCHLD", SIGCHLD);
+    luaX_set_field(L, "SIGCONT", SIGCONT);
+    luaX_set_field(L, "SIGFPE", SIGFPE);
+    luaX_set_field(L, "SIGHUP", SIGHUP);
+    luaX_set_field(L, "SIGILL", SIGILL);
+    luaX_set_field(L, "SIGINT", SIGINT);
+    luaX_set_field(L, "SIGKILL", SIGKILL);
+    luaX_set_field(L, "SIGPIPE", SIGPIPE);
+    luaX_set_field(L, "SIGQUIT", SIGQUIT);
+    luaX_set_field(L, "SIGSEGV", SIGSEGV);
+    luaX_set_field(L, "SIGSTOP", SIGSTOP);
+    luaX_set_field(L, "SIGTERM", SIGTERM);
+    luaX_set_field(L, "SIGTSTP", SIGTSTP);
+    luaX_set_field(L, "SIGTTIN", SIGTTIN);
+    luaX_set_field(L, "SIGTTOU", SIGTTOU);
+    luaX_set_field(L, "SIGUSR1", SIGUSR1);
+    luaX_set_field(L, "SIGUSR2", SIGUSR2);
+    luaX_set_field(L, "SIGSYS", SIGSYS);
+    luaX_set_field(L, "SIGTRAP", SIGTRAP);
+    luaX_set_field(L, "SIGURG", SIGURG);
+    luaX_set_field(L, "SIGVTALRM", SIGVTALRM);
+    luaX_set_field(L, "SIGXCPU", SIGXCPU);
+    luaX_set_field(L, "SIGXFSZ", SIGXFSZ);
   }
 }

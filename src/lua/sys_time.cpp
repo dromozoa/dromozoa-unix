@@ -29,8 +29,8 @@ namespace dromozoa {
       struct timeval tv = {};
       if (gettimeofday(&tv, 0) != -1) {
         lua_newtable(L);
-        set_field(L, "tv_sec", tv.tv_sec);
-        set_field(L, "tv_usec", tv.tv_usec);
+        luaX_set_field(L, "tv_sec", tv.tv_sec);
+        luaX_set_field(L, "tv_usec", tv.tv_usec);
         return 1;
       } else {
         return push_error(L);
@@ -39,6 +39,6 @@ namespace dromozoa {
   }
 
   void initialize_sys_time(lua_State* L) {
-    function<impl_gettimeofday>::set_field(L, "gettimeofday");
+    luaX_set_field(L, "gettimeofday", impl_gettimeofday);
   }
 }

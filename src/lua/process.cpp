@@ -92,15 +92,15 @@ namespace dromozoa {
 
   int open_process(lua_State* L) {
     lua_newtable(L);
-    function<impl_forkexec>::set_field(L, "forkexec");
-    function<impl_forkexec_daemon>::set_field(L, "forkexec_daemon");
-    lua_newtable(L);
-    function<impl_new>::set_field(L, "__call");
-    lua_setmetatable(L, -2);
+    luaX_set_field(L, "forkexec", impl_forkexec);
+    luaX_set_field(L, "forkexec_daemon", impl_forkexec_daemon);
+    luaX_set_metafield(L, "__call", impl_new);
+
     luaL_newmetatable(L, "dromozoa.unix.process");
     lua_pushvalue(L, -2);
-    lua_setfield(L, -2, "__index");
+    luaX_set_field(L, "__index");
     lua_pop(L, 1);
+
     return 1;
   }
 }

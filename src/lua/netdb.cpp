@@ -71,17 +71,17 @@ namespace dromozoa {
         for (struct addrinfo* ai = result; ai; ai = ai->ai_next, ++i) {
           lua_pushinteger(L, i);
           lua_newtable(L);
-          set_field(L, "ai_family", ai->ai_family);
-          set_field(L, "ai_socktype", ai->ai_socktype);
-          set_field(L, "ai_protocol", ai->ai_protocol);
-          set_field(L, "ai_addrlen", ai->ai_addrlen);
+          luaX_set_field(L, "ai_family", ai->ai_family);
+          luaX_set_field(L, "ai_socktype", ai->ai_socktype);
+          luaX_set_field(L, "ai_protocol", ai->ai_protocol);
+          luaX_set_field(L, "ai_addrlen", ai->ai_addrlen);
           if (ai->ai_addr) {
             new_sockaddr(L, ai->ai_addr, ai->ai_addrlen);
-            lua_setfield(L, -2, "ai_addr");
+            luaX_set_field(L, "ai_addr");
           }
           if (ai->ai_canonname) {
             lua_pushstring(L, ai->ai_canonname);
-            lua_setfield(L, -2, "ai_canonname");
+            luaX_set_field(L, "ai_canonname");
           }
           lua_settable(L, -3);
         }
@@ -109,7 +109,7 @@ namespace dromozoa {
   }
 
   void initialize_netdb(lua_State* L) {
-    function<impl_getaddrinfo>::set_field(L, "getaddrinfo");
+    luaX_set_field(L, "getaddrinfo", impl_getaddrinfo);
 
     DROMOZOA_BIND_SET_FIELD(L, AI_PASSIVE);
     DROMOZOA_BIND_SET_FIELD(L, AI_CANONNAME);
@@ -130,6 +130,6 @@ namespace dromozoa {
   }
 
   void initialize_getnameinfo(lua_State* L) {
-    function<impl_getnameinfo>::set_field(L, "getnameinfo");
+    luaX_set_field(L, "getnameinfo", impl_getnameinfo);
   }
 }

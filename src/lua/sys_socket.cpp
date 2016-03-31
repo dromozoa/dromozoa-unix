@@ -49,27 +49,27 @@ namespace dromozoa {
   }
 
   void initialize_sys_socket(lua_State* L) {
-    function<impl_socket>::set_field(L, "socket");
-    function<impl_socketpair>::set_field(L, "socketpair");
+    luaX_set_field(L, "socket", impl_socket);
+    luaX_set_field(L, "socketpair", impl_socketpair);
 
-    DROMOZOA_BIND_SET_FIELD(L, AF_INET);
-    DROMOZOA_BIND_SET_FIELD(L, AF_INET6);
-    DROMOZOA_BIND_SET_FIELD(L, AF_UNIX);
-    DROMOZOA_BIND_SET_FIELD(L, AF_UNSPEC);
+    luaX_set_field(L, "AF_INET", AF_INET);
+    luaX_set_field(L, "AF_INET6", AF_INET6);
+    luaX_set_field(L, "AF_UNIX", AF_UNIX);
+    luaX_set_field(L, "AF_UNSPEC", AF_UNSPEC);
 
-    DROMOZOA_BIND_SET_FIELD(L, SOCK_STREAM);
-    DROMOZOA_BIND_SET_FIELD(L, SOCK_DGRAM);
+    luaX_set_field(L, "SOCK_STREAM", SOCK_STREAM);
+    luaX_set_field(L, "SOCK_DGRAM", SOCK_DGRAM);
 
-    DROMOZOA_BIND_SET_FIELD(L, SOMAXCONN);
+    luaX_set_field(L, "SOMAXCONN", SOMAXCONN);
 
-    DROMOZOA_BIND_SET_FIELD(L, SHUT_RD);
-    DROMOZOA_BIND_SET_FIELD(L, SHUT_WR);
-    DROMOZOA_BIND_SET_FIELD(L, SHUT_RDWR);
+    luaX_set_field(L, "SHUT_RD", SHUT_RD);
+    luaX_set_field(L, "SHUT_WR", SHUT_WR);
+    luaX_set_field(L, "SHUT_RDWR", SHUT_RDWR);
 
-    DROMOZOA_BIND_SET_FIELD(L, SOL_SOCKET);
-    DROMOZOA_BIND_SET_FIELD(L, SO_ERROR);
-    DROMOZOA_BIND_SET_FIELD(L, SO_RCVBUF);
-    DROMOZOA_BIND_SET_FIELD(L, SO_REUSEADDR);
-    DROMOZOA_BIND_SET_FIELD(L, SO_SNDBUF);
+    luaX_set_field(L, "SOL_SOCKET", SOL_SOCKET);
+    luaX_set_field(L, "SO_ERROR", SO_ERROR);
+    luaX_set_field(L, "SO_RCVBUF", SO_RCVBUF);
+    luaX_set_field(L, "SO_REUSEADDR", SO_REUSEADDR);
+    luaX_set_field(L, "SO_SNDBUF", SO_SNDBUF);
   }
 }

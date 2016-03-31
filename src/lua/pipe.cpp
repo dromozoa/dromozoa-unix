@@ -35,6 +35,6 @@ namespace dromozoa {
   }
 
   void initialize_pipe(lua_State* L) {
-    function<impl_pipe>::set_field(L, "pipe");
+    luaX_set_field(L, "pipe", impl_pipe);
   }
 }

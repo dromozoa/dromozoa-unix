@@ -28,6 +28,6 @@ namespace dromozoa {
   }
 
   void initialize_sys_stat(lua_State* L) {
-    function<impl_umask>::set_field(L, "umask");
+    luaX_set_field(L, "umask", impl_umask);
   }
 }

@@ -26,53 +26,6 @@ extern "C" {
 #include <exception>
 
 namespace dromozoa {
-  template <lua_CFunction T>
-  struct function {
-    static int value(lua_State* L) {
-      try {
-        return T(L);
-      } catch (const std::exception& e) {
-        return luaL_error(L, "caught: %s", e.what());
-      } catch (...) {
-        lua_pushliteral(L, "caught");
-        return lua_error(L);
-      }
-    }
-
-    static void set_field(lua_State* L, const char* key) {
-      lua_pushcfunction(L, value);
-      lua_setfield(L, -2, key);
-    }
-  };
-
-  template <class T>
-  struct push_impl {
-    static void push(lua_State* L, lua_Integer value) {
-      lua_pushinteger(L, value);
-    }
-  };
-
-  template <lua_CFunction T>
-  struct push_impl<function<T> > {
-    template <class U>
-    static void push(lua_State* L, const U&) {
-      lua_pushcfunction(L, U::value);
-    }
-  };
-
-  template <>
-  struct push_impl<char*> {
-    static void push(lua_State* L, const char* value) {
-      lua_pushstring(L, value);
-    }
-  };
-
-  template <class T>
-  inline void set_field(lua_State* L, const char* key, const T& value) {
-    push_impl<T>::push(L, value);
-    lua_setfield(L, -2, key);
-  }
-
   template <class T>
   inline T* new_userdata(lua_State* L) {
     return static_cast<T*>(lua_newuserdata(L, sizeof(T)));
@@ -106,39 +59,6 @@ namespace dromozoa {
       return check_userdata<T>(L, n, name2);
     }
   }
-
-  inline void new_metatable(lua_State* L, const char* name) {
-    luaL_newmetatable(L, name);
-    lua_pushvalue(L, -2);
-    lua_setfield(L, -2, "__index");
-    lua_pop(L, 1);
-  }
-
-  template <class T>
-  inline void new_metatable(lua_State* L, const char* name, const T&) {
-    luaL_newmetatable(L, name);
-    lua_pushvalue(L, -2);
-    lua_setfield(L, -2, "__index");
-    T::set_field(L, "__gc");
-    lua_pop(L, 1);
-  }
-
-  inline void set_metatable(lua_State* L, const char* name) {
-    luaL_getmetatable(L, name);
-    lua_setmetatable(L, -2);
-  }
-
-  template <class T>
-  inline void set_metafield(lua_State* L, const char* name, const T&) {
-    if (!lua_getmetatable(L, -1)) {
-      lua_newtable(L);
-    }
-    T::set_field(L, name);
-    lua_setmetatable(L, -2);
-  }
 }
-
-#define DROMOZOA_SET_FIELD(L, value) \
-  dromozoa::set_field(L, #value, (value))
 
 #endif
