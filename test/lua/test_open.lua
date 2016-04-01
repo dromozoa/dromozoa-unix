@@ -17,8 +17,6 @@
 
 local unix = require "dromozoa.unix"
 
-unix.set_log_level(2)
-
 local path = os.getenv("PATH")
 local envp = unix.environ()
 

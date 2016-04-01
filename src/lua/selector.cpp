@@ -49,68 +49,67 @@ namespace dromozoa {
       return *static_cast<selector*>(luaL_checkudata(L, n, "dromozoa.unix.selector"));
     }
 
-    int impl_new(lua_State* L) {
+    void impl_new(lua_State* L) {
       size_t size = luaL_checkinteger(L, 2);
       int flags = luaL_optinteger(L, 3, 0);
       file_descriptor fd(selector_impl::open(size, flags));
       if (!fd.valid()) {
-        return push_error(L);
+        push_error(L);
+      } else {
+        selector_impl* s = static_cast<selector_impl*>(lua_newuserdata(L, sizeof(selector_impl)));
+        new(s) selector_impl(fd.release(), size);
+        luaL_getmetatable(L, "dromozoa.unix.selector");
+        lua_setmetatable(L, -2);
+        // if (get_log_level() > 2) {
+        //   std::cerr << "[dromozoa-unix] new selector " << s << std::endl;
+        // }
       }
-      selector_impl* s = static_cast<selector_impl*>(lua_newuserdata(L, sizeof(selector_impl)));
-      new(s) selector_impl(fd.release(), size);
-      luaL_getmetatable(L, "dromozoa.unix.selector");
-      lua_setmetatable(L, -2);
-      // if (get_log_level() > 2) {
-      //   std::cerr << "[dromozoa-unix] new selector " << s << std::endl;
-      // }
-      return 1;
     }
 
-    int impl_gc(lua_State* L) {
+    void impl_gc(lua_State* L) {
       selector& s = get_selector(L, 1);
       s.~selector();
-      return 0;
     }
 
-    int impl_close(lua_State* L) {
+    void impl_close(lua_State* L) {
       selector& s = get_selector(L, 1);
       if (s.close() == -1) {
-        return push_error(L);
+        push_error(L);
       } else {
-        return push_success(L);
+        luaX_push_success(L);
       }
     }
 
-    int impl_add(lua_State* L) {
+    void impl_add(lua_State* L) {
       int fd = get_fd(L, 2);
       int event = luaL_checkinteger(L, 3);
       if (get_selector(L, 1).add(fd, event) == -1) {
-        return push_error(L);
+        push_error(L);
       } else {
-        return push_success(L);
+        luaX_push_success(L);
       }
     }
 
-    int impl_mod(lua_State* L) {
+    void impl_mod(lua_State* L) {
       int fd = get_fd(L, 2);
       int event = luaL_checkinteger(L, 3);
       if (get_selector(L, 1).mod(fd, event) == -1) {
-        return push_error(L);
+        push_error(L);
       } else {
-        return push_success(L);
+        luaX_push_success(L);
       }
     }
 
-    int impl_del(lua_State* L) {
+    void impl_del(lua_State* L) {
       int fd = get_fd(L, 2);
       if (get_selector(L, 1).del(fd) == -1) {
-        return push_error(L);
+        push_error(L);
       } else {
-        return push_success(L);
+        luaX_push_success(L);
       }
     }
 
-    int impl_select(lua_State* L) {
+    void impl_select(lua_State* L) {
       int result = -1;
       if (lua_isnoneornil(L, 2)) {
         result = get_selector(L, 1).select(0);
@@ -127,26 +126,24 @@ namespace dromozoa {
       if (result == -1) {
         int code = errno;
         if (code == EINTR) {
-          return push_interrupted(L);
+          push_interrupted(L);
         } else {
-          return push_error(L);
+          push_error(L);
         }
       } else {
         lua_pushinteger(L, result);
-        return 1;
       }
     }
 
-    int impl_event(lua_State* L) {
+    void impl_event(lua_State* L) {
       int i = luaL_checkinteger(L, 2);
       int fd = -1;
       int event = 0;
       if (get_selector(L, 1).event(i - 1, fd, event) == -1) {
-        return push_error(L);
+        push_error(L);
       } else {
         lua_pushinteger(L, fd);
         lua_pushinteger(L, event);
-        return 2;
       }
     }
   }

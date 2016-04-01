@@ -15,14 +15,12 @@
 -- You should have received a copy of the GNU General Public License
 -- along with dromozoa-unix.  If not, see <http://www.gnu.org/licenses/>.
 
+local uint32 = require "dromozoa.commons.uint32"
 local unix = require "dromozoa.unix"
-
-unix.set_log_level(1)
-unix.set_raise_error(true)
 
 local pid = unix.getpid()
 
-local fd = unix.open("test.lock", unix.bor(unix.O_CREAT, unix.O_WRONLY), 384)
+local fd = unix.open("test.lock", uint32.bor(unix.O_CREAT, unix.O_WRONLY), 384)
 print(pid, "locking")
 if fd:lock_exnb() == unix.resource_unavailable_try_again then
   print(pid, "could not lock")

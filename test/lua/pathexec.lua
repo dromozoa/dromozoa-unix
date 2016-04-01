@@ -17,5 +17,4 @@
 
 local unix = require "dromozoa.unix"
 
-unix.set_raise_error(true)
 unix.pathexec(os.getenv("PATH"), arg, unix.environ())

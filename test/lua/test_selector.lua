@@ -17,8 +17,6 @@
 
 local unix = require "dromozoa.unix"
 
-unix.set_log_level(2)
-unix.set_raise_error(true)
 unix.selfpipe.open()
 unix.block_signal(unix.SIGCHLD)
 

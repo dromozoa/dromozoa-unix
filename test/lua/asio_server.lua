@@ -15,10 +15,8 @@
 -- You should have received a copy of the GNU General Public License
 -- along with dromozoa-unix.  If not, see <http://www.gnu.org/licenses/>.
 
+local uint32 = require "dromozoa.commons.uint32"
 local unix = require "dromozoa.unix"
-
-unix.set_log_level(3)
-unix.set_raise_error(true)
 
 local selector = unix.selector(1024, unix.O_CLOEXEC)
 
@@ -35,7 +33,7 @@ local count = 0
 
 coroutine.resume(coroutine.create(function ()
   while true do
-    local fd, sockaddr = asio:accept(server, unix.bor(unix.O_CLOEXEC, unix.O_NONBLOCK), 10)
+    local fd, sockaddr = asio:accept(server, uint32.bor(unix.O_CLOEXEC, unix.O_NONBLOCK), 10)
     if fd == nil then
       break
     end

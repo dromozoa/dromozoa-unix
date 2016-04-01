@@ -56,7 +56,7 @@ namespace dromozoa {
       return 1;
     }
 
-    int impl_close(lua_State* L) {
+    void impl_close(lua_State* L) {
       int result = -1;
       if (lua_isuserdata(L, 1)) {
         result = get_file_descriptor(L, 1)->close();
@@ -64,9 +64,9 @@ namespace dromozoa {
         result = file_descriptor(luaL_checkinteger(L, 1)).close();
       }
       if (result == -1) {
-        return push_error(L);
+        push_error(L);
       } else {
-        return push_success(L);
+        luaX_push_success(L);
       }
     }
 

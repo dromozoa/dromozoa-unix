@@ -68,7 +68,6 @@ namespace dromozoa {
     open_timespec(L);
     lua_setfield(L, -2, "timespec");
 
-    bind::initialize(L);
     initialize_error(L);
     initialize_fcntl(L);
     initialize_netdb(L);

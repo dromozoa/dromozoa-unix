@@ -23,8 +23,6 @@ assert(unix.selfpipe.get() == -1)
 assert(unix.selfpipe.open())
 assert(unix.selfpipe.get() ~= -1)
 
--- unix.set_log_level(3)
-
 local path = os.getenv("PATH")
 local envp = unix.environ()
 

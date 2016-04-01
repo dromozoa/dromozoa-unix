@@ -23,32 +23,32 @@
 
 namespace dromozoa {
   namespace {
-    int impl_lock_ex(lua_State* L) {
+    void impl_lock_ex(lua_State* L) {
       if (lock_ex(get_fd(L, 1)) == -1) {
-        return push_error(L);
+        push_error(L);
       } else {
-        return push_success(L);
+        luaX_push_success(L);
       }
     }
 
-    int impl_lock_exnb(lua_State* L) {
+    void impl_lock_exnb(lua_State* L) {
       if (lock_exnb(get_fd(L, 1)) == -1) {
         int code = errno;
         if (code == EWOULDBLOCK) {
-          return push_resource_unavailable_try_again(L);
+          push_resource_unavailable_try_again(L);
         } else {
-          return push_error(L);
+          push_error(L);
         }
       } else {
-        return push_success(L);
+        luaX_push_success(L);
       }
     }
 
-    int impl_lock_un(lua_State* L) {
+    void impl_lock_un(lua_State* L) {
       if (lock_un(get_fd(L, 1)) == -1) {
-        return push_error(L);
+        push_error(L);
       } else {
-        return push_success(L);
+        luaX_push_success(L);
       }
     }
   }

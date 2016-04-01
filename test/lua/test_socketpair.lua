@@ -17,8 +17,6 @@
 
 local unix = require "dromozoa.unix"
 
--- unix.set_log_level(3)
-
 local fd1, fd2 = assert(unix.socketpair(unix.AF_UNIX, unix.SOCK_STREAM))
 assert(fd1:coe())
 assert(fd2:coe())

@@ -23,14 +23,13 @@
 
 namespace dromozoa {
   namespace {
-    int impl_new(lua_State* L) {
+    void impl_new(lua_State* L) {
       lua_newtable(L);
       luaL_getmetatable(L, "dromozoa.unix.process");
       lua_setmetatable(L, -2);
-      return 1;
     }
 
-    int impl_forkexec(lua_State* L) {
+    void impl_forkexec(lua_State* L) {
       const char* path = luaL_checkstring(L, 2);
       luaL_checktype(L, 3, LUA_TTABLE);
       argument_vector argv = make_argument_vector(L, 3);
@@ -56,13 +55,13 @@ namespace dromozoa {
         lua_settable(L, 1);
       }
       if (result == -1) {
-        return push_error(L, code);
+        push_error(L, code);
       } else {
-        return push_success(L);
+        luaX_push_success(L);
       }
     }
 
-    int impl_forkexec_daemon(lua_State* L) {
+    void impl_forkexec_daemon(lua_State* L) {
       const char* path = luaL_checkstring(L, 2);
       luaL_checktype(L, 3, LUA_TTABLE);
       argument_vector argv = make_argument_vector(L, 3);
@@ -83,9 +82,9 @@ namespace dromozoa {
         lua_settable(L, 1);
       }
       if (result == -1) {
-        return push_error(L, code);
+        push_error(L, code);
       } else {
-        return push_success(L);
+        luaX_push_success(L);
       }
     }
   }

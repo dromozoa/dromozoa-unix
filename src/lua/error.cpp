@@ -81,10 +81,10 @@ namespace dromozoa {
       return 1;
     }
 
-    int impl_set_errno(lua_State* L) {
+    void impl_set_errno(lua_State* L) {
       int code = luaL_checkinteger(L, 1);
       errno = code;
-      return push_success(L);
+      luaX_push_success(L);
     }
 
     int impl_get_errno(lua_State* L) {

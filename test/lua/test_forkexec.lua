@@ -17,8 +17,6 @@
 
 local unix = require "dromozoa.unix"
 
-unix.set_log_level(2)
-
 local reader, writer = unix.pipe(unix.O_CLOEXEC)
 
 local path = os.getenv("PATH")

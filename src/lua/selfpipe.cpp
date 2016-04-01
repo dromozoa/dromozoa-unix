@@ -29,30 +29,28 @@ extern "C" {
 
 namespace dromozoa {
   namespace {
-    int impl_open(lua_State* L) {
+    void impl_open(lua_State* L) {
       if (selfpipe_open() == -1) {
-        return push_error(L);
+        push_error(L);
       } else {
-        return push_success(L);
+        luaX_push_success(L);
       }
     }
 
-    int impl_close(lua_State* L) {
+    void impl_close(lua_State* L) {
       if (selfpipe_close() == -1) {
-        return push_error(L);
+        push_error(L);
       } else {
-        return push_success(L);
+        luaX_push_success(L);
       }
     }
 
-    int impl_get(lua_State* L) {
+    void impl_get(lua_State* L) {
       lua_pushinteger(L, selfpipe_get());
-      return 1;
     }
 
-    int impl_read(lua_State* L) {
+    void impl_read(lua_State* L) {
       lua_pushinteger(L, selfpipe_read());
-      return 1;
     }
   }
 

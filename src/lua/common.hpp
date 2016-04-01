@@ -26,19 +26,12 @@ extern "C" {
 #include <errno.h>
 #include <sys/socket.h>
 
-#include <dromozoa/bind.hpp>
 #include <dromozoa/luacxx.hpp>
 #include <dromozoa/argument_vector.hpp>
 #include <dromozoa/compat_strerror.hpp>
 #include <dromozoa/socket_address.hpp>
 
 namespace dromozoa {
-  // using bind::function;
-  using bind::push_success;
-  // using bind::set_field;
-  using bind::translate_range_i;
-  using bind::translate_range_j;
-
   int push_resource_unavailable_try_again(lua_State* L);
   int push_operation_in_progress(lua_State* L);
   int push_interrupted(lua_State* L);

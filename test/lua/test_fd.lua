@@ -15,12 +15,8 @@
 -- You should have received a copy of the GNU General Public License
 -- along with dromozoa-unix.  If not, see <http://www.gnu.org/licenses/>.
 
+local uint32 = require "dromozoa.commons.uint32"
 local unix = require "dromozoa.unix"
-
-assert(unix.get_log_level() == 0)
-unix.set_log_level(3)
-assert(unix.get_log_level() == 3)
-unix.set_log_level(0)
 
 local fd
 
@@ -60,7 +56,7 @@ unix.fd.stderr:write("baz\n")
 -- print(json.encode(unix.fd))
 
 do
-  local reader, writer = unix.pipe(unix.bor(unix.O_CLOEXEC, unix.O_NONBLOCK))
+  local reader, writer = unix.pipe(uint32.bor(unix.O_CLOEXEC, unix.O_NONBLOCK))
   writer:write("foobarbaz")
   assert(reader:read(3) == "foo")
   assert(reader:read(3) == "bar")

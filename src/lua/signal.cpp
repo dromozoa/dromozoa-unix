@@ -29,75 +29,81 @@ extern "C" {
 
 namespace dromozoa {
   namespace {
-    int impl_kill(lua_State* L) {
+    void impl_kill(lua_State* L) {
       pid_t pid = luaL_checkinteger(L, 1);
       int sig = luaL_optinteger(L, 2, SIGTERM);
       if (kill(pid, sig) == -1) {
-        return push_error(L);
+        push_error(L);
       } else {
-        return push_success(L);
+        luaX_push_success(L);
       }
     }
 
-    int impl_default_signal(lua_State* L) {
+    void impl_default_signal(lua_State* L) {
       struct sigaction sa = {};
       sa.sa_handler = SIG_DFL;
       if (sigaction(luaL_checkinteger(L, 1), &sa, 0) == -1) {
-        return push_error(L);
+        push_error(L);
       } else {
-        return push_success(L);
+        luaX_push_success(L);
       }
     }
 
-    int impl_ignore_signal(lua_State* L) {
+    void impl_ignore_signal(lua_State* L) {
       struct sigaction sa = {};
       sa.sa_handler = SIG_IGN;
       if (sigaction(luaL_checkinteger(L, 1), &sa, 0) == -1) {
-        return push_error(L);
+        push_error(L);
       } else {
-        return push_success(L);
+        luaX_push_success(L);
       }
     }
 
-    int impl_block_signal(lua_State* L) {
+    void impl_block_signal(lua_State* L) {
       sigset_t mask;
       if (lua_isnoneornil(L, 1)) {
         if (sigfillset(&mask) == -1) {
-          return push_error(L);
+          push_error(L);
+          return;
         }
       } else {
         if (sigemptyset(&mask) == -1) {
-          return push_error(L);
+          push_error(L);
+          return;
         }
         if (sigaddset(&mask, luaL_checkinteger(L, 1)) == -1) {
-          return push_error(L);
+          push_error(L);
+          return;
         }
       }
       if (compat_sigmask(SIG_BLOCK, &mask, 0) == -1) {
-        return push_error(L);
+        push_error(L);
       } else {
-        return push_success(L);
+        luaX_push_success(L);
       }
     }
 
-    int impl_unblock_signal(lua_State* L) {
+    void impl_unblock_signal(lua_State* L) {
       sigset_t mask;
       if (lua_isnoneornil(L, 1)) {
         if (sigfillset(&mask) == -1) {
-          return push_error(L);
+          push_error(L);
+          return;
         }
       } else {
         if (sigemptyset(&mask) == -1) {
-          return push_error(L);
+          push_error(L);
+          return;
         }
         if (sigaddset(&mask, luaL_checkinteger(L, 1)) == -1) {
-          return push_error(L);
+          push_error(L);
+          return;
         }
       }
       if (compat_sigmask(SIG_UNBLOCK, &mask, 0) == -1) {
-        return push_error(L);
+        push_error(L);
       } else {
-        return push_success(L);
+        luaX_push_success(L);
       }
     }
   }

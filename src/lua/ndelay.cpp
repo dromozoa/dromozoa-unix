@@ -21,19 +21,19 @@
 
 namespace dromozoa {
   namespace {
-    int impl_ndelay_on(lua_State* L) {
+    void impl_ndelay_on(lua_State* L) {
       if (ndelay_on(get_fd(L, 1)) == -1) {
-        return push_error(L);
+        push_error(L);
       } else {
-        return push_success(L);
+        luaX_push_success(L);
       }
     }
 
-    int impl_ndelay_off(lua_State* L) {
+    void impl_ndelay_off(lua_State* L) {
       if (ndelay_off(get_fd(L, 1)) == -1) {
-        return push_error(L);
+        push_error(L);
       } else {
-        return push_success(L);
+        luaX_push_success(L);
       }
     }
   }

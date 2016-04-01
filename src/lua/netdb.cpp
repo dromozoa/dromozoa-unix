@@ -111,22 +111,22 @@ namespace dromozoa {
   void initialize_netdb(lua_State* L) {
     luaX_set_field(L, "getaddrinfo", impl_getaddrinfo);
 
-    DROMOZOA_BIND_SET_FIELD(L, AI_PASSIVE);
-    DROMOZOA_BIND_SET_FIELD(L, AI_CANONNAME);
-    DROMOZOA_BIND_SET_FIELD(L, AI_NUMERICHOST);
-    DROMOZOA_BIND_SET_FIELD(L, AI_NUMERICSERV);
-    DROMOZOA_BIND_SET_FIELD(L, AI_V4MAPPED);
-    DROMOZOA_BIND_SET_FIELD(L, AI_ALL);
-    DROMOZOA_BIND_SET_FIELD(L, AI_ADDRCONFIG);
+    luaX_set_field(L, "AI_PASSIVE", AI_PASSIVE);
+    luaX_set_field(L, "AI_CANONNAME", AI_CANONNAME);
+    luaX_set_field(L, "AI_NUMERICHOST", AI_NUMERICHOST);
+    luaX_set_field(L, "AI_NUMERICSERV", AI_NUMERICSERV);
+    luaX_set_field(L, "AI_V4MAPPED", AI_V4MAPPED);
+    luaX_set_field(L, "AI_ALL", AI_ALL);
+    luaX_set_field(L, "AI_ADDRCONFIG", AI_ADDRCONFIG);
 
-    DROMOZOA_BIND_SET_FIELD(L, NI_NOFQDN);
-    DROMOZOA_BIND_SET_FIELD(L, NI_NUMERICHOST);
-    DROMOZOA_BIND_SET_FIELD(L, NI_NAMEREQD);
-    DROMOZOA_BIND_SET_FIELD(L, NI_NUMERICSERV);
+    luaX_set_field(L, "NI_NOFQDN", NI_NOFQDN);
+    luaX_set_field(L, "NI_NUMERICHOST", NI_NUMERICHOST);
+    luaX_set_field(L, "NI_NAMEREQD", NI_NAMEREQD);
+    luaX_set_field(L, "NI_NUMERICSERV", NI_NUMERICSERV);
 #ifdef NI_NUMERICSCOPE
-    DROMOZOA_BIND_SET_FIELD(L, NI_NUMERICSCOPE);
+    luaX_set_field(L, "NI_NUMERICSCOPE", NI_NUMERICSCOPE);
 #endif
-    DROMOZOA_BIND_SET_FIELD(L, NI_DGRAM);
+    luaX_set_field(L, "NI_DGRAM", NI_DGRAM);
   }
 
   void initialize_getnameinfo(lua_State* L) {

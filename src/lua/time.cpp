@@ -21,7 +21,7 @@
 
 namespace dromozoa {
   namespace {
-    int impl_nanosleep(lua_State* L) {
+    void impl_nanosleep(lua_State* L) {
       struct timespec tv1 = {};
       struct timespec tv2 = {};
 
@@ -33,13 +33,12 @@ namespace dromozoa {
       lua_pop(L, 1);
 
       if (nanosleep(&tv1, &tv2) != -1) {
-        return push_success(L);
+        luaX_push_success(L);
       } else {
-        int result = push_error(L);
+        push_error(L);
         lua_newtable(L);
         luaX_set_field(L, "tv_sec", tv2.tv_sec);
         luaX_set_field(L, "tv_nsec", tv2.tv_nsec);
-        return result + 1;
       }
     }
   }

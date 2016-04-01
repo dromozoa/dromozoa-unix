@@ -17,9 +17,6 @@
 
 local unix = require "dromozoa.unix"
 
-unix.set_log_level(2)
-unix.set_raise_error(true)
-
 local PATH = os.getenv("PATH")
 
 unix.process():forkexec(PATH, { arg[-1], "test/lua/lock.lua" })

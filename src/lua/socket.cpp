@@ -28,104 +28,102 @@
 
 namespace dromozoa {
   namespace {
-    int impl_getsockname(lua_State* L) {
+    void impl_getsockname(lua_State* L) {
       socket_address address;
       if (getsockname(get_fd(L, 1), address.get(), address.size_ptr()) == -1) {
-        return push_error(L);
+        push_error(L);
       } else {
-        return new_sockaddr(L, address);
+        new_sockaddr(L, address);
       }
     }
 
-    int impl_getpeername(lua_State* L) {
+    void impl_getpeername(lua_State* L) {
       socket_address address;
       if (getpeername(get_fd(L, 1), address.get(), address.size_ptr()) == -1) {
-        return push_error(L);
+        push_error(L);
       } else {
-        return new_sockaddr(L, address);
+        new_sockaddr(L, address);
       }
     }
 
-    int impl_bind(lua_State* L) {
+    void impl_bind(lua_State* L) {
       const socket_address* address = get_sockaddr(L, 2);
       if (::bind(get_fd(L, 1), address->get(), address->size()) == -1) {
-        return push_error(L);
+        push_error(L);
       } else {
-        return push_success(L);
+        luaX_push_success(L);
       }
     }
 
-    int impl_listen(lua_State* L) {
+    void impl_listen(lua_State* L) {
       int backlog = luaL_optinteger(L, 2, SOMAXCONN);
       if (listen(get_fd(L, 1), backlog) == -1) {
-        return push_error(L);
+        push_error(L);
       } else {
-        return push_success(L);
+        luaX_push_success(L);
       }
     }
 
-    int impl_accept(lua_State* L) {
+    void impl_accept(lua_State* L) {
       int flags = luaL_optinteger(L, 2, 0);
       socket_address address;
       int result = compat_accept4(get_fd(L, 1), address.get(), address.size_ptr(), flags);
       if (result == -1) {
         int code = errno;
         if (code == EAGAIN || code == EWOULDBLOCK) {
-          return push_resource_unavailable_try_again(L);
+          push_resource_unavailable_try_again(L);
         } else {
-          return push_error(L, code);
+          push_error(L, code);
         }
       } else {
         new_fd(L, result);
         new_sockaddr(L, address);
-        return 2;
       }
     }
 
-    int impl_connect(lua_State* L) {
+    void impl_connect(lua_State* L) {
       const socket_address* address = get_sockaddr(L, 2);
       if (connect(get_fd(L, 1), address->get(), address->size()) == -1) {
         int code = errno;
         if (code == EINPROGRESS) {
-          return push_operation_in_progress(L);
+          push_operation_in_progress(L);
         } else {
-          return push_error(L, code);
+          push_error(L, code);
         }
       } else {
-        return push_success(L);
+        luaX_push_success(L);
       }
     }
 
-    int impl_shutdown(lua_State* L) {
+    void impl_shutdown(lua_State* L) {
       int how = luaL_checkinteger(L, 2);
       if (shutdown(get_fd(L, 1), how) == -1) {
-        return push_error(L);
+        push_error(L);
       } else {
-        return push_success(L);
+        luaX_push_success(L);
       }
     }
 
-    int impl_setsockopt(lua_State* L) {
+    void impl_setsockopt(lua_State* L) {
       int level = luaL_checkinteger(L, 2);
       int name = luaL_checkinteger(L, 3);
       int value = luaL_checkinteger(L, 4);
       if (setsockopt(get_fd(L, 1), level, name, &value, sizeof(value)) == -1) {
-        return push_error(L);
+        push_error(L);
       } else {
-        return push_success(L);
+        luaX_push_success(L);
       }
     }
 
-    int impl_getsockopt(lua_State* L) {
+    void impl_getsockopt(lua_State* L) {
       int level = luaL_checkinteger(L, 2);
       int name = luaL_checkinteger(L, 3);
       int value = 0;
       socklen_t size = sizeof(value);
       if (getsockopt(get_fd(L, 1), level, name, &value, &size) == -1) {
-        return push_error(L);
+        push_error(L);
       } else {
         lua_pushinteger(L, value);
-        return 1;
       }
     }
   }

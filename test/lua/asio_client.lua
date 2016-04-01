@@ -18,9 +18,6 @@
 local pairs = require "dromozoa.commons.pairs"
 local unix = require "dromozoa.unix"
 
-unix.set_log_level(3)
--- unix.set_raise_error(true)
-
 local host, serv = ...
 
 local selector = unix.selector(1024, unix.O_CLOEXEC)
