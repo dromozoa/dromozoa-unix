@@ -32,8 +32,6 @@ extern "C" {
 #include <dromozoa/compat_strerror.hpp>
 #include <dromozoa/socket_address.hpp>
 
-#include "bind.hpp"
-
 namespace dromozoa {
   // using bind::function;
   using bind::push_success;

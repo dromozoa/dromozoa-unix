@@ -15,15 +15,13 @@
 // You should have received a copy of the GNU General Public License
 // along with dromozoa-unix.  If not, see <http://www.gnu.org/licenses/>.
 
-#include <new>
-
 #include <dromozoa/file_descriptor.hpp>
 
 #include "common.hpp"
 
 namespace dromozoa {
   int new_fd(lua_State* L, int fd, bool ref) {
-    new(new_userdata<file_descriptor>(L)) file_descriptor(fd);
+    luaX_new<file_descriptor>(L, fd);
     if (ref) {
       luaX_set_metatable(L, "dromozoa.unix.fd.ref");
     } else {
@@ -34,7 +32,7 @@ namespace dromozoa {
 
   namespace {
     file_descriptor* get_file_descriptor(lua_State* L, int n) {
-      return check_userdata<file_descriptor>(L, n, "dromozoa.unix.fd.ref", "dromozoa.unix.fd");
+      return luaX_check_udata<file_descriptor>(L, n, "dromozoa.unix.fd.ref", "dromozoa.unix.fd");
     }
   }
 
