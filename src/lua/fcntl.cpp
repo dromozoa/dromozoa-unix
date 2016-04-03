@@ -23,7 +23,7 @@ namespace dromozoa {
   namespace {
     int impl_open(lua_State* L) {
       const char* path = luaL_checkstring(L, 1);
-      int flags = luaL_optinteger(L, 2, 0);
+      int flags = luaL_optinteger(L, 2, O_RDONLY | O_CLOEXEC);
       int mode = luaL_optinteger(L, 3, 0666);
       int result = open(path, flags, mode);
       if (result == -1) {
