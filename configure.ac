@@ -22,7 +22,7 @@ LT_INIT
 
 AC_CONFIG_MACRO_DIR([m4])
 AC_CONFIG_HEADER([config.h])
-AC_CONFIG_FILES([Makefile bind/Makefile src/lib/Makefile src/lua/Makefile test/lib/Makefile])
+AC_CONFIG_FILES([Makefile src/lib/Makefile src/lua/Makefile test/lib/Makefile])
 
 AC_PROG_CXX
 AC_CHECK_FUNCS([accept4])

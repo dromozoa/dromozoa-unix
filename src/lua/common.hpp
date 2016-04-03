@@ -26,7 +26,8 @@ extern "C" {
 #include <errno.h>
 #include <sys/socket.h>
 
-#include <dromozoa/luacxx.hpp>
+#include <dromozoa/bind.hpp>
+
 #include <dromozoa/argument_vector.hpp>
 #include <dromozoa/compat_strerror.hpp>
 #include <dromozoa/socket_address.hpp>

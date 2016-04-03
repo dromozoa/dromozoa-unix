@@ -20,7 +20,6 @@ luaexec_LTLIBRARIES = unix.la
 unix_la_CPPFLAGS = -I$(top_srcdir)/bind -I$(top_srcdir)/include
 unix_la_LDFLAGS = -module -avoid-version -shared
 unix_la_LIBADD = \
-	$(top_srcdir)/bind/libdromozoa-bind.la \
 	$(top_srcdir)/src/lib/libdromozoa-unix.la
 unix_la_SOURCES = \
 	argument_vector.cpp \
