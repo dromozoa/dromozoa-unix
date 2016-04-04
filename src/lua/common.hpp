@@ -18,18 +18,12 @@
 #ifndef COMMON_HPP
 #define COMMON_HPP
 
-extern "C" {
-#include <lua.h>
-#include <lauxlib.h>
-}
-
 #include <errno.h>
 #include <sys/socket.h>
 
 #include <dromozoa/bind.hpp>
 
 #include <dromozoa/argument_vector.hpp>
-#include <dromozoa/compat_strerror.hpp>
 #include <dromozoa/socket_address.hpp>
 
 namespace dromozoa {

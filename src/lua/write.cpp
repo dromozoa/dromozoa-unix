@@ -15,8 +15,6 @@
 // You should have received a copy of the GNU General Public License
 // along with dromozoa-unix.  If not, see <http://www.gnu.org/licenses/>.
 
-#include <errno.h>
-#include <stddef.h>
 #include <unistd.h>
 
 #include <vector>
@@ -32,14 +30,7 @@ namespace dromozoa {
     if (i < j) {
       ssize_t result = write(get_fd(L, 1), buffer + i, j - i);
       if (result == -1) {
-        int code = errno;
-        if (code == EAGAIN || code == EWOULDBLOCK) {
-          push_resource_unavailable_try_again(L);
-        } else if (code == EPIPE) {
-          push_broken_pipe(L);
-        } else {
-          push_error(L);
-        }
+        push_error(L);
       } else {
         lua_pushinteger(L, result);
       }

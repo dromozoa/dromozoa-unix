@@ -213,16 +213,23 @@ function class:write(fd, buffer, timeout, size, i, j)
   end
   local min, max = translate_range(#buffer, i, j)
   local a, b, c = class.super.fd.write(fd, buffer)
-  if a == 0 or a == class.super.resource_unavailable_try_again then
+  if a == nil then
+    if c == class.super.EAGAIN or c == class.super.EWOULDBLOCK then
+      if add_pending(self, fd, 2, timeout) == nil then
+        self.writtens[get_fd(fd)] = size
+        return timedout()
+      end
+    elseif c == class.super.EPIPE then
+      return closed()
+    else
+      self.writtens[get_fd(fd)] = size
+      return a, b, c
+    end
+  elseif a == 0 then
     if add_pending(self, fd, 2, timeout) == nil then
       self.writtens[get_fd(fd)] = size
       return timedout()
     end
-  elseif a == class.super.broken_pipe then
-    return closed()
-  elseif a == nil then
-    self.writtens[get_fd(fd)] = size
-    return a, b, c
   else
     size = size + a
     min = min + a
