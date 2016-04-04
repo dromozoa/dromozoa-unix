@@ -36,7 +36,7 @@ namespace dromozoa {
 
   argument_vector make_argument_vector(lua_State* L, int n);
 
-  int new_fd(lua_State* L, int fd, bool ref = false);
+  void new_fd(lua_State* L, int fd);
   int get_fd(lua_State* L, int n);
 
   int new_sockaddr(lua_State* L, const socket_address& address);

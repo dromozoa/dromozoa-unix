@@ -21,15 +21,15 @@
 
 namespace dromozoa {
   namespace {
-    int impl_socket(lua_State* L) {
+    void impl_socket(lua_State* L) {
       int domain = luaL_checkinteger(L, 1);
       int type = luaL_checkinteger(L, 2);
       int protocol = luaL_optinteger(L, 3, 0);
       int result = socket(domain, type, protocol);
       if (result == -1) {
-        return push_error(L);
+        push_error(L);
       } else {
-        return new_fd(L, result);
+        new_fd(L, result);
       }
     }
 
