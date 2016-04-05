@@ -23,7 +23,7 @@ namespace dromozoa {
   namespace {
     void impl_bind(lua_State* L) {
       const socket_address* address = get_sockaddr(L, 2);
-      if (::bind(get_fd(L, 1), address->get(), address->size()) == -1) {
+      if (::bind(check_fd(L, 1), address->get(), address->size()) == -1) {
         push_error(L);
       } else {
         luaX_push_success(L);
@@ -32,7 +32,7 @@ namespace dromozoa {
 
     void impl_listen(lua_State* L) {
       int backlog = luaL_optinteger(L, 2, SOMAXCONN);
-      if (listen(get_fd(L, 1), backlog) == -1) {
+      if (listen(check_fd(L, 1), backlog) == -1) {
         push_error(L);
       } else {
         luaX_push_success(L);
@@ -42,7 +42,7 @@ namespace dromozoa {
     void impl_accept(lua_State* L) {
       int flags = luaL_optinteger(L, 2, COMPAT_SOCK_CLOEXEC);
       socket_address address;
-      int result = compat_accept4(get_fd(L, 1), address.get(), address.size_ptr(), flags);
+      int result = compat_accept4(check_fd(L, 1), address.get(), address.size_ptr(), flags);
       if (result == -1) {
         push_error(L);
       } else {
@@ -53,7 +53,7 @@ namespace dromozoa {
 
     void impl_connect(lua_State* L) {
       const socket_address* address = get_sockaddr(L, 2);
-      if (connect(get_fd(L, 1), address->get(), address->size()) == -1) {
+      if (connect(check_fd(L, 1), address->get(), address->size()) == -1) {
         push_error(L);
       } else {
         luaX_push_success(L);
@@ -62,7 +62,7 @@ namespace dromozoa {
 
     void impl_shutdown(lua_State* L) {
       int how = luaL_checkinteger(L, 2);
-      if (shutdown(get_fd(L, 1), how) == -1) {
+      if (shutdown(check_fd(L, 1), how) == -1) {
         push_error(L);
       } else {
         luaX_push_success(L);
@@ -73,7 +73,7 @@ namespace dromozoa {
       int level = luaL_checkinteger(L, 2);
       int name = luaL_checkinteger(L, 3);
       int value = luaL_checkinteger(L, 4);
-      if (setsockopt(get_fd(L, 1), level, name, &value, sizeof(value)) == -1) {
+      if (setsockopt(check_fd(L, 1), level, name, &value, sizeof(value)) == -1) {
         push_error(L);
       } else {
         luaX_push_success(L);
@@ -85,7 +85,7 @@ namespace dromozoa {
       int name = luaL_checkinteger(L, 3);
       int value;
       socklen_t size = sizeof(value);
-      if (getsockopt(get_fd(L, 1), level, name, &value, &size) == -1) {
+      if (getsockopt(check_fd(L, 1), level, name, &value, &size) == -1) {
         push_error(L);
       } else {
         lua_pushinteger(L, value);
@@ -94,7 +94,7 @@ namespace dromozoa {
 
     void impl_getsockname(lua_State* L) {
       socket_address address;
-      if (getsockname(get_fd(L, 1), address.get(), address.size_ptr()) == -1) {
+      if (getsockname(check_fd(L, 1), address.get(), address.size_ptr()) == -1) {
         push_error(L);
       } else {
         new_sockaddr(L, address);
@@ -103,7 +103,7 @@ namespace dromozoa {
 
     void impl_getpeername(lua_State* L) {
       socket_address address;
-      if (getpeername(get_fd(L, 1), address.get(), address.size_ptr()) == -1) {
+      if (getpeername(check_fd(L, 1), address.get(), address.size_ptr()) == -1) {
         push_error(L);
       } else {
         new_sockaddr(L, address);

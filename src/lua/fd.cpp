@@ -31,14 +31,14 @@ namespace dromozoa {
       luaX_set_metatable(L, "dromozoa.unix.fd_ref");
     }
 
-    file_descriptor* get_file_descriptor(lua_State* L, int index) {
+    file_descriptor* check_file_descriptor(lua_State* L, int index) {
       return luaX_check_udata<file_descriptor>(L, index, "dromozoa.unix.fd_ref", "dromozoa.unix.fd");
     }
   }
 
-  int get_fd(lua_State* L, int index) {
+  int check_fd(lua_State* L, int index) {
     if (lua_isuserdata(L, index)) {
-      return get_file_descriptor(L, index)->get();
+      return check_file_descriptor(L, index)->get();
     } else {
       return luaL_checkinteger(L, index);
     }
@@ -46,21 +46,21 @@ namespace dromozoa {
 
   namespace {
     void impl_gc(lua_State* L) {
-      get_file_descriptor(L, 1)->~file_descriptor();
+      check_file_descriptor(L, 1)->~file_descriptor();
     }
 
     void impl_call(lua_State* L) {
-      new_fd(L, get_fd(L, 2));
+      new_fd(L, check_fd(L, 2));
     }
 
     void impl_get(lua_State* L) {
-      lua_pushinteger(L, get_fd(L, 1));
+      lua_pushinteger(L, check_fd(L, 1));
     }
 
     void impl_close(lua_State* L) {
       int result = -1;
       if (lua_isuserdata(L, 1)) {
-        result = get_file_descriptor(L, 1)->close();
+        result = check_file_descriptor(L, 1)->close();
       } else {
         result = file_descriptor(luaL_checkinteger(L, 1)).close();
       }
@@ -72,7 +72,7 @@ namespace dromozoa {
     }
 
     void impl_fd_ref(lua_State* L) {
-      new_fd_ref(L, get_fd(L, 2));
+      new_fd_ref(L, check_fd(L, 2));
     }
   }
 

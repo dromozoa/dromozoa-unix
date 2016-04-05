@@ -81,7 +81,7 @@ namespace dromozoa {
     }
 
     void impl_add(lua_State* L) {
-      int fd = get_fd(L, 2);
+      int fd = check_fd(L, 2);
       int event = luaL_checkinteger(L, 3);
       if (get_selector(L, 1).add(fd, event) == -1) {
         push_error(L);
@@ -91,7 +91,7 @@ namespace dromozoa {
     }
 
     void impl_mod(lua_State* L) {
-      int fd = get_fd(L, 2);
+      int fd = check_fd(L, 2);
       int event = luaL_checkinteger(L, 3);
       if (get_selector(L, 1).mod(fd, event) == -1) {
         push_error(L);
@@ -101,7 +101,7 @@ namespace dromozoa {
     }
 
     void impl_del(lua_State* L) {
-      int fd = get_fd(L, 2);
+      int fd = check_fd(L, 2);
       if (get_selector(L, 1).del(fd) == -1) {
         push_error(L);
       } else {

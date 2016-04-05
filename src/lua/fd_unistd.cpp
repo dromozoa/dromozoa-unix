@@ -25,7 +25,7 @@ namespace dromozoa {
   namespace {
     void impl_read(lua_State* L) {
       std::vector<char> buffer(luaL_checkinteger(L, 2));
-      ssize_t result = read(get_fd(L, 1), &buffer[0], buffer.size());
+      ssize_t result = read(check_fd(L, 1), &buffer[0], buffer.size());
       if (result == -1) {
         push_error(L);
       } else {
@@ -39,7 +39,7 @@ namespace dromozoa {
       size_t i = luaX_range_i(L, 3, size);
       size_t j = luaX_range_j(L, 4, size);
       if (i < j) {
-        ssize_t result = write(get_fd(L, 1), buffer + i, j - i);
+        ssize_t result = write(check_fd(L, 1), buffer + i, j - i);
         if (result == -1) {
           push_error(L);
         } else {
