@@ -74,9 +74,6 @@ namespace dromozoa {
 
   int open_fd(lua_State* L) {
     lua_newtable(L);
-    luaX_set_metafield(L, "__call", impl_call);
-    luaX_set_field(L, "get", impl_get);
-    luaX_set_field(L, "close", impl_close);
 
     luaL_newmetatable(L, "dromozoa.unix.fd.ref");
     lua_pushvalue(L, -2);
@@ -88,6 +85,10 @@ namespace dromozoa {
     luaX_set_field(L, "__index");
     luaX_set_field(L, "__gc", impl_gc);
     lua_pop(L, 1);
+
+    luaX_set_metafield(L, "__call", impl_call);
+    luaX_set_field(L, "get", impl_get);
+    luaX_set_field(L, "close", impl_close);
 
     new_fd_ref(L, 0);
     luaX_set_field(L, "stdin");
