@@ -20,29 +20,27 @@
 #include "common.hpp"
 
 namespace dromozoa {
-  namespace {
-    void new_fd_ref(lua_State* L, int fd) {
-      luaX_new<file_descriptor>(L, fd);
-      luaX_set_metatable(L, "dromozoa.unix.fd.ref");
-    }
-  }
-
   void new_fd(lua_State* L, int fd) {
     luaX_new<file_descriptor>(L, fd);
     luaX_set_metatable(L, "dromozoa.unix.fd");
   }
 
   namespace {
-    file_descriptor* get_file_descriptor(lua_State* L, int n) {
-      return luaX_check_udata<file_descriptor>(L, n, "dromozoa.unix.fd.ref", "dromozoa.unix.fd");
+    void new_fd_ref(lua_State* L, int fd) {
+      luaX_new<file_descriptor>(L, fd);
+      luaX_set_metatable(L, "dromozoa.unix.fd.ref");
+    }
+
+    file_descriptor* get_file_descriptor(lua_State* L, int index) {
+      return luaX_check_udata<file_descriptor>(L, index, "dromozoa.unix.fd.ref", "dromozoa.unix.fd");
     }
   }
 
-  int get_fd(lua_State* L, int n) {
-    if (lua_isuserdata(L, n)) {
-      return get_file_descriptor(L, n)->get();
+  int get_fd(lua_State* L, int index) {
+    if (lua_isuserdata(L, index)) {
+      return get_file_descriptor(L, index)->get();
     } else {
-      return luaL_checkinteger(L, n);
+      return luaL_checkinteger(L, index);
     }
   }
 

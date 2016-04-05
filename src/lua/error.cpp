@@ -61,6 +61,10 @@ namespace dromozoa {
     return 1;
   }
 
+  int push_error(lua_State* L) {
+    return push_error(L, errno);
+  }
+
   int push_error(lua_State* L, int code) {
     int save = errno;
     std::string message = compat_strerror(code);

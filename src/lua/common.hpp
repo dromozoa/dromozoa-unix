@@ -18,7 +18,6 @@
 #ifndef COMMON_HPP
 #define COMMON_HPP
 
-#include <errno.h>
 #include <sys/socket.h>
 
 #include <dromozoa/bind.hpp>
@@ -32,15 +31,17 @@ namespace dromozoa {
   int push_interrupted(lua_State* L);
   int push_broken_pipe(lua_State* L);
   int push_timed_out(lua_State* L);
-  int push_error(lua_State* L, int code = errno);
+
+  int push_error(lua_State* L);
+  int push_error(lua_State* L, int code);
 
   argument_vector make_argument_vector(lua_State* L, int n);
 
   void new_fd(lua_State* L, int fd);
-  int get_fd(lua_State* L, int n);
+  int get_fd(lua_State* L, int index);
 
-  int new_sockaddr(lua_State* L, const socket_address& address);
-  int new_sockaddr(lua_State* L, const struct sockaddr* address, socklen_t size);
+  void new_sockaddr(lua_State* L, const socket_address& address);
+  void new_sockaddr(lua_State* L, const struct sockaddr* address, socklen_t size);
   const socket_address* get_sockaddr(lua_State* L, int n);
 }
 
