@@ -23,10 +23,10 @@ unix_la_LIBADD = \
 	$(top_srcdir)/src/lib/libdromozoa-unix.la
 unix_la_SOURCES = \
 	argument_vector.cpp \
-	coe.cpp \
 	error.cpp \
 	fcntl.cpp \
 	fd.cpp \
+	fd_djb.cpp \
 	lock.cpp \
 	ndelay.cpp \
 	netdb.cpp \
