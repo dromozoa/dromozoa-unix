@@ -27,17 +27,17 @@ unix_la_SOURCES = \
 	fcntl.cpp \
 	fd.cpp \
 	fd_djb.cpp \
+	fd_socket.cpp \
+	fd_unistd.cpp \
 	netdb.cpp \
 	netinet.cpp \
 	pathexec.cpp \
 	pipe.cpp \
 	process.cpp \
-	read.cpp \
 	selector.cpp \
 	selfpipe.cpp \
 	signal.cpp \
 	sockaddr.cpp \
-	socket.cpp \
 	stdlib.cpp \
 	sys_socket.cpp \
 	sys_stat.cpp \
@@ -45,5 +45,4 @@ unix_la_SOURCES = \
 	sys_wait.cpp \
 	time.cpp \
 	unistd.cpp \
-	write.cpp \
 	module.cpp

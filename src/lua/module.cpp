@@ -42,11 +42,9 @@ namespace dromozoa {
 
     open_fd(L);
     initialize_fd_djb(L);
-
-    initialize_read(L);
-    initialize_write(L);
-    initialize_socket(L);
-    lua_setfield(L, -2, "fd");
+    initialize_fd_socket(L);
+    initialize_fd_unistd(L);
+    luaX_set_field(L, "fd");
 
     open_process(L);
     lua_setfield(L, -2, "process");

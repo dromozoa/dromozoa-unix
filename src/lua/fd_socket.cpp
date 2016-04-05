@@ -21,24 +21,6 @@
 
 namespace dromozoa {
   namespace {
-    void impl_getsockname(lua_State* L) {
-      socket_address address;
-      if (getsockname(get_fd(L, 1), address.get(), address.size_ptr()) == -1) {
-        push_error(L);
-      } else {
-        new_sockaddr(L, address);
-      }
-    }
-
-    void impl_getpeername(lua_State* L) {
-      socket_address address;
-      if (getpeername(get_fd(L, 1), address.get(), address.size_ptr()) == -1) {
-        push_error(L);
-      } else {
-        new_sockaddr(L, address);
-      }
-    }
-
     void impl_bind(lua_State* L) {
       const socket_address* address = get_sockaddr(L, 2);
       if (::bind(get_fd(L, 1), address->get(), address->size()) == -1) {
@@ -109,11 +91,27 @@ namespace dromozoa {
         lua_pushinteger(L, value);
       }
     }
+
+    void impl_getsockname(lua_State* L) {
+      socket_address address;
+      if (getsockname(get_fd(L, 1), address.get(), address.size_ptr()) == -1) {
+        push_error(L);
+      } else {
+        new_sockaddr(L, address);
+      }
+    }
+
+    void impl_getpeername(lua_State* L) {
+      socket_address address;
+      if (getpeername(get_fd(L, 1), address.get(), address.size_ptr()) == -1) {
+        push_error(L);
+      } else {
+        new_sockaddr(L, address);
+      }
+    }
   }
 
-  void initialize_socket(lua_State* L) {
-    luaX_set_field(L, "getsockname", impl_getsockname);
-    luaX_set_field(L, "getpeername", impl_getpeername);
+  void initialize_fd_socket(lua_State* L) {
     luaX_set_field(L, "bind", impl_bind);
     luaX_set_field(L, "listen", impl_listen);
     luaX_set_field(L, "accept", impl_accept);
@@ -121,5 +119,7 @@ namespace dromozoa {
     luaX_set_field(L, "shutdown", impl_shutdown);
     luaX_set_field(L, "setsockopt", impl_setsockopt);
     luaX_set_field(L, "getsockopt", impl_getsockopt);
+    luaX_set_field(L, "getsockname", impl_getsockname);
+    luaX_set_field(L, "getpeername", impl_getpeername);
   }
 }

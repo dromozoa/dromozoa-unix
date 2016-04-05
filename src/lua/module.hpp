@@ -26,6 +26,8 @@ namespace dromozoa {
   int open_sockaddr(lua_State* L);
 
   void initialize_fd_djb(lua_State* L);
+  void initialize_fd_socket(lua_State* L);
+  void initialize_fd_unistd(lua_State* L);
 
   void initialize_error(lua_State* L);
   void initialize_fcntl(lua_State* L);
@@ -34,12 +36,9 @@ namespace dromozoa {
   void initialize_netinet(lua_State* L);
   void initialize_pathexec(lua_State* L);
   void initialize_pipe(lua_State* L);
-  void initialize_read(lua_State* L);
   void initialize_signal(lua_State* L);
   void initialize_sockaddr(lua_State* L);
-  void initialize_socket(lua_State* L);
   void initialize_stdlib(lua_State* L);
-  void initialize_write(lua_State* L);
   void initialize_time(lua_State* L);
   void initialize_unistd(lua_State* L);
   void initialize_sys_socket(lua_State* L);

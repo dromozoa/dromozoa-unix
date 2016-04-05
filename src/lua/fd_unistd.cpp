@@ -15,7 +15,6 @@
 // You should have received a copy of the GNU General Public License
 // along with dromozoa-unix.  If not, see <http://www.gnu.org/licenses/>.
 
-#include <stddef.h>
 #include <unistd.h>
 
 #include <vector>
@@ -33,9 +32,27 @@ namespace dromozoa {
         lua_pushlstring(L, &buffer[0], result);
       }
     }
+
+    void impl_write(lua_State* L) {
+      size_t size;
+      const char* buffer = luaL_checklstring(L, 2, &size);
+      size_t i = luaX_range_i(L, 3, size);
+      size_t j = luaX_range_j(L, 4, size);
+      if (i < j) {
+        ssize_t result = write(get_fd(L, 1), buffer + i, j - i);
+        if (result == -1) {
+          push_error(L);
+        } else {
+          lua_pushinteger(L, result);
+        }
+      } else {
+        lua_pushinteger(L, 0);
+      }
+    }
   }
 
-  void initialize_read(lua_State* L) {
+  void initialize_fd_unistd(lua_State* L) {
     luaX_set_field(L, "read", impl_read);
+    luaX_set_field(L, "write", impl_write);
   }
 }
