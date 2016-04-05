@@ -95,13 +95,14 @@ end
 function class:accept(fd, flags, timeout)
   timeout = translate_timeout(self, timeout)
   local a, b, c = class.super.fd.accept(fd, flags)
-  if a == class.super.resource_unavailable_try_again then
-    if add_pending(self, fd, 1, timeout) == nil then
-      return timedout()
+  if a == nil then
+    if c == class.super.EAGAIN or c == class.super.EWOULDBLOCK then
+      if add_pending(self, fd, 1, timeout) == nil then
+        return timedout()
+      end
+    else
+      return a, b, c
     end
-    return self:accept(fd, flags, timeout)
-  elseif a == nil then
-    return a, b, c
   else
     return a, b
   end
@@ -110,23 +111,21 @@ end
 function class:connect(fd, address, timeout)
   timeout = translate_timeout(self, timeout)
   local a, b, c = class.super.fd.connect(fd, address)
-  if a == class.super.operation_in_progress then
-    if add_pending(self, fd, 2, timeout) == nil then
-      return timedout()
-    end
-    local unix = self.super
-    local code = unix.fd.getsockopt(fd, unix.SOL_SOCKET, unix.SO_ERROR)
-    if code == 0 then
-      return fd
-    else
-      if unix.get_raise_error() then
-        error(unix.strerror(code))
+  if a == nil then
+    if c == class.super.EINPROGRESS then
+      if add_pending(self, fd, 2, timeout) == nil then
+        return timedout()
+      end
+      local unix = self.super
+      local code = unix.fd.getsockopt(fd, unix.SOL_SOCKET, unix.SO_ERROR)
+      if code == 0 then
+        return fd
       else
         return nil, unix.strerror(code), code
       end
+    else
+      return a, b, c
     end
-  elseif a == nil then
-    return a, b, c
   else
     return a
   end

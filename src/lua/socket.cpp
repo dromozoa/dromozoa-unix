@@ -15,14 +15,7 @@
 // You should have received a copy of the GNU General Public License
 // along with dromozoa-unix.  If not, see <http://www.gnu.org/licenses/>.
 
-#include <errno.h>
-#include <fcntl.h>
-#include <unistd.h>
-#include <sys/socket.h>
-
-#include <dromozoa/coe.hpp>
 #include <dromozoa/compat_accept4.hpp>
-#include <dromozoa/ndelay.hpp>
 
 #include "common.hpp"
 
@@ -65,16 +58,11 @@ namespace dromozoa {
     }
 
     void impl_accept(lua_State* L) {
-      int flags = luaL_optinteger(L, 2, 0);
+      int flags = luaL_optinteger(L, 2, COMPAT_SOCK_CLOEXEC);
       socket_address address;
       int result = compat_accept4(get_fd(L, 1), address.get(), address.size_ptr(), flags);
       if (result == -1) {
-        int code = errno;
-        if (code == EAGAIN || code == EWOULDBLOCK) {
-          push_resource_unavailable_try_again(L);
-        } else {
-          push_error(L, code);
-        }
+        push_error(L);
       } else {
         new_fd(L, result);
         new_sockaddr(L, address);
@@ -84,12 +72,7 @@ namespace dromozoa {
     void impl_connect(lua_State* L) {
       const socket_address* address = get_sockaddr(L, 2);
       if (connect(get_fd(L, 1), address->get(), address->size()) == -1) {
-        int code = errno;
-        if (code == EINPROGRESS) {
-          push_operation_in_progress(L);
-        } else {
-          push_error(L, code);
-        }
+        push_error(L);
       } else {
         luaX_push_success(L);
       }
@@ -118,7 +101,7 @@ namespace dromozoa {
     void impl_getsockopt(lua_State* L) {
       int level = luaL_checkinteger(L, 2);
       int name = luaL_checkinteger(L, 3);
-      int value = 0;
+      int value;
       socklen_t size = sizeof(value);
       if (getsockopt(get_fd(L, 1), level, name, &value, &size) == -1) {
         push_error(L);
