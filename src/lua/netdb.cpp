@@ -129,7 +129,7 @@ namespace dromozoa {
     luaX_set_field(L, "NI_DGRAM", NI_DGRAM);
   }
 
-  void initialize_getnameinfo(lua_State* L) {
+  void initialize_sockaddr_netdb(lua_State* L) {
     luaX_set_field(L, "getnameinfo", impl_getnameinfo);
   }
 }

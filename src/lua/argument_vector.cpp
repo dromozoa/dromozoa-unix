@@ -18,12 +18,11 @@
 #include "common.hpp"
 
 namespace dromozoa {
-  argument_vector make_argument_vector(lua_State* L, int n) {
+  argument_vector make_argument_vector(lua_State* L, int index) {
     argument_vector result;
-    if (lua_istable(L, n)) {
+    if (lua_istable(L, index)) {
       for (int i = 1; ; ++i) {
-        lua_pushinteger(L, i);
-        lua_gettable(L, n);
+        lua_geti(L, index, i);
         if (const char* p = lua_tostring(L, -1)) {
           result.push_back(p);
           lua_pop(L, 1);

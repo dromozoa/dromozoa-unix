@@ -28,11 +28,11 @@ namespace dromozoa {
   namespace {
     void new_fd_ref(lua_State* L, int fd) {
       luaX_new<file_descriptor>(L, fd);
-      luaX_set_metatable(L, "dromozoa.unix.fd.ref");
+      luaX_set_metatable(L, "dromozoa.unix.fd_ref");
     }
 
     file_descriptor* get_file_descriptor(lua_State* L, int index) {
-      return luaX_check_udata<file_descriptor>(L, index, "dromozoa.unix.fd.ref", "dromozoa.unix.fd");
+      return luaX_check_udata<file_descriptor>(L, index, "dromozoa.unix.fd_ref", "dromozoa.unix.fd");
     }
   }
 
@@ -45,8 +45,12 @@ namespace dromozoa {
   }
 
   namespace {
+    void impl_gc(lua_State* L) {
+      get_file_descriptor(L, 1)->~file_descriptor();
+    }
+
     void impl_call(lua_State* L) {
-      new_fd_ref(L, get_fd(L, 2));
+      new_fd(L, get_fd(L, 2));
     }
 
     void impl_get(lua_State* L) {
@@ -67,15 +71,13 @@ namespace dromozoa {
       }
     }
 
-    void impl_gc(lua_State* L) {
-      get_file_descriptor(L, 1)->~file_descriptor();
+    void impl_fd_ref(lua_State* L) {
+      new_fd_ref(L, get_fd(L, 2));
     }
   }
 
-  int open_fd(lua_State* L) {
-    lua_newtable(L);
-
-    luaL_newmetatable(L, "dromozoa.unix.fd.ref");
+  void initialize_fd(lua_State* L) {
+    luaL_newmetatable(L, "dromozoa.unix.fd_ref");
     lua_pushvalue(L, -2);
     luaX_set_field(L, "__index");
     lua_pop(L, 1);
@@ -96,6 +98,9 @@ namespace dromozoa {
     luaX_set_field(L, "stdout");
     new_fd_ref(L, 2);
     luaX_set_field(L, "stderr");
-    return 1;
+  }
+
+  void initialize_fd_ref(lua_State* L) {
+    luaX_set_field(L, "fd_ref", impl_fd_ref);
   }
 }

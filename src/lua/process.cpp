@@ -23,10 +23,9 @@
 
 namespace dromozoa {
   namespace {
-    void impl_new(lua_State* L) {
+    void impl_call(lua_State* L) {
       lua_newtable(L);
-      luaL_getmetatable(L, "dromozoa.unix.process");
-      lua_setmetatable(L, -2);
+      luaX_set_metatable(L, "dromozoa.unix.process");
     }
 
     void impl_forkexec(lua_State* L) {
@@ -38,9 +37,9 @@ namespace dromozoa {
       int dup2_stdio[3] = { -1, -1, -1 };
       if (lua_istable(L, 6)) {
         for (int i = 0; i < 3; ++i) {
-          lua_pushinteger(L, i);
-          lua_gettable(L, 6);
+          lua_geti(L, 6, i);
           if (!lua_isnil(L, -1)) {
+            // [TODO] do not use luaL_checkudata
             dup2_stdio[i] = get_fd(L, -1);
           }
           lua_pop(L, 1);
@@ -89,17 +88,14 @@ namespace dromozoa {
     }
   }
 
-  int open_process(lua_State* L) {
-    lua_newtable(L);
-    luaX_set_field(L, "forkexec", impl_forkexec);
-    luaX_set_field(L, "forkexec_daemon", impl_forkexec_daemon);
-    luaX_set_metafield(L, "__call", impl_new);
-
+  void initialize_process(lua_State* L) {
     luaL_newmetatable(L, "dromozoa.unix.process");
     lua_pushvalue(L, -2);
     luaX_set_field(L, "__index");
     lua_pop(L, 1);
 
-    return 1;
+    luaX_set_metafield(L, "__call", impl_call);
+    luaX_set_field(L, "forkexec", impl_forkexec);
+    luaX_set_field(L, "forkexec_daemon", impl_forkexec_daemon);
   }
 }

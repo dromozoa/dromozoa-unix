@@ -37,17 +37,26 @@ namespace dromozoa {
     return 1;
   }
 
-  int open(lua_State* L) {
+  void initialize(lua_State* L) {
     lua_newtable(L);
-
-    open_fd(L);
+    initialize_fd(L);
     initialize_fd_djb(L);
     initialize_fd_socket(L);
     initialize_fd_unistd(L);
     luaX_set_field(L, "fd");
 
-    open_process(L);
+    initialize_fd_ref(L);
+
+    lua_newtable(L);
+    initialize_process(L);
     lua_setfield(L, -2, "process");
+
+    lua_newtable(L);
+    initialize_sockaddr(L);
+    initialize_sockaddr_netdb(L);
+    luaX_set_field(L, "sockaddr");
+
+    initialize_sockaddr_un(L);
 
     open_selector(L);
     lua_setfield(L, -2, "selector");
@@ -55,9 +64,10 @@ namespace dromozoa {
     open_selfpipe(L);
     lua_setfield(L, -2, "selfpipe");
 
-    open_sockaddr(L);
-    initialize_getnameinfo(L);
-    lua_setfield(L, -2, "sockaddr");
+
+
+
+
 
     open_asio(L);
     lua_setfield(L, -2, "asio");
@@ -72,7 +82,6 @@ namespace dromozoa {
     initialize_pathexec(L);
     initialize_pipe(L);
     initialize_signal(L);
-    initialize_sockaddr(L);
     initialize_stdlib(L);
     initialize_sys_socket(L);
     initialize_sys_stat(L);
@@ -80,11 +89,11 @@ namespace dromozoa {
     initialize_sys_wait(L);
     initialize_time(L);
     initialize_unistd(L);
-
-    return 1;
   }
 }
 
 extern "C" int luaopen_dromozoa_unix(lua_State* L) {
-  return dromozoa::open(L);
+  lua_newtable(L);
+  dromozoa::initialize(L);
+  return 1;
 }

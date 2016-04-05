@@ -19,25 +19,28 @@
 #define MODULE_HPP
 
 namespace dromozoa {
-  int open_fd(lua_State* L);
-  int open_process(lua_State* L);
   int open_selector(lua_State* L);
   int open_selfpipe(lua_State* L);
-  int open_sockaddr(lua_State* L);
 
+  void initialize_fd(lua_State* L);
   void initialize_fd_djb(lua_State* L);
   void initialize_fd_socket(lua_State* L);
   void initialize_fd_unistd(lua_State* L);
+  void initialize_fd_ref(lua_State* L);
+
+  void initialize_process(lua_State* L);
+
+  void initialize_sockaddr(lua_State* L);
+  void initialize_sockaddr_netdb(lua_State* L);
+  void initialize_sockaddr_un(lua_State* L);
 
   void initialize_error(lua_State* L);
   void initialize_fcntl(lua_State* L);
-  void initialize_getnameinfo(lua_State* L);
   void initialize_netdb(lua_State* L);
   void initialize_netinet(lua_State* L);
   void initialize_pathexec(lua_State* L);
   void initialize_pipe(lua_State* L);
   void initialize_signal(lua_State* L);
-  void initialize_sockaddr(lua_State* L);
   void initialize_stdlib(lua_State* L);
   void initialize_time(lua_State* L);
   void initialize_unistd(lua_State* L);

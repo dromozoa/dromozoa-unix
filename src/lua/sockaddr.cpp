@@ -81,9 +81,7 @@ namespace dromozoa {
     }
   }
 
-  int open_sockaddr(lua_State* L) {
-    lua_newtable(L);
-
+  void initialize_sockaddr(lua_State* L) {
     luaL_newmetatable(L, "dromozoa.unix.sockaddr");
     lua_pushvalue(L, -2);
     luaX_set_field(L, "__index");
@@ -92,11 +90,9 @@ namespace dromozoa {
     luaX_set_field(L, "size", impl_size);
     luaX_set_field(L, "family", impl_family);
     luaX_set_field(L, "path", impl_path);
-
-    return 1;
   }
 
-  void initialize_sockaddr(lua_State* L) {
+  void initialize_sockaddr_un(lua_State* L) {
     luaX_set_field(L, "sockaddr_un", impl_sockaddr_un);
   }
 }
