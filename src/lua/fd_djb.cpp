@@ -16,6 +16,8 @@
 // along with dromozoa-unix.  If not, see <http://www.gnu.org/licenses/>.
 
 #include <dromozoa/coe.hpp>
+#include <dromozoa/lock.hpp>
+#include <dromozoa/ndelay.hpp>
 
 #include "common.hpp"
 
@@ -28,9 +30,54 @@ namespace dromozoa {
         luaX_push_success(L);
       }
     }
+
+    void impl_lock_ex(lua_State* L) {
+      if (lock_ex(get_fd(L, 1)) == -1) {
+        push_error(L);
+      } else {
+        luaX_push_success(L);
+      }
+    }
+
+    void impl_lock_exnb(lua_State* L) {
+      if (lock_exnb(get_fd(L, 1)) == -1) {
+        push_error(L);
+      } else {
+        luaX_push_success(L);
+      }
+    }
+
+    void impl_lock_un(lua_State* L) {
+      if (lock_un(get_fd(L, 1)) == -1) {
+        push_error(L);
+      } else {
+        luaX_push_success(L);
+      }
+    }
+
+    void impl_ndelay_on(lua_State* L) {
+      if (ndelay_on(get_fd(L, 1)) == -1) {
+        push_error(L);
+      } else {
+        luaX_push_success(L);
+      }
+    }
+
+    void impl_ndelay_off(lua_State* L) {
+      if (ndelay_off(get_fd(L, 1)) == -1) {
+        push_error(L);
+      } else {
+        luaX_push_success(L);
+      }
+    }
   }
 
-  void initialize_coe(lua_State* L) {
+  void initialize_fd_djb(lua_State* L) {
     luaX_set_field(L, "coe", impl_coe);
+    luaX_set_field(L, "lock_ex", impl_lock_ex);
+    luaX_set_field(L, "lock_exnb", impl_lock_exnb);
+    luaX_set_field(L, "lock_un", impl_lock_un);
+    luaX_set_field(L, "ndelay_on", impl_ndelay_on);
+    luaX_set_field(L, "ndelay_off", impl_ndelay_off);
   }
 }

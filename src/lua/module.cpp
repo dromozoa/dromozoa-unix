@@ -41,9 +41,8 @@ namespace dromozoa {
     lua_newtable(L);
 
     open_fd(L);
-    initialize_coe(L);
-    initialize_lock(L);
-    initialize_ndelay(L);
+    initialize_fd_djb(L);
+
     initialize_read(L);
     initialize_write(L);
     initialize_socket(L);

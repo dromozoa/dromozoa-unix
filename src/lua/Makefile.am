@@ -27,8 +27,6 @@ unix_la_SOURCES = \
 	fcntl.cpp \
 	fd.cpp \
 	fd_djb.cpp \
-	lock.cpp \
-	ndelay.cpp \
 	netdb.cpp \
 	netinet.cpp \
 	pathexec.cpp \
