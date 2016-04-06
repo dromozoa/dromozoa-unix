@@ -43,7 +43,7 @@ namespace dromozoa {
     }
 
     void impl_close(lua_State* L) {
-      int result = -1;
+      int result;
       if (lua_isuserdata(L, 1)) {
         result = check_file_descriptor(L, 1)->close();
       } else {
@@ -71,7 +71,7 @@ namespace dromozoa {
       if (file_descriptor* data = luaX_to_udata<file_descriptor>(L, index, "dromozoa.unix.fd_ref", "dromozoa.unix.fd")) {
         return data->get();
       }
-    } else if (lua_isinteger(L, index)) {
+    } else if (lua_isnumber(L, index)) {
       return lua_tointeger(L, index);
     }
     return -1;

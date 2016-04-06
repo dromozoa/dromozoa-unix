@@ -25,6 +25,7 @@ extern "C" {
 }
 
 #include <errno.h>
+#include <math.h>
 #include <time.h>
 
 #include <iostream>
@@ -51,29 +52,22 @@ namespace dromozoa {
 
     void impl_call(lua_State* L) {
       size_t size = luaL_checkinteger(L, 2);
-      int flags = luaL_optinteger(L, 3, 0);
+      int flags = luaL_optinteger(L, 3, SELECTOR_CLOEXEC);
       file_descriptor fd(selector_impl::open(size, flags));
-      if (!fd.valid()) {
-        push_error(L);
+      if (fd.valid()) {
+        luaX_new<selector_impl>(L, fd.release(), size);
+        luaX_set_metatable(L, "dromozoa.unix.selector");
       } else {
-        selector_impl* s = static_cast<selector_impl*>(lua_newuserdata(L, sizeof(selector_impl)));
-        new(s) selector_impl(fd.release(), size);
-        luaL_getmetatable(L, "dromozoa.unix.selector");
-        lua_setmetatable(L, -2);
-        // if (get_log_level() > 2) {
-        //   std::cerr << "[dromozoa-unix] new selector " << s << std::endl;
-        // }
+        push_error(L);
       }
     }
 
     void impl_gc(lua_State* L) {
-      selector* self = check_selector(L, 1);
-      self->~selector();
+      check_selector(L, 1)->~selector();
     }
 
     void impl_close(lua_State* L) {
-      selector* s = check_selector(L, 1);
-      if (s->close() == -1) {
+      if (check_selector(L, 1)->close() == -1) {
         push_error(L);
       } else {
         luaX_push_success(L);
@@ -110,28 +104,39 @@ namespace dromozoa {
     }
 
     void impl_select(lua_State* L) {
-      int result = -1;
+      int result;
       if (lua_isnoneornil(L, 2)) {
         result = check_selector(L, 1)->select(0);
+      } else if (lua_isnumber(L, 3)) {
+        double t = lua_tonumber(L, 2);
+        if (t < 0) {
+          result = check_selector(L, 1)->select(0);
+        } else {
+          double i;
+          double f = modf(t, &i);
+          struct timespec tv = {};
+          tv.tv_sec = i;
+          tv.tv_nsec = f * 1000000000;
+          result = check_selector(L, 1)->select(&tv);
+        }
       } else {
         struct timespec tv = {};
         lua_getfield(L, 2, "tv_sec");
-        tv.tv_sec = luaL_checkinteger(L, -1);
+        if (lua_isnumber(L, -1)) {
+          tv.tv_sec = lua_tointeger(L, -1);
+        }
         lua_pop(L, 1);
         lua_getfield(L, 2, "tv_nsec");
-        tv.tv_nsec = luaL_checkinteger(L, -1);
+        if (lua_isnumber(L, -1)) {
+          tv.tv_nsec = lua_tointeger(L, -1);
+        }
         lua_pop(L, 1);
         result = check_selector(L, 1)->select(&tv);
       }
       if (result == -1) {
-        int code = errno;
-        if (code == EINTR) {
-          push_interrupted(L);
-        } else {
-          push_error(L);
-        }
+        push_error(L);
       } else {
-        lua_pushinteger(L, result);
+        luaX_push(L, result);
       }
     }
 

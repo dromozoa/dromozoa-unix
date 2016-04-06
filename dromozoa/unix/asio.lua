@@ -282,10 +282,14 @@ function class:dispatch()
     if self.stopped then
       break
     end
-    local result = selector:select(self.selector_timeout)
+    local a, b, c = selector:select(self.selector_timeout)
     local current_time = class.super.timespec.now()
     self.current_time = current_time
-    if result ~= class.super.interruputed then
+    if a == nil then
+      if c ~= class.super.EINTR then
+        error(b)
+      end
+    else
       for i = 1, result do
         local fd, event = selector:event(i)
         local pending = pendings[fd]
