@@ -290,7 +290,7 @@ function class:dispatch()
         error(b)
       end
     else
-      for i = 1, result do
+      for i = 1, a do
         local fd, event = selector:event(i)
         local pending = pendings[fd]
         if pending ~= nil then

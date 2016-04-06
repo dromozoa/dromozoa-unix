@@ -24,14 +24,9 @@ extern "C" {
 #include <lauxlib.h>
 }
 
-#include <errno.h>
 #include <math.h>
 #include <time.h>
 
-#include <iostream>
-#include <new>
-
-#include <dromozoa/bind.hpp>
 #include <dromozoa/selector.hpp>
 
 #include "common.hpp"
@@ -147,25 +142,25 @@ namespace dromozoa {
       if (check_selector(L, 1)->event(i - 1, fd, event) == -1) {
         push_error(L);
       } else {
-        lua_pushinteger(L, fd);
-        lua_pushinteger(L, event);
+        luaX_push(L, fd);
+        luaX_push(L, event);
       }
     }
   }
 
   void initialize_selector(lua_State* L) {
+    luaL_newmetatable(L, "dromozoa.unix.selector");
+    lua_pushvalue(L, -2);
+    luaX_set_field(L, "__index");
+    luaX_set_field(L, "__gc", impl_gc);
+    lua_pop(L, 1);
+
+    luaX_set_metafield(L, "__call", impl_call);
     luaX_set_field(L, "close", impl_close);
     luaX_set_field(L, "add", impl_add);
     luaX_set_field(L, "mod", impl_mod);
     luaX_set_field(L, "del", impl_del);
     luaX_set_field(L, "select", impl_select);
     luaX_set_field(L, "event", impl_event);
-    luaX_set_metafield(L, "__call", impl_call);
-
-    luaL_newmetatable(L, "dromozoa.unix.selector");
-    lua_pushvalue(L, -2);
-    luaX_set_field(L, "__index");
-    luaX_set_field(L, "__gc", impl_gc);
-    lua_pop(L, 1);
   }
 }
