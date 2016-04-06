@@ -36,8 +36,8 @@ namespace dromozoa {
     void impl_write(lua_State* L) {
       size_t size;
       const char* buffer = luaL_checklstring(L, 2, &size);
-      size_t i = luaX_range_i(L, 3, size);
-      size_t j = luaX_range_j(L, 4, size);
+      size_t i = luaX_opt_range_i(L, 3, size);
+      size_t j = luaX_opt_range_j(L, 4, size);
       if (i < j) {
         ssize_t result = write(check_fd(L, 1), buffer + i, j - i);
         if (result == -1) {

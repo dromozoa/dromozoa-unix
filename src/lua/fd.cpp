@@ -36,11 +36,22 @@ namespace dromozoa {
     }
   }
 
-  int check_fd(lua_State* L, int index) {
+  int to_fd(lua_State* L, int index) {
     if (lua_isuserdata(L, index)) {
-      return check_file_descriptor(L, index)->get();
+      if (file_descriptor* data = luaX_to_udata<file_descriptor>(L, index, "dromozoa.unix.fd_ref", "dromozoa.unix.fd")) {
+        return data->get();
+      }
+    } else if (lua_isinteger(L, index)) {
+      return lua_tointeger(L, index);
+    }
+    return -1;
+  }
+
+  int check_fd(lua_State* L, int n) {
+    if (lua_isuserdata(L, n)) {
+      return check_file_descriptor(L, n)->get();
     } else {
-      return luaL_checkinteger(L, index);
+      return luaL_checkinteger(L, n);
     }
   }
 

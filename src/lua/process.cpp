@@ -38,10 +38,7 @@ namespace dromozoa {
       if (lua_istable(L, 6)) {
         for (int i = 0; i < 3; ++i) {
           lua_geti(L, 6, i);
-          if (!lua_isnil(L, -1)) {
-            // [TODO] do not use luaL_checkudata
-            dup2_stdio[i] = check_fd(L, -1);
-          }
+          dup2_stdio[i] = to_fd(L, -1);
           lua_pop(L, 1);
         }
       }
