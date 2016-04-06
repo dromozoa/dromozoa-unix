@@ -58,8 +58,9 @@ namespace dromozoa {
 
     initialize_sockaddr_un(L);
 
-    open_selector(L);
-    lua_setfield(L, -2, "selector");
+    lua_newtable(L);
+    initialize_selector(L);
+    luaX_set_field(L, "selector");
 
     open_selfpipe(L);
     lua_setfield(L, -2, "selfpipe");

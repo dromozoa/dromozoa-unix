@@ -45,11 +45,11 @@ typedef dromozoa::selector_kqueue selector_impl;
 
 namespace dromozoa {
   namespace {
-    selector& get_selector(lua_State* L, int n) {
-      return *static_cast<selector*>(luaL_checkudata(L, n, "dromozoa.unix.selector"));
+    selector* check_selector(lua_State* L, int n) {
+      return luaX_check_udata<selector>(L, n, "dromozoa.unix.selector");
     }
 
-    void impl_new(lua_State* L) {
+    void impl_call(lua_State* L) {
       size_t size = luaL_checkinteger(L, 2);
       int flags = luaL_optinteger(L, 3, 0);
       file_descriptor fd(selector_impl::open(size, flags));
@@ -67,13 +67,13 @@ namespace dromozoa {
     }
 
     void impl_gc(lua_State* L) {
-      selector& s = get_selector(L, 1);
-      s.~selector();
+      selector* self = check_selector(L, 1);
+      self->~selector();
     }
 
     void impl_close(lua_State* L) {
-      selector& s = get_selector(L, 1);
-      if (s.close() == -1) {
+      selector* s = check_selector(L, 1);
+      if (s->close() == -1) {
         push_error(L);
       } else {
         luaX_push_success(L);
@@ -83,7 +83,7 @@ namespace dromozoa {
     void impl_add(lua_State* L) {
       int fd = check_fd(L, 2);
       int event = luaL_checkinteger(L, 3);
-      if (get_selector(L, 1).add(fd, event) == -1) {
+      if (check_selector(L, 1)->add(fd, event) == -1) {
         push_error(L);
       } else {
         luaX_push_success(L);
@@ -93,7 +93,7 @@ namespace dromozoa {
     void impl_mod(lua_State* L) {
       int fd = check_fd(L, 2);
       int event = luaL_checkinteger(L, 3);
-      if (get_selector(L, 1).mod(fd, event) == -1) {
+      if (check_selector(L, 1)->mod(fd, event) == -1) {
         push_error(L);
       } else {
         luaX_push_success(L);
@@ -102,7 +102,7 @@ namespace dromozoa {
 
     void impl_del(lua_State* L) {
       int fd = check_fd(L, 2);
-      if (get_selector(L, 1).del(fd) == -1) {
+      if (check_selector(L, 1)->del(fd) == -1) {
         push_error(L);
       } else {
         luaX_push_success(L);
@@ -112,7 +112,7 @@ namespace dromozoa {
     void impl_select(lua_State* L) {
       int result = -1;
       if (lua_isnoneornil(L, 2)) {
-        result = get_selector(L, 1).select(0);
+        result = check_selector(L, 1)->select(0);
       } else {
         struct timespec tv = {};
         lua_getfield(L, 2, "tv_sec");
@@ -121,7 +121,7 @@ namespace dromozoa {
         lua_getfield(L, 2, "tv_nsec");
         tv.tv_nsec = luaL_checkinteger(L, -1);
         lua_pop(L, 1);
-        result = get_selector(L, 1).select(&tv);
+        result = check_selector(L, 1)->select(&tv);
       }
       if (result == -1) {
         int code = errno;
@@ -139,7 +139,7 @@ namespace dromozoa {
       int i = luaL_checkinteger(L, 2);
       int fd = -1;
       int event = 0;
-      if (get_selector(L, 1).event(i - 1, fd, event) == -1) {
+      if (check_selector(L, 1)->event(i - 1, fd, event) == -1) {
         push_error(L);
       } else {
         lua_pushinteger(L, fd);
@@ -148,22 +148,19 @@ namespace dromozoa {
     }
   }
 
-  int open_selector(lua_State* L) {
-    lua_newtable(L);
+  void initialize_selector(lua_State* L) {
     luaX_set_field(L, "close", impl_close);
     luaX_set_field(L, "add", impl_add);
     luaX_set_field(L, "mod", impl_mod);
     luaX_set_field(L, "del", impl_del);
     luaX_set_field(L, "select", impl_select);
     luaX_set_field(L, "event", impl_event);
-    luaX_set_metafield(L, "__call", impl_new);
+    luaX_set_metafield(L, "__call", impl_call);
 
     luaL_newmetatable(L, "dromozoa.unix.selector");
     lua_pushvalue(L, -2);
     luaX_set_field(L, "__index");
     luaX_set_field(L, "__gc", impl_gc);
     lua_pop(L, 1);
-
-    return 1;
   }
 }

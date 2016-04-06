@@ -20,11 +20,6 @@
 #include "common.hpp"
 
 namespace dromozoa {
-  void new_fd(lua_State* L, int fd) {
-    luaX_new<file_descriptor>(L, fd);
-    luaX_set_metatable(L, "dromozoa.unix.fd");
-  }
-
   namespace {
     void new_fd_ref(lua_State* L, int fd) {
       luaX_new<file_descriptor>(L, fd);
@@ -34,28 +29,7 @@ namespace dromozoa {
     file_descriptor* check_file_descriptor(lua_State* L, int index) {
       return luaX_check_udata<file_descriptor>(L, index, "dromozoa.unix.fd_ref", "dromozoa.unix.fd");
     }
-  }
 
-  int to_fd(lua_State* L, int index) {
-    if (lua_isuserdata(L, index)) {
-      if (file_descriptor* data = luaX_to_udata<file_descriptor>(L, index, "dromozoa.unix.fd_ref", "dromozoa.unix.fd")) {
-        return data->get();
-      }
-    } else if (lua_isinteger(L, index)) {
-      return lua_tointeger(L, index);
-    }
-    return -1;
-  }
-
-  int check_fd(lua_State* L, int n) {
-    if (lua_isuserdata(L, n)) {
-      return check_file_descriptor(L, n)->get();
-    } else {
-      return luaL_checkinteger(L, n);
-    }
-  }
-
-  namespace {
     void impl_gc(lua_State* L) {
       check_file_descriptor(L, 1)->~file_descriptor();
     }
@@ -65,7 +39,7 @@ namespace dromozoa {
     }
 
     void impl_get(lua_State* L) {
-      lua_pushinteger(L, check_fd(L, 1));
+      luaX_push(L, check_fd(L, 1));
     }
 
     void impl_close(lua_State* L) {
@@ -84,6 +58,30 @@ namespace dromozoa {
 
     void impl_fd_ref(lua_State* L) {
       new_fd_ref(L, check_fd(L, 2));
+    }
+  }
+
+  void new_fd(lua_State* L, int fd) {
+    luaX_new<file_descriptor>(L, fd);
+    luaX_set_metatable(L, "dromozoa.unix.fd");
+  }
+
+  int to_fd(lua_State* L, int index) {
+    if (lua_isuserdata(L, index)) {
+      if (file_descriptor* data = luaX_to_udata<file_descriptor>(L, index, "dromozoa.unix.fd_ref", "dromozoa.unix.fd")) {
+        return data->get();
+      }
+    } else if (lua_isinteger(L, index)) {
+      return lua_tointeger(L, index);
+    }
+    return -1;
+  }
+
+  int check_fd(lua_State* L, int n) {
+    if (lua_isuserdata(L, n)) {
+      return check_file_descriptor(L, n)->get();
+    } else {
+      return luaL_checkinteger(L, n);
     }
   }
 

@@ -43,10 +43,10 @@ namespace dromozoa {
         if (result == -1) {
           push_error(L);
         } else {
-          lua_pushinteger(L, result);
+          luaX_push(L, result);
         }
       } else {
-        lua_pushinteger(L, 0);
+        luaX_push(L, 0);
       }
     }
   }
