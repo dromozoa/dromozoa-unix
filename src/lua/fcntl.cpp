@@ -36,6 +36,7 @@ namespace dromozoa {
 
   void initialize_fcntl(lua_State* L) {
     luaX_set_field(L, "open", impl_open);
+
     luaX_set_field(L, "O_APPEND", O_APPEND);
     luaX_set_field(L, "O_CLOEXEC", O_CLOEXEC);
     luaX_set_field(L, "O_CREAT", O_CREAT);
