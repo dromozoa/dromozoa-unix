@@ -52,16 +52,16 @@ namespace dromozoa {
       } else {
         struct addrinfo hints = {};
         lua_getfield(L, 3, "ai_flags");
-        hints.ai_flags = luaL_optinteger(L, -1, AI_V4MAPPED | AI_ADDRCONFIG);
+        hints.ai_flags = luaX_opt_integer<int>(L, -1, AI_V4MAPPED | AI_ADDRCONFIG);
         lua_pop(L, 1);
         lua_getfield(L, 3, "ai_family");
-        hints.ai_family = luaL_optinteger(L, -1, AF_UNSPEC);
+        hints.ai_family = luaX_opt_integer<int>(L, -1, AF_UNSPEC);
         lua_pop(L, 1);
         lua_getfield(L, 3, "ai_socktype");
-        hints.ai_socktype = luaL_optinteger(L, -1, 0);
+        hints.ai_socktype = luaX_opt_integer<int>(L, -1, 0);
         lua_pop(L, 1);
         lua_getfield(L, 3, "ai_protocol");
-        hints.ai_protocol = luaL_optinteger(L, -1, 0);
+        hints.ai_protocol = luaX_opt_integer<int>(L, -1, 0);
         lua_pop(L, 1);
         code = getaddrinfo(nodename, servname, &hints, &result);
       }
@@ -96,7 +96,7 @@ namespace dromozoa {
       std::vector<char> nodename(NI_MAXHOST);
       std::vector<char> servname(NI_MAXSERV);
       const socket_address* address = get_sockaddr(L, 1);
-      int flags = luaL_optinteger(L, 2, 0);
+      int flags = luaX_opt_integer<int>(L, 2, 0);
       int code = getnameinfo(address->get(), address->size(), &nodename[0], nodename.size(), &servname[0], servname.size(), flags);
       if (code == 0) {
         lua_pushstring(L, &nodename[0]);

@@ -52,7 +52,7 @@ namespace dromozoa {
   namespace {
     int impl_strerror(lua_State* L) {
       int save = errno;
-      int code = luaL_optinteger(L, 1, save);
+      int code = luaX_opt_integer<int>(L, 1, save);
       std::string message = compat_strerror(code);
       lua_pushlstring(L, message.c_str(), message.size());
       errno = save;

@@ -25,7 +25,7 @@ extern char** environ;
 
 namespace dromozoa {
   namespace {
-    int impl_environ(lua_State* L) {
+    void impl_environ(lua_State* L) {
       lua_newtable(L);
       for (int i = 0; ; ++i) {
         if (const char* p = environ[i]) {
@@ -36,57 +36,48 @@ namespace dromozoa {
           break;
         }
       }
-      return 1;
     }
 
-    int impl_getcwd(lua_State* L) {
+    void impl_getcwd(lua_State* L) {
       long path_max = pathconf(".", _PC_PATH_MAX);
       if (path_max == -1) {
-        return push_error(L);
+        push_error(L);
       } else {
         std::vector<char> buffer(path_max);
         if (getcwd(&buffer[0], buffer.size())) {
           lua_pushstring(L, &buffer[0]);
-          return 1;
         } else {
-          return push_error(L);
+          push_error(L);
         }
       }
     }
 
-    int impl_getuid(lua_State* L) {
+    void impl_getuid(lua_State* L) {
       lua_pushinteger(L, getuid());
-      return 1;
     }
 
-    int impl_getgid(lua_State* L) {
+    void impl_getgid(lua_State* L) {
       lua_pushinteger(L, getgid());
-      return 1;
     }
 
-    int impl_geteuid(lua_State* L) {
+    void impl_geteuid(lua_State* L) {
       lua_pushinteger(L, geteuid());
-      return 1;
     }
 
-    int impl_getegid(lua_State* L) {
+    void impl_getegid(lua_State* L) {
       lua_pushinteger(L, getegid());
-      return 1;
     }
 
-    int impl_getpid(lua_State* L) {
+    void impl_getpid(lua_State* L) {
       lua_pushinteger(L, getpid());
-      return 1;
     }
 
-    int impl_getpgrp(lua_State* L) {
+    void impl_getpgrp(lua_State* L) {
       lua_pushinteger(L, getpgrp());
-      return 1;
     }
 
-    int impl_getppid(lua_State* L) {
+    void impl_getppid(lua_State* L) {
       lua_pushinteger(L, getppid());
-      return 1;
     }
   }
 

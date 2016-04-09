@@ -31,7 +31,7 @@ namespace dromozoa {
     }
 
     void impl_listen(lua_State* L) {
-      int backlog = luaL_optinteger(L, 2, SOMAXCONN);
+      int backlog = luaX_opt_integer<int>(L, 2, SOMAXCONN);
       if (listen(check_fd(L, 1), backlog) == -1) {
         push_error(L);
       } else {
@@ -40,7 +40,7 @@ namespace dromozoa {
     }
 
     void impl_accept(lua_State* L) {
-      int flags = luaL_optinteger(L, 2, COMPAT_SOCK_CLOEXEC);
+      int flags = luaX_opt_integer<int>(L, 2, COMPAT_SOCK_CLOEXEC);
       socket_address address;
       int result = compat_accept4(check_fd(L, 1), address.get(), address.size_ptr(), flags);
       if (result == -1) {

@@ -31,7 +31,7 @@ namespace dromozoa {
   namespace {
     void impl_kill(lua_State* L) {
       pid_t pid = luaX_check_integer<pid_t>(L, 1);
-      int sig = luaL_optinteger(L, 2, SIGTERM);
+      int sig = luaX_opt_integer<int>(L, 2, SIGTERM);
       if (kill(pid, sig) == -1) {
         push_error(L);
       } else {

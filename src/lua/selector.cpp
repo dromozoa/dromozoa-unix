@@ -47,7 +47,7 @@ namespace dromozoa {
 
     void impl_call(lua_State* L) {
       size_t size = luaX_check_integer<size_t>(L, 2);
-      int flags = luaL_optinteger(L, 3, SELECTOR_CLOEXEC);
+      int flags = luaX_opt_integer<int>(L, 3, SELECTOR_CLOEXEC);
       file_descriptor fd(selector_impl::open(size, flags));
       if (fd.valid()) {
         luaX_new<selector_impl>(L, fd.release(), size);

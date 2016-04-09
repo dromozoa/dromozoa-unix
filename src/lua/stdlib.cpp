@@ -30,48 +30,44 @@ extern "C" {
 
 namespace dromozoa {
   namespace {
-    int impl_realpath(lua_State* L) {
+    void impl_realpath(lua_State* L) {
 #ifdef PATH_MAX
       std::vector<char> buffer(PATH_MAX);
       if (const char* result = realpath(luaL_checkstring(L, 1), &buffer[0])) {
         lua_pushstring(L, result);
-        return 1;
       }
 #else
       if (char* result = realpath(luaL_checkstring(L, 1), 0)) {
         lua_pushstring(L, result);
         free(result);
-        return 1;
       }
 #endif
       else {
-        return push_error(L);
+        push_error(L);
       }
     }
 
-    int impl_mkdtemp(lua_State* L) {
+    void impl_mkdtemp(lua_State* L) {
       size_t size = 0;
       const char* tmpl = luaL_checklstring(L, 1, &size);
       std::vector<char> buffer(tmpl, tmpl + size + 1);
       if (const char* result = mkdtemp(&buffer[0])) {
         lua_pushstring(L, result);
-        return 1;
       } else {
-        return push_error(L);
+        push_error(L);
       }
     }
 
-    int impl_mkstemp(lua_State* L) {
+    void impl_mkstemp(lua_State* L) {
       size_t size = 0;
       const char* tmpl = luaL_checklstring(L, 1, &size);
       std::vector<char> buffer(tmpl, tmpl + size + 1);
       int result = mkstemp(&buffer[0]);
       if (result == -1) {
-        return push_error(L);
+        push_error(L);
       } else {
         new_fd(L, result);
         lua_pushstring(L, &buffer[0]);
-        return 2;
       }
     }
   }

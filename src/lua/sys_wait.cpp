@@ -21,33 +21,27 @@
 
 namespace dromozoa {
   namespace {
-    int impl_wait(lua_State* L) {
-      pid_t pid = luaL_optinteger(L, 1, -1);
-      int options = luaL_optinteger(L, 2, 0);
+    void impl_wait(lua_State* L) {
+      pid_t pid = luaX_opt_integer<pid_t>(L, 1, -1);
+      int options = luaX_opt_integer<int>(L, 2, 0);
       int status = 0;
       pid_t result = waitpid(pid, &status, options);
       if (result == -1) {
-        return push_error(L);
+        push_error(L);
       } else {
         lua_pushinteger(L, result);
         if (WIFEXITED(status)) {
           lua_pushliteral(L, "exit");
           lua_pushinteger(L, WEXITSTATUS(status));
-          return 3;
         } else if (WIFSIGNALED(status)) {
           lua_pushliteral(L, "signal");
           lua_pushinteger(L, WTERMSIG(status));
-          return 3;
         } else if (WIFSTOPPED(status)) {
           lua_pushliteral(L, "stop");
           lua_pushinteger(L, WSTOPSIG(status));
-          return 3;
         } else if (WIFCONTINUED(status)) {
           lua_pushliteral(L, "continue");
           lua_pushinteger(L, SIGCONT);
-          return 3;
-        } else {
-          return 1;
         }
       }
     }

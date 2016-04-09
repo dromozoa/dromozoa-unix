@@ -25,15 +25,14 @@ extern "C" {
 
 namespace dromozoa {
   namespace {
-    int impl_gettimeofday(lua_State* L) {
+    void impl_gettimeofday(lua_State* L) {
       struct timeval tv = {};
       if (gettimeofday(&tv, 0) != -1) {
         lua_newtable(L);
         luaX_set_field(L, "tv_sec", tv.tv_sec);
         luaX_set_field(L, "tv_usec", tv.tv_usec);
-        return 1;
       } else {
-        return push_error(L);
+        push_error(L);
       }
     }
   }

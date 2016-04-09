@@ -22,7 +22,7 @@
 namespace dromozoa {
   namespace {
     void impl_pipe(lua_State* L) {
-      int flags = luaL_optinteger(L, 1, 0);
+      int flags = luaX_opt_integer<int>(L, 1, 0);
       int fd[2] = { -1, -1 };
       if (compat_pipe2(fd, flags) == -1) {
         push_error(L);
