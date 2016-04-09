@@ -36,43 +36,17 @@ extern "C" {
 #include "common.hpp"
 
 namespace dromozoa {
-  int push_resource_unavailable_try_again(lua_State* L) {
-    lua_pushlightuserdata(L, reinterpret_cast<void*>(EAGAIN));
-    return 1;
+  void push_error(lua_State* L) {
+    push_error(L, errno);
   }
 
-  int push_operation_in_progress(lua_State* L) {
-    lua_pushlightuserdata(L, reinterpret_cast<void*>(EINPROGRESS));
-    return 1;
-  }
-
-  int push_interrupted(lua_State* L) {
-    lua_pushlightuserdata(L, reinterpret_cast<void*>(EINTR));
-    return 1;
-  }
-
-  int push_broken_pipe(lua_State* L) {
-    lua_pushlightuserdata(L, reinterpret_cast<void*>(EPIPE));
-    return 1;
-  }
-
-  int push_timed_out(lua_State* L) {
-    lua_pushlightuserdata(L, reinterpret_cast<void*>(ETIMEDOUT));
-    return 1;
-  }
-
-  int push_error(lua_State* L) {
-    return push_error(L, errno);
-  }
-
-  int push_error(lua_State* L, int code) {
+  void push_error(lua_State* L, int code) {
     int save = errno;
     std::string message = compat_strerror(code);
     lua_pushnil(L);
     lua_pushlstring(L, message.c_str(), message.size());
     lua_pushinteger(L, code);
     errno = save;
-    return 3;
   }
 
   namespace {
@@ -86,15 +60,12 @@ namespace dromozoa {
     }
 
     void impl_set_errno(lua_State* L) {
-      int code = luaL_checkinteger(L, 1);
-      errno = code;
+      errno = luaX_check_integer<int>(L, 1);
       luaX_push_success(L);
     }
 
-    int impl_get_errno(lua_State* L) {
-      int code = errno;
-      lua_pushinteger(L, code);
-      return 1;
+    void impl_get_errno(lua_State* L) {
+      luaX_push(L, errno);
     }
   }
 
@@ -110,20 +81,5 @@ namespace dromozoa {
     luaX_set_field(L, "EPIPE", EPIPE);
     luaX_set_field(L, "ETIMEDOUT", ETIMEDOUT);
     luaX_set_field(L, "EWOULDBLOCK", EWOULDBLOCK);
-
-    push_resource_unavailable_try_again(L);
-    lua_setfield(L, -2, "resource_unavailable_try_again");
-
-    push_operation_in_progress(L);
-    lua_setfield(L, -2, "operation_in_progress");
-
-    push_interrupted(L);
-    lua_setfield(L, -2, "interrupted");
-
-    push_broken_pipe(L);
-    lua_setfield(L, -2, "broken_pipe");
-
-    push_timed_out(L);
-    lua_setfield(L, -2, "timed_out");
   }
 }

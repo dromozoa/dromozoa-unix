@@ -26,14 +26,8 @@
 #include <dromozoa/socket_address.hpp>
 
 namespace dromozoa {
-  int push_resource_unavailable_try_again(lua_State* L);
-  int push_operation_in_progress(lua_State* L);
-  int push_interrupted(lua_State* L);
-  int push_broken_pipe(lua_State* L);
-  int push_timed_out(lua_State* L);
-
-  int push_error(lua_State* L);
-  int push_error(lua_State* L, int code);
+  void push_error(lua_State* L);
+  void push_error(lua_State* L, int code);
 
   argument_vector make_argument_vector(lua_State* L, int n);
 
