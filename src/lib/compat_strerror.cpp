@@ -23,6 +23,7 @@
 #include <string>
 
 #include <dromozoa/compat_strerror.hpp>
+#include <dromozoa/errno_saver.hpp>
 
 namespace dromozoa {
   const char* compat_strerror_r_result(const char* result, char*) {
@@ -45,39 +46,32 @@ namespace dromozoa {
   }
 
   std::string compat_strerror(int code) {
-    int save = errno;
+    errno_saver save;
     errno = 0;
+    std::string what;
 
-    try {
-      std::string what;
-
-      char* buffer = 0;
-      size_t size = 16;
-      while (true) {
-        size = size * 2;
-        if (char* result = static_cast<char*>(realloc(buffer, size))) {
-          buffer = result;
-          if (const char* result = compat_strerror_r(code, buffer, size)) {
-            what = result;
-          } else if (errno == ERANGE) {
-            continue;
-          }
+    char* buffer = 0;
+    size_t size = 16;
+    while (true) {
+      size = size * 2;
+      if (char* result = static_cast<char*>(realloc(buffer, size))) {
+        buffer = result;
+        if (const char* result = compat_strerror_r(code, buffer, size)) {
+          what = result;
+        } else if (errno == ERANGE) {
+          continue;
         }
-        break;
       }
-      free(buffer);
-
-      if (what.empty()) {
-        std::ostringstream out;
-        out << "error number " << code;
-        what = out.str();
-      }
-
-      errno = save;
-      return what;
-    } catch (...) {
-      errno = save;
-      throw;
+      break;
     }
+    free(buffer);
+
+    if (what.empty()) {
+      std::ostringstream out;
+      out << "error number " << code;
+      what = out.str();
+    }
+
+    return what;
   }
 }
