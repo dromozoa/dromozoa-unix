@@ -22,7 +22,7 @@
 namespace dromozoa {
   namespace {
     int impl_umask(lua_State* L) {
-      lua_pushinteger(L, umask(luaL_checkinteger(L, 1)));
+      lua_pushinteger(L, umask(luaX_check_integer<mode_t>(L, 1)));
       return 1;
     }
   }

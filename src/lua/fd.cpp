@@ -47,7 +47,7 @@ namespace dromozoa {
       if (lua_isuserdata(L, 1)) {
         result = check_file_descriptor(L, 1)->close();
       } else {
-        result = file_descriptor(luaL_checkinteger(L, 1)).close();
+        result = file_descriptor(luaX_check_integer<int>(L, 1)).close();
       }
       if (result == -1) {
         push_error(L);
@@ -81,7 +81,7 @@ namespace dromozoa {
     if (lua_isuserdata(L, n)) {
       return check_file_descriptor(L, n)->get();
     } else {
-      return luaL_checkinteger(L, n);
+      return luaX_check_integer<int>(L, n);
     }
   }
 

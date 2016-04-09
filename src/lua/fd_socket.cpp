@@ -61,7 +61,7 @@ namespace dromozoa {
     }
 
     void impl_shutdown(lua_State* L) {
-      int how = luaL_checkinteger(L, 2);
+      int how = luaX_check_integer<int>(L, 2);
       if (shutdown(check_fd(L, 1), how) == -1) {
         push_error(L);
       } else {
@@ -70,9 +70,9 @@ namespace dromozoa {
     }
 
     void impl_setsockopt(lua_State* L) {
-      int level = luaL_checkinteger(L, 2);
-      int name = luaL_checkinteger(L, 3);
-      int value = luaL_checkinteger(L, 4);
+      int level = luaX_check_integer<int>(L, 2);
+      int name = luaX_check_integer<int>(L, 3);
+      int value = luaX_check_integer<int>(L, 4);
       if (setsockopt(check_fd(L, 1), level, name, &value, sizeof(value)) == -1) {
         push_error(L);
       } else {
@@ -81,8 +81,8 @@ namespace dromozoa {
     }
 
     void impl_getsockopt(lua_State* L) {
-      int level = luaL_checkinteger(L, 2);
-      int name = luaL_checkinteger(L, 3);
+      int level = luaX_check_integer<int>(L, 2);
+      int name = luaX_check_integer<int>(L, 3);
       int value;
       socklen_t size = sizeof(value);
       if (getsockopt(check_fd(L, 1), level, name, &value, &size) == -1) {

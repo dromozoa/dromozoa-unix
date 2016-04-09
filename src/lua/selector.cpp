@@ -46,7 +46,7 @@ namespace dromozoa {
     }
 
     void impl_call(lua_State* L) {
-      size_t size = luaL_checkinteger(L, 2);
+      size_t size = luaX_check_integer<size_t>(L, 2);
       int flags = luaL_optinteger(L, 3, SELECTOR_CLOEXEC);
       file_descriptor fd(selector_impl::open(size, flags));
       if (fd.valid()) {
@@ -71,7 +71,7 @@ namespace dromozoa {
 
     void impl_add(lua_State* L) {
       int fd = check_fd(L, 2);
-      int event = luaL_checkinteger(L, 3);
+      int event = luaX_check_integer<int>(L, 3);
       if (check_selector(L, 1)->add(fd, event) == -1) {
         push_error(L);
       } else {
@@ -81,7 +81,7 @@ namespace dromozoa {
 
     void impl_mod(lua_State* L) {
       int fd = check_fd(L, 2);
-      int event = luaL_checkinteger(L, 3);
+      int event = luaX_check_integer<int>(L, 3);
       if (check_selector(L, 1)->mod(fd, event) == -1) {
         push_error(L);
       } else {
@@ -136,7 +136,7 @@ namespace dromozoa {
     }
 
     void impl_event(lua_State* L) {
-      int i = luaL_checkinteger(L, 2);
+      int i = luaX_check_integer<int>(L, 2);
       int fd = -1;
       int event = 0;
       if (check_selector(L, 1)->event(i - 1, fd, event) == -1) {

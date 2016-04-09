@@ -30,7 +30,7 @@ extern "C" {
 namespace dromozoa {
   namespace {
     void impl_kill(lua_State* L) {
-      pid_t pid = luaL_checkinteger(L, 1);
+      pid_t pid = luaX_check_integer<pid_t>(L, 1);
       int sig = luaL_optinteger(L, 2, SIGTERM);
       if (kill(pid, sig) == -1) {
         push_error(L);
@@ -42,7 +42,7 @@ namespace dromozoa {
     void impl_default_signal(lua_State* L) {
       struct sigaction sa = {};
       sa.sa_handler = SIG_DFL;
-      if (sigaction(luaL_checkinteger(L, 1), &sa, 0) == -1) {
+      if (sigaction(luaX_check_integer<int>(L, 1), &sa, 0) == -1) {
         push_error(L);
       } else {
         luaX_push_success(L);
@@ -52,7 +52,7 @@ namespace dromozoa {
     void impl_ignore_signal(lua_State* L) {
       struct sigaction sa = {};
       sa.sa_handler = SIG_IGN;
-      if (sigaction(luaL_checkinteger(L, 1), &sa, 0) == -1) {
+      if (sigaction(luaX_check_integer<int>(L, 1), &sa, 0) == -1) {
         push_error(L);
       } else {
         luaX_push_success(L);
@@ -71,7 +71,7 @@ namespace dromozoa {
           push_error(L);
           return;
         }
-        if (sigaddset(&mask, luaL_checkinteger(L, 1)) == -1) {
+        if (sigaddset(&mask, luaX_check_integer<int>(L, 1)) == -1) {
           push_error(L);
           return;
         }
@@ -95,7 +95,7 @@ namespace dromozoa {
           push_error(L);
           return;
         }
-        if (sigaddset(&mask, luaL_checkinteger(L, 1)) == -1) {
+        if (sigaddset(&mask, luaX_check_integer<int>(L, 1)) == -1) {
           push_error(L);
           return;
         }

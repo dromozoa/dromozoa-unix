@@ -22,8 +22,8 @@
 namespace dromozoa {
   namespace {
     void impl_socket(lua_State* L) {
-      int domain = luaL_checkinteger(L, 1);
-      int type = luaL_checkinteger(L, 2);
+      int domain = luaX_check_integer<int>(L, 1);
+      int type = luaX_check_integer<int>(L, 2);
       int protocol = luaL_optinteger(L, 3, 0);
       int result = socket(domain, type, protocol);
       if (result == -1) {
@@ -34,8 +34,8 @@ namespace dromozoa {
     }
 
     void impl_socketpair(lua_State* L) {
-      int domain = luaL_checkinteger(L, 1);
-      int type = luaL_checkinteger(L, 2);
+      int domain = luaX_check_integer<int>(L, 1);
+      int type = luaX_check_integer<int>(L, 2);
       int protocol = luaL_optinteger(L, 3, 0);
       int fd[2] = { -1, -1 };
       if (socketpair(domain, type, protocol, fd) == -1) {
