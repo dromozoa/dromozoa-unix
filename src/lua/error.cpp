@@ -15,23 +15,10 @@
 // You should have received a copy of the GNU General Public License
 // along with dromozoa-unix.  If not, see <http://www.gnu.org/licenses/>.
 
-#ifdef HAVE_CONFIG_H
-#include "config.h"
-#endif
-
-extern "C" {
-#include <lua.h>
-#include <lauxlib.h>
-}
-
 #include <errno.h>
-#include <stddef.h>
-#include <stdlib.h>
-#include <string.h>
-
-#include <iostream>
 
 #include <dromozoa/compat_strerror.hpp>
+#include <dromozoa/errno_saver.hpp>
 
 #include "common.hpp"
 
@@ -41,22 +28,18 @@ namespace dromozoa {
   }
 
   void push_error(lua_State* L, int code) {
-    int save = errno;
+    errno_saver save;
     std::string message = compat_strerror(code);
     lua_pushnil(L);
     lua_pushlstring(L, message.c_str(), message.size());
     lua_pushinteger(L, code);
-    errno = save;
   }
 
   namespace {
-    int impl_strerror(lua_State* L) {
-      int save = errno;
-      int code = luaX_opt_integer<int>(L, 1, save);
-      std::string message = compat_strerror(code);
+    void impl_strerror(lua_State* L) {
+      errno_saver save;
+      std::string message = compat_strerror(luaX_opt_integer<int>(L, 1, errno));
       lua_pushlstring(L, message.c_str(), message.size());
-      errno = save;
-      return 1;
     }
 
     void impl_set_errno(lua_State* L) {
