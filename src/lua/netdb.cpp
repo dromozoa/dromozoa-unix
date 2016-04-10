@@ -31,18 +31,17 @@
 
 namespace dromozoa {
   namespace {
-    int push_netdb_error(lua_State* L, int code) {
-      lua_pushnil(L);
+    void push_netdb_error(lua_State* L, int code) {
+      luaX_push(L, luaX_nil);
       if (const char* what = gai_strerror(code)) {
-        lua_pushstring(L, what);
+        luaX_push(L, what);
       } else {
         lua_pushfstring(L, "error number %d", code);
       }
-      lua_pushinteger(L, code);
-      return 3;
+      luaX_push(L, code);
     }
 
-    int impl_getaddrinfo(lua_State* L) {
+    void impl_getaddrinfo(lua_State* L) {
       const char* nodename = lua_tostring(L, 1);
       const char* servname = lua_tostring(L, 2);
       struct addrinfo* result = 0;
@@ -86,13 +85,12 @@ namespace dromozoa {
           lua_settable(L, -3);
         }
         freeaddrinfo(result);
-        return 1;
       } else {
-        return push_netdb_error(L, code);
+        push_netdb_error(L, code);
       }
     }
 
-    int impl_getnameinfo(lua_State* L) {
+    void impl_getnameinfo(lua_State* L) {
       std::vector<char> nodename(NI_MAXHOST);
       std::vector<char> servname(NI_MAXSERV);
       const socket_address* address = get_sockaddr(L, 1);
@@ -101,9 +99,8 @@ namespace dromozoa {
       if (code == 0) {
         lua_pushstring(L, &nodename[0]);
         lua_pushstring(L, &servname[0]);
-        return 2;
       } else {
-        return push_netdb_error(L, code);
+        push_netdb_error(L, code);
       }
     }
   }
