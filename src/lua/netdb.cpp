@@ -50,18 +50,10 @@ namespace dromozoa {
         code = getaddrinfo(nodename, servname, 0, &result);
       } else {
         struct addrinfo hints = {};
-        lua_getfield(L, 3, "ai_flags");
-        hints.ai_flags = luaX_opt_integer<int>(L, -1, AI_V4MAPPED | AI_ADDRCONFIG);
-        lua_pop(L, 1);
-        lua_getfield(L, 3, "ai_family");
-        hints.ai_family = luaX_opt_integer<int>(L, -1, AF_UNSPEC);
-        lua_pop(L, 1);
-        lua_getfield(L, 3, "ai_socktype");
-        hints.ai_socktype = luaX_opt_integer<int>(L, -1, 0);
-        lua_pop(L, 1);
-        lua_getfield(L, 3, "ai_protocol");
-        hints.ai_protocol = luaX_opt_integer<int>(L, -1, 0);
-        lua_pop(L, 1);
+        hints.ai_flags = luaX_opt_integer_field<int>(L, "ai_flags", AI_V4MAPPED | AI_ADDRCONFIG);
+        hints.ai_family = luaX_opt_integer_field<int>(L, "ai_family", AF_UNSPEC);
+        hints.ai_socktype = luaX_opt_integer_field<int>(L, "ai_socktype", 0);
+        hints.ai_protocol = luaX_opt_integer_field<int>(L, "ai_protocol", 0);
         code = getaddrinfo(nodename, servname, &hints, &result);
       }
       if (code == 0) {
