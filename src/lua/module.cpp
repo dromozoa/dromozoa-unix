@@ -38,13 +38,7 @@ namespace dromozoa {
   }
 
   void initialize(lua_State* L) {
-    lua_newtable(L);
     initialize_fd(L);
-    initialize_fd_djb(L);
-    initialize_fd_socket(L);
-    initialize_fd_unistd(L);
-    luaX_set_field(L, "fd");
-
     initialize_fd_ref(L);
 
     lua_newtable(L);

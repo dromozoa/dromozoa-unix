@@ -22,9 +22,6 @@ namespace dromozoa {
   int open_selfpipe(lua_State* L);
 
   void initialize_fd(lua_State* L);
-  void initialize_fd_djb(lua_State* L);
-  void initialize_fd_socket(lua_State* L);
-  void initialize_fd_unistd(lua_State* L);
   void initialize_fd_ref(lua_State* L);
 
   void initialize_process(lua_State* L);

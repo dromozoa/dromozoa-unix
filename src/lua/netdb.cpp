@@ -84,12 +84,12 @@ namespace dromozoa {
     void impl_getnameinfo(lua_State* L) {
       const socket_address* address = check_sockaddr(L, 1);
       int flags = luaX_opt_integer<int>(L, 2, 0);
-      std::vector<char> nodename(NI_MAXHOST);
-      std::vector<char> servname(NI_MAXSERV);
-      int code = getnameinfo(address->get(), address->size(), &nodename[0], nodename.size(), &servname[0], servname.size(), flags);
+      char nodename[NI_MAXHOST];
+      char servname[NI_MAXSERV];
+      int code = getnameinfo(address->get(), address->size(), nodename, NI_MAXHOST, servname, NI_MAXSERV, flags);
       if (code == 0) {
-        luaX_push(L, &nodename[0]);
-        luaX_push(L, &servname[0]);
+        luaX_push(L, nodename);
+        luaX_push(L, servname);
       } else {
         push_netdb_error(L, code);
       }
