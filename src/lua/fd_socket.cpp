@@ -22,7 +22,7 @@
 namespace dromozoa {
   namespace {
     void impl_bind(lua_State* L) {
-      const socket_address* address = get_sockaddr(L, 2);
+      const socket_address* address = check_sockaddr(L, 2);
       if (::bind(check_fd(L, 1), address->get(), address->size()) == -1) {
         push_error(L);
       } else {
@@ -52,7 +52,7 @@ namespace dromozoa {
     }
 
     void impl_connect(lua_State* L) {
-      const socket_address* address = get_sockaddr(L, 2);
+      const socket_address* address = check_sockaddr(L, 2);
       if (connect(check_fd(L, 1), address->get(), address->size()) == -1) {
         push_error(L);
       } else {

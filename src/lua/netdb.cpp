@@ -50,10 +50,10 @@ namespace dromozoa {
         code = getaddrinfo(nodename, servname, 0, &result);
       } else {
         struct addrinfo hints = {};
-        hints.ai_flags = luaX_opt_integer_field<int>(L, "ai_flags", AI_V4MAPPED | AI_ADDRCONFIG);
-        hints.ai_family = luaX_opt_integer_field<int>(L, "ai_family", AF_UNSPEC);
-        hints.ai_socktype = luaX_opt_integer_field<int>(L, "ai_socktype", 0);
-        hints.ai_protocol = luaX_opt_integer_field<int>(L, "ai_protocol", 0);
+        hints.ai_flags = luaX_opt_integer_field<int>(L, 3, "ai_flags", AI_V4MAPPED | AI_ADDRCONFIG);
+        hints.ai_family = luaX_opt_integer_field<int>(L, 3, "ai_family", AF_UNSPEC);
+        hints.ai_socktype = luaX_opt_integer_field<int>(L, 3, "ai_socktype", 0);
+        hints.ai_protocol = luaX_opt_integer_field<int>(L, 3, "ai_protocol", 0);
         code = getaddrinfo(nodename, servname, &hints, &result);
       }
       if (code == 0) {
@@ -71,8 +71,7 @@ namespace dromozoa {
             luaX_set_field(L, "ai_addr");
           }
           if (ai->ai_canonname) {
-            lua_pushstring(L, ai->ai_canonname);
-            luaX_set_field(L, "ai_canonname");
+            luaX_set_field(L, "ai_canonname", ai->ai_canonname);
           }
           lua_settable(L, -3);
         }
@@ -83,14 +82,14 @@ namespace dromozoa {
     }
 
     void impl_getnameinfo(lua_State* L) {
+      const socket_address* address = check_sockaddr(L, 1);
+      int flags = luaX_opt_integer<int>(L, 2, 0);
       std::vector<char> nodename(NI_MAXHOST);
       std::vector<char> servname(NI_MAXSERV);
-      const socket_address* address = get_sockaddr(L, 1);
-      int flags = luaX_opt_integer<int>(L, 2, 0);
       int code = getnameinfo(address->get(), address->size(), &nodename[0], nodename.size(), &servname[0], servname.size(), flags);
       if (code == 0) {
-        lua_pushstring(L, &nodename[0]);
-        lua_pushstring(L, &servname[0]);
+        luaX_push(L, &nodename[0]);
+        luaX_push(L, &servname[0]);
       } else {
         push_netdb_error(L, code);
       }

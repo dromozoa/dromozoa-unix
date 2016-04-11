@@ -31,21 +31,21 @@ namespace dromozoa {
     luaX_set_metatable(L, "dromozoa.unix.sockaddr");
   }
 
-  const socket_address* get_sockaddr(lua_State* L, int index) {
+  const socket_address* check_sockaddr(lua_State* L, int index) {
     return luaX_check_udata<socket_address>(L, index, "dromozoa.unix.sockaddr");
   }
 
   namespace {
     void impl_size(lua_State* L) {
-      lua_pushinteger(L, get_sockaddr(L, 1)->size());
+      lua_pushinteger(L, check_sockaddr(L, 1)->size());
     }
 
     void impl_family(lua_State* L) {
-      lua_pushinteger(L, get_sockaddr(L, 1)->family());
+      lua_pushinteger(L, check_sockaddr(L, 1)->family());
     }
 
     void impl_path(lua_State* L) {
-      const socket_address* self = get_sockaddr(L, 1);
+      const socket_address* self = check_sockaddr(L, 1);
       if (self->family() == AF_UNIX) {
         const struct sockaddr_un* sun = reinterpret_cast<const struct sockaddr_un*>(self->get());
         socklen_t n = self->size() - offsetof(struct sockaddr_un, sun_path);
