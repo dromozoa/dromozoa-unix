@@ -55,7 +55,7 @@ namespace dromozoa {
     }
 
     void impl_sockaddr_un(lua_State* L) {
-      size_t size;
+      size_t size = 0;
       const char* path = luaL_checklstring(L, 1, &size);
       struct sockaddr_un sun = {};
       sun.sun_family = AF_UNIX;

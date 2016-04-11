@@ -31,28 +31,23 @@ namespace dromozoa {
     }
 
     void impl_gc(lua_State* L) {
-      file_descriptor* self = check_file_descriptor(L, 1);
-      self->~file_descriptor();
+      check_file_descriptor(L, 1)->~file_descriptor();
     }
 
     void impl_call(lua_State* L) {
-      int fd = check_fd(L, 2);
-      new_fd(L, fd);
+      new_fd(L, check_fd(L, 2));
     }
 
     void impl_get(lua_State* L) {
-      int fd = check_fd(L, 1);
-      luaX_push(L, fd);
+      luaX_push(L, check_fd(L, 1));
     }
 
     void impl_close(lua_State* L) {
       int result = -1;
       if (lua_isuserdata(L, 1)) {
-        file_descriptor* self = check_file_descriptor(L, 1);
-        result = self->close();
+        result = check_file_descriptor(L, 1)->close();
       } else {
-        int fd = luaX_check_integer<int>(L, 1);
-        result = file_descriptor(fd).close();
+        result = file_descriptor(luaX_check_integer<int>(L, 1)).close();
       }
       if (result == -1) {
         push_error(L);

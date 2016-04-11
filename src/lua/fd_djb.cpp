@@ -24,8 +24,7 @@
 namespace dromozoa {
   namespace {
     void impl_coe(lua_State* L) {
-      int fd = check_fd(L, 1);
-      if (coe(fd) == -1) {
+      if (coe(check_fd(L, 1)) == -1) {
         push_error(L);
       } else {
         luaX_push_success(L);
@@ -33,8 +32,7 @@ namespace dromozoa {
     }
 
     void impl_lock_ex(lua_State* L) {
-      int fd = check_fd(L, 1);
-      if (lock_ex(fd) == -1) {
+      if (lock_ex(check_fd(L, 1)) == -1) {
         push_error(L);
       } else {
         luaX_push_success(L);
@@ -42,8 +40,7 @@ namespace dromozoa {
     }
 
     void impl_lock_exnb(lua_State* L) {
-      int fd = check_fd(L, 1);
-      if (lock_exnb(fd) == -1) {
+      if (lock_exnb(check_fd(L, 1)) == -1) {
         push_error(L);
       } else {
         luaX_push_success(L);
@@ -51,8 +48,7 @@ namespace dromozoa {
     }
 
     void impl_lock_un(lua_State* L) {
-      int fd = check_fd(L, 1);
-      if (lock_un(fd) == -1) {
+      if (lock_un(check_fd(L, 1)) == -1) {
         push_error(L);
       } else {
         luaX_push_success(L);
@@ -60,8 +56,7 @@ namespace dromozoa {
     }
 
     void impl_ndelay_on(lua_State* L) {
-      int fd = check_fd(L, 1);
-      if (ndelay_on(fd) == -1) {
+      if (ndelay_on(check_fd(L, 1)) == -1) {
         push_error(L);
       } else {
         luaX_push_success(L);
@@ -69,8 +64,7 @@ namespace dromozoa {
     }
 
     void impl_ndelay_off(lua_State* L) {
-      int fd = check_fd(L, 1);
-      if (ndelay_off(fd) == -1) {
+      if (ndelay_off(check_fd(L, 1)) == -1) {
         push_error(L);
       } else {
         luaX_push_success(L);

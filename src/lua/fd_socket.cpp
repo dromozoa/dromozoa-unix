@@ -83,7 +83,7 @@ namespace dromozoa {
     void impl_getsockopt(lua_State* L) {
       int level = luaX_check_integer<int>(L, 2);
       int name = luaX_check_integer<int>(L, 3);
-      int value;
+      int value = 0;
       socklen_t size = sizeof(value);
       if (getsockopt(check_fd(L, 1), level, name, &value, &size) == -1) {
         push_error(L);
