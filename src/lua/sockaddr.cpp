@@ -21,27 +21,15 @@
 #include "common.hpp"
 
 namespace dromozoa {
-  void new_sockaddr(lua_State* L, const socket_address& address) {
-    luaX_new<socket_address>(L, address);
-    luaX_set_metatable(L, "dromozoa.unix.sockaddr");
-  }
-
-  void new_sockaddr(lua_State* L, const struct sockaddr* address, socklen_t size) {
-    luaX_new<socket_address>(L, address, size);
-    luaX_set_metatable(L, "dromozoa.unix.sockaddr");
-  }
-
-  const socket_address* check_sockaddr(lua_State* L, int index) {
-    return luaX_check_udata<socket_address>(L, index, "dromozoa.unix.sockaddr");
-  }
-
   namespace {
     void impl_size(lua_State* L) {
-      lua_pushinteger(L, check_sockaddr(L, 1)->size());
+      const socket_address* self = check_sockaddr(L, 1);
+      luaX_push(L, self->size());
     }
 
     void impl_family(lua_State* L) {
-      lua_pushinteger(L, check_sockaddr(L, 1)->family());
+      const socket_address* self = check_sockaddr(L, 1);
+      luaX_push(L, self->family());
     }
 
     void impl_path(lua_State* L) {
@@ -76,9 +64,23 @@ namespace dromozoa {
         sun.sun_path[size] = '\0';
         new_sockaddr(L, reinterpret_cast<const struct sockaddr*>(&sun), sizeof(sun));
       } else {
-        luaL_error(L, "path too long");
+        luaL_argerror(L, 1, "string too long");
       }
     }
+  }
+
+  void new_sockaddr(lua_State* L, const socket_address& address) {
+    luaX_new<socket_address>(L, address);
+    luaX_set_metatable(L, "dromozoa.unix.sockaddr");
+  }
+
+  void new_sockaddr(lua_State* L, const struct sockaddr* address, socklen_t size) {
+    luaX_new<socket_address>(L, address, size);
+    luaX_set_metatable(L, "dromozoa.unix.sockaddr");
+  }
+
+  const socket_address* check_sockaddr(lua_State* L, int n) {
+    return luaX_check_udata<socket_address>(L, n, "dromozoa.unix.sockaddr");
   }
 
   void initialize_sockaddr(lua_State* L) {

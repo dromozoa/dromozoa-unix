@@ -44,8 +44,8 @@ namespace dromozoa {
     void impl_getaddrinfo(lua_State* L) {
       const char* nodename = lua_tostring(L, 1);
       const char* servname = lua_tostring(L, 2);
-      struct addrinfo* result = 0;
-      int code = 0;
+      struct addrinfo* result;
+      int code;
       if (lua_isnoneornil(L, 3)) {
         code = getaddrinfo(nodename, servname, 0, &result);
       } else {
@@ -59,7 +59,7 @@ namespace dromozoa {
       if (code == 0) {
         lua_newtable(L);
         int i = 1;
-        for (struct addrinfo* ai = result; ai; ai = ai->ai_next, ++i) {
+        for (const struct addrinfo* ai = result; ai; ai = ai->ai_next, ++i) {
           lua_pushinteger(L, i);
           lua_newtable(L);
           luaX_set_field(L, "ai_family", ai->ai_family);

@@ -23,18 +23,6 @@
 #include "common.hpp"
 
 namespace dromozoa {
-  void push_error(lua_State* L) {
-    push_error(L, errno);
-  }
-
-  void push_error(lua_State* L, int code) {
-    errno_saver save;
-    std::string message = compat_strerror(code);
-    lua_pushnil(L);
-    lua_pushlstring(L, message.c_str(), message.size());
-    lua_pushinteger(L, code);
-  }
-
   namespace {
     void impl_strerror(lua_State* L) {
       errno_saver save;
@@ -50,6 +38,18 @@ namespace dromozoa {
     void impl_get_errno(lua_State* L) {
       luaX_push(L, errno);
     }
+  }
+
+  void push_error(lua_State* L) {
+    push_error(L, errno);
+  }
+
+  void push_error(lua_State* L, int code) {
+    errno_saver save;
+    std::string message = compat_strerror(code);
+    lua_pushnil(L);
+    lua_pushlstring(L, message.c_str(), message.size());
+    lua_pushinteger(L, code);
   }
 
   void initialize_error(lua_State* L) {

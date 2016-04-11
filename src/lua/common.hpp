@@ -18,8 +18,6 @@
 #ifndef COMMON_HPP
 #define COMMON_HPP
 
-#include <sys/socket.h>
-
 #include <dromozoa/bind.hpp>
 
 #include <dromozoa/argument_vector.hpp>
