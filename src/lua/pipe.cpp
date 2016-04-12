@@ -15,6 +15,7 @@
 // You should have received a copy of the GNU General Public License
 // along with dromozoa-unix.  If not, see <http://www.gnu.org/licenses/>.
 
+#include <fcntl.h>
 #include <dromozoa/compat_pipe2.hpp>
 
 #include "common.hpp"
@@ -22,7 +23,7 @@
 namespace dromozoa {
   namespace {
     void impl_pipe(lua_State* L) {
-      int flags = luaX_opt_integer<int>(L, 1, 0);
+      int flags = luaX_opt_integer<int>(L, 1, O_CLOEXEC);
       int fd[2] = { -1, -1 };
       if (compat_pipe2(fd, flags) == -1) {
         push_error(L);

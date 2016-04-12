@@ -38,13 +38,16 @@ namespace dromozoa {
   }
 
   void initialize(lua_State* L) {
+    initialize_error(L);
+    initialize_fcntl(L);
     initialize_fd(L);
     initialize_fd_ref(L);
+    initialize_netdb(L);
+    initialize_netinet(L);
+    initialize_pathexec(L);
+    initialize_pipe(L);
     initialize_sockaddr(L);
     initialize_sockaddr_un(L);
-    initialize_netdb(L);
-
-
 
     lua_newtable(L);
     initialize_process(L);
@@ -64,11 +67,6 @@ namespace dromozoa {
     open_timespec(L);
     lua_setfield(L, -2, "timespec");
 
-    initialize_error(L);
-    initialize_fcntl(L);
-    initialize_netinet(L);
-    initialize_pathexec(L);
-    initialize_pipe(L);
     initialize_signal(L);
     initialize_stdlib(L);
     initialize_sys_socket(L);
