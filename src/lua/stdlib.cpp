@@ -31,13 +31,14 @@ extern "C" {
 namespace dromozoa {
   namespace {
     void impl_realpath(lua_State* L) {
+      const char* path = luaL_checkstring(L, 1);
 #ifdef PATH_MAX
       std::vector<char> buffer(PATH_MAX);
-      if (const char* result = realpath(luaL_checkstring(L, 1), &buffer[0])) {
+      if (const char* result = realpath(path, &buffer[0])) {
         lua_pushstring(L, result);
       }
 #else
-      if (char* result = realpath(luaL_checkstring(L, 1), 0)) {
+      if (char* result = realpath(path, 0)) {
         lua_pushstring(L, result);
         free(result);
       }

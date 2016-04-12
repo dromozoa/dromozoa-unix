@@ -15,8 +15,9 @@
 // You should have received a copy of the GNU General Public License
 // along with dromozoa-unix.  If not, see <http://www.gnu.org/licenses/>.
 
-#include <stdlib.h>
 #include <unistd.h>
+
+#include <vector>
 
 #include "common.hpp"
 
@@ -25,17 +26,12 @@ namespace dromozoa {
     void impl_read(lua_State* L) {
       int fd = check_fd(L, 1);
       size_t size = luaX_check_integer<size_t>(L, 2);
-      if (char* buffer = static_cast<char*>(malloc(size))) {
-        ssize_t result = read(fd, buffer, size);
-        if (result == -1) {
-          free(buffer);
-          push_error(L);
-        } else {
-          lua_pushlstring(L, &buffer[0], result);
-          free(buffer);
-        }
-      } else {
+      std::vector<char> buffer(size);
+      ssize_t result = read(fd, &buffer[0], buffer.size());
+      if (result == -1) {
         push_error(L);
+      } else {
+        lua_pushlstring(L, &buffer[0], result);
       }
     }
 
