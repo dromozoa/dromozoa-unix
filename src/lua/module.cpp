@@ -40,17 +40,15 @@ namespace dromozoa {
   void initialize(lua_State* L) {
     initialize_fd(L);
     initialize_fd_ref(L);
+    initialize_sockaddr(L);
+    initialize_sockaddr_un(L);
+    initialize_netdb(L);
+
+
 
     lua_newtable(L);
     initialize_process(L);
     lua_setfield(L, -2, "process");
-
-    lua_newtable(L);
-    initialize_sockaddr(L);
-    initialize_sockaddr_netdb(L);
-    luaX_set_field(L, "sockaddr");
-
-    initialize_sockaddr_un(L);
 
     lua_newtable(L);
     initialize_selector(L);
@@ -58,10 +56,6 @@ namespace dromozoa {
 
     open_selfpipe(L);
     lua_setfield(L, -2, "selfpipe");
-
-
-
-
 
 
     open_asio(L);
@@ -72,7 +66,6 @@ namespace dromozoa {
 
     initialize_error(L);
     initialize_fcntl(L);
-    initialize_netdb(L);
     initialize_netinet(L);
     initialize_pathexec(L);
     initialize_pipe(L);

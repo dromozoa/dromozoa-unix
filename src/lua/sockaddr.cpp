@@ -23,13 +23,11 @@
 namespace dromozoa {
   namespace {
     void impl_size(lua_State* L) {
-      const socket_address* self = check_sockaddr(L, 1);
-      luaX_push(L, self->size());
+      luaX_push(L, check_sockaddr(L, 1)->size());
     }
 
     void impl_family(lua_State* L) {
-      const socket_address* self = check_sockaddr(L, 1);
-      luaX_push(L, self->family());
+      luaX_push(L, check_sockaddr(L, 1)->family());
     }
 
     void impl_path(lua_State* L) {
@@ -83,15 +81,23 @@ namespace dromozoa {
     return luaX_check_udata<socket_address>(L, n, "dromozoa.unix.sockaddr");
   }
 
-  void initialize_sockaddr(lua_State* L) {
-    luaL_newmetatable(L, "dromozoa.unix.sockaddr");
-    lua_pushvalue(L, -2);
-    luaX_set_field(L, "__index");
-    lua_pop(L, 1);
+  void initialize_sockaddr_netdb(lua_State* L);
 
-    luaX_set_field(L, "size", impl_size);
-    luaX_set_field(L, "family", impl_family);
-    luaX_set_field(L, "path", impl_path);
+  void initialize_sockaddr(lua_State* L) {
+    lua_newtable(L);
+    {
+      luaL_newmetatable(L, "dromozoa.unix.sockaddr");
+      lua_pushvalue(L, -2);
+      luaX_set_field(L, "__index");
+      lua_pop(L, 1);
+
+      luaX_set_field(L, "size", impl_size);
+      luaX_set_field(L, "family", impl_family);
+      luaX_set_field(L, "path", impl_path);
+
+      initialize_sockaddr_netdb(L);
+    }
+    luaX_set_field(L, "sockaddr");
   }
 
   void initialize_sockaddr_un(lua_State* L) {

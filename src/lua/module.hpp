@@ -29,7 +29,6 @@ namespace dromozoa {
   void initialize_selector(lua_State* L);
 
   void initialize_sockaddr(lua_State* L);
-  void initialize_sockaddr_netdb(lua_State* L);
   void initialize_sockaddr_un(lua_State* L);
 
   void initialize_error(lua_State* L);
