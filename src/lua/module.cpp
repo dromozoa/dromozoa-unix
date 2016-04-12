@@ -49,6 +49,8 @@ namespace dromozoa {
     initialize_sockaddr(L);
     initialize_sockaddr_un(L);
 
+    initialize_stdlib(L);
+
     lua_newtable(L);
     initialize_process(L);
     lua_setfield(L, -2, "process");
@@ -68,7 +70,6 @@ namespace dromozoa {
     lua_setfield(L, -2, "timespec");
 
     initialize_signal(L);
-    initialize_stdlib(L);
     initialize_sys_socket(L);
     initialize_sys_stat(L);
     initialize_sys_time(L);

@@ -15,13 +15,7 @@
 // You should have received a copy of the GNU General Public License
 // along with dromozoa-unix.  If not, see <http://www.gnu.org/licenses/>.
 
-extern "C" {
-#include <lua.h>
-#include <lauxlib.h>
-}
-
 #include <limits.h>
-#include <stddef.h>
 #include <stdlib.h>
 
 #include <vector>
