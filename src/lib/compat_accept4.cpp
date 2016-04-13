@@ -23,22 +23,17 @@
 
 #include <dromozoa/coe.hpp>
 #include <dromozoa/compat_accept4.hpp>
+#include <dromozoa/compat_socket.hpp>
 #include <dromozoa/file_descriptor.hpp>
 #include <dromozoa/ndelay.hpp>
 #include <dromozoa/sigmask.hpp>
 
 namespace dromozoa {
 #ifdef HAVE_ACCEPT4
-  const int COMPAT_SOCK_CLOEXEC = SOCK_CLOEXEC;
-  const int COMPAT_SOCK_NONBLOCK = SOCK_NONBLOCK;
-
   int compat_accept4(int socket, struct sockaddr* address, socklen_t* size_ptr, int flags) {
     return accept4(socket, address, size_ptr, flags);
   }
 #else
-  const int COMPAT_SOCK_CLOEXEC = O_CLOEXEC;
-  const int COMPAT_SOCK_NONBLOCK = O_NONBLOCK;
-
   int compat_accept4(int socket, struct sockaddr* address, socklen_t* size_ptr, int flags) {
     sigset_t mask;
     if (sigmask_block_all_signals(&mask) == -1) {

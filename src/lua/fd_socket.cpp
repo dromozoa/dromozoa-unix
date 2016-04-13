@@ -16,6 +16,7 @@
 // along with dromozoa-unix.  If not, see <http://www.gnu.org/licenses/>.
 
 #include <dromozoa/compat_accept4.hpp>
+#include <dromozoa/compat_socket.hpp>
 
 #include "common.hpp"
 

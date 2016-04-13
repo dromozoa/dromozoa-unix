@@ -17,6 +17,8 @@
 
 #include <sys/socket.h>
 
+#include <dromozoa/compat_socket.hpp>
+
 #include "common.hpp"
 
 namespace dromozoa {
@@ -25,7 +27,7 @@ namespace dromozoa {
       int domain = luaX_check_integer<int>(L, 1);
       int type = luaX_check_integer<int>(L, 2);
       int protocol = luaX_opt_integer<int>(L, 3, 0);
-      int result = socket(domain, type, protocol);
+      int result = compat_socket(domain, type, protocol);
       if (result == -1) {
         push_error(L);
       } else {
@@ -38,7 +40,7 @@ namespace dromozoa {
       int type = luaX_check_integer<int>(L, 2);
       int protocol = luaX_opt_integer<int>(L, 3, 0);
       int fd[2] = { -1, -1 };
-      if (socketpair(domain, type, protocol, fd) == -1) {
+      if (compat_socketpair(domain, type, protocol, fd) == -1) {
         push_error(L);
       } else {
         new_fd(L, fd[0]);
@@ -58,6 +60,9 @@ namespace dromozoa {
 
     luaX_set_field(L, "SOCK_STREAM", SOCK_STREAM);
     luaX_set_field(L, "SOCK_DGRAM", SOCK_DGRAM);
+    luaX_set_field(L, "SOCK_SEQPACKET", SOCK_SEQPACKET);
+    luaX_set_field(L, "SOCK_CLOEXEC", COMPAT_SOCK_CLOEXEC);
+    luaX_set_field(L, "SOCK_NONBLOCK", COMPAT_SOCK_NONBLOCK);
 
     luaX_set_field(L, "SOMAXCONN", SOMAXCONN);
 

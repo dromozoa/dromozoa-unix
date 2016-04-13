@@ -56,7 +56,6 @@ namespace dromozoa {
         return -1;
       }
     }
-
     if (flags & O_NONBLOCK) {
       if (ndelay_on(fd0.get()) == -1) {
         return -1;

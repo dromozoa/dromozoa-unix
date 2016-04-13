@@ -15,13 +15,14 @@
 // You should have received a copy of the GNU General Public License
 // along with dromozoa-unix.  If not, see <http://www.gnu.org/licenses/>.
 
-#ifndef DROMOZOA_COMPAT_ACCEPT4_HPP
-#define DROMOZOA_COMPAT_ACCEPT4_HPP
-
-#include <sys/socket.h>
+#ifndef DROMOZOA_COMPAT_SOCKET_HPP
+#define DROMOZOA_COMPAT_SOCKET_HPP
 
 namespace dromozoa {
-  int compat_accept4(int socket, struct sockaddr* address, socklen_t* size_ptr, int flags);
+  extern const int COMPAT_SOCK_CLOEXEC;
+  extern const int COMPAT_SOCK_NONBLOCK;
+  int compat_socket(int domain, int type, int protocol);
+  int compat_socketpair(int domain, int type, int protocol, int socket_fd[2]);
 }
 
 #endif
