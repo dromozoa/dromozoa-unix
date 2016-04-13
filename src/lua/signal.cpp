@@ -15,8 +15,6 @@
 // You should have received a copy of the GNU General Public License
 // along with dromozoa-unix.  If not, see <http://www.gnu.org/licenses/>.
 
-#include <signal.h>
-
 #include <dromozoa/compat_sigmask.hpp>
 #include <dromozoa/sigmask.hpp>
 
