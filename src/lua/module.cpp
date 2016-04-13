@@ -46,6 +46,7 @@ namespace dromozoa {
     initialize_netinet(L);
     initialize_pathexec(L);
     initialize_pipe(L);
+    initialize_signal(L);
     initialize_sockaddr(L);
     initialize_sockaddr_un(L);
     initialize_stdlib(L);
@@ -71,7 +72,6 @@ namespace dromozoa {
     open_timespec(L);
     lua_setfield(L, -2, "timespec");
 
-    initialize_signal(L);
     initialize_sys_time(L);
     initialize_sys_wait(L);
     initialize_time(L);

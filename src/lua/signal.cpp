@@ -15,11 +15,6 @@
 // You should have received a copy of the GNU General Public License
 // along with dromozoa-unix.  If not, see <http://www.gnu.org/licenses/>.
 
-extern "C" {
-#include <lua.h>
-#include <lauxlib.h>
-}
-
 #include <signal.h>
 
 #include <dromozoa/compat_sigmask.hpp>
@@ -39,16 +34,6 @@ namespace dromozoa {
       }
     }
 
-    void impl_default_signal(lua_State* L) {
-      struct sigaction sa = {};
-      sa.sa_handler = SIG_DFL;
-      if (sigaction(luaX_check_integer<int>(L, 1), &sa, 0) == -1) {
-        push_error(L);
-      } else {
-        luaX_push_success(L);
-      }
-    }
-
     void impl_ignore_signal(lua_State* L) {
       struct sigaction sa = {};
       sa.sa_handler = SIG_IGN;
@@ -59,59 +44,65 @@ namespace dromozoa {
       }
     }
 
-    void impl_block_signal(lua_State* L) {
-      sigset_t mask;
-      if (lua_isnoneornil(L, 1)) {
-        if (sigfillset(&mask) == -1) {
-          push_error(L);
-          return;
-        }
-      } else {
-        if (sigemptyset(&mask) == -1) {
-          push_error(L);
-          return;
-        }
-        if (sigaddset(&mask, luaX_check_integer<int>(L, 1)) == -1) {
-          push_error(L);
-          return;
-        }
-      }
-      if (compat_sigmask(SIG_BLOCK, &mask, 0) == -1) {
+    void impl_block_all_signals(lua_State* L) {
+      if (sigmask_block_all_signals(0) == -1) {
         push_error(L);
       } else {
         luaX_push_success(L);
       }
     }
 
-    void impl_unblock_signal(lua_State* L) {
-      sigset_t mask;
-      if (lua_isnoneornil(L, 1)) {
-        if (sigfillset(&mask) == -1) {
-          push_error(L);
-          return;
-        }
-      } else {
-        if (sigemptyset(&mask) == -1) {
-          push_error(L);
-          return;
-        }
-        if (sigaddset(&mask, luaX_check_integer<int>(L, 1)) == -1) {
-          push_error(L);
-          return;
-        }
-      }
-      if (compat_sigmask(SIG_UNBLOCK, &mask, 0) == -1) {
+    void impl_unblock_all_signals(lua_State* L) {
+      if (sigmask_unblock_all_signals(0) == -1) {
         push_error(L);
       } else {
         luaX_push_success(L);
+      }
+    }
+
+    void impl_block_signal(lua_State* L) {
+      int sig = luaX_check_integer<int>(L, 1);
+      sigset_t mask;
+      if (sigemptyset(&mask) == -1) {
+        push_error(L);
+      } else {
+        if (sigaddset(&mask, sig) == -1) {
+          push_error(L);
+        } else {
+          if (compat_sigmask(SIG_BLOCK, &mask, 0) == -1) {
+            push_error(L);
+          } else {
+            luaX_push_success(L);
+          }
+        }
+      }
+    }
+
+    void impl_unblock_signal(lua_State* L) {
+      int sig = luaX_check_integer<int>(L, 1);
+      sigset_t mask;
+      if (sigemptyset(&mask) == -1) {
+        push_error(L);
+        return;
+      } else {
+        if (sigaddset(&mask, sig) == -1) {
+          push_error(L);
+        } else {
+          if (compat_sigmask(SIG_UNBLOCK, &mask, 0) == -1) {
+            push_error(L);
+          } else {
+            luaX_push_success(L);
+          }
+        }
       }
     }
   }
 
   void initialize_signal(lua_State* L) {
     luaX_set_field(L, "kill", impl_kill);
-    luaX_set_field(L, "default_signal", impl_default_signal);
     luaX_set_field(L, "ignore_signal", impl_ignore_signal);
+    luaX_set_field(L, "block_all_signals", impl_block_all_signals);
+    luaX_set_field(L, "unblock_all_signals", impl_unblock_all_signals);
     luaX_set_field(L, "block_signal", impl_block_signal);
     luaX_set_field(L, "unblock_signal", impl_unblock_signal);
 
