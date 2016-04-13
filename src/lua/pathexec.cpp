@@ -26,8 +26,8 @@ namespace dromozoa {
     void impl_pathexec(lua_State* L) {
       const char* path = luaL_checkstring(L, 1);
       luaL_checktype(L, 2, LUA_TTABLE);
-      argument_vector argv = make_argument_vector(L, 2);
-      argument_vector envp = make_argument_vector(L, 3);
+      argument_vector argv = to_argument_vector(L, 2);
+      argument_vector envp = to_argument_vector(L, 3);
       std::vector<char> buffer(pathexec_buffer_size(path, argv.get()));
       if (pathexec(path, argv.get(), envp.get(), &buffer[0], buffer.size()) == -1) {
         push_error(L);

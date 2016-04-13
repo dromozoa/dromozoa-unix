@@ -30,10 +30,10 @@ namespace dromozoa {
 
     void impl_forkexec(lua_State* L) {
       const char* path = luaL_checkstring(L, 2);
-      luaL_checktype(L, 3, LUA_TTABLE);
-      argument_vector argv = make_argument_vector(L, 3);
-      argument_vector envp = make_argument_vector(L, 4);
       const char* chdir = lua_tostring(L, 5);
+      luaL_checktype(L, 3, LUA_TTABLE);
+      argument_vector argv = to_argument_vector(L, 3);
+      argument_vector envp = to_argument_vector(L, 4);
       int dup2_stdio[3] = { -1, -1, -1 };
       if (lua_istable(L, 6)) {
         for (int i = 0; i < 3; ++i) {
@@ -42,13 +42,14 @@ namespace dromozoa {
           lua_pop(L, 1);
         }
       }
+
       pid_t pid = -1;
       int result = forkexec(path, argv.get(), envp.get(), chdir, dup2_stdio, pid);
       int code = errno;
+
       if (pid != -1) {
-        lua_pushinteger(L, 1);
-        lua_pushinteger(L, pid);
-        lua_settable(L, 1);
+        luaX_push(L, pid);
+        lua_seti(L, 1, 1);
       }
       if (result == -1) {
         push_error(L, code);
@@ -60,22 +61,22 @@ namespace dromozoa {
     void impl_forkexec_daemon(lua_State* L) {
       const char* path = luaL_checkstring(L, 2);
       luaL_checktype(L, 3, LUA_TTABLE);
-      argument_vector argv = make_argument_vector(L, 3);
-      argument_vector envp = make_argument_vector(L, 4);
+      argument_vector argv = to_argument_vector(L, 3);
+      argument_vector envp = to_argument_vector(L, 4);
       const char* chdir = lua_tostring(L, 5);
+
       pid_t pid1 = -1;
       pid_t pid2 = -1;
       int result = forkexec_daemon(path, argv.get(), envp.get(), chdir, pid1, pid2);
       int code = errno;
+
       if (pid1 != -1) {
-        lua_pushinteger(L, 1);
-        lua_pushinteger(L, pid1);
-        lua_settable(L, 1);
+        luaX_push(L, pid1);
+        lua_seti(L, 1, 1);
       }
       if (pid2 != -1) {
-        lua_pushinteger(L, 2);
-        lua_pushinteger(L, pid2);
-        lua_settable(L, 1);
+        luaX_push(L, pid2);
+        lua_seti(L, 1, 2);
       }
       if (result == -1) {
         push_error(L, code);

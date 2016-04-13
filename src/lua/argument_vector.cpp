@@ -18,7 +18,7 @@
 #include "common.hpp"
 
 namespace dromozoa {
-  argument_vector make_argument_vector(lua_State* L, int index) {
+  argument_vector to_argument_vector(lua_State* L, int index) {
     argument_vector result;
     if (lua_istable(L, index)) {
       for (int i = 1; ; ++i) {

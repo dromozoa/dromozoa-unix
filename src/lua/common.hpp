@@ -27,7 +27,7 @@ namespace dromozoa {
   void push_error(lua_State* L);
   void push_error(lua_State* L, int code);
 
-  argument_vector make_argument_vector(lua_State* L, int n);
+  argument_vector to_argument_vector(lua_State* L, int n);
 
   void new_fd(lua_State* L, int fd);
   int to_fd(lua_State* L, int index);
