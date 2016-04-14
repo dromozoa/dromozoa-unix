@@ -19,12 +19,7 @@
 #include "config.h"
 #endif
 
-#include <math.h>
-#include <time.h>
-
 #include <dromozoa/selector.hpp>
-
-#include "common.hpp"
 
 #if defined(HAVE_EPOLL_CREATE) || defined(HAVE_EPOLL_CREATE1)
 #include <dromozoa/selector_epoll.hpp>
@@ -33,6 +28,8 @@ typedef dromozoa::selector_epoll selector_impl;
 #include <dromozoa/selector_kqueue.hpp>
 typedef dromozoa::selector_kqueue selector_impl;
 #endif
+
+#include "common.hpp"
 
 namespace dromozoa {
   namespace {
