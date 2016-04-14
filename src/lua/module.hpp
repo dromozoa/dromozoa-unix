@@ -19,8 +19,7 @@
 #define MODULE_HPP
 
 namespace dromozoa {
-  int open_selfpipe(lua_State* L);
-
+  void initialize_selfpipe(lua_State* L);
   void initialize_fd(lua_State* L);
   void initialize_fd_ref(lua_State* L);
 

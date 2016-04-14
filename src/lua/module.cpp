@@ -48,6 +48,7 @@ namespace dromozoa {
     initialize_pipe(L);
     initialize_process(L);
     initialize_selector(L);
+    initialize_selfpipe(L);
     initialize_signal(L);
     initialize_sockaddr(L);
     initialize_sockaddr_un(L);
@@ -58,9 +59,6 @@ namespace dromozoa {
     initialize_sys_wait(L);
     initialize_time(L);
     initialize_unistd(L);
-
-    open_selfpipe(L);
-    lua_setfield(L, -2, "selfpipe");
 
     open_asio(L);
     lua_setfield(L, -2, "asio");
