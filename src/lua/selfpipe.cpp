@@ -15,14 +15,6 @@
 // You should have received a copy of the GNU General Public License
 // along with dromozoa-unix.  If not, see <http://www.gnu.org/licenses/>.
 
-extern "C" {
-#include <lua.h>
-}
-
-#include <fcntl.h>
-#include <signal.h>
-#include <unistd.h>
-
 #include <dromozoa/selfpipe.hpp>
 
 #include "common.hpp"
@@ -46,11 +38,11 @@ namespace dromozoa {
     }
 
     void impl_get(lua_State* L) {
-      lua_pushinteger(L, selfpipe_get());
+      luaX_push(L, selfpipe_get());
     }
 
     void impl_read(lua_State* L) {
-      lua_pushinteger(L, selfpipe_read());
+      luaX_push(L, selfpipe_read());
     }
   }
 
