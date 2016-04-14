@@ -44,5 +44,6 @@ unix_la_SOURCES = \
 	sys_time.cpp \
 	sys_wait.cpp \
 	time.cpp \
+	timespec.cpp \
 	unistd.cpp \
 	module.cpp
