@@ -19,11 +19,6 @@
 #include "config.h"
 #endif
 
-extern "C" {
-#include <lua.h>
-#include <lauxlib.h>
-}
-
 #include <math.h>
 #include <time.h>
 
@@ -99,34 +94,12 @@ namespace dromozoa {
     }
 
     void impl_select(lua_State* L) {
-      int result;
-      if (lua_isnoneornil(L, 2)) {
-        result = check_selector(L, 1)->select(0);
-      } else if (lua_isnumber(L, 3)) {
-        double t = lua_tonumber(L, 2);
-        if (t < 0) {
-          result = check_selector(L, 1)->select(0);
-        } else {
-          double i;
-          double f = modf(t, &i);
-          struct timespec tv = {};
-          tv.tv_sec = i;
-          tv.tv_nsec = f * 1000000000;
-          result = check_selector(L, 1)->select(&tv);
-        }
-      } else {
-        struct timespec tv = {};
-        lua_getfield(L, 2, "tv_sec");
-        if (lua_isnumber(L, -1)) {
-          tv.tv_sec = lua_tointeger(L, -1);
-        }
-        lua_pop(L, 1);
-        lua_getfield(L, 2, "tv_nsec");
-        if (lua_isnumber(L, -1)) {
-          tv.tv_nsec = lua_tointeger(L, -1);
-        }
-        lua_pop(L, 1);
+      struct timespec tv = {};
+      int result = -1;
+      if (check_timespec(L, 2, tv)) {
         result = check_selector(L, 1)->select(&tv);
+      } else {
+        result = check_selector(L, 1)->select(0);
       }
       if (result == -1) {
         push_error(L);
@@ -162,5 +135,7 @@ namespace dromozoa {
     luaX_set_field(L, "del", impl_del);
     luaX_set_field(L, "select", impl_select);
     luaX_set_field(L, "event", impl_event);
+
+    luaX_set_field(L, "SELECTOR_CLOEXEC", SELECTOR_CLOEXEC);
   }
 }
