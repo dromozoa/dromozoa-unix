@@ -18,6 +18,8 @@
 #ifndef COMMON_HPP
 #define COMMON_HPP
 
+#include <time.h>
+
 #include <dromozoa/bind.hpp>
 
 #include <dromozoa/argument_vector.hpp>
@@ -36,6 +38,8 @@ namespace dromozoa {
   void new_sockaddr(lua_State* L, const socket_address& address);
   void new_sockaddr(lua_State* L, const struct sockaddr* address, socklen_t size);
   const socket_address* check_sockaddr(lua_State* L, int n);
+
+  bool check_timespec(lua_State* L, int n, struct timespec& tv);
 }
 
 #endif
