@@ -44,6 +44,8 @@ namespace dromozoa {
   void initialize_sys_stat(lua_State* L);
   void initialize_sys_time(lua_State* L);
   void initialize_sys_wait(lua_State* L);
+
+  void initialize_timespec(lua_State* L);
 }
 
 #endif

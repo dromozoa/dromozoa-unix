@@ -23,12 +23,12 @@ namespace dromozoa {
   namespace {
     void impl_gettimeofday(lua_State* L) {
       struct timeval tv = {};
-      if (gettimeofday(&tv, 0) != -1) {
+      if (gettimeofday(&tv, 0) == -1) {
+        push_error(L);
+      } else {
         lua_newtable(L);
         luaX_set_field(L, "tv_sec", tv.tv_sec);
         luaX_set_field(L, "tv_usec", tv.tv_usec);
-      } else {
-        push_error(L);
       }
     }
   }

@@ -28,7 +28,9 @@ assert(t1 == t1)
 assert(t1 < t2)
 
 local t = t2 - t1
--- print(t:tonumber())
+print(t:tonumber())
+print(t1:tostring())
+print(t2:tostring(true))
 assert(t.tv_sec == 0)
 assert(100000000 < t.tv_nsec and t.tv_nsec < 300000000)
 assert(t1 + t == t2)
@@ -37,3 +39,4 @@ local t1 = unix.timespec({ tv_sec = 1, tv_nsec = 0 })
 local t2 = unix.timespec({ tv_sec = 1, tv_nsec = 1 })
 assert(t1 <= t1)
 assert(t1 <= t2)
+

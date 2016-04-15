@@ -28,15 +28,6 @@ namespace dromozoa {
     return 1;
   }
 
-  int open_timespec(lua_State* L) {
-    lua_getglobal(L, "require");
-    lua_pushliteral(L, "dromozoa.unix.timespec");
-    lua_call(L, 1, 1);
-    lua_pushvalue(L, -2);
-    lua_setfield(L, -2, "super");
-    return 1;
-  }
-
   void initialize(lua_State* L) {
     initialize_error(L);
     initialize_fcntl(L);
@@ -58,14 +49,11 @@ namespace dromozoa {
     initialize_sys_time(L);
     initialize_sys_wait(L);
     initialize_time(L);
+    initialize_timespec(L);
     initialize_unistd(L);
 
     open_asio(L);
     lua_setfield(L, -2, "asio");
-
-    open_timespec(L);
-    lua_setfield(L, -2, "timespec");
-
   }
 }
 
