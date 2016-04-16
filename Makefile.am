@@ -24,10 +24,10 @@ EXTRA_DIST = \
 	bind \
 	dromozoa \
 	dromozoa-unix-*.rockspec \
+	include \
 	m4/update \
 	test \
 	test.sh
 
 nobase_lua_DATA = \
-	dromozoa/unix/asio.lua \
-	dromozoa/unix/timespec.lua
+	dromozoa/unix/asio.lua
