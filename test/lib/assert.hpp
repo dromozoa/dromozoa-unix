@@ -15,31 +15,19 @@
 // You should have received a copy of the GNU General Public License
 // along with dromozoa-unix.  If not, see <http://www.gnu.org/licenses/>.
 
+#ifndef DROMOZOA_ASSERT_HPP
+#define DROMOZOA_ASSERT_HPP
+
 #include <assert.h>
+#include <fcntl.h>
 
-#include <string>
+#define assert_coe(fd) \
+  assert("assert_coe" && (fcntl((fd), F_GETFD) & FD_CLOEXEC))
 
-#include <dromozoa/argument_vector.hpp>
+#define assert_ndelay_on(fd) \
+  assert("assert_ndelay_on" && (fcntl((fd), F_GETFL) & O_NONBLOCK))
 
-void test1() {
-  dromozoa::argument_vector args;
-  assert(args.get() == 0);
-}
+#define assert_ndelay_off(fd) \
+  assert("assert_ndelay_off" && !(fcntl((fd), F_GETFL) & O_NONBLOCK))
 
-void test2() {
-  dromozoa::argument_vector args;
-  args.push_back("foo");
-  args.push_back("bar");
-  args.push_back("baz");
-  const char* const* argv = args.get();
-  assert(std::string(argv[0]) == "foo");
-  assert(std::string(argv[1]) == "bar");
-  assert(std::string(argv[2]) == "baz");
-  assert(argv[3] == 0);
-}
-
-int main(int, char*[]) {
-  test1();
-  test2();
-  return 0;
-}
+#endif

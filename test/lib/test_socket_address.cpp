@@ -15,7 +15,6 @@
 // You should have received a copy of the GNU General Public License
 // along with dromozoa-unix.  If not, see <http://www.gnu.org/licenses/>.
 
-#include <assert.h>
 #include <netdb.h>
 #include <string.h>
 #include <arpa/inet.h>
@@ -26,12 +25,14 @@
 
 #include <dromozoa/socket_address.hpp>
 
+#include "assert.hpp"
+
 int main(int, char*[]) {
   struct sockaddr_in sin;
   sin.sin_family = AF_INET;
   sin.sin_port = htons(80);
   in_addr_t in_addr = inet_addr("127.0.0.1");
-  memmove(&sin.sin_addr, &in_addr, sizeof(sin.sin_addr));
+  memcpy(&sin.sin_addr, &in_addr, sizeof(sin.sin_addr));
   dromozoa::socket_address socket_address1(reinterpret_cast<const struct sockaddr*>(&sin), sizeof(sin));
 
   dromozoa::socket_address socket_address2;
@@ -40,11 +41,13 @@ int main(int, char*[]) {
   assert(socket_address2.family() == 0);
 
   socket_address2 = socket_address1;
+  assert(socket_address2.get());
+  assert(socket_address2.size() == sizeof(struct sockaddr_in));
+  assert(socket_address2.family() == AF_INET);
 
-  char nodename[NI_MAXHOST];
-  char servname[NI_MAXSERV];
+  char nodename[NI_MAXHOST] = { 0 };
+  char servname[NI_MAXSERV] = { 0 };
   assert(getnameinfo(socket_address2.get(), socket_address2.size(), nodename, NI_MAXHOST, servname, NI_MAXSERV, NI_NUMERICHOST | NI_NUMERICSERV) == 0);
-
   assert(std::string(nodename) == "127.0.0.1");
   assert(std::string(servname) == "80");
 

@@ -15,8 +15,8 @@
 // You should have received a copy of the GNU General Public License
 // along with dromozoa-unix.  If not, see <http://www.gnu.org/licenses/>.
 
-#ifndef COMMON_HPP
-#define COMMON_HPP
+#ifndef DROMOZOA_COMMON_HPP
+#define DROMOZOA_COMMON_HPP
 
 #include <time.h>
 

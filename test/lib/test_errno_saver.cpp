@@ -15,10 +15,11 @@
 // You should have received a copy of the GNU General Public License
 // along with dromozoa-unix.  If not, see <http://www.gnu.org/licenses/>.
 
-#include <assert.h>
 #include <errno.h>
 
 #include <dromozoa/errno_saver.hpp>
+
+#include "assert.hpp"
 
 int main(int, char*[]) {
   errno = ENOENT;

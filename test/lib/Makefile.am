@@ -17,6 +17,8 @@
 
 TESTS = $(check_PROGRAMS)
 
+noinst_HEADERS = assert.hpp
+
 check_PROGRAMS = \
 	test_argument_vector.exe \
 	test_compat_pipe2.exe \
