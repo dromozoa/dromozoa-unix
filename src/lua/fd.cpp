@@ -95,34 +95,34 @@ namespace dromozoa {
     {
       luaL_newmetatable(L, "dromozoa.unix.fd_ref");
       lua_pushvalue(L, -2);
-      luaX_set_field(L, "__index");
+      luaX_set_field(L, -2, "__index");
       lua_pop(L, 1);
 
       luaL_newmetatable(L, "dromozoa.unix.fd");
       lua_pushvalue(L, -2);
-      luaX_set_field(L, "__index");
-      luaX_set_field(L, "__gc", impl_gc);
+      luaX_set_field(L, -2, "__index");
+      luaX_set_field(L, -1, "__gc", impl_gc);
       lua_pop(L, 1);
 
       luaX_set_metafield(L, "__call", impl_call);
-      luaX_set_field(L, "get", impl_get);
-      luaX_set_field(L, "close", impl_close);
+      luaX_set_field(L, -1, "get", impl_get);
+      luaX_set_field(L, -1, "close", impl_close);
 
       new_fd_ref(L, 0);
-      luaX_set_field(L, "stdin");
+      luaX_set_field(L, -2, "stdin");
       new_fd_ref(L, 1);
-      luaX_set_field(L, "stdout");
+      luaX_set_field(L, -2, "stdout");
       new_fd_ref(L, 2);
-      luaX_set_field(L, "stderr");
+      luaX_set_field(L, -2, "stderr");
 
       initialize_fd_djb(L);
       initialize_fd_socket(L);
       initialize_fd_unistd(L);
     }
-    luaX_set_field(L, "fd");
+    luaX_set_field(L, -2, "fd");
   }
 
   void initialize_fd_ref(lua_State* L) {
-    luaX_set_field(L, "fd_ref", impl_fd_ref);
+    luaX_set_field(L, -1, "fd_ref", impl_fd_ref);
   }
 }

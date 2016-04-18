@@ -38,6 +38,6 @@ namespace dromozoa {
   }
 
   void initialize_pathexec(lua_State* L) {
-    luaX_set_field(L, "pathexec", impl_pathexec);
+    luaX_set_field(L, -1, "pathexec", impl_pathexec);
   }
 }

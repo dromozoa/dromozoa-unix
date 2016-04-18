@@ -49,11 +49,11 @@ namespace dromozoa {
   void initialize_selfpipe(lua_State* L) {
     lua_newtable(L);
     {
-      luaX_set_field(L, "open", impl_open);
-      luaX_set_field(L, "close", impl_close);
-      luaX_set_field(L, "get", impl_get);
-      luaX_set_field(L, "read", impl_read);
+      luaX_set_field(L, -1, "open", impl_open);
+      luaX_set_field(L, -1, "close", impl_close);
+      luaX_set_field(L, -1, "get", impl_get);
+      luaX_set_field(L, -1, "read", impl_read);
     }
-    luaX_set_field(L, "selfpipe");
+    luaX_set_field(L, -2, "selfpipe");
   }
 }

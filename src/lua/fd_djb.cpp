@@ -73,11 +73,11 @@ namespace dromozoa {
   }
 
   void initialize_fd_djb(lua_State* L) {
-    luaX_set_field(L, "coe", impl_coe);
-    luaX_set_field(L, "lock_ex", impl_lock_ex);
-    luaX_set_field(L, "lock_exnb", impl_lock_exnb);
-    luaX_set_field(L, "lock_un", impl_lock_un);
-    luaX_set_field(L, "ndelay_on", impl_ndelay_on);
-    luaX_set_field(L, "ndelay_off", impl_ndelay_off);
+    luaX_set_field(L, -1, "coe", impl_coe);
+    luaX_set_field(L, -1, "lock_ex", impl_lock_ex);
+    luaX_set_field(L, -1, "lock_exnb", impl_lock_exnb);
+    luaX_set_field(L, -1, "lock_un", impl_lock_un);
+    luaX_set_field(L, -1, "ndelay_on", impl_ndelay_on);
+    luaX_set_field(L, -1, "ndelay_off", impl_ndelay_off);
   }
 }

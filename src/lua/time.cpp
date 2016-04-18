@@ -28,13 +28,13 @@ namespace dromozoa {
       } else {
         push_error(L);
         lua_newtable(L);
-        luaX_set_field(L, "tv_sec", tv2.tv_sec);
-        luaX_set_field(L, "tv_nsec", tv2.tv_nsec);
+        luaX_set_field(L, -1, "tv_sec", tv2.tv_sec);
+        luaX_set_field(L, -1, "tv_nsec", tv2.tv_nsec);
       }
     }
   }
 
   void initialize_time(lua_State* L) {
-    luaX_set_field(L, "nanosleep", impl_nanosleep);
+    luaX_set_field(L, -1, "nanosleep", impl_nanosleep);
   }
 }

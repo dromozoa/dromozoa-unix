@@ -91,13 +91,13 @@ namespace dromozoa {
     {
       luaL_newmetatable(L, "dromozoa.unix.process");
       lua_pushvalue(L, -2);
-      luaX_set_field(L, "__index");
+      luaX_set_field(L, -2, "__index");
       lua_pop(L, 1);
 
       luaX_set_metafield(L, "__call", impl_call);
-      luaX_set_field(L, "forkexec", impl_forkexec);
-      luaX_set_field(L, "forkexec_daemon", impl_forkexec_daemon);
+      luaX_set_field(L, -1, "forkexec", impl_forkexec);
+      luaX_set_field(L, -1, "forkexec_daemon", impl_forkexec_daemon);
     }
-    luaX_set_field(L, "process");
+    luaX_set_field(L, -2, "process");
   }
 }

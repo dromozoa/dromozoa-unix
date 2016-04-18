@@ -54,7 +54,7 @@ namespace dromozoa {
   }
 
   void initialize_fd_unistd(lua_State* L) {
-    luaX_set_field(L, "read", impl_read);
-    luaX_set_field(L, "write", impl_write);
+    luaX_set_field(L, -1, "read", impl_read);
+    luaX_set_field(L, -1, "write", impl_write);
   }
 }

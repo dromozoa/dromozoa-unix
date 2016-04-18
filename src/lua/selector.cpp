@@ -123,20 +123,20 @@ namespace dromozoa {
     {
       luaL_newmetatable(L, "dromozoa.unix.selector");
       lua_pushvalue(L, -2);
-      luaX_set_field(L, "__index");
-      luaX_set_field(L, "__gc", impl_gc);
+      luaX_set_field(L, -2, "__index");
+      luaX_set_field(L, -1, "__gc", impl_gc);
       lua_pop(L, 1);
 
       luaX_set_metafield(L, "__call", impl_call);
-      luaX_set_field(L, "close", impl_close);
-      luaX_set_field(L, "add", impl_add);
-      luaX_set_field(L, "mod", impl_mod);
-      luaX_set_field(L, "del", impl_del);
-      luaX_set_field(L, "select", impl_select);
-      luaX_set_field(L, "event", impl_event);
+      luaX_set_field(L, -1, "close", impl_close);
+      luaX_set_field(L, -1, "add", impl_add);
+      luaX_set_field(L, -1, "mod", impl_mod);
+      luaX_set_field(L, -1, "del", impl_del);
+      luaX_set_field(L, -1, "select", impl_select);
+      luaX_set_field(L, -1, "event", impl_event);
 
-      luaX_set_field(L, "SELECTOR_CLOEXEC", SELECTOR_CLOEXEC);
+      luaX_set_field(L, -1, "SELECTOR_CLOEXEC", SELECTOR_CLOEXEC);
     }
-    luaX_set_field(L, "selector");
+    luaX_set_field(L, -2, "selector");
   }
 }

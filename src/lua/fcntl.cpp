@@ -35,14 +35,14 @@ namespace dromozoa {
   }
 
   void initialize_fcntl(lua_State* L) {
-    luaX_set_field(L, "open", impl_open);
+    luaX_set_field(L, -1, "open", impl_open);
 
-    luaX_set_field(L, "O_APPEND", O_APPEND);
-    luaX_set_field(L, "O_CLOEXEC", O_CLOEXEC);
-    luaX_set_field(L, "O_CREAT", O_CREAT);
-    luaX_set_field(L, "O_NONBLOCK", O_NONBLOCK);
-    luaX_set_field(L, "O_RDONLY", O_RDONLY);
-    luaX_set_field(L, "O_RDWR", O_RDWR);
-    luaX_set_field(L, "O_WRONLY", O_WRONLY);
+    luaX_set_field(L, -1, "O_APPEND", O_APPEND);
+    luaX_set_field(L, -1, "O_CLOEXEC", O_CLOEXEC);
+    luaX_set_field(L, -1, "O_CREAT", O_CREAT);
+    luaX_set_field(L, -1, "O_NONBLOCK", O_NONBLOCK);
+    luaX_set_field(L, -1, "O_RDONLY", O_RDONLY);
+    luaX_set_field(L, -1, "O_RDWR", O_RDWR);
+    luaX_set_field(L, -1, "O_WRONLY", O_WRONLY);
   }
 }

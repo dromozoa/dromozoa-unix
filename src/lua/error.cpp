@@ -53,16 +53,16 @@ namespace dromozoa {
   }
 
   void initialize_error(lua_State* L) {
-    luaX_set_field(L, "strerror", impl_strerror);
-    luaX_set_field(L, "set_errno", impl_set_errno);
-    luaX_set_field(L, "get_errno", impl_get_errno);
+    luaX_set_field(L, -1, "strerror", impl_strerror);
+    luaX_set_field(L, -1, "set_errno", impl_set_errno);
+    luaX_set_field(L, -1, "get_errno", impl_get_errno);
 
-    luaX_set_field(L, "EAGAIN", EAGAIN);
-    luaX_set_field(L, "EINPROGRESS", EINPROGRESS);
-    luaX_set_field(L, "EINTR", EINTR);
-    luaX_set_field(L, "ENOENT", ENOENT);
-    luaX_set_field(L, "EPIPE", EPIPE);
-    luaX_set_field(L, "ETIMEDOUT", ETIMEDOUT);
-    luaX_set_field(L, "EWOULDBLOCK", EWOULDBLOCK);
+    luaX_set_field(L, -1, "EAGAIN", EAGAIN);
+    luaX_set_field(L, -1, "EINPROGRESS", EINPROGRESS);
+    luaX_set_field(L, -1, "EINTR", EINTR);
+    luaX_set_field(L, -1, "ENOENT", ENOENT);
+    luaX_set_field(L, -1, "EPIPE", EPIPE);
+    luaX_set_field(L, -1, "ETIMEDOUT", ETIMEDOUT);
+    luaX_set_field(L, -1, "EWOULDBLOCK", EWOULDBLOCK);
   }
 }

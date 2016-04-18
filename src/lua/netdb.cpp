@@ -61,18 +61,18 @@ namespace dromozoa {
         int i = 1;
         for (const struct addrinfo* ai = result; ai; ai = ai->ai_next, ++i) {
           lua_newtable(L);
-          luaX_set_field(L, "ai_family", ai->ai_family);
-          luaX_set_field(L, "ai_socktype", ai->ai_socktype);
-          luaX_set_field(L, "ai_protocol", ai->ai_protocol);
-          luaX_set_field(L, "ai_addrlen", ai->ai_addrlen);
+          luaX_set_field(L, -1, "ai_family", ai->ai_family);
+          luaX_set_field(L, -1, "ai_socktype", ai->ai_socktype);
+          luaX_set_field(L, -1, "ai_protocol", ai->ai_protocol);
+          luaX_set_field(L, -1, "ai_addrlen", ai->ai_addrlen);
           if (ai->ai_addr) {
             new_sockaddr(L, ai->ai_addr, ai->ai_addrlen);
-            luaX_set_field(L, "ai_addr");
+            luaX_set_field(L, -2, "ai_addr");
           }
           if (ai->ai_canonname) {
-            luaX_set_field(L, "ai_canonname", ai->ai_canonname);
+            luaX_set_field(L, -1, "ai_canonname", ai->ai_canonname);
           }
-          luaX_set_field(L, i);
+          luaX_set_field(L, -2, i);
         }
         freeaddrinfo(result);
       } else {
@@ -96,27 +96,27 @@ namespace dromozoa {
   }
 
   void initialize_netdb(lua_State* L) {
-    luaX_set_field(L, "getaddrinfo", impl_getaddrinfo);
+    luaX_set_field(L, -1, "getaddrinfo", impl_getaddrinfo);
 
-    luaX_set_field(L, "AI_PASSIVE", AI_PASSIVE);
-    luaX_set_field(L, "AI_CANONNAME", AI_CANONNAME);
-    luaX_set_field(L, "AI_NUMERICHOST", AI_NUMERICHOST);
-    luaX_set_field(L, "AI_NUMERICSERV", AI_NUMERICSERV);
-    luaX_set_field(L, "AI_V4MAPPED", AI_V4MAPPED);
-    luaX_set_field(L, "AI_ALL", AI_ALL);
-    luaX_set_field(L, "AI_ADDRCONFIG", AI_ADDRCONFIG);
+    luaX_set_field(L, -1, "AI_PASSIVE", AI_PASSIVE);
+    luaX_set_field(L, -1, "AI_CANONNAME", AI_CANONNAME);
+    luaX_set_field(L, -1, "AI_NUMERICHOST", AI_NUMERICHOST);
+    luaX_set_field(L, -1, "AI_NUMERICSERV", AI_NUMERICSERV);
+    luaX_set_field(L, -1, "AI_V4MAPPED", AI_V4MAPPED);
+    luaX_set_field(L, -1, "AI_ALL", AI_ALL);
+    luaX_set_field(L, -1, "AI_ADDRCONFIG", AI_ADDRCONFIG);
 
-    luaX_set_field(L, "NI_NOFQDN", NI_NOFQDN);
-    luaX_set_field(L, "NI_NUMERICHOST", NI_NUMERICHOST);
-    luaX_set_field(L, "NI_NAMEREQD", NI_NAMEREQD);
-    luaX_set_field(L, "NI_NUMERICSERV", NI_NUMERICSERV);
+    luaX_set_field(L, -1, "NI_NOFQDN", NI_NOFQDN);
+    luaX_set_field(L, -1, "NI_NUMERICHOST", NI_NUMERICHOST);
+    luaX_set_field(L, -1, "NI_NAMEREQD", NI_NAMEREQD);
+    luaX_set_field(L, -1, "NI_NUMERICSERV", NI_NUMERICSERV);
 #ifdef NI_NUMERICSCOPE
-    luaX_set_field(L, "NI_NUMERICSCOPE", NI_NUMERICSCOPE);
+    luaX_set_field(L, -1, "NI_NUMERICSCOPE", NI_NUMERICSCOPE);
 #endif
-    luaX_set_field(L, "NI_DGRAM", NI_DGRAM);
+    luaX_set_field(L, -1, "NI_DGRAM", NI_DGRAM);
   }
 
   void initialize_sockaddr_netdb(lua_State* L) {
-    luaX_set_field(L, "getnameinfo", impl_getnameinfo);
+    luaX_set_field(L, -1, "getnameinfo", impl_getnameinfo);
   }
 }

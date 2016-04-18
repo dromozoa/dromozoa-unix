@@ -113,14 +113,14 @@ namespace dromozoa {
   }
 
   void initialize_fd_socket(lua_State* L) {
-    luaX_set_field(L, "bind", impl_bind);
-    luaX_set_field(L, "listen", impl_listen);
-    luaX_set_field(L, "accept", impl_accept);
-    luaX_set_field(L, "connect", impl_connect);
-    luaX_set_field(L, "shutdown", impl_shutdown);
-    luaX_set_field(L, "setsockopt", impl_setsockopt);
-    luaX_set_field(L, "getsockopt", impl_getsockopt);
-    luaX_set_field(L, "getsockname", impl_getsockname);
-    luaX_set_field(L, "getpeername", impl_getpeername);
+    luaX_set_field(L, -1, "bind", impl_bind);
+    luaX_set_field(L, -1, "listen", impl_listen);
+    luaX_set_field(L, -1, "accept", impl_accept);
+    luaX_set_field(L, -1, "connect", impl_connect);
+    luaX_set_field(L, -1, "shutdown", impl_shutdown);
+    luaX_set_field(L, -1, "setsockopt", impl_setsockopt);
+    luaX_set_field(L, -1, "getsockopt", impl_getsockopt);
+    luaX_set_field(L, -1, "getsockname", impl_getsockname);
+    luaX_set_field(L, -1, "getpeername", impl_getpeername);
   }
 }

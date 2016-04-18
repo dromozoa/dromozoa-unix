@@ -48,10 +48,10 @@ namespace dromozoa {
   }
 
   void initialize_sys_wait(lua_State* L) {
-    luaX_set_field(L, "wait", impl_wait);
+    luaX_set_field(L, -1, "wait", impl_wait);
 
-    luaX_set_field(L, "WCONTINUED", WCONTINUED);
-    luaX_set_field(L, "WNOHANG", WNOHANG);
-    luaX_set_field(L, "WUNTRACED", WUNTRACED);
+    luaX_set_field(L, -1, "WCONTINUED", WCONTINUED);
+    luaX_set_field(L, -1, "WNOHANG", WNOHANG);
+    luaX_set_field(L, -1, "WUNTRACED", WUNTRACED);
   }
 }

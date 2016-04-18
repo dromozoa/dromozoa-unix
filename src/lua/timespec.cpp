@@ -19,6 +19,7 @@
 #include <sys/time.h>
 
 #include <iomanip>
+#include <sstream>
 
 #include "common.hpp"
 
@@ -26,8 +27,8 @@ namespace dromozoa {
   namespace {
     void push_timespec(lua_State* L, const timespec& tv) {
       lua_newtable(L);
-      luaX_set_field(L, "tv_sec", tv.tv_sec);
-      luaX_set_field(L, "tv_nsec", tv.tv_nsec);
+      luaX_set_field(L, -1, "tv_sec", tv.tv_sec);
+      luaX_set_field(L, -1, "tv_nsec", tv.tv_nsec);
       luaX_set_metatable(L, "dromozoa.unix.timespec");
     }
 
@@ -43,8 +44,8 @@ namespace dromozoa {
         push_error(L);
       } else {
         lua_newtable(L);
-        luaX_set_field(L, "tv_sec", tv.tv_sec);
-        luaX_set_field(L, "tv_nsec", tv.tv_usec * 1000);
+        luaX_set_field(L, -1, "tv_sec", tv.tv_sec);
+        luaX_set_field(L, -1, "tv_nsec", tv.tv_usec * 1000);
         luaX_set_metatable(L, "dromozoa.unix.timespec");
       }
     }
@@ -177,19 +178,19 @@ namespace dromozoa {
     {
       luaL_newmetatable(L, "dromozoa.unix.timespec");
       lua_pushvalue(L, -2);
-      luaX_set_field(L, "__index");
-      luaX_set_field(L, "__add", impl_add);
-      luaX_set_field(L, "__sub", impl_sub);
-      luaX_set_field(L, "__eq", impl_eq);
-      luaX_set_field(L, "__lt", impl_lt);
-      luaX_set_field(L, "__le", impl_le);
+      luaX_set_field(L, -2, "__index");
+      luaX_set_field(L, -1, "__add", impl_add);
+      luaX_set_field(L, -1, "__sub", impl_sub);
+      luaX_set_field(L, -1, "__eq", impl_eq);
+      luaX_set_field(L, -1, "__lt", impl_lt);
+      luaX_set_field(L, -1, "__le", impl_le);
       lua_pop(L, 1);
 
       luaX_set_metafield(L, "__call", impl_call);
-      luaX_set_field(L, "now", impl_now);
-      luaX_set_field(L, "tostring", impl_tostring);
-      luaX_set_field(L, "tonumber", impl_tonumber);
+      luaX_set_field(L, -1, "now", impl_now);
+      luaX_set_field(L, -1, "tostring", impl_tostring);
+      luaX_set_field(L, -1, "tonumber", impl_tonumber);
     }
-    luaX_set_field(L, "timespec");
+    luaX_set_field(L, -2, "timespec");
   }
 }

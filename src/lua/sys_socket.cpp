@@ -50,30 +50,30 @@ namespace dromozoa {
   }
 
   void initialize_sys_socket(lua_State* L) {
-    luaX_set_field(L, "socket", impl_socket);
-    luaX_set_field(L, "socketpair", impl_socketpair);
+    luaX_set_field(L, -1, "socket", impl_socket);
+    luaX_set_field(L, -1, "socketpair", impl_socketpair);
 
-    luaX_set_field(L, "AF_INET", AF_INET);
-    luaX_set_field(L, "AF_INET6", AF_INET6);
-    luaX_set_field(L, "AF_UNIX", AF_UNIX);
-    luaX_set_field(L, "AF_UNSPEC", AF_UNSPEC);
+    luaX_set_field(L, -1, "AF_INET", AF_INET);
+    luaX_set_field(L, -1, "AF_INET6", AF_INET6);
+    luaX_set_field(L, -1, "AF_UNIX", AF_UNIX);
+    luaX_set_field(L, -1, "AF_UNSPEC", AF_UNSPEC);
 
-    luaX_set_field(L, "SOCK_STREAM", SOCK_STREAM);
-    luaX_set_field(L, "SOCK_DGRAM", SOCK_DGRAM);
-    luaX_set_field(L, "SOCK_SEQPACKET", SOCK_SEQPACKET);
-    luaX_set_field(L, "SOCK_CLOEXEC", COMPAT_SOCK_CLOEXEC);
-    luaX_set_field(L, "SOCK_NONBLOCK", COMPAT_SOCK_NONBLOCK);
+    luaX_set_field(L, -1, "SOCK_STREAM", SOCK_STREAM);
+    luaX_set_field(L, -1, "SOCK_DGRAM", SOCK_DGRAM);
+    luaX_set_field(L, -1, "SOCK_SEQPACKET", SOCK_SEQPACKET);
+    luaX_set_field(L, -1, "SOCK_CLOEXEC", COMPAT_SOCK_CLOEXEC);
+    luaX_set_field(L, -1, "SOCK_NONBLOCK", COMPAT_SOCK_NONBLOCK);
 
-    luaX_set_field(L, "SOMAXCONN", SOMAXCONN);
+    luaX_set_field(L, -1, "SOMAXCONN", SOMAXCONN);
 
-    luaX_set_field(L, "SHUT_RD", SHUT_RD);
-    luaX_set_field(L, "SHUT_WR", SHUT_WR);
-    luaX_set_field(L, "SHUT_RDWR", SHUT_RDWR);
+    luaX_set_field(L, -1, "SHUT_RD", SHUT_RD);
+    luaX_set_field(L, -1, "SHUT_WR", SHUT_WR);
+    luaX_set_field(L, -1, "SHUT_RDWR", SHUT_RDWR);
 
-    luaX_set_field(L, "SOL_SOCKET", SOL_SOCKET);
-    luaX_set_field(L, "SO_ERROR", SO_ERROR);
-    luaX_set_field(L, "SO_RCVBUF", SO_RCVBUF);
-    luaX_set_field(L, "SO_REUSEADDR", SO_REUSEADDR);
-    luaX_set_field(L, "SO_SNDBUF", SO_SNDBUF);
+    luaX_set_field(L, -1, "SOL_SOCKET", SOL_SOCKET);
+    luaX_set_field(L, -1, "SO_ERROR", SO_ERROR);
+    luaX_set_field(L, -1, "SO_RCVBUF", SO_RCVBUF);
+    luaX_set_field(L, -1, "SO_REUSEADDR", SO_REUSEADDR);
+    luaX_set_field(L, -1, "SO_SNDBUF", SO_SNDBUF);
   }
 }

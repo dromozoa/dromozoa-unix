@@ -68,8 +68,8 @@ namespace dromozoa {
   }
 
   void initialize_stdlib(lua_State* L) {
-    luaX_set_field(L, "realpath", impl_realpath);
-    luaX_set_field(L, "mkdtemp", impl_mkdtemp);
-    luaX_set_field(L, "mkstemp", impl_mkstemp);
+    luaX_set_field(L, -1, "realpath", impl_realpath);
+    luaX_set_field(L, -1, "mkdtemp", impl_mkdtemp);
+    luaX_set_field(L, -1, "mkstemp", impl_mkstemp);
   }
 }

@@ -27,13 +27,13 @@ namespace dromozoa {
         push_error(L);
       } else {
         lua_newtable(L);
-        luaX_set_field(L, "tv_sec", tv.tv_sec);
-        luaX_set_field(L, "tv_usec", tv.tv_usec);
+        luaX_set_field(L, -1, "tv_sec", tv.tv_sec);
+        luaX_set_field(L, -1, "tv_usec", tv.tv_usec);
       }
     }
   }
 
   void initialize_sys_time(lua_State* L) {
-    luaX_set_field(L, "gettimeofday", impl_gettimeofday);
+    luaX_set_field(L, -1, "gettimeofday", impl_gettimeofday);
   }
 }

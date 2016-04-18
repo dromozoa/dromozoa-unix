@@ -29,7 +29,7 @@ namespace dromozoa {
       lua_newtable(L);
       for (int i = 0; ; ++i) {
         if (const char* p = environ[i]) {
-          luaX_set_field(L, i + 1, p);
+          luaX_set_field(L, -1, i + 1, p);
         } else {
           break;
         }
@@ -80,18 +80,18 @@ namespace dromozoa {
   }
 
   void initialize_unistd(lua_State* L) {
-    luaX_set_field(L, "environ", impl_environ);
-    luaX_set_field(L, "getcwd", impl_getcwd);
-    luaX_set_field(L, "getuid", impl_getuid);
-    luaX_set_field(L, "getgid", impl_getgid);
-    luaX_set_field(L, "geteuid", impl_geteuid);
-    luaX_set_field(L, "getegid", impl_getegid);
-    luaX_set_field(L, "getpid", impl_getpid);
-    luaX_set_field(L, "getpgrp", impl_getpgrp);
-    luaX_set_field(L, "getppid", impl_getppid);
+    luaX_set_field(L, -1, "environ", impl_environ);
+    luaX_set_field(L, -1, "getcwd", impl_getcwd);
+    luaX_set_field(L, -1, "getuid", impl_getuid);
+    luaX_set_field(L, -1, "getgid", impl_getgid);
+    luaX_set_field(L, -1, "geteuid", impl_geteuid);
+    luaX_set_field(L, -1, "getegid", impl_getegid);
+    luaX_set_field(L, -1, "getpid", impl_getpid);
+    luaX_set_field(L, -1, "getpgrp", impl_getpgrp);
+    luaX_set_field(L, -1, "getppid", impl_getppid);
 
-    luaX_set_field(L, "STDIN_FILENO", STDIN_FILENO);
-    luaX_set_field(L, "STDOUT_FILENO", STDOUT_FILENO);
-    luaX_set_field(L, "STDERR_FILENO", STDERR_FILENO);
+    luaX_set_field(L, -1, "STDIN_FILENO", STDIN_FILENO);
+    luaX_set_field(L, -1, "STDOUT_FILENO", STDOUT_FILENO);
+    luaX_set_field(L, -1, "STDERR_FILENO", STDERR_FILENO);
   }
 }

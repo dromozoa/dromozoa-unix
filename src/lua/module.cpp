@@ -23,8 +23,8 @@ namespace dromozoa {
     lua_pushliteral(L, "dromozoa.unix.asio");
     lua_call(L, 1, 1);
     lua_pushvalue(L, -2);
-    luaX_set_field(L, "super");
-    luaX_set_field(L, "asio");
+    luaX_set_field(L, -2, "super");
+    luaX_set_field(L, -2, "asio");
   }
 
   void initialize_error(lua_State* L);
