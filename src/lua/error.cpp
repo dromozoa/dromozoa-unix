@@ -60,9 +60,7 @@ namespace dromozoa {
     luaX_set_field(L, -1, "EAGAIN", EAGAIN);
     luaX_set_field(L, -1, "EINPROGRESS", EINPROGRESS);
     luaX_set_field(L, -1, "EINTR", EINTR);
-    luaX_set_field(L, -1, "ENOENT", ENOENT);
     luaX_set_field(L, -1, "EPIPE", EPIPE);
-    luaX_set_field(L, -1, "ETIMEDOUT", ETIMEDOUT);
     luaX_set_field(L, -1, "EWOULDBLOCK", EWOULDBLOCK);
   }
 }

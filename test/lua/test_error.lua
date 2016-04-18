@@ -17,17 +17,16 @@
 
 local unix = require "dromozoa.unix"
 
-local code = unix.get_errno()
-
 unix.set_errno(0)
 assert(unix.get_errno() == 0)
 print(unix.strerror())
 
-unix.set_errno(unix.ETIMEDOUT)
-assert(unix.get_errno() == unix.ETIMEDOUT)
-print(unix.strerror())
-
-assert(unix.strerror() == unix.strerror(unix.ETIMEDOUT))
+unix.set_errno(unix.EAGAIN)
+assert(unix.get_errno() == unix.EAGAIN)
+assert(unix.strerror() == unix.strerror(unix.EAGAIN))
+print(unix.strerror(unix.EAGAIN))
+print(unix.strerror(unix.EINTR))
+assert(unix.get_errno() == unix.EAGAIN)
 
 -- print(unix.strerror(unix.EAGAIN))
 -- print(unix.strerror(unix.EINPROGRESS))
