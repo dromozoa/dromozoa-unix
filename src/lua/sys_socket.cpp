@@ -58,17 +58,17 @@ namespace dromozoa {
     luaX_set_field(L, -1, "AF_UNIX", AF_UNIX);
     luaX_set_field(L, -1, "AF_UNSPEC", AF_UNSPEC);
 
-    luaX_set_field(L, -1, "SOCK_STREAM", SOCK_STREAM);
-    luaX_set_field(L, -1, "SOCK_DGRAM", SOCK_DGRAM);
-    luaX_set_field(L, -1, "SOCK_SEQPACKET", SOCK_SEQPACKET);
+    luaX_set_field<int>(L, -1, "SOCK_STREAM", SOCK_STREAM);
+    luaX_set_field<int>(L, -1, "SOCK_DGRAM", SOCK_DGRAM);
+    luaX_set_field<int>(L, -1, "SOCK_SEQPACKET", SOCK_SEQPACKET);
     luaX_set_field(L, -1, "SOCK_CLOEXEC", COMPAT_SOCK_CLOEXEC);
     luaX_set_field(L, -1, "SOCK_NONBLOCK", COMPAT_SOCK_NONBLOCK);
 
     luaX_set_field(L, -1, "SOMAXCONN", SOMAXCONN);
 
-    luaX_set_field(L, -1, "SHUT_RD", SHUT_RD);
-    luaX_set_field(L, -1, "SHUT_WR", SHUT_WR);
-    luaX_set_field(L, -1, "SHUT_RDWR", SHUT_RDWR);
+    luaX_set_field<int>(L, -1, "SHUT_RD", SHUT_RD);
+    luaX_set_field<int>(L, -1, "SHUT_WR", SHUT_WR);
+    luaX_set_field<int>(L, -1, "SHUT_RDWR", SHUT_RDWR);
 
     luaX_set_field(L, -1, "SOL_SOCKET", SOL_SOCKET);
     luaX_set_field(L, -1, "SO_ERROR", SO_ERROR);
