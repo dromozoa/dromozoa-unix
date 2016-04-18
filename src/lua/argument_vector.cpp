@@ -22,7 +22,7 @@ namespace dromozoa {
     argument_vector result;
     if (lua_istable(L, index)) {
       for (int i = 1; ; ++i) {
-        lua_geti(L, index, i);
+        luaX_get_field(L, index, i);
         if (const char* p = lua_tostring(L, -1)) {
           result.push_back(p);
           lua_pop(L, 1);

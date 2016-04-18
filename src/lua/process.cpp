@@ -37,7 +37,7 @@ namespace dromozoa {
       int dup2_stdio[3] = { -1, -1, -1 };
       if (lua_istable(L, 6)) {
         for (int i = 0; i < 3; ++i) {
-          lua_geti(L, 6, i);
+          luaX_get_field(L, 6, i);
           dup2_stdio[i] = to_fd(L, -1);
           lua_pop(L, 1);
         }
@@ -48,8 +48,7 @@ namespace dromozoa {
       int code = errno;
 
       if (pid != -1) {
-        luaX_push(L, pid);
-        lua_seti(L, 1, 1);
+        luaX_set_field(L, 1, 1, pid);
       }
       if (result == -1) {
         push_error(L, code);
@@ -71,12 +70,10 @@ namespace dromozoa {
       int code = errno;
 
       if (pid1 != -1) {
-        luaX_push(L, pid1);
-        lua_seti(L, 1, 1);
+        luaX_set_field(L, 1, 1, pid1);
       }
       if (pid2 != -1) {
-        luaX_push(L, pid2);
-        lua_seti(L, 1, 2);
+        luaX_set_field(L, 1, 2, pid2);
       }
       if (result == -1) {
         push_error(L, code);
