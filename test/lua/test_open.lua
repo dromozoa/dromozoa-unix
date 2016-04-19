@@ -18,8 +18,7 @@
 local uint32 = require "dromozoa.commons.uint32"
 local unix = require "dromozoa.unix"
 
--- local path = os.getenv("PATH")
--- local envp = unix.environ()
+os.remove("test.txt")
 
 local fd = assert(unix.open("test.txt", uint32.bor(unix.O_WRONLY, unix.O_CREAT, unix.O_CLOEXEC)))
 assert(fd:is_coe())
@@ -27,14 +26,8 @@ assert(fd:is_ndelay_off())
 fd:write("foo\n")
 fd:close()
 
---[[
-local pid = assert(unix.process():forkexec(path, { "ls", "-l" }, envp, "/", { [1] = fd, [2] = fd }))[1]
-local a, b, c = unix.wait()
--- print(a, b, c)
-assert(a == pid)
-assert(b == "exit")
-assert(c == 0)
-
-fd:write("bar\n")
+local fd = assert(unix.open("test.txt"))
+assert(fd:is_coe())
+assert(fd:is_ndelay_off())
+assert(fd:read(4) == "foo\n")
 fd:close()
-]]
