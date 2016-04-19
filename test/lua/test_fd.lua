@@ -18,22 +18,27 @@
 local uint32 = require "dromozoa.commons.uint32"
 local unix = require "dromozoa.unix"
 
+assert(unix.fd.get(0) == 0)
+assert(unix.fd.stdin:get() == 0)
+assert(not unix.fd.close(-2))
+
 local fd
 
 do
   local reader, writer = unix.pipe()
-  fd = { reader:coe():ndelay_on():get(), writer:get() }
+  assert(reader:is_coe())
+  assert(reader:is_ndelay_off())
+  assert(writer:is_coe())
+  assert(writer:is_ndelay_off())
+  fd = { reader:ndelay_on():get(), writer:get() }
   assert(reader:close())
-  assert(reader:close() == nil)
+  assert(not reader:close())
 end
 collectgarbage()
 collectgarbage()
 
-assert(unix.fd.get(0) == 0)
-assert(not unix.fd.close(-2))
-
 do
-  local reader, writer = unix.pipe(unix.O_CLOEXEC)
+  local reader, writer = unix.pipe()
   assert(reader:get() == fd[1])
   assert(writer:get() == fd[2])
   assert(reader:close():get() == -1)
@@ -41,32 +46,29 @@ do
 end
 
 do
-  local stdout = unix.fd(1, true)
-  stdout:write("foo\n")
+  local stdout = assert(unix.fd_ref(1))
+  assert(stdout:write("foo\n"))
 end
 collectgarbage()
 collectgarbage()
-unix.fd.write(1, "bar\n")
+assert(unix.fd.write(1, "bar\n"))
+assert(unix.fd.stdout:write("baz\n"))
+assert(unix.fd.stderr:write("qux\n"))
 
 assert(unix.STDIN_FILENO == 0)
 assert(unix.STDOUT_FILENO == 1)
 assert(unix.STDERR_FILENO == 2)
 
-unix.fd.stderr:write("baz\n")
--- print(json.encode(unix.fd))
-
-do
-  local reader, writer = unix.pipe(uint32.bor(unix.O_CLOEXEC, unix.O_NONBLOCK))
-  writer:write("foobarbaz")
-  assert(reader:read(3) == "foo")
-  assert(reader:read(3) == "bar")
-  assert(reader:read(3) == "baz")
-  local a, b, c = reader:read(3)
-  assert(a == nil)
-  assert(c == unix.EAGAIN or c == unix.EWOULDBLOCK)
-  writer:write("qux")
-  writer:close()
-  assert(reader:read(4) == "qux")
-  assert(reader:read(4) == "")
-  reader:close()
-end
+local reader, writer = assert(unix.pipe(uint32.bor(unix.O_CLOEXEC, unix.O_NONBLOCK)))
+assert(writer:write("foobarbaz"))
+assert(assert(reader:read(3)) == "foo")
+assert(assert(reader:read(3)) == "bar")
+assert(assert(reader:read(3)) == "baz")
+local a, b, c = reader:read(3)
+assert(a == nil)
+assert(c == unix.EAGAIN or c == unix.EWOULDBLOCK)
+assert(writer:write("qux"))
+assert(writer:close())
+assert(reader:read(4) == "qux")
+assert(reader:read(4) == "")
+assert(reader:close())

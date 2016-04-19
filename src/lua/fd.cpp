@@ -57,7 +57,7 @@ namespace dromozoa {
     }
 
     void impl_fd_ref(lua_State* L) {
-      int fd = check_fd(L, 2);
+      int fd = check_fd(L, 1);
       new_fd_ref(L, fd);
     }
   }
