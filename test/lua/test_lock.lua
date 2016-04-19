@@ -19,6 +19,8 @@ local unix = require "dromozoa.unix"
 
 local PATH = os.getenv("PATH")
 
+os.remove("test.lock")
+
 local reader1, writer1 = assert(unix.pipe())
 local reader2, writer2 = assert(unix.pipe())
 local process1 = assert(unix.process())
