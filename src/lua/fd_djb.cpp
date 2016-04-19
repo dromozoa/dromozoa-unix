@@ -15,6 +15,8 @@
 // You should have received a copy of the GNU General Public License
 // along with dromozoa-unix.  If not, see <http://www.gnu.org/licenses/>.
 
+#include <fcntl.h>
+
 #include <dromozoa/coe.hpp>
 #include <dromozoa/lock.hpp>
 #include <dromozoa/ndelay.hpp>
@@ -70,6 +72,33 @@ namespace dromozoa {
         luaX_push_success(L);
       }
     }
+
+    void impl_is_coe(lua_State* L) {
+      int result = fcntl(check_fd(L, 1), F_GETFD);
+      if (result == -1) {
+        push_error(L);
+      } else {
+        luaX_push(L, (result & FD_CLOEXEC) != 0);
+      }
+    }
+
+    void impl_is_ndelay_on(lua_State* L) {
+      int result = fcntl(check_fd(L, 1), F_GETFL);
+      if (result == -1) {
+        push_error(L);
+      } else {
+        luaX_push(L, (result & O_NONBLOCK) != 0);
+      }
+    }
+
+    void impl_is_ndelay_off(lua_State* L) {
+      int result = fcntl(check_fd(L, 1), F_GETFL);
+      if (result == -1) {
+        push_error(L);
+      } else {
+        luaX_push(L, (result & O_NONBLOCK) == 0);
+      }
+    }
   }
 
   void initialize_fd_djb(lua_State* L) {
@@ -79,5 +108,8 @@ namespace dromozoa {
     luaX_set_field(L, -1, "lock_un", impl_lock_un);
     luaX_set_field(L, -1, "ndelay_on", impl_ndelay_on);
     luaX_set_field(L, -1, "ndelay_off", impl_ndelay_off);
+    luaX_set_field(L, -1, "is_coe", impl_is_coe);
+    luaX_set_field(L, -1, "is_ndelay_on", impl_is_ndelay_on);
+    luaX_set_field(L, -1, "is_ndelay_off", impl_is_ndelay_off);
   }
 }

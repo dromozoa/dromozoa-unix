@@ -15,14 +15,19 @@
 -- You should have received a copy of the GNU General Public License
 -- along with dromozoa-unix.  If not, see <http://www.gnu.org/licenses/>.
 
+local uint32 = require "dromozoa.commons.uint32"
 local unix = require "dromozoa.unix"
 
-local path = os.getenv("PATH")
-local envp = unix.environ()
+-- local path = os.getenv("PATH")
+-- local envp = unix.environ()
 
-local fd = assert(unix.open("test.txt", unix.O_WRONLY + unix.O_CREAT + unix.O_CLOEXEC))
+local fd = assert(unix.open("test.txt", uint32.bor(unix.O_WRONLY, unix.O_CREAT, unix.O_CLOEXEC)))
+assert(fd:is_coe())
+assert(fd:is_ndelay_off())
 fd:write("foo\n")
+fd:close()
 
+--[[
 local pid = assert(unix.process():forkexec(path, { "ls", "-l" }, envp, "/", { [1] = fd, [2] = fd }))[1]
 local a, b, c = unix.wait()
 -- print(a, b, c)
@@ -32,3 +37,4 @@ assert(c == 0)
 
 fd:write("bar\n")
 fd:close()
+]]
