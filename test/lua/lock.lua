@@ -18,16 +18,23 @@
 local uint32 = require "dromozoa.commons.uint32"
 local unix = require "dromozoa.unix"
 
-local pid = unix.getpid()
+local mode = ...
 
-local fd = unix.open("test.lock", uint32.bor(unix.O_CREAT, unix.O_WRONLY), 384)
-print(pid, "locking")
-if fd:lock_exnb() == unix.resource_unavailable_try_again then
-  print(pid, "could not lock")
+local fd = assert(unix.open("test.lock", uint32.bor(unix.O_WRONLY, unix.O_CREAT, unix.O_CLOEXEC)))
+
+if mode == "1" then
+  assert(io.stdin:read(1) == "x")
+  local a, b, c = fd:lock_exnb()
+  assert(a == nil)
+  assert(c == unix.EWOULDBLOCK)
+  io.stdout:write("x")
+  io.stdout:flush()
+  assert(fd:lock_ex())
 else
-  print(pid, "locked")
-  unix.nanosleep({ tv_sec = 1, tv_nsec = 0 })
-  print(pid, "unlocking")
-  fd:lock_un()
-  print(pid, "unlocked")
+  assert(fd:lock_exnb())
+  io.stdout:write("x")
+  io.stdout:flush()
+  assert(io.stdin:read(1) == "x")
+  assert(unix.nanosleep(0.2))
+  assert(fd:lock_un())
 end

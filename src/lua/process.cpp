@@ -30,10 +30,10 @@ namespace dromozoa {
 
     void impl_forkexec(lua_State* L) {
       const char* path = luaL_checkstring(L, 2);
-      const char* chdir = lua_tostring(L, 5);
       luaL_checktype(L, 3, LUA_TTABLE);
       argument_vector argv = to_argument_vector(L, 3);
       argument_vector envp = to_argument_vector(L, 4);
+      const char* chdir = lua_tostring(L, 5);
       int dup2_stdio[3] = { -1, -1, -1 };
       if (lua_istable(L, 6)) {
         for (int i = 0; i < 3; ++i) {
