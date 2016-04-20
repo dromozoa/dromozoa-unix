@@ -108,21 +108,18 @@ namespace dromozoa {
       luaX_set_field(L, -1, "get", impl_get);
       luaX_set_field(L, -1, "close", impl_close);
 
-      new_fd_ref(L, 0);
-      luaX_set_field(L, -2, "stdin");
-      new_fd_ref(L, 1);
-      luaX_set_field(L, -2, "stdout");
-      new_fd_ref(L, 2);
-      luaX_set_field(L, -2, "stderr");
-
       initialize_fd_djb(L);
       initialize_fd_socket(L);
       initialize_fd_unistd(L);
     }
     luaX_set_field(L, -2, "fd");
-  }
 
-  void initialize_fd_ref(lua_State* L) {
     luaX_set_field(L, -1, "fd_ref", impl_fd_ref);
+    new_fd_ref(L, 0);
+    luaX_set_field(L, -2, "stdin");
+    new_fd_ref(L, 1);
+    luaX_set_field(L, -2, "stdout");
+    new_fd_ref(L, 2);
+    luaX_set_field(L, -2, "stderr");
   }
 }

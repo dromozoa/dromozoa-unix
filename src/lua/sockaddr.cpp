@@ -98,9 +98,7 @@ namespace dromozoa {
       initialize_sockaddr_netdb(L);
     }
     luaX_set_field(L, -2, "sockaddr");
-  }
 
-  void initialize_sockaddr_un(lua_State* L) {
     luaX_set_field(L, -1, "sockaddr_un", impl_sockaddr_un);
   }
 }

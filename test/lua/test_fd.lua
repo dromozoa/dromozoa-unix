@@ -19,7 +19,7 @@ local uint32 = require "dromozoa.commons.uint32"
 local unix = require "dromozoa.unix"
 
 assert(unix.fd.get(0) == 0)
-assert(unix.fd.stdin:get() == 0)
+assert(unix.stdin:get() == 0)
 assert(not unix.fd.close(-2))
 
 local fd
@@ -52,8 +52,8 @@ end
 collectgarbage()
 collectgarbage()
 assert(unix.fd.write(1, "bar\n"))
-assert(unix.fd.stdout:write("baz\n"))
-assert(unix.fd.stderr:write("qux\n"))
+assert(unix.stdout:write("baz\n"))
+assert(unix.stderr:write("qux\n"))
 
 assert(unix.STDIN_FILENO == 0)
 assert(unix.STDOUT_FILENO == 1)

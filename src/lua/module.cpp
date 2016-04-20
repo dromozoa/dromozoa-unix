@@ -30,7 +30,6 @@ namespace dromozoa {
   void initialize_error(lua_State* L);
   void initialize_fcntl(lua_State* L);
   void initialize_fd(lua_State* L);
-  void initialize_fd_ref(lua_State* L);
   void initialize_netdb(lua_State* L);
   void initialize_netinet(lua_State* L);
   void initialize_pathexec(lua_State* L);
@@ -40,7 +39,6 @@ namespace dromozoa {
   void initialize_selfpipe(lua_State* L);
   void initialize_signal(lua_State* L);
   void initialize_sockaddr(lua_State* L);
-  void initialize_sockaddr_un(lua_State* L);
   void initialize_stdlib(lua_State* L);
   void initialize_sys_socket(lua_State* L);
   void initialize_sys_stat(lua_State* L);
@@ -55,7 +53,6 @@ namespace dromozoa {
     initialize_error(L);
     initialize_fcntl(L);
     initialize_fd(L);
-    initialize_fd_ref(L);
     initialize_netdb(L);
     initialize_netinet(L);
     initialize_pathexec(L);
@@ -65,7 +62,6 @@ namespace dromozoa {
     initialize_selfpipe(L);
     initialize_signal(L);
     initialize_sockaddr(L);
-    initialize_sockaddr_un(L);
     initialize_stdlib(L);
     initialize_sys_socket(L);
     initialize_sys_stat(L);
