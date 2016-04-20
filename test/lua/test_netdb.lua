@@ -27,3 +27,5 @@ assert(ai.ai_socktype == unix.SOCK_STREAM)
 assert(ai.ai_addr:family() == unix.AF_INET)
 assert(host == "127.0.0.1")
 assert(tonumber(serv) == 80)
+
+assert(not unix.getaddrinfo())

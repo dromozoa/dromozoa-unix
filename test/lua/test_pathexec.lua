@@ -15,7 +15,36 @@
 -- You should have received a copy of the GNU General Public License
 -- along with dromozoa-unix.  If not, see <http://www.gnu.org/licenses/>.
 
+local sequence = require "dromozoa.commons.sequence"
+local sequence_writer = require "dromozoa.commons.sequence_writer"
+local string_reader = require "dromozoa.commons.string_reader"
 local unix = require "dromozoa.unix"
 
-local pid = assert(unix.process():forkexec(os.getenv("PATH"), { arg[-1], "test/lua/pathexec.lua", "ls", "-l" }))[1]
-assert(unix.wait() == pid)
+local PATH = os.getenv("PATH")
+local envp = unix.environ()
+sequence.push(envp, "foo=bar")
+
+local reader, writer = assert(unix.pipe())
+local process = assert(unix.process())
+assert(process:forkexec(PATH, { arg[-1], "test/lua/pathexec.lua" }, envp, nil, { [1] = writer }))
+assert(writer:close())
+
+local out = sequence_writer()
+while true do
+  local data = assert(reader:read(4096))
+  if data == "" then
+    break
+  else
+    out:write(data)
+  end
+end
+assert(reader:close())
+local reader = string_reader(out:concat())
+for line in reader:lines() do
+  assert(line ~= "foo=bar")
+end
+
+local a, b, c = assert(unix.wait())
+assert(a == process[1])
+assert(b == "exit")
+assert(c == 0)

@@ -23,15 +23,25 @@
 
 void test1() {
   dromozoa::argument_vector args;
-  assert(args.get() == 0);
+  const char* const* argv = args.get();
+  assert(argv == 0);
 }
 
 void test2() {
+  dromozoa::argument_vector args;
+  args.clear();
+  const char* const* argv = args.get();
+  assert(argv);
+  assert(argv[0] == 0);
+}
+
+void test3() {
   dromozoa::argument_vector args;
   args.push_back("foo");
   args.push_back("bar");
   args.push_back("baz");
   const char* const* argv = args.get();
+  assert(argv);
   assert(std::string(argv[0]) == "foo");
   assert(std::string(argv[1]) == "bar");
   assert(std::string(argv[2]) == "baz");
@@ -41,5 +51,6 @@ void test2() {
 int main(int, char*[]) {
   test1();
   test2();
+  test3();
   return 0;
 }
