@@ -30,18 +30,20 @@ namespace dromozoa {
         push_error(L);
       } else {
         lua_pushinteger(L, result);
-        if (WIFEXITED(status)) {
-          lua_pushliteral(L, "exit");
-          lua_pushinteger(L, WEXITSTATUS(status));
-        } else if (WIFSIGNALED(status)) {
-          lua_pushliteral(L, "signal");
-          lua_pushinteger(L, WTERMSIG(status));
-        } else if (WIFSTOPPED(status)) {
-          lua_pushliteral(L, "stop");
-          lua_pushinteger(L, WSTOPSIG(status));
-        } else if (WIFCONTINUED(status)) {
-          lua_pushliteral(L, "continue");
-          lua_pushinteger(L, SIGCONT);
+        if (result != 0) {
+          if (WIFEXITED(status)) {
+            lua_pushliteral(L, "exit");
+            lua_pushinteger(L, WEXITSTATUS(status));
+          } else if (WIFSIGNALED(status)) {
+            lua_pushliteral(L, "signal");
+            lua_pushinteger(L, WTERMSIG(status));
+          } else if (WIFSTOPPED(status)) {
+            lua_pushliteral(L, "stop");
+            lua_pushinteger(L, WSTOPSIG(status));
+          } else if (WIFCONTINUED(status)) {
+            lua_pushliteral(L, "continue");
+            lua_pushinteger(L, SIGCONT);
+          }
         }
       }
     }

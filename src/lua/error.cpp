@@ -58,6 +58,7 @@ namespace dromozoa {
     luaX_set_field(L, -1, "get_errno", impl_get_errno);
 
     luaX_set_field(L, -1, "EAGAIN", EAGAIN);
+    luaX_set_field(L, -1, "ECHILD", ECHILD);
     luaX_set_field(L, -1, "EINPROGRESS", EINPROGRESS);
     luaX_set_field(L, -1, "EINTR", EINTR);
     luaX_set_field(L, -1, "ENOENT", ENOENT);
