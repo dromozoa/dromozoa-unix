@@ -36,6 +36,15 @@ namespace dromozoa {
       }
     }
 
+    void impl_chdir(lua_State* L) {
+      const char* path = luaL_checkstring(L, 1);
+      if (chdir(path) == -1) {
+        push_error(L);
+      } else {
+        luaX_push_success(L);
+      }
+    }
+
     void impl_getcwd(lua_State* L) {
       long path_max = pathconf(".", _PC_PATH_MAX);
       if (path_max == -1) {
@@ -81,6 +90,7 @@ namespace dromozoa {
 
   void initialize_unistd(lua_State* L) {
     luaX_set_field(L, -1, "environ", impl_environ);
+    luaX_set_field(L, -1, "chdir", impl_chdir);
     luaX_set_field(L, -1, "getcwd", impl_getcwd);
     luaX_set_field(L, -1, "getuid", impl_getuid);
     luaX_set_field(L, -1, "getgid", impl_getgid);
