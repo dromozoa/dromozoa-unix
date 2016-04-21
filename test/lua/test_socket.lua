@@ -22,7 +22,8 @@ local addrinfo = assert(unix.getaddrinfo(nil, "0", { ai_socktype = unix.SOCK_STR
 local ai = addrinfo[1]
 assert(ai.ai_socktype == unix.SOCK_STREAM)
 
-local server = assert(unix.socket(ai.ai_family, ai.ai_socktype, ai.ai_protocol))
+local server = assert(unix.socket(ai.ai_family, uint32.bor(ai.ai_socktype, unix.SOCK_CLOEXEC), ai.ai_protocol))
+assert(server:is_coe())
 assert(server:getsockopt(unix.SOL_SOCKET, unix.SO_REUSEADDR) == 0)
 assert(server:setsockopt(unix.SOL_SOCKET, unix.SO_REUSEADDR, 1))
 assert(server:getsockopt(unix.SOL_SOCKET, unix.SO_REUSEADDR) ~= 0)
