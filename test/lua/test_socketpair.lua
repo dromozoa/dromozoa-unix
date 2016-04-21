@@ -15,30 +15,28 @@
 -- You should have received a copy of the GNU General Public License
 -- along with dromozoa-unix.  If not, see <http://www.gnu.org/licenses/>.
 
+local uint32 = require "dromozoa.commons.uint32"
 local unix = require "dromozoa.unix"
 
-local fd1, fd2 = assert(unix.socketpair(unix.AF_UNIX, unix.SOCK_STREAM))
-assert(fd1:coe())
-assert(fd2:coe())
+local fd1, fd2 = assert(unix.socketpair(unix.AF_UNIX, uint32.bor(unix.SOCK_STREAM, unix.SOCK_CLOEXEC)))
+assert(fd1:is_coe())
+assert(fd2:is_coe())
 
-local sa1 = fd1:getsockname()
+local sa1 = assert(fd1:getsockname())
 assert(sa1:family() == unix.AF_UNIX)
 assert(sa1:path() == "")
--- print(sa1:size())
--- print(("%q"):format(sa1:path()))
-local sa2 = fd1:getpeername()
+
+local sa2 = assert(fd1:getpeername())
 assert(sa2:family() == unix.AF_UNIX)
-assert(sa1:path())
--- print(sa2:size())
--- print(("%q"):format(sa2:path()))
+assert(sa2:path() == "")
 
 assert(fd1:getsockopt(unix.SOL_SOCKET, unix.SO_ERROR) == 0)
 assert(fd1:getsockopt(unix.SOL_SOCKET, unix.SO_RCVBUF) > 0);
 assert(fd1:getsockopt(unix.SOL_SOCKET, unix.SO_SNDBUF) > 0);
 
-fd1:write("foo")
-fd1:close()
+assert(fd1:write("foo"))
+assert(fd1:close())
 
 assert(fd2:read(4) == "foo")
 assert(fd2:read(4) == "")
-fd2:close()
+assert(fd2:close())
