@@ -26,3 +26,6 @@ local a, b, c = writer:write("x")
 assert(a == nil)
 assert(c == unix.EPIPE)
 print(b)
+
+assert(unix.kill(unix.getpid(), 0))
+assert(unix.kill(-unix.getpgrp(), 0))
