@@ -15,9 +15,22 @@
 -- You should have received a copy of the GNU General Public License
 -- along with dromozoa-unix.  If not, see <http://www.gnu.org/licenses/>.
 
+local uint32 = require "dromozoa.commons.uint32"
 local unix = require "dromozoa.unix"
 
--- print(("O_CLOEXEC: %08x"):format(unix.O_CLOEXEC))
--- print(("O_NONBLOCK: %08x"):format(unix.O_NONBLOCK))
 assert(unix.O_CLOEXEC)
 assert(unix.O_NONBLOCK)
+
+os.remove("test.txt")
+
+local fd = assert(unix.open("test.txt", uint32.bor(unix.O_WRONLY, unix.O_CREAT, unix.O_CLOEXEC)))
+assert(fd:is_coe())
+assert(fd:is_ndelay_off())
+fd:write("foo\n")
+fd:close()
+
+local fd = assert(unix.open("test.txt"))
+assert(fd:is_coe())
+assert(fd:is_ndelay_off())
+assert(fd:read(4) == "foo\n")
+fd:close()
