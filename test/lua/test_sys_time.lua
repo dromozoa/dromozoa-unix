@@ -19,8 +19,8 @@ local unix = require "dromozoa.unix"
 local gettimeofday = unix.gettimeofday
 
 local t1 = os.time()
-local t2 = gettimeofday()
-local t3 = gettimeofday()
+local t2 = unix.gettimeofday()
+local t3 = unix.gettimeofday()
 
 assert(os.difftime(t2.tv_sec, t1) < 2)
 
@@ -31,4 +31,3 @@ if u < 0 then
   s = s - 1
 end
 assert(s == 0)
--- print(("%d.%06d"):format(s, u))
