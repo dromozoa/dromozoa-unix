@@ -31,12 +31,9 @@ assert(fd:write("foo\n"))
 assert(fd:close())
 
 local fd = assert(unix.open(tmpname))
+assert(fd:is_coe())
 assert(fd:read(4) == "foo\n")
 assert(fd:read(4) == "")
 assert(fd:close())
 
 assert(os.remove(tmpname))
-
-
-
-

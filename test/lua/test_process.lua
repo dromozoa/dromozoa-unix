@@ -66,10 +66,13 @@ assert(a == process[1])
 assert(b == "exit")
 assert(c == 0)
 
+local t1 = os.time()
 assert(reader:read(4) == "foo\n")
 assert(unix.kill(process[2], 0))
 assert(unix.kill(process[2]))
 assert(reader:read(4) == "")
+local t2 = os.time()
+assert(os.difftime(t2, t1) < 5)
 
 local process = unix.process()
 local a, b, c = process:forkexec_daemon(PATH, { "no such command" })

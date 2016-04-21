@@ -43,6 +43,7 @@ namespace dromozoa {
     luaX_set_field(L, -1, "O_NONBLOCK", O_NONBLOCK);
     luaX_set_field(L, -1, "O_RDONLY", O_RDONLY);
     luaX_set_field(L, -1, "O_RDWR", O_RDWR);
+    luaX_set_field(L, -1, "O_SYNC", O_SYNC);
     luaX_set_field(L, -1, "O_WRONLY", O_WRONLY);
   }
 }
