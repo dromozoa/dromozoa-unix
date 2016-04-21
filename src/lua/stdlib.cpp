@@ -15,10 +15,13 @@
 // You should have received a copy of the GNU General Public License
 // along with dromozoa-unix.  If not, see <http://www.gnu.org/licenses/>.
 
+#include <fcntl.h>
 #include <limits.h>
 #include <stdlib.h>
 
 #include <vector>
+
+#include <dromozoa/compat_mkostemp.hpp>
 
 #include "common.hpp"
 
@@ -56,8 +59,9 @@ namespace dromozoa {
     void impl_mkstemp(lua_State* L) {
       size_t size = 0;
       const char* tmpl = luaL_checklstring(L, 1, &size);
+      int flags = luaX_opt_integer<int>(L, 2, O_CLOEXEC);
       std::vector<char> buffer(tmpl, tmpl + size + 1);
-      int result = mkstemp(&buffer[0]);
+      int result = compat_mkostemp(&buffer[0], flags);
       if (result == -1) {
         push_error(L);
       } else {

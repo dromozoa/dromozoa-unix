@@ -26,9 +26,10 @@ AC_CONFIG_FILES([Makefile src/lib/Makefile src/lua/Makefile test/lib/Makefile])
 
 AC_PROG_CXX
 AC_CHECK_FUNCS([accept4])
-AC_CHECK_FUNCS([epoll_create])
 AC_CHECK_FUNCS([epoll_create1])
+AC_CHECK_FUNCS([epoll_create])
 AC_CHECK_FUNCS([kqueue])
+AC_CHECK_FUNCS([mkostemp])
 AC_CHECK_FUNCS([pipe2])
 
 AX_PTHREAD()

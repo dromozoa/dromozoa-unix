@@ -58,7 +58,7 @@ assert(c == 1)
 local reader, writer = assert(unix.pipe(0))
 assert(reader:coe())
 local process = assert(unix.process())
-assert(process:forkexec_daemon(PATH, { "sh", "-c", "echo foo >&" .. writer:get() .. "; sleep 10" }))
+assert(process:forkexec_daemon(PATH, { "sh", "-c", "echo foo >&" .. writer:get() .. "; exec sleep 10" }))
 assert(writer:close())
 
 local a, b, c = assert(unix.wait())

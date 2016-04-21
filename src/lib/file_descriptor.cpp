@@ -19,6 +19,7 @@
 #include <unistd.h>
 
 #include <dromozoa/compat_strerror.hpp>
+#include <dromozoa/errno_saver.hpp>
 #include <dromozoa/file_descriptor.hpp>
 #include <dromozoa/unexpected.hpp>
 
@@ -29,6 +30,7 @@ namespace dromozoa {
 
   file_descriptor::~file_descriptor() {
     if (fd_ != -1) {
+      errno_saver save;
       if (close() == -1) {
         DROMOZOA_UNEXPECTED(compat_strerror(errno));
       }
