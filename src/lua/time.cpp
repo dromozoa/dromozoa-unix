@@ -27,9 +27,7 @@ namespace dromozoa {
         luaX_push_success(L);
       } else {
         push_error(L);
-        lua_newtable(L);
-        luaX_set_field(L, -1, "tv_sec", tv2.tv_sec);
-        luaX_set_field(L, -1, "tv_nsec", tv2.tv_nsec);
+        new_timespec(L, tv2);
       }
     }
   }

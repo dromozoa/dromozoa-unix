@@ -25,17 +25,10 @@
 
 namespace dromozoa {
   namespace {
-    void push_timespec(lua_State* L, const timespec& tv) {
-      lua_newtable(L);
-      luaX_set_field(L, -1, "tv_sec", tv.tv_sec);
-      luaX_set_field(L, -1, "tv_nsec", tv.tv_nsec);
-      luaX_set_metatable(L, "dromozoa.unix.timespec");
-    }
-
     void impl_call(lua_State* L) {
       struct timespec tv = {};
       check_timespec(L, 2, tv);
-      push_timespec(L, tv);
+      new_timespec(L, tv);
     }
 
     void impl_now(lua_State* L) {
@@ -103,7 +96,7 @@ namespace dromozoa {
         ++tv1.tv_sec;
         tv1.tv_nsec -= 1000000000;
       }
-      push_timespec(L, tv1);
+      new_timespec(L, tv1);
     }
 
     void impl_sub(lua_State* L) {
@@ -117,7 +110,7 @@ namespace dromozoa {
         --tv1.tv_sec;
         tv1.tv_nsec += 1000000000;
       }
-      push_timespec(L, tv1);
+      new_timespec(L, tv1);
     }
 
     void impl_eq(lua_State* L) {
@@ -151,6 +144,13 @@ namespace dromozoa {
         return luaX_push(L, tv1.tv_sec <= tv2.tv_sec);
       }
     }
+  }
+
+  void new_timespec(lua_State* L, const timespec& tv) {
+    lua_newtable(L);
+    luaX_set_field(L, -1, "tv_sec", tv.tv_sec);
+    luaX_set_field(L, -1, "tv_nsec", tv.tv_nsec);
+    luaX_set_metatable(L, "dromozoa.unix.timespec");
   }
 
   bool check_timespec(lua_State* L, int n, struct timespec& tv) {
