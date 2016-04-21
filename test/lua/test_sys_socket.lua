@@ -35,3 +35,26 @@ local host, serv = assert(sa:getnameinfo(uint32.bor(unix.NI_NUMERICHOST, unix.NI
 assert(host == "0.0.0.0" or host == "::")
 assert(tonumber(serv) > 0)
 assert(server:close())
+
+local fd1, fd2 = assert(unix.socketpair(unix.AF_UNIX, uint32.bor(unix.SOCK_STREAM, unix.SOCK_CLOEXEC)))
+assert(fd1:is_coe())
+assert(fd2:is_coe())
+
+local sa1 = assert(fd1:getsockname())
+assert(sa1:family() == unix.AF_UNIX)
+assert(sa1:path() == "")
+
+local sa2 = assert(fd1:getpeername())
+assert(sa2:family() == unix.AF_UNIX)
+assert(sa2:path() == "")
+
+assert(fd1:getsockopt(unix.SOL_SOCKET, unix.SO_ERROR) == 0)
+assert(fd1:getsockopt(unix.SOL_SOCKET, unix.SO_RCVBUF) > 0);
+assert(fd1:getsockopt(unix.SOL_SOCKET, unix.SO_SNDBUF) > 0);
+
+assert(fd1:write("foo"))
+assert(fd1:close())
+
+assert(fd2:read(4) == "foo")
+assert(fd2:read(4) == "")
+assert(fd2:close())
