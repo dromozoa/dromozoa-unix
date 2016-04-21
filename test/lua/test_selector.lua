@@ -15,25 +15,26 @@
 -- You should have received a copy of the GNU General Public License
 -- along with dromozoa-unix.  If not, see <http://www.gnu.org/licenses/>.
 
+local uint32 = require "dromozoa.commons.uint32"
 local unix = require "dromozoa.unix"
 
-unix.selfpipe.open()
-unix.block_signal(unix.SIGCHLD)
+local reader, writer = assert(unix.pipe(uint32.bor(unix.O_CLOEXEC, unix.O_NONBLOCK)))
 
-local PATH = os.getenv("PATH")
+local selector = assert(unix.selector(1024))
+assert(selector:add(reader, unix.SELECTOR_READ))
 
-local selector = unix.selector(1, unix.O_CLOEXEC)
-selector:add(unix.selfpipe.get(), 1)
+assert(selector:select(0.2) == 0)
 
-local pid = assert(unix.process():forkexec(PATH, { "sleep", "1" }))[1]
-assert(unix.wait(-1, unix.WNOHANG) == 0)
-unix.unblock_signal(unix.SIGCHLD)
-assert("select", selector:select(unix.timespec(3)) == unix.interrupted)
-assert("select", selector:select(unix.timespec(3)) == 1)
-unix.block_signal(unix.SIGCHLD)
-assert("selfpipe", unix.selfpipe.read() == 1)
-assert(unix.wait(-1, unix.WNOHANG) == pid)
+assert(writer:write("x"))
+assert(selector:select() == 1)
+assert(reader:read(1) == "x")
+local a, b, c = reader:read(1)
+assert(a == nil)
+assert(c == unix.EAGAIN or c == unix.EWOULDBLOCK)
 
-selector:del(unix.selfpipe.get())
-selector:close()
-unix.selfpipe.close()
+assert(selector:select(0.2) == 0)
+
+assert(writer:close())
+assert(selector:select() == 1)
+assert(reader:read(1) == "")
+assert(reader:close())
