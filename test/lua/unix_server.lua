@@ -15,35 +15,19 @@
 -- You should have received a copy of the GNU General Public License
 -- along with dromozoa-unix.  If not, see <http://www.gnu.org/licenses/>.
 
+local uint32 = require "dromozoa.commons.uint32"
 local unix = require "dromozoa.unix"
 
-local abstract = 1
-local server = assert(unix.socket(unix.AF_UNIX, unix.SOCK_STREAM))
-local result, message, code = server:bind(unix.sockaddr_un("\0dromozoa-unix/test.sock"))
-if not result then
-  if code == unix.ENOENT then
-    abstract = 0
-    os.remove("test.sock")
-    assert(server:bind(unix.sockaddr_un("test.sock")))
-  else
-    assert(result, message, code)
-  end
-end
+local server = assert(unix.socket(unix.AF_UNIX, uint32.bor(unix.SOCK_STREAM, unix.SOCK_CLOEXEC)))
+os.remove("test.sock")
+assert(server:bind(unix.sockaddr_un("test.sock")))
 assert(server:listen())
-io.stdout:write(abstract, "\n")
-io.stdout:flush()
-io.stdout:close()
+unix.stdout:close()
 
-local fd, sa = server:accept(unix.O_CLOEXEC)
-while true do
-  local result, message, code = fd:read(256)
-  if result and #result > 0 then
-    assert(result == "foo\n")
-    -- io.stderr:write(result)
-    assert(fd:write("bar\n") == 4)
-  else
-    break
-  end
-end
+local fd, sa = assert(server:accept())
+assert(fd:is_coe())
+assert(fd:read(1) == "x")
+assert(fd:read(1) == "")
+assert(fd:write("x"))
 assert(fd:close())
 assert(server:close())
