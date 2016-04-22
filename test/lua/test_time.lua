@@ -17,20 +17,35 @@
 
 local unix = require "dromozoa.unix"
 
-unix.set_log_level(2)
+assert(unix.block_signal(unix.SIGCHLD))
+assert(unix.selfpipe.open())
 
-local path = os.getenv("PATH")
-local envp = unix.environ()
+local PATH = os.getenv("PATH")
 
-local fd = assert(unix.open("test.txt", unix.O_WRONLY + unix.O_CREAT + unix.O_CLOEXEC))
-fd:write("foo\n")
+assert(unix.nanosleep(0.2))
 
-local pid = assert(unix.process():forkexec(path, { "ls", "-l" }, envp, "/", { [1] = fd, [2] = fd }))[1]
-local a, b, c = unix.wait()
--- print(a, b, c)
-assert(a == pid)
+local a, b, c, d = unix.nanosleep(-1)
+assert(a == nil)
+assert(d == unix.timespec())
+print(b)
+
+local process = assert(unix.process())
+assert(process:forkexec(PATH, { arg[-1], "-e", "local unix = require \"dromozoa.unix\" unix.nanosleep(0.2)" }))
+
+assert(unix.unblock_signal(unix.SIGCHLD))
+local a, b, c, d = unix.nanosleep(10)
+assert(unix.block_signal(unix.SIGCHLD))
+
+assert(a == nil)
+assert(c == unix.EINTR)
+assert(getmetatable(d))
+assert(d > unix.timespec(5))
+print(b)
+print(d:tonumber())
+
+local a, b, c = assert(unix.wait())
+assert(a == process[1])
 assert(b == "exit")
 assert(c == 0)
 
-fd:write("bar\n")
-fd:close()
+assert(unix.selfpipe.close())

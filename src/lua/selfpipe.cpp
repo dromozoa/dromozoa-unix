@@ -15,53 +15,45 @@
 // You should have received a copy of the GNU General Public License
 // along with dromozoa-unix.  If not, see <http://www.gnu.org/licenses/>.
 
-extern "C" {
-#include <lua.h>
-}
-
-#include <fcntl.h>
-#include <signal.h>
-#include <unistd.h>
-
 #include <dromozoa/selfpipe.hpp>
 
 #include "common.hpp"
 
 namespace dromozoa {
   namespace {
-    int impl_open(lua_State* L) {
+    void impl_open(lua_State* L) {
       if (selfpipe_open() == -1) {
-        return push_error(L);
+        push_error(L);
       } else {
-        return push_success(L);
+        luaX_push_success(L);
       }
     }
 
-    int impl_close(lua_State* L) {
+    void impl_close(lua_State* L) {
       if (selfpipe_close() == -1) {
-        return push_error(L);
+        push_error(L);
       } else {
-        return push_success(L);
+        luaX_push_success(L);
       }
     }
 
-    int impl_get(lua_State* L) {
-      lua_pushinteger(L, selfpipe_get());
-      return 1;
+    void impl_get(lua_State* L) {
+      luaX_push(L, selfpipe_get());
     }
 
-    int impl_read(lua_State* L) {
-      lua_pushinteger(L, selfpipe_read());
-      return 1;
+    void impl_read(lua_State* L) {
+      luaX_push(L, selfpipe_read());
     }
   }
 
-  int open_selfpipe(lua_State* L) {
+  void initialize_selfpipe(lua_State* L) {
     lua_newtable(L);
-    function<impl_open>::set_field(L, "open");
-    function<impl_close>::set_field(L, "close");
-    function<impl_get>::set_field(L, "get");
-    function<impl_read>::set_field(L, "read");
-    return 1;
+    {
+      luaX_set_field(L, -1, "open", impl_open);
+      luaX_set_field(L, -1, "close", impl_close);
+      luaX_set_field(L, -1, "get", impl_get);
+      luaX_set_field(L, -1, "read", impl_read);
+    }
+    luaX_set_field(L, -2, "selfpipe");
   }
 }

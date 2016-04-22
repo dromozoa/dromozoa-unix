@@ -31,18 +31,17 @@
 
 namespace dromozoa {
   namespace {
-    int push_netdb_error(lua_State* L, int code) {
-      lua_pushnil(L);
+    void push_netdb_error(lua_State* L, int code) {
+      luaX_push(L, luaX_nil);
       if (const char* what = gai_strerror(code)) {
-        lua_pushstring(L, what);
+        luaX_push(L, what);
       } else {
         lua_pushfstring(L, "error number %d", code);
       }
-      lua_pushinteger(L, code);
-      return 3;
+      luaX_push(L, code);
     }
 
-    int impl_getaddrinfo(lua_State* L) {
+    void impl_getaddrinfo(lua_State* L) {
       const char* nodename = lua_tostring(L, 1);
       const char* servname = lua_tostring(L, 2);
       struct addrinfo* result = 0;
@@ -51,85 +50,73 @@ namespace dromozoa {
         code = getaddrinfo(nodename, servname, 0, &result);
       } else {
         struct addrinfo hints = {};
-        lua_getfield(L, 3, "ai_flags");
-        hints.ai_flags = luaL_optinteger(L, -1, AI_V4MAPPED | AI_ADDRCONFIG);
-        lua_pop(L, 1);
-        lua_getfield(L, 3, "ai_family");
-        hints.ai_family = luaL_optinteger(L, -1, AF_UNSPEC);
-        lua_pop(L, 1);
-        lua_getfield(L, 3, "ai_socktype");
-        hints.ai_socktype = luaL_optinteger(L, -1, 0);
-        lua_pop(L, 1);
-        lua_getfield(L, 3, "ai_protocol");
-        hints.ai_protocol = luaL_optinteger(L, -1, 0);
-        lua_pop(L, 1);
+        hints.ai_flags = luaX_opt_integer_field<int>(L, 3, "ai_flags", AI_V4MAPPED | AI_ADDRCONFIG);
+        hints.ai_family = luaX_opt_integer_field<int>(L, 3, "ai_family", AF_UNSPEC);
+        hints.ai_socktype = luaX_opt_integer_field<int>(L, 3, "ai_socktype", 0);
+        hints.ai_protocol = luaX_opt_integer_field<int>(L, 3, "ai_protocol", 0);
         code = getaddrinfo(nodename, servname, &hints, &result);
       }
       if (code == 0) {
         lua_newtable(L);
         int i = 1;
-        for (struct addrinfo* ai = result; ai; ai = ai->ai_next, ++i) {
-          lua_pushinteger(L, i);
+        for (const struct addrinfo* ai = result; ai; ai = ai->ai_next, ++i) {
           lua_newtable(L);
-          set_field(L, "ai_family", ai->ai_family);
-          set_field(L, "ai_socktype", ai->ai_socktype);
-          set_field(L, "ai_protocol", ai->ai_protocol);
-          set_field(L, "ai_addrlen", ai->ai_addrlen);
+          luaX_set_field(L, -1, "ai_family", ai->ai_family);
+          luaX_set_field(L, -1, "ai_socktype", ai->ai_socktype);
+          luaX_set_field(L, -1, "ai_protocol", ai->ai_protocol);
+          luaX_set_field(L, -1, "ai_addrlen", ai->ai_addrlen);
           if (ai->ai_addr) {
             new_sockaddr(L, ai->ai_addr, ai->ai_addrlen);
-            lua_setfield(L, -2, "ai_addr");
+            luaX_set_field(L, -2, "ai_addr");
           }
           if (ai->ai_canonname) {
-            lua_pushstring(L, ai->ai_canonname);
-            lua_setfield(L, -2, "ai_canonname");
+            luaX_set_field(L, -1, "ai_canonname", ai->ai_canonname);
           }
-          lua_settable(L, -3);
+          luaX_set_field(L, -2, i);
         }
         freeaddrinfo(result);
-        return 1;
       } else {
-        return push_netdb_error(L, code);
+        push_netdb_error(L, code);
       }
     }
 
-    int impl_getnameinfo(lua_State* L) {
+    void impl_getnameinfo(lua_State* L) {
+      const socket_address* address = check_sockaddr(L, 1);
+      int flags = luaX_opt_integer<int>(L, 2, 0);
       std::vector<char> nodename(NI_MAXHOST);
       std::vector<char> servname(NI_MAXSERV);
-      const socket_address* address = get_sockaddr(L, 1);
-      int flags = luaL_optinteger(L, 2, 0);
       int code = getnameinfo(address->get(), address->size(), &nodename[0], nodename.size(), &servname[0], servname.size(), flags);
       if (code == 0) {
-        lua_pushstring(L, &nodename[0]);
-        lua_pushstring(L, &servname[0]);
-        return 2;
+        luaX_push(L, &nodename[0]);
+        luaX_push(L, &servname[0]);
       } else {
-        return push_netdb_error(L, code);
+        push_netdb_error(L, code);
       }
     }
   }
 
   void initialize_netdb(lua_State* L) {
-    function<impl_getaddrinfo>::set_field(L, "getaddrinfo");
+    luaX_set_field(L, -1, "getaddrinfo", impl_getaddrinfo);
 
-    DROMOZOA_BIND_SET_FIELD(L, AI_PASSIVE);
-    DROMOZOA_BIND_SET_FIELD(L, AI_CANONNAME);
-    DROMOZOA_BIND_SET_FIELD(L, AI_NUMERICHOST);
-    DROMOZOA_BIND_SET_FIELD(L, AI_NUMERICSERV);
-    DROMOZOA_BIND_SET_FIELD(L, AI_V4MAPPED);
-    DROMOZOA_BIND_SET_FIELD(L, AI_ALL);
-    DROMOZOA_BIND_SET_FIELD(L, AI_ADDRCONFIG);
+    luaX_set_field(L, -1, "AI_PASSIVE", AI_PASSIVE);
+    luaX_set_field(L, -1, "AI_CANONNAME", AI_CANONNAME);
+    luaX_set_field(L, -1, "AI_NUMERICHOST", AI_NUMERICHOST);
+    luaX_set_field(L, -1, "AI_NUMERICSERV", AI_NUMERICSERV);
+    luaX_set_field(L, -1, "AI_V4MAPPED", AI_V4MAPPED);
+    luaX_set_field(L, -1, "AI_ALL", AI_ALL);
+    luaX_set_field(L, -1, "AI_ADDRCONFIG", AI_ADDRCONFIG);
 
-    DROMOZOA_BIND_SET_FIELD(L, NI_NOFQDN);
-    DROMOZOA_BIND_SET_FIELD(L, NI_NUMERICHOST);
-    DROMOZOA_BIND_SET_FIELD(L, NI_NAMEREQD);
-    DROMOZOA_BIND_SET_FIELD(L, NI_NUMERICSERV);
+    luaX_set_field(L, -1, "NI_NOFQDN", NI_NOFQDN);
+    luaX_set_field(L, -1, "NI_NUMERICHOST", NI_NUMERICHOST);
+    luaX_set_field(L, -1, "NI_NAMEREQD", NI_NAMEREQD);
+    luaX_set_field(L, -1, "NI_NUMERICSERV", NI_NUMERICSERV);
 #ifdef NI_NUMERICSCOPE
-    DROMOZOA_BIND_SET_FIELD(L, NI_NUMERICSCOPE);
+    luaX_set_field(L, -1, "NI_NUMERICSCOPE", NI_NUMERICSCOPE);
 #endif
-    DROMOZOA_BIND_SET_FIELD(L, NI_DGRAM);
+    luaX_set_field(L, -1, "NI_DGRAM", NI_DGRAM);
   }
 
-  void initialize_getnameinfo(lua_State* L) {
-    function<impl_getnameinfo>::set_field(L, "getnameinfo");
+  void initialize_sockaddr_netdb(lua_State* L) {
+    luaX_set_field(L, -1, "getnameinfo", impl_getnameinfo);
   }
 }

@@ -15,7 +15,6 @@
 // You should have received a copy of the GNU General Public License
 // along with dromozoa-unix.  If not, see <http://www.gnu.org/licenses/>.
 
-#include <assert.h>
 #include <errno.h>
 #include <stdlib.h>
 
@@ -23,13 +22,19 @@
 
 #include <dromozoa/pathexec.hpp>
 
-void assert_pathexec_buffer_size(const char* path, const char* command, size_t size) {
-  const char* argv[] = { command, 0 };
-  assert(dromozoa::pathexec_buffer_size(path, argv) == size);
-}
+#include "assert.h"
+
+#define assert_pathexec_buffer_size(path, command, size) \
+  do { \
+    const char* argv[] = { (command), 0 }; \
+    size_t result = dromozoa::pathexec_buffer_size((path), argv); \
+    assert("assert_pathexec_buffer_size" && (result == (size))); \
+  } while (false)
 
 int main(int, char*[]) {
   assert_pathexec_buffer_size(0, "/foo", 0);
+  assert_pathexec_buffer_size(0, "./foo", 0);
+  assert_pathexec_buffer_size(0, "foo/bar", 0);
   assert_pathexec_buffer_size("", "foo", 6);
   assert_pathexec_buffer_size(".", "foo", 6);
   assert_pathexec_buffer_size(":", "foo", 6);

@@ -15,47 +15,46 @@
 // You should have received a copy of the GNU General Public License
 // along with dromozoa-unix.  If not, see <http://www.gnu.org/licenses/>.
 
-#include <errno.h>
+#include <unistd.h>
 
-#include <dromozoa/lock.hpp>
+#include <vector>
 
 #include "common.hpp"
 
 namespace dromozoa {
   namespace {
-    int impl_lock_ex(lua_State* L) {
-      if (lock_ex(get_fd(L, 1)) == -1) {
-        return push_error(L);
+    void impl_read(lua_State* L) {
+      int fd = check_fd(L, 1);
+      size_t size = luaX_check_integer<size_t>(L, 2);
+      std::vector<char> buffer(size);
+      ssize_t result = read(fd, &buffer[0], buffer.size());
+      if (result == -1) {
+        push_error(L);
       } else {
-        return push_success(L);
+        lua_pushlstring(L, &buffer[0], result);
       }
     }
 
-    int impl_lock_exnb(lua_State* L) {
-      if (lock_exnb(get_fd(L, 1)) == -1) {
-        int code = errno;
-        if (code == EWOULDBLOCK) {
-          return push_resource_unavailable_try_again(L);
+    void impl_write(lua_State* L) {
+      size_t size = 0;
+      const char* buffer = luaL_checklstring(L, 2, &size);
+      size_t i = luaX_opt_range_i(L, 3, size);
+      size_t j = luaX_opt_range_j(L, 4, size);
+      if (i < j) {
+        ssize_t result = write(check_fd(L, 1), buffer + i, j - i);
+        if (result == -1) {
+          push_error(L);
         } else {
-          return push_error(L);
+          luaX_push(L, result);
         }
       } else {
-        return push_success(L);
-      }
-    }
-
-    int impl_lock_un(lua_State* L) {
-      if (lock_un(get_fd(L, 1)) == -1) {
-        return push_error(L);
-      } else {
-        return push_success(L);
+        luaX_push(L, 0);
       }
     }
   }
 
-  void initialize_lock(lua_State* L) {
-    set_field(L, "lock_ex", function<impl_lock_ex>());
-    set_field(L, "lock_exnb", function<impl_lock_exnb>());
-    set_field(L, "lock_un", function<impl_lock_un>());
+  void initialize_fd_unistd(lua_State* L) {
+    luaX_set_field(L, -1, "read", impl_read);
+    luaX_set_field(L, -1, "write", impl_write);
   }
 }

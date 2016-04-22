@@ -15,34 +15,19 @@
 // You should have received a copy of the GNU General Public License
 // along with dromozoa-unix.  If not, see <http://www.gnu.org/licenses/>.
 
-#include <errno.h>
-#include <stddef.h>
-#include <unistd.h>
+#ifndef DROMOZOA_ASSERT_HPP
+#define DROMOZOA_ASSERT_HPP
 
-#include <vector>
+#include <assert.h>
+#include <fcntl.h>
 
-#include "common.hpp"
+#define assert_coe(fd) \
+  assert("assert_coe" && (fcntl((fd), F_GETFD) & FD_CLOEXEC))
 
-namespace dromozoa {
-  namespace {
-    int impl_read(lua_State* L) {
-      std::vector<char> buffer(luaL_checkinteger(L, 2));
-      ssize_t result = read(get_fd(L, 1), &buffer[0], buffer.size());
-      if (result == -1) {
-        int code = errno;
-        if (code == EAGAIN || code == EWOULDBLOCK) {
-          return push_resource_unavailable_try_again(L);
-        } else {
-          return push_error(L, code);
-        }
-      } else {
-        lua_pushlstring(L, &buffer[0], result);
-        return 1;
-      }
-    }
-  }
+#define assert_ndelay_on(fd) \
+  assert("assert_ndelay_on" && (fcntl((fd), F_GETFL) & O_NONBLOCK))
 
-  void initialize_read(lua_State* L) {
-    function<impl_read>::set_field(L, "read");
-  }
-}
+#define assert_ndelay_off(fd) \
+  assert("assert_ndelay_off" && !(fcntl((fd), F_GETFL) & O_NONBLOCK))
+
+#endif

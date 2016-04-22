@@ -15,22 +15,21 @@
 // You should have received a copy of the GNU General Public License
 // along with dromozoa-unix.  If not, see <http://www.gnu.org/licenses/>.
 
-#include <dromozoa/coe.hpp>
+#include <errno.h>
 
-#include "common.hpp"
+#include <dromozoa/errno_saver.hpp>
 
-namespace dromozoa {
-  namespace {
-    int impl_coe(lua_State* L) {
-      if (coe(get_fd(L, 1)) == -1) {
-        return push_error(L);
-      } else {
-        return push_success(L);
-      }
-    }
+#include "assert.hpp"
+
+int main(int, char*[]) {
+  errno = ENOENT;
+  assert(errno == ENOENT);
+  {
+    dromozoa::errno_saver save;
+    assert(errno == ENOENT);
+    errno = EINTR;
+    assert(errno == EINTR);
   }
-
-  void initialize_coe(lua_State* L) {
-    set_field(L, "coe", function<impl_coe>());
-  }
+  assert(errno == ENOENT);
+  return 0;
 }

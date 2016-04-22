@@ -128,7 +128,7 @@ namespace dromozoa {
         }
 
         if (dup2_null) {
-          file_descriptor(open("/dev/null", O_RDWR, 0)).swap(null_fd_);
+          file_descriptor(open("/dev/null", O_RDWR | O_CLOEXEC, 0)).swap(null_fd_);
           if (!null_fd_.valid()) {
             die();
           }

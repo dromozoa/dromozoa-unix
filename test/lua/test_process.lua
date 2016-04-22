@@ -17,7 +17,6 @@
 
 local sequence = require "dromozoa.commons.sequence"
 local sequence_writer = require "dromozoa.commons.sequence_writer"
-local string_reader = require "dromozoa.commons.string_reader"
 local unix = require "dromozoa.unix"
 
 local PATH = os.getenv("PATH")
@@ -26,7 +25,7 @@ sequence.push(envp, "foo=bar")
 
 local reader, writer = assert(unix.pipe())
 local process = assert(unix.process())
-assert(process:forkexec(PATH, { arg[-1], "test/lua/pathexec.lua" }, envp, nil, { [1] = writer }))
+assert(process:forkexec(PATH, { "sh", "-c", "pwd; echo \"$foo\"" }, envp, "/", { [1] = writer }))
 assert(writer:close())
 
 local out = sequence_writer()
@@ -39,10 +38,46 @@ while true do
   end
 end
 assert(reader:close())
-local reader = string_reader(out:concat())
-for line in reader:lines() do
-  assert(line ~= "foo=bar")
-end
+assert(out:concat() == "/\nbar\n")
+
+local a, b, c = assert(unix.wait())
+assert(a == process[1])
+assert(b == "exit")
+assert(c == 0)
+
+local process = unix.process()
+local a, b, c = process:forkexec(PATH, { "no such command" })
+assert(a == nil)
+assert(c == unix.ENOENT)
+
+local a, b, c = assert(unix.wait())
+assert(a == process[1])
+assert(b == "exit")
+assert(c == 1)
+
+local reader, writer = assert(unix.pipe(0))
+assert(reader:coe())
+local process = assert(unix.process())
+assert(process:forkexec_daemon(PATH, { "sh", "-c", "echo foo >&" .. writer:get() .. "; exec sleep 10" }))
+assert(writer:close())
+
+local a, b, c = assert(unix.wait())
+assert(a == process[1])
+assert(b == "exit")
+assert(c == 0)
+
+local t1 = unix.timespec.now()
+assert(reader:read(4) == "foo\n")
+assert(unix.kill(process[2], 0))
+assert(unix.kill(process[2]))
+assert(reader:read(4) == "")
+local t2 = unix.timespec.now()
+assert(t2 - t1 < unix.timespec(5))
+
+local process = unix.process()
+local a, b, c = process:forkexec_daemon(PATH, { "no such command" })
+assert(a == nil)
+assert(c == unix.ENOENT)
 
 local a, b, c = assert(unix.wait())
 assert(a == process[1])

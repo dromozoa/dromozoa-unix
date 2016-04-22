@@ -21,10 +21,8 @@
 #include <time.h>
 
 namespace dromozoa {
-  enum {
-    SELECTOR_READ = 1,
-    SELECTOR_WRITE = 2,
-  };
+  static const int SELECTOR_READ = 1;
+  static const int SELECTOR_WRITE = 2;
 
   class selector {
   public:

@@ -16,17 +16,18 @@
 # along with dromozoa-unix.  If not, see <http://www.gnu.org/licenses/>.
 
 ACLOCAL_AMFLAGS = -I m4
-SUBDIRS = bind src/lib src/lua test/lib
+SUBDIRS = src/lib src/lua test/lib
 
 EXTRA_DIST = \
 	.gitignore \
 	README.md \
+	bind \
 	dromozoa \
 	dromozoa-unix-*.rockspec \
+	include \
 	m4/update \
 	test \
 	test.sh
 
 nobase_lua_DATA = \
-	dromozoa/unix/asio.lua \
-	dromozoa/unix/timespec.lua
+	dromozoa/unix/asio.lua

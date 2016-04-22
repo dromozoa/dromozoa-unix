@@ -15,17 +15,28 @@
 -- You should have received a copy of the GNU General Public License
 -- along with dromozoa-unix.  If not, see <http://www.gnu.org/licenses/>.
 
+local sequence = require "dromozoa.commons.sequence"
 local unix = require "dromozoa.unix"
 
-print("cwd", unix.getcwd())
-print("uid", unix.getuid())
-print("gid", unix.getgid())
-print("euid", unix.geteuid())
-print("egid", unix.getegid())
-print("pid", unix.getpid())
-print("pgrp", unix.getpgrp())
-print("ppid", unix.getppid())
+for i in sequence.each(assert(unix.environ())) do
+  local k, v = i:match("([^=]+)=(.*)")
+  assert(os.getenv(k) == v)
+end
 
-local mask = unix.umask(18) -- 022
-assert(mask == 18)
-assert(unix.umask(mask) == 18)
+assert(unix.getcwd() == unix.realpath("."))
+
+local tmpdir = assert(unix.mkdtemp("tmp-XXXXXX"))
+assert(unix.chdir(tmpdir))
+assert(os.remove(unix.getcwd()))
+
+local a, b, c = unix.getcwd()
+assert(a == nil)
+assert(c == unix.ENOENT)
+
+assert(unix.getuid() > 0)
+assert(unix.getgid() > 0)
+assert(unix.geteuid() > 0)
+assert(unix.getegid() > 0)
+assert(unix.getpid() > 0)
+assert(unix.getpgrp() > 0)
+assert(unix.getppid() > 0)

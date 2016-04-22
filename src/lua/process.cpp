@@ -23,84 +23,78 @@
 
 namespace dromozoa {
   namespace {
-    int impl_new(lua_State* L) {
+    void impl_call(lua_State* L) {
       lua_newtable(L);
-      luaL_getmetatable(L, "dromozoa.unix.process");
-      lua_setmetatable(L, -2);
-      return 1;
+      luaX_set_metatable(L, "dromozoa.unix.process");
     }
 
-    int impl_forkexec(lua_State* L) {
+    void impl_forkexec(lua_State* L) {
       const char* path = luaL_checkstring(L, 2);
       luaL_checktype(L, 3, LUA_TTABLE);
-      argument_vector argv = make_argument_vector(L, 3);
-      argument_vector envp = make_argument_vector(L, 4);
+      argument_vector argv = to_argument_vector(L, 3);
+      argument_vector envp = to_argument_vector(L, 4);
       const char* chdir = lua_tostring(L, 5);
       int dup2_stdio[3] = { -1, -1, -1 };
       if (lua_istable(L, 6)) {
         for (int i = 0; i < 3; ++i) {
-          lua_pushinteger(L, i);
-          lua_gettable(L, 6);
-          if (!lua_isnil(L, -1)) {
-            dup2_stdio[i] = get_fd(L, -1);
-          }
+          luaX_get_field(L, 6, i);
+          dup2_stdio[i] = to_fd(L, -1);
           lua_pop(L, 1);
         }
       }
+
       pid_t pid = -1;
       int result = forkexec(path, argv.get(), envp.get(), chdir, dup2_stdio, pid);
       int code = errno;
+
       if (pid != -1) {
-        lua_pushinteger(L, 1);
-        lua_pushinteger(L, pid);
-        lua_settable(L, 1);
+        luaX_set_field(L, 1, 1, pid);
       }
       if (result == -1) {
-        return push_error(L, code);
+        push_error(L, code);
       } else {
-        return push_success(L);
+        luaX_push_success(L);
       }
     }
 
-    int impl_forkexec_daemon(lua_State* L) {
+    void impl_forkexec_daemon(lua_State* L) {
       const char* path = luaL_checkstring(L, 2);
       luaL_checktype(L, 3, LUA_TTABLE);
-      argument_vector argv = make_argument_vector(L, 3);
-      argument_vector envp = make_argument_vector(L, 4);
+      argument_vector argv = to_argument_vector(L, 3);
+      argument_vector envp = to_argument_vector(L, 4);
       const char* chdir = lua_tostring(L, 5);
+
       pid_t pid1 = -1;
       pid_t pid2 = -1;
       int result = forkexec_daemon(path, argv.get(), envp.get(), chdir, pid1, pid2);
       int code = errno;
+
       if (pid1 != -1) {
-        lua_pushinteger(L, 1);
-        lua_pushinteger(L, pid1);
-        lua_settable(L, 1);
+        luaX_set_field(L, 1, 1, pid1);
       }
       if (pid2 != -1) {
-        lua_pushinteger(L, 2);
-        lua_pushinteger(L, pid2);
-        lua_settable(L, 1);
+        luaX_set_field(L, 1, 2, pid2);
       }
       if (result == -1) {
-        return push_error(L, code);
+        push_error(L, code);
       } else {
-        return push_success(L);
+        luaX_push_success(L);
       }
     }
   }
 
-  int open_process(lua_State* L) {
+  void initialize_process(lua_State* L) {
     lua_newtable(L);
-    function<impl_forkexec>::set_field(L, "forkexec");
-    function<impl_forkexec_daemon>::set_field(L, "forkexec_daemon");
-    lua_newtable(L);
-    function<impl_new>::set_field(L, "__call");
-    lua_setmetatable(L, -2);
-    luaL_newmetatable(L, "dromozoa.unix.process");
-    lua_pushvalue(L, -2);
-    lua_setfield(L, -2, "__index");
-    lua_pop(L, 1);
-    return 1;
+    {
+      luaL_newmetatable(L, "dromozoa.unix.process");
+      lua_pushvalue(L, -2);
+      luaX_set_field(L, -2, "__index");
+      lua_pop(L, 1);
+
+      luaX_set_metafield(L, "__call", impl_call);
+      luaX_set_field(L, -1, "forkexec", impl_forkexec);
+      luaX_set_field(L, -1, "forkexec_daemon", impl_forkexec_daemon);
+    }
+    luaX_set_field(L, -2, "process");
   }
 }

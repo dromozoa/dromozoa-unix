@@ -15,30 +15,25 @@
 // You should have received a copy of the GNU General Public License
 // along with dromozoa-unix.  If not, see <http://www.gnu.org/licenses/>.
 
-extern "C" {
-#include <lua.h>
-}
-
 #include <sys/time.h>
 
 #include "common.hpp"
 
 namespace dromozoa {
   namespace {
-    int impl_gettimeofday(lua_State* L) {
+    void impl_gettimeofday(lua_State* L) {
       struct timeval tv = {};
-      if (gettimeofday(&tv, 0) != -1) {
-        lua_newtable(L);
-        set_field(L, "tv_sec", tv.tv_sec);
-        set_field(L, "tv_usec", tv.tv_usec);
-        return 1;
+      if (gettimeofday(&tv, 0) == -1) {
+        push_error(L);
       } else {
-        return push_error(L);
+        lua_newtable(L);
+        luaX_set_field(L, -1, "tv_sec", tv.tv_sec);
+        luaX_set_field(L, -1, "tv_usec", tv.tv_usec);
       }
     }
   }
 
   void initialize_sys_time(lua_State* L) {
-    function<impl_gettimeofday>::set_field(L, "gettimeofday");
+    luaX_set_field(L, -1, "gettimeofday", impl_gettimeofday);
   }
 }

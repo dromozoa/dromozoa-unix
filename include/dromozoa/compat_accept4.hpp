@@ -21,8 +21,6 @@
 #include <sys/socket.h>
 
 namespace dromozoa {
-  extern const int COMPAT_SOCK_CLOEXEC;
-  extern const int COMPAT_SOCK_NONBLOCK;
   int compat_accept4(int socket, struct sockaddr* address, socklen_t* size_ptr, int flags);
 }
 

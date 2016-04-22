@@ -17,36 +17,34 @@
 
 luaexec_LTLIBRARIES = unix.la
 
+noinst_HEADERS = common.hpp
+
 unix_la_CPPFLAGS = -I$(top_srcdir)/bind -I$(top_srcdir)/include
 unix_la_LDFLAGS = -module -avoid-version -shared
-unix_la_LIBADD = \
-	$(top_srcdir)/bind/libdromozoa-bind.la \
-	$(top_srcdir)/src/lib/libdromozoa-unix.la
+unix_la_LIBADD = $(top_srcdir)/src/lib/libdromozoa-unix.la
 unix_la_SOURCES = \
 	argument_vector.cpp \
-	coe.cpp \
 	error.cpp \
 	fcntl.cpp \
 	fd.cpp \
-	lock.cpp \
-	ndelay.cpp \
+	fd_djb.cpp \
+	fd_socket.cpp \
+	fd_unistd.cpp \
+	module.cpp \
 	netdb.cpp \
 	netinet.cpp \
 	pathexec.cpp \
 	pipe.cpp \
 	process.cpp \
-	read.cpp \
 	selector.cpp \
 	selfpipe.cpp \
 	signal.cpp \
 	sockaddr.cpp \
-	socket.cpp \
 	stdlib.cpp \
 	sys_socket.cpp \
 	sys_stat.cpp \
 	sys_time.cpp \
 	sys_wait.cpp \
 	time.cpp \
-	unistd.cpp \
-	write.cpp \
-	module.cpp
+	timespec.cpp \
+	unistd.cpp

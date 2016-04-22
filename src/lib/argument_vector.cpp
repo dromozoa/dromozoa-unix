@@ -18,18 +18,28 @@
 #include <dromozoa/argument_vector.hpp>
 
 namespace dromozoa {
+  argument_vector::argument_vector() : is_null_(true) {}
+
+  void argument_vector::clear() {
+    str_.clear();
+    ptr_.clear();
+    is_null_ = false;
+  }
+
   void argument_vector::push_back(const char* value) {
     str_.push_back(value);
     ptr_.clear();
+    is_null_ = false;
   }
 
   void argument_vector::push_back(const std::string& value) {
     str_.push_back(value);
     ptr_.clear();
+    is_null_ = false;
   }
 
   const char* const* argument_vector::get() {
-    if (str_.empty()) {
+    if (is_null_) {
       return 0;
     } else {
       if (ptr_.empty()) {

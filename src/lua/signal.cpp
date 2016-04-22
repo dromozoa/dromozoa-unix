@@ -15,13 +15,6 @@
 // You should have received a copy of the GNU General Public License
 // along with dromozoa-unix.  If not, see <http://www.gnu.org/licenses/>.
 
-extern "C" {
-#include <lua.h>
-#include <lauxlib.h>
-}
-
-#include <signal.h>
-
 #include <dromozoa/compat_sigmask.hpp>
 #include <dromozoa/sigmask.hpp>
 
@@ -29,111 +22,113 @@ extern "C" {
 
 namespace dromozoa {
   namespace {
-    int impl_kill(lua_State* L) {
-      pid_t pid = luaL_checkinteger(L, 1);
-      int sig = luaL_optinteger(L, 2, SIGTERM);
+    void impl_kill(lua_State* L) {
+      pid_t pid = luaX_check_integer<pid_t>(L, 1);
+      int sig = luaX_opt_integer<int>(L, 2, SIGTERM);
       if (kill(pid, sig) == -1) {
-        return push_error(L);
+        push_error(L);
       } else {
-        return push_success(L);
+        luaX_push_success(L);
       }
     }
 
-    int impl_default_signal(lua_State* L) {
-      struct sigaction sa = {};
-      sa.sa_handler = SIG_DFL;
-      if (sigaction(luaL_checkinteger(L, 1), &sa, 0) == -1) {
-        return push_error(L);
-      } else {
-        return push_success(L);
-      }
-    }
-
-    int impl_ignore_signal(lua_State* L) {
+    void impl_ignore_signal(lua_State* L) {
       struct sigaction sa = {};
       sa.sa_handler = SIG_IGN;
-      if (sigaction(luaL_checkinteger(L, 1), &sa, 0) == -1) {
-        return push_error(L);
+      if (sigaction(luaX_check_integer<int>(L, 1), &sa, 0) == -1) {
+        push_error(L);
       } else {
-        return push_success(L);
+        luaX_push_success(L);
       }
     }
 
-    int impl_block_signal(lua_State* L) {
-      sigset_t mask;
-      if (lua_isnoneornil(L, 1)) {
-        if (sigfillset(&mask) == -1) {
-          return push_error(L);
-        }
+    void impl_block_all_signals(lua_State* L) {
+      if (sigmask_block_all_signals(0) == -1) {
+        push_error(L);
       } else {
-        if (sigemptyset(&mask) == -1) {
-          return push_error(L);
-        }
-        if (sigaddset(&mask, luaL_checkinteger(L, 1)) == -1) {
-          return push_error(L);
-        }
-      }
-      if (compat_sigmask(SIG_BLOCK, &mask, 0) == -1) {
-        return push_error(L);
-      } else {
-        return push_success(L);
+        luaX_push_success(L);
       }
     }
 
-    int impl_unblock_signal(lua_State* L) {
-      sigset_t mask;
-      if (lua_isnoneornil(L, 1)) {
-        if (sigfillset(&mask) == -1) {
-          return push_error(L);
-        }
+    void impl_unblock_all_signals(lua_State* L) {
+      if (sigmask_unblock_all_signals(0) == -1) {
+        push_error(L);
       } else {
-        if (sigemptyset(&mask) == -1) {
-          return push_error(L);
-        }
-        if (sigaddset(&mask, luaL_checkinteger(L, 1)) == -1) {
-          return push_error(L);
+        luaX_push_success(L);
+      }
+    }
+
+    void impl_block_signal(lua_State* L) {
+      int sig = luaX_check_integer<int>(L, 1);
+      sigset_t mask;
+      if (sigemptyset(&mask) == -1) {
+        push_error(L);
+      } else {
+        if (sigaddset(&mask, sig) == -1) {
+          push_error(L);
+        } else {
+          if (compat_sigmask(SIG_BLOCK, &mask, 0) == -1) {
+            push_error(L);
+          } else {
+            luaX_push_success(L);
+          }
         }
       }
-      if (compat_sigmask(SIG_UNBLOCK, &mask, 0) == -1) {
-        return push_error(L);
+    }
+
+    void impl_unblock_signal(lua_State* L) {
+      int sig = luaX_check_integer<int>(L, 1);
+      sigset_t mask;
+      if (sigemptyset(&mask) == -1) {
+        push_error(L);
+        return;
       } else {
-        return push_success(L);
+        if (sigaddset(&mask, sig) == -1) {
+          push_error(L);
+        } else {
+          if (compat_sigmask(SIG_UNBLOCK, &mask, 0) == -1) {
+            push_error(L);
+          } else {
+            luaX_push_success(L);
+          }
+        }
       }
     }
   }
 
   void initialize_signal(lua_State* L) {
-    function<impl_kill>::set_field(L, "kill");
-    function<impl_default_signal>::set_field(L, "default_signal");
-    function<impl_ignore_signal>::set_field(L, "ignore_signal");
-    function<impl_block_signal>::set_field(L, "block_signal");
-    function<impl_unblock_signal>::set_field(L, "unblock_signal");
+    luaX_set_field(L, -1, "kill", impl_kill);
+    luaX_set_field(L, -1, "ignore_signal", impl_ignore_signal);
+    luaX_set_field(L, -1, "block_all_signals", impl_block_all_signals);
+    luaX_set_field(L, -1, "unblock_all_signals", impl_unblock_all_signals);
+    luaX_set_field(L, -1, "block_signal", impl_block_signal);
+    luaX_set_field(L, -1, "unblock_signal", impl_unblock_signal);
 
-    DROMOZOA_BIND_SET_FIELD(L, SIGABRT);
-    DROMOZOA_BIND_SET_FIELD(L, SIGALRM);
-    DROMOZOA_BIND_SET_FIELD(L, SIGBUS);
-    DROMOZOA_BIND_SET_FIELD(L, SIGCHLD);
-    DROMOZOA_BIND_SET_FIELD(L, SIGCONT);
-    DROMOZOA_BIND_SET_FIELD(L, SIGFPE);
-    DROMOZOA_BIND_SET_FIELD(L, SIGHUP);
-    DROMOZOA_BIND_SET_FIELD(L, SIGILL);
-    DROMOZOA_BIND_SET_FIELD(L, SIGINT);
-    DROMOZOA_BIND_SET_FIELD(L, SIGKILL);
-    DROMOZOA_BIND_SET_FIELD(L, SIGPIPE);
-    DROMOZOA_BIND_SET_FIELD(L, SIGQUIT);
-    DROMOZOA_BIND_SET_FIELD(L, SIGSEGV);
-    DROMOZOA_BIND_SET_FIELD(L, SIGSTOP);
-    DROMOZOA_BIND_SET_FIELD(L, SIGTERM);
-    DROMOZOA_BIND_SET_FIELD(L, SIGTSTP);
-    DROMOZOA_BIND_SET_FIELD(L, SIGTTIN);
-    DROMOZOA_BIND_SET_FIELD(L, SIGTTOU);
-    DROMOZOA_BIND_SET_FIELD(L, SIGUSR1);
-    DROMOZOA_BIND_SET_FIELD(L, SIGUSR2);
-    DROMOZOA_BIND_SET_FIELD(L, SIGSYS);
-    DROMOZOA_BIND_SET_FIELD(L, SIGTRAP);
-    DROMOZOA_BIND_SET_FIELD(L, SIGURG);
-    DROMOZOA_BIND_SET_FIELD(L, SIGVTALRM);
-    DROMOZOA_BIND_SET_FIELD(L, SIGXCPU);
-    DROMOZOA_BIND_SET_FIELD(L, SIGXFSZ);
+    luaX_set_field(L, -1, "SIGABRT", SIGABRT);
+    luaX_set_field(L, -1, "SIGALRM", SIGALRM);
+    luaX_set_field(L, -1, "SIGBUS", SIGBUS);
+    luaX_set_field(L, -1, "SIGCHLD", SIGCHLD);
+    luaX_set_field(L, -1, "SIGCONT", SIGCONT);
+    luaX_set_field(L, -1, "SIGFPE", SIGFPE);
+    luaX_set_field(L, -1, "SIGHUP", SIGHUP);
+    luaX_set_field(L, -1, "SIGILL", SIGILL);
+    luaX_set_field(L, -1, "SIGINT", SIGINT);
+    luaX_set_field(L, -1, "SIGKILL", SIGKILL);
+    luaX_set_field(L, -1, "SIGPIPE", SIGPIPE);
+    luaX_set_field(L, -1, "SIGQUIT", SIGQUIT);
+    luaX_set_field(L, -1, "SIGSEGV", SIGSEGV);
+    luaX_set_field(L, -1, "SIGSTOP", SIGSTOP);
+    luaX_set_field(L, -1, "SIGTERM", SIGTERM);
+    luaX_set_field(L, -1, "SIGTSTP", SIGTSTP);
+    luaX_set_field(L, -1, "SIGTTIN", SIGTTIN);
+    luaX_set_field(L, -1, "SIGTTOU", SIGTTOU);
+    luaX_set_field(L, -1, "SIGUSR1", SIGUSR1);
+    luaX_set_field(L, -1, "SIGUSR2", SIGUSR2);
+    luaX_set_field(L, -1, "SIGSYS", SIGSYS);
+    luaX_set_field(L, -1, "SIGTRAP", SIGTRAP);
+    luaX_set_field(L, -1, "SIGURG", SIGURG);
+    luaX_set_field(L, -1, "SIGVTALRM", SIGVTALRM);
+    luaX_set_field(L, -1, "SIGXCPU", SIGXCPU);
+    luaX_set_field(L, -1, "SIGXFSZ", SIGXFSZ);
   }
 }

@@ -19,6 +19,7 @@
 
 #include <dromozoa/compat_strerror.hpp>
 #include <dromozoa/compat_sigmask.hpp>
+#include <dromozoa/errno_saver.hpp>
 #include <dromozoa/sigmask.hpp>
 #include <dromozoa/unexpected.hpp>
 
@@ -48,6 +49,7 @@ namespace dromozoa {
   sigmask_saver::sigmask_saver(const sigset_t& mask) : mask_(mask) {}
 
   sigmask_saver::~sigmask_saver() {
+    errno_saver save;
     if (compat_sigmask(SIG_SETMASK, &mask_, 0) == -1) {
       DROMOZOA_UNEXPECTED(compat_strerror(errno));
     }

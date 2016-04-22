@@ -15,70 +15,65 @@
 // You should have received a copy of the GNU General Public License
 // along with dromozoa-unix.  If not, see <http://www.gnu.org/licenses/>.
 
-extern "C" {
-#include <lua.h>
-#include <lauxlib.h>
-}
-
+#include <fcntl.h>
 #include <limits.h>
-#include <stddef.h>
 #include <stdlib.h>
 
 #include <vector>
+
+#include <dromozoa/compat_mkostemp.hpp>
 
 #include "common.hpp"
 
 namespace dromozoa {
   namespace {
-    int impl_realpath(lua_State* L) {
+    void impl_realpath(lua_State* L) {
+      const char* path = luaL_checkstring(L, 1);
 #ifdef PATH_MAX
       std::vector<char> buffer(PATH_MAX);
-      if (const char* result = realpath(luaL_checkstring(L, 1), &buffer[0])) {
+      if (const char* result = realpath(path, &buffer[0])) {
         lua_pushstring(L, result);
-        return 1;
       }
 #else
-      if (char* result = realpath(luaL_checkstring(L, 1), 0)) {
+      if (char* result = realpath(path, 0)) {
         lua_pushstring(L, result);
         free(result);
-        return 1;
       }
 #endif
       else {
-        return push_error(L);
+        push_error(L);
       }
     }
 
-    int impl_mkdtemp(lua_State* L) {
+    void impl_mkdtemp(lua_State* L) {
       size_t size = 0;
       const char* tmpl = luaL_checklstring(L, 1, &size);
       std::vector<char> buffer(tmpl, tmpl + size + 1);
       if (const char* result = mkdtemp(&buffer[0])) {
         lua_pushstring(L, result);
-        return 1;
       } else {
-        return push_error(L);
+        push_error(L);
       }
     }
 
-    int impl_mkstemp(lua_State* L) {
+    void impl_mkstemp(lua_State* L) {
       size_t size = 0;
       const char* tmpl = luaL_checklstring(L, 1, &size);
+      int flags = luaX_opt_integer<int>(L, 2, O_CLOEXEC);
       std::vector<char> buffer(tmpl, tmpl + size + 1);
-      int result = mkstemp(&buffer[0]);
+      int result = compat_mkostemp(&buffer[0], flags);
       if (result == -1) {
-        return push_error(L);
+        push_error(L);
       } else {
         new_fd(L, result);
         lua_pushstring(L, &buffer[0]);
-        return 2;
       }
     }
   }
 
   void initialize_stdlib(lua_State* L) {
-    function<impl_realpath>::set_field(L, "realpath");
-    function<impl_mkdtemp>::set_field(L, "mkdtemp");
-    function<impl_mkstemp>::set_field(L, "mkstemp");
+    luaX_set_field(L, -1, "realpath", impl_realpath);
+    luaX_set_field(L, -1, "mkdtemp", impl_mkdtemp);
+    luaX_set_field(L, -1, "mkstemp", impl_mkstemp);
   }
 }

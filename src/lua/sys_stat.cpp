@@ -21,13 +21,12 @@
 
 namespace dromozoa {
   namespace {
-    int impl_umask(lua_State* L) {
-      lua_pushinteger(L, umask(luaL_checkinteger(L, 1)));
-      return 1;
+    void impl_umask(lua_State* L) {
+      luaX_push(L, umask(luaX_check_integer<mode_t>(L, 1)));
     }
   }
 
   void initialize_sys_stat(lua_State* L) {
-    function<impl_umask>::set_field(L, "umask");
+    luaX_set_field(L, -1, "umask", impl_umask);
   }
 }

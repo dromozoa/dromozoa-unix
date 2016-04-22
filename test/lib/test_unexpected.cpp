@@ -15,11 +15,11 @@
 // You should have received a copy of the GNU General Public License
 // along with dromozoa-unix.  If not, see <http://www.gnu.org/licenses/>.
 
-#include <assert.h>
-
 #include <string>
 
 #include <dromozoa/unexpected.hpp>
+
+#include "assert.hpp"
 
 void handler(const char* what, const char* file, int line, const char* function) {
   assert(std::string(what) == "test2");

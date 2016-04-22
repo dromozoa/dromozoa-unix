@@ -15,9 +15,13 @@
 // You should have received a copy of the GNU General Public License
 // along with dromozoa-unix.  If not, see <http://www.gnu.org/licenses/>.
 
+#include <errno.h>
 #include <unistd.h>
 
+#include <dromozoa/compat_strerror.hpp>
+#include <dromozoa/errno_saver.hpp>
 #include <dromozoa/file_descriptor.hpp>
+#include <dromozoa/unexpected.hpp>
 
 namespace dromozoa {
   file_descriptor::file_descriptor() : fd_(-1) {}
@@ -26,7 +30,10 @@ namespace dromozoa {
 
   file_descriptor::~file_descriptor() {
     if (fd_ != -1) {
-      close();
+      errno_saver save;
+      if (close() == -1) {
+        DROMOZOA_UNEXPECTED(compat_strerror(errno));
+      }
     }
   }
 

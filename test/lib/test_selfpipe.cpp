@@ -19,11 +19,8 @@
 #include "config.h"
 #endif
 
-#include <assert.h>
 #include <errno.h>
-#include <fcntl.h>
 #include <stdlib.h>
-#include <unistd.h>
 #include <sys/wait.h>
 
 #include <iostream>
@@ -40,11 +37,17 @@ typedef dromozoa::selector_epoll selector_impl;
 typedef dromozoa::selector_kqueue selector_impl;
 #endif
 
+#include "assert.hpp"
+
 int main(int, char*[]) {
   assert(dromozoa::selfpipe_open() == 0);
 
-  int fd = selector_impl::open(16, O_CLOEXEC);
+  int fd = selector_impl::open(16, dromozoa::SELECTOR_CLOEXEC);
+  std::cout << fd << "\n";
   assert(fd != -1);
+  assert_coe(fd);
+  assert_ndelay_off(fd);
+
   selector_impl selector(fd, 16);
   assert(selector.add(dromozoa::selfpipe_get(), dromozoa::SELECTOR_READ) == 0);
 
@@ -52,11 +55,12 @@ int main(int, char*[]) {
   const char* argv[] = { "env", 0 };
   pid_t pid = -1;
   assert(dromozoa::forkexec(path, argv, 0, 0, 0, pid) == 0);
-  assert(pid != -1);
   std::cout << pid << "\n";
+  assert(pid != -1);
 
   while (true) {
     int result = selector.select(0);
+    std::cout << result << "\n";
     if (result == -1) {
       assert(errno == EINTR);
     } else {
@@ -66,7 +70,7 @@ int main(int, char*[]) {
   }
   assert(dromozoa::selfpipe_read() == 1);
 
-  int status;
+  int status = 0;
   assert(waitpid(-1, &status, 0) == pid);
   assert(WIFEXITED(status) && WEXITSTATUS(status) == 0);
 

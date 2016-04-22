@@ -17,10 +17,14 @@
 
 TESTS = $(check_PROGRAMS)
 
+noinst_HEADERS = assert.hpp
+
 check_PROGRAMS = \
 	test_argument_vector.exe \
 	test_compat_pipe2.exe \
+	test_compat_socket.exe \
 	test_compat_strerror.exe \
+	test_errno_saver.exe \
 	test_forkexec.exe \
 	test_pathexec.exe \
 	test_selfpipe.exe \
@@ -35,6 +39,18 @@ test_argument_vector_exe_SOURCES = test_argument_vector.cpp
 test_compat_pipe2_exe_CPPFLAGS = -I$(top_srcdir)/include
 test_compat_pipe2_exe_LDADD = $(top_builddir)/src/lib/libdromozoa-unix.la
 test_compat_pipe2_exe_SOURCES = test_compat_pipe2.cpp
+
+test_compat_socket_exe_CPPFLAGS = -I$(top_srcdir)/include
+test_compat_socket_exe_LDADD = $(top_builddir)/src/lib/libdromozoa-unix.la
+test_compat_socket_exe_SOURCES = test_compat_socket.cpp
+
+test_compat_strerror_exe_CPPFLAGS = -I$(top_srcdir)/include
+test_compat_strerror_exe_LDADD = $(top_builddir)/src/lib/libdromozoa-unix.la
+test_compat_strerror_exe_SOURCES = test_compat_strerror.cpp
+
+test_errno_saver_exe_CPPFLAGS = -I$(top_srcdir)/include
+test_errno_saver_exe_LDADD = $(top_builddir)/src/lib/libdromozoa-unix.la
+test_errno_saver_exe_SOURCES = test_errno_saver.cpp
 
 test_forkexec_exe_CPPFLAGS = -I$(top_srcdir)/include
 test_forkexec_exe_LDADD = $(top_builddir)/src/lib/libdromozoa-unix.la
@@ -55,10 +71,6 @@ test_sigmask_exe_SOURCES = test_sigmask.cpp
 test_socket_address_exe_CPPFLAGS = -I$(top_srcdir)/include
 test_socket_address_exe_LDADD = $(top_builddir)/src/lib/libdromozoa-unix.la
 test_socket_address_exe_SOURCES = test_socket_address.cpp
-
-test_compat_strerror_exe_CPPFLAGS = -I$(top_srcdir)/include
-test_compat_strerror_exe_LDADD = $(top_builddir)/src/lib/libdromozoa-unix.la
-test_compat_strerror_exe_SOURCES = test_compat_strerror.cpp
 
 test_unexpected_exe_CPPFLAGS = -I$(top_srcdir)/include
 test_unexpected_exe_LDADD = $(top_builddir)/src/lib/libdromozoa-unix.la

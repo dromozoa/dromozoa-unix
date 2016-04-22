@@ -22,12 +22,12 @@
 
 namespace dromozoa {
   void initialize_netinet(lua_State* L) {
-    DROMOZOA_BIND_SET_FIELD(L, IPPROTO_IP);
-    DROMOZOA_BIND_SET_FIELD(L, IPPROTO_IPV6);
-    DROMOZOA_BIND_SET_FIELD(L, IPPROTO_ICMP);
-    DROMOZOA_BIND_SET_FIELD(L, IPPROTO_RAW);
-    DROMOZOA_BIND_SET_FIELD(L, IPPROTO_TCP);
-    DROMOZOA_BIND_SET_FIELD(L, IPPROTO_UDP);
-    DROMOZOA_BIND_SET_FIELD(L, TCP_NODELAY);
+    luaX_set_field<int>(L, -1, "IPPROTO_IP", IPPROTO_IP);
+    luaX_set_field<int>(L, -1, "IPPROTO_IPV6", IPPROTO_IPV6);
+    luaX_set_field<int>(L, -1, "IPPROTO_ICMP", IPPROTO_ICMP);
+    luaX_set_field<int>(L, -1, "IPPROTO_RAW", IPPROTO_RAW);
+    luaX_set_field<int>(L, -1, "IPPROTO_TCP", IPPROTO_TCP);
+    luaX_set_field<int>(L, -1, "IPPROTO_UDP", IPPROTO_UDP);
+    luaX_set_field(L, -1, "TCP_NODELAY", TCP_NODELAY);
   }
 }

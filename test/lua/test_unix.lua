@@ -17,27 +17,20 @@
 
 local unix = require "dromozoa.unix"
 
-assert(unix.selfpipe.open())
+assert(unix.block_signal(unix.SIGCHLD))
 
 local path = os.getenv("PATH")
-local envp = unix.environ()
 
-local reader, writer = unix.pipe(unix.O_CLOEXEC)
+local reader, writer = assert(unix.pipe())
 
-assert(unix.block_signal(unix.SIGCHLD))
-local pid1 = assert(unix.process():forkexec(path, { arg[-1], "test/lua/unix_server.lua" }, envp, nil, { [1] = writer }))[1]
-local abstract = assert(reader:read(256))
--- print(abstract)
+local process1 = assert(unix.process())
+assert(process1:forkexec(path, { arg[-1], "test/lua/unix_server.lua" }, nil, nil, { [1] = writer }))
+assert(writer:close())
+assert(reader:read(1) == "")
+assert(reader:close())
 
-local pid2 = assert(unix.process():forkexec(path, { arg[-1], "test/lua/unix_client.lua", abstract }, envp, nil, {}))[1]
+local process2 = assert(unix.process())
+assert(process2:forkexec(path, { arg[-1], "test/lua/unix_client.lua" }))
 
-assert(unix.unblock_signal(unix.SIGCHLD))
-unix.selfpipe.read()
-assert(unix.block_signal(unix.SIGCHLD))
-
-local result = assert(unix.wait())
-assert(result == pid1 or result == pid2)
-local result = assert(unix.wait())
-assert(result == pid1 or result == pid2)
-
-assert(unix.selfpipe.close())
+assert(unix.wait())
+assert(unix.wait())

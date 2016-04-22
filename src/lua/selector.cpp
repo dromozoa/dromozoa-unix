@@ -19,21 +19,7 @@
 #include "config.h"
 #endif
 
-extern "C" {
-#include <lua.h>
-#include <lauxlib.h>
-}
-
-#include <errno.h>
-#include <time.h>
-
-#include <iostream>
-#include <new>
-
-#include <dromozoa/bind.hpp>
 #include <dromozoa/selector.hpp>
-
-#include "common.hpp"
 
 #if defined(HAVE_EPOLL_CREATE) || defined(HAVE_EPOLL_CREATE1)
 #include <dromozoa/selector_epoll.hpp>
@@ -43,130 +29,116 @@ typedef dromozoa::selector_epoll selector_impl;
 typedef dromozoa::selector_kqueue selector_impl;
 #endif
 
+#include "common.hpp"
+
 namespace dromozoa {
   namespace {
-    selector& get_selector(lua_State* L, int n) {
-      return *static_cast<selector*>(luaL_checkudata(L, n, "dromozoa.unix.selector"));
+    selector* check_selector(lua_State* L, int n) {
+      return luaX_check_udata<selector>(L, n, "dromozoa.unix.selector");
     }
 
-    int impl_new(lua_State* L) {
-      size_t size = luaL_checkinteger(L, 2);
-      int flags = luaL_optinteger(L, 3, 0);
+    void impl_call(lua_State* L) {
+      size_t size = luaX_check_integer<size_t>(L, 2);
+      int flags = luaX_opt_integer<int>(L, 3, SELECTOR_CLOEXEC);
       file_descriptor fd(selector_impl::open(size, flags));
-      if (!fd.valid()) {
-        return push_error(L);
-      }
-      selector_impl* s = static_cast<selector_impl*>(lua_newuserdata(L, sizeof(selector_impl)));
-      new(s) selector_impl(fd.release(), size);
-      luaL_getmetatable(L, "dromozoa.unix.selector");
-      lua_setmetatable(L, -2);
-      // if (get_log_level() > 2) {
-      //   std::cerr << "[dromozoa-unix] new selector " << s << std::endl;
-      // }
-      return 1;
-    }
-
-    int impl_gc(lua_State* L) {
-      selector& s = get_selector(L, 1);
-      s.~selector();
-      return 0;
-    }
-
-    int impl_close(lua_State* L) {
-      selector& s = get_selector(L, 1);
-      if (s.close() == -1) {
-        return push_error(L);
+      if (fd.valid()) {
+        luaX_new<selector_impl>(L, fd.release(), size);
+        luaX_set_metatable(L, "dromozoa.unix.selector");
       } else {
-        return push_success(L);
+        push_error(L);
       }
     }
 
-    int impl_add(lua_State* L) {
-      int fd = get_fd(L, 2);
-      int event = luaL_checkinteger(L, 3);
-      if (get_selector(L, 1).add(fd, event) == -1) {
-        return push_error(L);
+    void impl_gc(lua_State* L) {
+      check_selector(L, 1)->~selector();
+    }
+
+    void impl_close(lua_State* L) {
+      if (check_selector(L, 1)->close() == -1) {
+        push_error(L);
       } else {
-        return push_success(L);
+        luaX_push_success(L);
       }
     }
 
-    int impl_mod(lua_State* L) {
-      int fd = get_fd(L, 2);
-      int event = luaL_checkinteger(L, 3);
-      if (get_selector(L, 1).mod(fd, event) == -1) {
-        return push_error(L);
+    void impl_add(lua_State* L) {
+      int fd = check_fd(L, 2);
+      int event = luaX_check_integer<int>(L, 3);
+      if (check_selector(L, 1)->add(fd, event) == -1) {
+        push_error(L);
       } else {
-        return push_success(L);
+        luaX_push_success(L);
       }
     }
 
-    int impl_del(lua_State* L) {
-      int fd = get_fd(L, 2);
-      if (get_selector(L, 1).del(fd) == -1) {
-        return push_error(L);
+    void impl_mod(lua_State* L) {
+      int fd = check_fd(L, 2);
+      int event = luaX_check_integer<int>(L, 3);
+      if (check_selector(L, 1)->mod(fd, event) == -1) {
+        push_error(L);
       } else {
-        return push_success(L);
+        luaX_push_success(L);
       }
     }
 
-    int impl_select(lua_State* L) {
+    void impl_del(lua_State* L) {
+      int fd = check_fd(L, 2);
+      if (check_selector(L, 1)->del(fd) == -1) {
+        push_error(L);
+      } else {
+        luaX_push_success(L);
+      }
+    }
+
+    void impl_select(lua_State* L) {
+      struct timespec tv = {};
       int result = -1;
-      if (lua_isnoneornil(L, 2)) {
-        result = get_selector(L, 1).select(0);
+      if (check_timespec(L, 2, tv)) {
+        result = check_selector(L, 1)->select(&tv);
       } else {
-        struct timespec tv = {};
-        lua_getfield(L, 2, "tv_sec");
-        tv.tv_sec = luaL_checkinteger(L, -1);
-        lua_pop(L, 1);
-        lua_getfield(L, 2, "tv_nsec");
-        tv.tv_nsec = luaL_checkinteger(L, -1);
-        lua_pop(L, 1);
-        result = get_selector(L, 1).select(&tv);
+        result = check_selector(L, 1)->select(0);
       }
       if (result == -1) {
-        int code = errno;
-        if (code == EINTR) {
-          return push_interrupted(L);
-        } else {
-          return push_error(L);
-        }
+        push_error(L);
       } else {
-        lua_pushinteger(L, result);
-        return 1;
+        luaX_push(L, result);
       }
     }
 
-    int impl_event(lua_State* L) {
-      int i = luaL_checkinteger(L, 2);
+    void impl_event(lua_State* L) {
+      int i = luaX_check_integer<int>(L, 2);
       int fd = -1;
       int event = 0;
-      if (get_selector(L, 1).event(i - 1, fd, event) == -1) {
-        return push_error(L);
+      if (check_selector(L, 1)->event(i - 1, fd, event) == -1) {
+        push_error(L);
       } else {
-        lua_pushinteger(L, fd);
-        lua_pushinteger(L, event);
-        return 2;
+        luaX_push(L, fd);
+        luaX_push(L, event);
       }
     }
   }
 
-  int open_selector(lua_State* L) {
+  void initialize_selector(lua_State* L) {
     lua_newtable(L);
-    function<impl_close>::set_field(L, "close");
-    function<impl_add>::set_field(L, "add");
-    function<impl_mod>::set_field(L, "mod");
-    function<impl_del>::set_field(L, "del");
-    function<impl_select>::set_field(L, "select");
-    function<impl_event>::set_field(L, "event");
-    lua_newtable(L);
-    function<impl_new>::set_field(L, "__call");
-    lua_setmetatable(L, -2);
-    luaL_newmetatable(L, "dromozoa.unix.selector");
-    lua_pushvalue(L, -2);
-    lua_setfield(L, -2, "__index");
-    function<impl_gc>::set_field(L, "__gc");
-    lua_pop(L, 1);
-    return 1;
+    {
+      luaL_newmetatable(L, "dromozoa.unix.selector");
+      lua_pushvalue(L, -2);
+      luaX_set_field(L, -2, "__index");
+      luaX_set_field(L, -1, "__gc", impl_gc);
+      lua_pop(L, 1);
+
+      luaX_set_metafield(L, "__call", impl_call);
+      luaX_set_field(L, -1, "close", impl_close);
+      luaX_set_field(L, -1, "add", impl_add);
+      luaX_set_field(L, -1, "mod", impl_mod);
+      luaX_set_field(L, -1, "del", impl_del);
+      luaX_set_field(L, -1, "select", impl_select);
+      luaX_set_field(L, -1, "event", impl_event);
+    }
+    luaX_set_field(L, -2, "selector");
+
+    luaX_set_field(L, -1, "SELECTOR_READ", SELECTOR_READ);
+    luaX_set_field(L, -1, "SELECTOR_WRITE", SELECTOR_WRITE);
+    luaX_set_field(L, -1, "SELECTOR_CLOEXEC", SELECTOR_CLOEXEC);
   }
 }

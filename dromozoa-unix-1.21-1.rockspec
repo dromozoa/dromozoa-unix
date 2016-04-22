@@ -14,6 +14,6 @@ dependencies = {
 }
 build = {
   type = "command";
-  build_command = "env CPPFLAGS='-I$(LUA_INCDIR)' CXXFLAGS='-Wall -W -Wno-missing-field-initializers $(CFLAGS)' LDFLAGS='-L$(LUA_LIBDIR)' LUA='$(LUA_BINDIR)/$(LUA)' ./configure --prefix='$(PREFIX)' && make clean && make";
+  build_command = "env PATH=\"$(LUA_BINDIR):$PATH\" CPPFLAGS='-I$(LUA_INCDIR)' CXXFLAGS='-Wall -W -Wno-missing-field-initializers $(CFLAGS)' LDFLAGS='-L$(LUA_LIBDIR)' LUA='$(LUA)' ./configure --prefix='$(PREFIX)' && make";
   install_command = "make luadir='$(LUADIR)' luaexecdir='$(LIBDIR)/dromozoa' install";
 }

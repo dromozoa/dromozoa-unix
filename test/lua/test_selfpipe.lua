@@ -17,54 +17,47 @@
 
 local unix = require "dromozoa.unix"
 
-assert(unix.block_signal())
-assert(unix.ignore_signal(unix.SIGPIPE))
+assert(unix.block_signal(unix.SIGCHLD))
 assert(unix.selfpipe.get() == -1)
 assert(unix.selfpipe.open())
 assert(unix.selfpipe.get() ~= -1)
 
--- unix.set_log_level(3)
+local PATH = os.getenv("PATH")
 
-local path = os.getenv("PATH")
-local envp = unix.environ()
+local selector = assert(unix.selector(1024))
+assert(selector:add(unix.selfpipe.get(), unix.SELECTOR_READ))
 
-local selector = unix.selector(256, unix.O_CLOEXEC)
-selector:add(unix.selfpipe.get(), 1)
-
-local pid1 = assert(unix.process():forkexec(path, { "sh", "-c", ":" }))[1]
-local pid2 = assert(unix.process():forkexec(path, { "sh", "-c", ":" }))[1]
--- print(pid1, pid2)
+local process1 = assert(unix.process())
+local process2 = assert(unix.process())
+local process3 = assert(unix.process())
+local process4 = assert(unix.process())
+assert(process1:forkexec(PATH, { "echo", "foo" }))
+assert(process2:forkexec(PATH, { "echo", "bar" }))
+assert(process3:forkexec(PATH, { "echo", "baz" }))
+assert(process4:forkexec(PATH, { "echo", "qux" }))
 
 local n = 0
 repeat
   assert(unix.unblock_signal(unix.SIGCHLD))
-  local a, b, c = selector:select({ tv_sec = 1, tv_nsec = 0 })
-  -- print("select", a, b, c)
+  local a, b, c = selector:select(1)
   assert(unix.block_signal(unix.SIGCHLD))
-
-  if a and a ~= unix.interrupted then
-    if a == 0 then
-      -- print("timeout")
-    else
-      for i = 1, a do
-        local fd, ev = selector:event(i)
-        -- print("event", fd, ev)
-        if fd == unix.selfpipe.get() then
-          local result = unix.selfpipe.read()
-          -- print("selfpipe", result)
-          if result > 0 then
-            while true do
-              local a, b, c = unix.wait(-1, unix.WNOHANG)
-              -- print("wait", a, b, c)
-              if a and a > 0 then
-                n = n + 1
-              else
-                break
-              end
-            end
-          end
-        end
+  if a == nil then
+    assert(c == unix.EINTR, b)
+    print(b)
+  else
+    assert(a == 1)
+    assert(unix.selfpipe.read() > 0)
+    while true do
+      local a, b, c = unix.wait(-1, unix.WNOHANG)
+      if a == nil then
+        assert(c == unix.ECHILD, b)
+        print(b)
+        break
+      elseif a == 0 then
+        break
+      else
+        n = n + 1
       end
     end
   end
-until n == 2
+until n == 4

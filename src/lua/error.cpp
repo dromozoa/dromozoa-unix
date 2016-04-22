@@ -15,111 +15,54 @@
 // You should have received a copy of the GNU General Public License
 // along with dromozoa-unix.  If not, see <http://www.gnu.org/licenses/>.
 
-#ifdef HAVE_CONFIG_H
-#include "config.h"
-#endif
-
-extern "C" {
-#include <lua.h>
-#include <lauxlib.h>
-}
-
 #include <errno.h>
-#include <stddef.h>
-#include <stdlib.h>
-#include <string.h>
-
-#include <iostream>
 
 #include <dromozoa/compat_strerror.hpp>
+#include <dromozoa/errno_saver.hpp>
 
 #include "common.hpp"
 
 namespace dromozoa {
-  int push_resource_unavailable_try_again(lua_State* L) {
-    lua_pushlightuserdata(L, reinterpret_cast<void*>(EAGAIN));
-    return 1;
+  namespace {
+    void impl_strerror(lua_State* L) {
+      errno_saver save;
+      std::string message = compat_strerror(luaX_opt_integer<int>(L, 1, errno));
+      lua_pushlstring(L, message.c_str(), message.size());
+    }
+
+    void impl_set_errno(lua_State* L) {
+      errno = luaX_check_integer<int>(L, 1);
+      luaX_push_success(L);
+    }
+
+    void impl_get_errno(lua_State* L) {
+      luaX_push(L, errno);
+    }
   }
 
-  int push_operation_in_progress(lua_State* L) {
-    lua_pushlightuserdata(L, reinterpret_cast<void*>(EINPROGRESS));
-    return 1;
+  void push_error(lua_State* L) {
+    push_error(L, errno);
   }
 
-  int push_interrupted(lua_State* L) {
-    lua_pushlightuserdata(L, reinterpret_cast<void*>(EINTR));
-    return 1;
-  }
-
-  int push_broken_pipe(lua_State* L) {
-    lua_pushlightuserdata(L, reinterpret_cast<void*>(EPIPE));
-    return 1;
-  }
-
-  int push_timed_out(lua_State* L) {
-    lua_pushlightuserdata(L, reinterpret_cast<void*>(ETIMEDOUT));
-    return 1;
-  }
-
-  int push_error(lua_State* L, int code) {
-    int save = errno;
+  void push_error(lua_State* L, int code) {
+    errno_saver save;
     std::string message = compat_strerror(code);
     lua_pushnil(L);
     lua_pushlstring(L, message.c_str(), message.size());
     lua_pushinteger(L, code);
-    errno = save;
-    return 3;
-  }
-
-  namespace {
-    int impl_strerror(lua_State* L) {
-      int save = errno;
-      int code = luaL_optinteger(L, 1, save);
-      std::string message = compat_strerror(code);
-      lua_pushlstring(L, message.c_str(), message.size());
-      errno = save;
-      return 1;
-    }
-
-    int impl_set_errno(lua_State* L) {
-      int code = luaL_checkinteger(L, 1);
-      errno = code;
-      return push_success(L);
-    }
-
-    int impl_get_errno(lua_State* L) {
-      int code = errno;
-      lua_pushinteger(L, code);
-      return 1;
-    }
   }
 
   void initialize_error(lua_State* L) {
-    set_field(L, "strerror", function<impl_strerror>());
-    set_field(L, "set_errno", function<impl_set_errno>());
-    set_field(L, "get_errno", function<impl_get_errno>());
+    luaX_set_field(L, -1, "strerror", impl_strerror);
+    luaX_set_field(L, -1, "set_errno", impl_set_errno);
+    luaX_set_field(L, -1, "get_errno", impl_get_errno);
 
-    DROMOZOA_SET_FIELD(L, EAGAIN);
-    DROMOZOA_SET_FIELD(L, EINPROGRESS);
-    DROMOZOA_SET_FIELD(L, EINTR);
-    DROMOZOA_SET_FIELD(L, ENOENT);
-    DROMOZOA_SET_FIELD(L, EPIPE);
-    DROMOZOA_SET_FIELD(L, ETIMEDOUT);
-    DROMOZOA_SET_FIELD(L, EWOULDBLOCK);
-
-    push_resource_unavailable_try_again(L);
-    lua_setfield(L, -2, "resource_unavailable_try_again");
-
-    push_operation_in_progress(L);
-    lua_setfield(L, -2, "operation_in_progress");
-
-    push_interrupted(L);
-    lua_setfield(L, -2, "interrupted");
-
-    push_broken_pipe(L);
-    lua_setfield(L, -2, "broken_pipe");
-
-    push_timed_out(L);
-    lua_setfield(L, -2, "timed_out");
+    luaX_set_field(L, -1, "EAGAIN", EAGAIN);
+    luaX_set_field(L, -1, "ECHILD", ECHILD);
+    luaX_set_field(L, -1, "EINPROGRESS", EINPROGRESS);
+    luaX_set_field(L, -1, "EINTR", EINTR);
+    luaX_set_field(L, -1, "ENOENT", ENOENT);
+    luaX_set_field(L, -1, "EPIPE", EPIPE);
+    luaX_set_field(L, -1, "EWOULDBLOCK", EWOULDBLOCK);
   }
 }

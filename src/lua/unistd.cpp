@@ -15,10 +15,6 @@
 // You should have received a copy of the GNU General Public License
 // along with dromozoa-unix.  If not, see <http://www.gnu.org/licenses/>.
 
-extern "C" {
-#include <lua.h>
-}
-
 #include <unistd.h>
 
 #include <vector>
@@ -29,84 +25,83 @@ extern char** environ;
 
 namespace dromozoa {
   namespace {
-    int impl_environ(lua_State* L) {
+    void impl_environ(lua_State* L) {
       lua_newtable(L);
       for (int i = 0; ; ++i) {
         if (const char* p = environ[i]) {
-          lua_pushinteger(L, i + 1);
-          lua_pushstring(L, p);
-          lua_settable(L, -3);
+          luaX_set_field(L, -1, i + 1, p);
         } else {
           break;
         }
       }
-      return 1;
     }
 
-    int impl_getcwd(lua_State* L) {
+    void impl_chdir(lua_State* L) {
+      const char* path = luaL_checkstring(L, 1);
+      if (chdir(path) == -1) {
+        push_error(L);
+      } else {
+        luaX_push_success(L);
+      }
+    }
+
+    void impl_getcwd(lua_State* L) {
       long path_max = pathconf(".", _PC_PATH_MAX);
       if (path_max == -1) {
-        return push_error(L);
+        push_error(L);
       } else {
         std::vector<char> buffer(path_max);
-        if (getcwd(&buffer[0], buffer.size())) {
-          lua_pushstring(L, &buffer[0]);
-          return 1;
+        if (const char* result = getcwd(&buffer[0], buffer.size())) {
+          lua_pushstring(L, result);
         } else {
-          return push_error(L);
+          push_error(L);
         }
       }
     }
 
-    int impl_getuid(lua_State* L) {
-      lua_pushinteger(L, getuid());
-      return 1;
+    void impl_getuid(lua_State* L) {
+      luaX_push(L, getuid());
     }
 
-    int impl_getgid(lua_State* L) {
-      lua_pushinteger(L, getgid());
-      return 1;
+    void impl_getgid(lua_State* L) {
+      luaX_push(L, getgid());
     }
 
-    int impl_geteuid(lua_State* L) {
-      lua_pushinteger(L, geteuid());
-      return 1;
+    void impl_geteuid(lua_State* L) {
+      luaX_push(L, geteuid());
     }
 
-    int impl_getegid(lua_State* L) {
-      lua_pushinteger(L, getegid());
-      return 1;
+    void impl_getegid(lua_State* L) {
+      luaX_push(L, getegid());
     }
 
-    int impl_getpid(lua_State* L) {
-      lua_pushinteger(L, getpid());
-      return 1;
+    void impl_getpid(lua_State* L) {
+      luaX_push(L, getpid());
     }
 
-    int impl_getpgrp(lua_State* L) {
-      lua_pushinteger(L, getpgrp());
-      return 1;
+    void impl_getpgrp(lua_State* L) {
+      luaX_push(L, getpgrp());
     }
 
-    int impl_getppid(lua_State* L) {
-      lua_pushinteger(L, getppid());
-      return 1;
+    void impl_getppid(lua_State* L) {
+      luaX_push(L, getppid());
     }
   }
 
   void initialize_unistd(lua_State* L) {
-    function<impl_environ>::set_field(L, "environ");
-    function<impl_getcwd>::set_field(L, "getcwd");
-    function<impl_getuid>::set_field(L, "getuid");
-    function<impl_getgid>::set_field(L, "getgid");
-    function<impl_geteuid>::set_field(L, "geteuid");
-    function<impl_getegid>::set_field(L, "getegid");
-    function<impl_getpid>::set_field(L, "getpid");
-    function<impl_getpgrp>::set_field(L, "getpgrp");
-    function<impl_getppid>::set_field(L, "getppid");
+    luaX_set_field(L, -1, "environ", impl_environ);
+    luaX_set_field(L, -1, "chdir", impl_chdir);
+    luaX_set_field(L, -1, "getcwd", impl_getcwd);
+    luaX_set_field(L, -1, "getuid", impl_getuid);
+    luaX_set_field(L, -1, "getgid", impl_getgid);
+    luaX_set_field(L, -1, "geteuid", impl_geteuid);
+    luaX_set_field(L, -1, "getegid", impl_getegid);
+    luaX_set_field(L, -1, "getpid", impl_getpid);
+    luaX_set_field(L, -1, "getpgrp", impl_getpgrp);
+    luaX_set_field(L, -1, "getppid", impl_getppid);
 
-    DROMOZOA_BIND_SET_FIELD(L, STDIN_FILENO);
-    DROMOZOA_BIND_SET_FIELD(L, STDOUT_FILENO);
-    DROMOZOA_BIND_SET_FIELD(L, STDERR_FILENO);
+    luaX_set_field(L, -1, "STDIN_FILENO", STDIN_FILENO);
+    luaX_set_field(L, -1, "STDOUT_FILENO", STDOUT_FILENO);
+    luaX_set_field(L, -1, "STDERR_FILENO", STDERR_FILENO);
   }
 }

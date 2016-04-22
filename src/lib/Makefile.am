@@ -23,9 +23,12 @@ libdromozoa_unix_la_SOURCES = \
 	argument_vector.cpp \
 	coe.cpp \
 	compat_accept4.cpp \
+	compat_mkostemp.cpp \
 	compat_pipe2.cpp \
 	compat_sigmask.cpp \
+	compat_socket.cpp \
 	compat_strerror.cpp \
+	errno_saver.cpp \
 	file_descriptor.cpp \
 	forkexec.cpp \
 	lock.cpp \

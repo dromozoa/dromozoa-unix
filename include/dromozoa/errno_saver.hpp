@@ -1,31 +1,33 @@
 // Copyright (C) 2016 Tomoyuki Fujimori <moyu@dromozoa.com>
 //
-// This file is part of dromozoa-bind.
+// This file is part of dromozoa-unix.
 //
-// dromozoa-bind is free software: you can redistribute it and/or modify
+// dromozoa-unix is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
 // (at your option) any later version.
 //
-// dromozoa-bind is distributed in the hope that it will be useful,
+// dromozoa-unix is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 // GNU General Public License for more details.
 //
 // You should have received a copy of the GNU General Public License
-// along with dromozoa-bind.  If not, see <http://www.gnu.org/licenses/>.
+// along with dromozoa-unix.  If not, see <http://www.gnu.org/licenses/>.
 
-#ifndef DROMOZOA_BIND_PUSH_SUCCESS_HPP
-#define DROMOZOA_BIND_PUSH_SUCCESS_HPP
-
-extern "C" {
-#include <lua.h>
-}
+#ifndef DROMOZOA_ERRNO_SAVER_HPP
+#define DROMOZOA_ERRNO_SAVER_HPP
 
 namespace dromozoa {
-  namespace bind {
-    int push_success(lua_State* L);
-  }
+  class errno_saver {
+  public:
+    errno_saver();
+    ~errno_saver();
+  private:
+    int code_;
+    errno_saver(const errno_saver&);
+    errno_saver& operator=(const errno_saver&);
+  };
 }
 
 #endif

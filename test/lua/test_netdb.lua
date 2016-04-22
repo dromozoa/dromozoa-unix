@@ -15,21 +15,17 @@
 -- You should have received a copy of the GNU General Public License
 -- along with dromozoa-unix.  If not, see <http://www.gnu.org/licenses/>.
 
+local uint32 = require "dromozoa.commons.uint32"
 local unix = require "dromozoa.unix"
 
-local addrinfo = assert(unix.getaddrinfo(nil, "0", { ai_socktype = unix.SOCK_STREAM, ai_flags = unix.AI_PASSIVE }))
+local addrinfo = assert(unix.getaddrinfo("127.0.0.1", "http", { ai_family = unix.AF_INET, ai_socktype = unix.SOCK_STREAM }))
+assert(#addrinfo == 1)
+
 local ai = addrinfo[1]
+local host, serv = assert(ai.ai_addr:getnameinfo(uint32.bor(unix.NI_NUMERICHOST, unix.NI_NUMERICSERV)))
 assert(ai.ai_socktype == unix.SOCK_STREAM)
-local server = assert(unix.socket(ai.ai_family, ai.ai_socktype, ai.ai_protocol))
-assert(server:getsockopt(unix.SOL_SOCKET, unix.SO_REUSEADDR) == 0)
-assert(server:setsockopt(unix.SOL_SOCKET, unix.SO_REUSEADDR, 1))
--- print(server:getsockopt(unix.SOL_SOCKET, unix.SO_REUSEADDR))
-assert(server:getsockopt(unix.SOL_SOCKET, unix.SO_REUSEADDR) ~= 0)
-assert(server:bind(ai.ai_addr))
-assert(server:listen())
-local sa = assert(server:getsockname())
-local host, serv = sa:getnameinfo(unix.NI_NUMERICHOST + unix.NI_NUMERICSERV)
--- print(host, serv)
-assert(host == "0.0.0.0" or host == "::")
-assert(tonumber(serv) > 0)
-server:close()
+assert(ai.ai_addr:family() == unix.AF_INET)
+assert(host == "127.0.0.1")
+assert(tonumber(serv) == 80)
+
+assert(not unix.getaddrinfo())

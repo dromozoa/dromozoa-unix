@@ -17,15 +17,23 @@
 
 local unix = require "dromozoa.unix"
 
-print(unix.realpath(arg[0]))
-assert(not unix.realpath("no such file"))
+assert(unix.realpath(".") == unix.getcwd())
+assert(unix.realpath(arg[0]) == unix.getcwd() .. "/test/lua/test_stdlib.lua")
 
-local tmpdir = unix.mkdtemp("tmp-XXXXXX")
+local tmpdir = assert(unix.mkdtemp("tmp-XXXXXX"))
 print(tmpdir)
 assert(os.remove(tmpdir))
 
-local fd, tmpname = unix.mkstemp("tmp-XXXXXX")
+local fd, tmpname = assert(unix.mkstemp("tmp-XXXXXX"))
 print(tmpname)
-fd:write("foo\n")
-fd:close()
+assert(fd:is_coe())
+assert(fd:write("foo\n"))
+assert(fd:close())
+
+local fd = assert(unix.open(tmpname))
+assert(fd:is_coe())
+assert(fd:read(4) == "foo\n")
+assert(fd:read(4) == "")
+assert(fd:close())
+
 assert(os.remove(tmpname))

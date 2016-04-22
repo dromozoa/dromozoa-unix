@@ -15,7 +15,6 @@
 // You should have received a copy of the GNU General Public License
 // along with dromozoa-unix.  If not, see <http://www.gnu.org/licenses/>.
 
-#include <assert.h>
 #include <fcntl.h>
 #include <unistd.h>
 
@@ -23,31 +22,38 @@
 
 #include <dromozoa/compat_pipe2.hpp>
 
-void assert_coe_and_ndelay_on(int fd) {
-  assert(fcntl(fd, F_GETFD) & FD_CLOEXEC);
-  assert(fcntl(fd, F_GETFL) & O_NONBLOCK);
+#include "assert.hpp"
+
+void test1() {
+  int fd[2] = { -1, -1 };
+  assert(dromozoa::compat_pipe2(fd, O_CLOEXEC | O_NONBLOCK) != -1);
+  std::cout << fd[0] << ", " << fd[1] << "\n";
+  assert(fd[0] != -1);
+  assert(fd[1] != -1);
+  assert_coe(fd[0]);
+  assert_coe(fd[1]);
+  assert_ndelay_on(fd[0]);
+  assert_ndelay_on(fd[1]);
+  assert(close(fd[0]) != -1);
+  assert(close(fd[1]) != -1);
 }
 
-void assert_coe_and_ndelay_off(int fd) {
-  assert(fcntl(fd, F_GETFD) & FD_CLOEXEC);
-  assert(!(fcntl(fd, F_GETFL) & O_NONBLOCK));
+void test2() {
+  int fd[2] = { -1, -1 };
+  assert(dromozoa::compat_pipe2(fd, O_CLOEXEC) != -1);
+  std::cout << fd[0] << ", " << fd[1] << "\n";
+  assert(fd[0] != -1);
+  assert(fd[1] != -1);
+  assert_coe(fd[0]);
+  assert_coe(fd[1]);
+  assert_ndelay_off(fd[0]);
+  assert_ndelay_off(fd[1]);
+  assert(close(fd[0]) != -1);
+  assert(close(fd[1]) != -1);
 }
 
 int main(int, char*[]) {
-  int fd[2] = { -1, -1 };
-
-  assert(dromozoa::compat_pipe2(fd, O_CLOEXEC | O_NONBLOCK) != -1);
-  std::cout << fd[0] << ", " << fd[1] << "\n";
-  assert_coe_and_ndelay_on(fd[0]);
-  assert_coe_and_ndelay_on(fd[1]);
-  assert(close(fd[0]) != -1);
-  assert(close(fd[1]) != -1);
-
-  assert(dromozoa::compat_pipe2(fd, O_CLOEXEC) != -1);
-  assert_coe_and_ndelay_off(fd[0]);
-  assert_coe_and_ndelay_off(fd[1]);
-  assert(close(fd[0]) != -1);
-  assert(close(fd[1]) != -1);
-
+  test1();
+  test2();
   return 0;
 }

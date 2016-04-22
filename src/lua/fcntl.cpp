@@ -21,27 +21,29 @@
 
 namespace dromozoa {
   namespace {
-    int impl_open(lua_State* L) {
+    void impl_open(lua_State* L) {
       const char* path = luaL_checkstring(L, 1);
-      int flags = luaL_optinteger(L, 2, 0);
-      int mode = luaL_optinteger(L, 3, 0666);
+      int flags = luaX_opt_integer<int>(L, 2, O_RDONLY | O_CLOEXEC);
+      int mode = luaX_opt_integer<int>(L, 3, 0666);
       int result = open(path, flags, mode);
       if (result == -1) {
-        return push_error(L);
+        push_error(L);
       } else {
-        return new_fd(L, result);
+        new_fd(L, result);
       }
     }
   }
 
   void initialize_fcntl(lua_State* L) {
-    set_field(L, "open", function<impl_open>());
-    DROMOZOA_SET_FIELD(L, O_APPEND);
-    DROMOZOA_SET_FIELD(L, O_CLOEXEC);
-    DROMOZOA_SET_FIELD(L, O_CREAT);
-    DROMOZOA_SET_FIELD(L, O_NONBLOCK);
-    DROMOZOA_SET_FIELD(L, O_RDONLY);
-    DROMOZOA_SET_FIELD(L, O_RDWR);
-    DROMOZOA_SET_FIELD(L, O_WRONLY);
+    luaX_set_field(L, -1, "open", impl_open);
+
+    luaX_set_field(L, -1, "O_APPEND", O_APPEND);
+    luaX_set_field(L, -1, "O_CLOEXEC", O_CLOEXEC);
+    luaX_set_field(L, -1, "O_CREAT", O_CREAT);
+    luaX_set_field(L, -1, "O_NONBLOCK", O_NONBLOCK);
+    luaX_set_field(L, -1, "O_RDONLY", O_RDONLY);
+    luaX_set_field(L, -1, "O_RDWR", O_RDWR);
+    luaX_set_field(L, -1, "O_SYNC", O_SYNC);
+    luaX_set_field(L, -1, "O_WRONLY", O_WRONLY);
   }
 }

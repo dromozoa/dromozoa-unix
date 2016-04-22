@@ -15,24 +15,13 @@
 -- You should have received a copy of the GNU General Public License
 -- along with dromozoa-unix.  If not, see <http://www.gnu.org/licenses/>.
 
+local uint32 = require "dromozoa.commons.uint32"
 local unix = require "dromozoa.unix"
 
-local abstract = ...
-local fd = assert(unix.socket(unix.AF_UNIX, unix.SOCK_STREAM))
-if abstract:find("^1") then
-  assert(fd:connect(unix.sockaddr_un("\0dromozoa-unix/test.sock")))
-else
-  assert(fd:connect(unix.sockaddr_un("test.sock")))
-end
-assert(fd:write("foo\n") == 4)
+local fd = assert(unix.socket(unix.AF_UNIX, uint32.bor(unix.SOCK_STREAM, unix.SOCK_CLOEXEC)))
+assert(fd:connect(unix.sockaddr_un("test.sock")))
+assert(fd:write("x"))
 assert(fd:shutdown(unix.SHUT_WR))
-while true do
-  local result, message, code = fd:read(256)
-  if result and #result > 0 then
-    assert(result == "bar\n")
-    -- io.stderr:write(result)
-  else
-    break
-  end
-end
+assert(fd:read(1) == "x")
+assert(fd:read(1) == "")
 assert(fd:close())

@@ -16,65 +16,50 @@
 // along with dromozoa-unix.  If not, see <http://www.gnu.org/licenses/>.
 
 #include "common.hpp"
-#include "module.hpp"
 
 namespace dromozoa {
-  int open_asio(lua_State* L) {
+  void initialize_asio(lua_State* L) {
     lua_getglobal(L, "require");
     lua_pushliteral(L, "dromozoa.unix.asio");
     lua_call(L, 1, 1);
     lua_pushvalue(L, -2);
-    lua_setfield(L, -2, "super");
-    return 1;
+    luaX_set_field(L, -2, "super");
+    luaX_set_field(L, -2, "asio");
   }
 
-  int open_timespec(lua_State* L) {
-    lua_getglobal(L, "require");
-    lua_pushliteral(L, "dromozoa.unix.timespec");
-    lua_call(L, 1, 1);
-    lua_pushvalue(L, -2);
-    lua_setfield(L, -2, "super");
-    return 1;
-  }
+  void initialize_error(lua_State* L);
+  void initialize_fcntl(lua_State* L);
+  void initialize_fd(lua_State* L);
+  void initialize_netdb(lua_State* L);
+  void initialize_netinet(lua_State* L);
+  void initialize_pathexec(lua_State* L);
+  void initialize_pipe(lua_State* L);
+  void initialize_process(lua_State* L);
+  void initialize_selector(lua_State* L);
+  void initialize_selfpipe(lua_State* L);
+  void initialize_signal(lua_State* L);
+  void initialize_sockaddr(lua_State* L);
+  void initialize_stdlib(lua_State* L);
+  void initialize_sys_socket(lua_State* L);
+  void initialize_sys_stat(lua_State* L);
+  void initialize_sys_time(lua_State* L);
+  void initialize_sys_wait(lua_State* L);
+  void initialize_time(lua_State* L);
+  void initialize_timespec(lua_State* L);
+  void initialize_unistd(lua_State* L);
 
-  int open(lua_State* L) {
-    lua_newtable(L);
-
-    open_fd(L);
-    initialize_coe(L);
-    initialize_lock(L);
-    initialize_ndelay(L);
-    initialize_read(L);
-    initialize_write(L);
-    initialize_socket(L);
-    lua_setfield(L, -2, "fd");
-
-    open_process(L);
-    lua_setfield(L, -2, "process");
-
-    open_selector(L);
-    lua_setfield(L, -2, "selector");
-
-    open_selfpipe(L);
-    lua_setfield(L, -2, "selfpipe");
-
-    open_sockaddr(L);
-    initialize_getnameinfo(L);
-    lua_setfield(L, -2, "sockaddr");
-
-    open_asio(L);
-    lua_setfield(L, -2, "asio");
-
-    open_timespec(L);
-    lua_setfield(L, -2, "timespec");
-
-    bind::initialize(L);
+  void initialize(lua_State* L) {
+    initialize_asio(L);
     initialize_error(L);
     initialize_fcntl(L);
+    initialize_fd(L);
     initialize_netdb(L);
     initialize_netinet(L);
     initialize_pathexec(L);
     initialize_pipe(L);
+    initialize_process(L);
+    initialize_selector(L);
+    initialize_selfpipe(L);
     initialize_signal(L);
     initialize_sockaddr(L);
     initialize_stdlib(L);
@@ -83,12 +68,13 @@ namespace dromozoa {
     initialize_sys_time(L);
     initialize_sys_wait(L);
     initialize_time(L);
+    initialize_timespec(L);
     initialize_unistd(L);
-
-    return 1;
   }
 }
 
 extern "C" int luaopen_dromozoa_unix(lua_State* L) {
-  return dromozoa::open(L);
+  lua_newtable(L);
+  dromozoa::initialize(L);
+  return 1;
 }

@@ -24,10 +24,13 @@
 namespace dromozoa {
   class argument_vector {
   public:
+    argument_vector();
+    void clear();
     void push_back(const char* value);
     void push_back(const std::string& value);
     const char* const* get();
   private:
+    bool is_null_;
     std::vector<std::string> str_;
     std::vector<const char*> ptr_;
   };

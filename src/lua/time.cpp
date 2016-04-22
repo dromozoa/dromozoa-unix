@@ -15,36 +15,24 @@
 // You should have received a copy of the GNU General Public License
 // along with dromozoa-unix.  If not, see <http://www.gnu.org/licenses/>.
 
-#include <time.h>
-
 #include "common.hpp"
 
 namespace dromozoa {
   namespace {
-    int impl_nanosleep(lua_State* L) {
+    void impl_nanosleep(lua_State* L) {
       struct timespec tv1 = {};
       struct timespec tv2 = {};
-
-      lua_getfield(L, 1, "tv_sec");
-      tv1.tv_sec = luaL_checkinteger(L, -1);
-      lua_pop(L, 1);
-      lua_getfield(L, 1, "tv_nsec");
-      tv1.tv_nsec = luaL_checkinteger(L, -1);
-      lua_pop(L, 1);
-
+      check_timespec(L, 1, tv1);
       if (nanosleep(&tv1, &tv2) != -1) {
-        return push_success(L);
+        luaX_push_success(L);
       } else {
-        int result = push_error(L);
-        lua_newtable(L);
-        set_field(L, "tv_sec", tv2.tv_sec);
-        set_field(L, "tv_nsec", tv2.tv_nsec);
-        return result + 1;
+        push_error(L);
+        new_timespec(L, tv2);
       }
     }
   }
 
   void initialize_time(lua_State* L) {
-    function<impl_nanosleep>::set_field(L, "nanosleep");
+    luaX_set_field(L, -1, "nanosleep", impl_nanosleep);
   }
 }

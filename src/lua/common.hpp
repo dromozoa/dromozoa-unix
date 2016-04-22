@@ -15,45 +15,28 @@
 // You should have received a copy of the GNU General Public License
 // along with dromozoa-unix.  If not, see <http://www.gnu.org/licenses/>.
 
-#ifndef COMMON_HPP
-#define COMMON_HPP
+#ifndef DROMOZOA_COMMON_HPP
+#define DROMOZOA_COMMON_HPP
 
-extern "C" {
-#include <lua.h>
-#include <lauxlib.h>
-}
-
-#include <errno.h>
-#include <sys/socket.h>
+#include <time.h>
 
 #include <dromozoa/bind.hpp>
+
 #include <dromozoa/argument_vector.hpp>
 #include <dromozoa/socket_address.hpp>
 
-#include "bind.hpp"
-
 namespace dromozoa {
-  // using bind::function;
-  using bind::push_success;
-  // using bind::set_field;
-  using bind::translate_range_i;
-  using bind::translate_range_j;
-
-  int push_resource_unavailable_try_again(lua_State* L);
-  int push_operation_in_progress(lua_State* L);
-  int push_interrupted(lua_State* L);
-  int push_broken_pipe(lua_State* L);
-  int push_timed_out(lua_State* L);
-  int push_error(lua_State* L, int code = errno);
-
-  argument_vector make_argument_vector(lua_State* L, int n);
-
-  int new_fd(lua_State* L, int fd, bool ref = false);
-  int get_fd(lua_State* L, int n);
-
-  int new_sockaddr(lua_State* L, const socket_address& address);
-  int new_sockaddr(lua_State* L, const struct sockaddr* address, socklen_t size);
-  const socket_address* get_sockaddr(lua_State* L, int n);
+  argument_vector to_argument_vector(lua_State* L, int n);
+  void push_error(lua_State* L);
+  void push_error(lua_State* L, int code);
+  void new_fd(lua_State* L, int fd);
+  int to_fd(lua_State* L, int index);
+  int check_fd(lua_State* L, int n);
+  void new_sockaddr(lua_State* L, const socket_address& address);
+  void new_sockaddr(lua_State* L, const struct sockaddr* address, socklen_t size);
+  const socket_address* check_sockaddr(lua_State* L, int n);
+  void new_timespec(lua_State* L, const timespec& tv);
+  bool check_timespec(lua_State* L, int n, struct timespec& tv);
 }
 
 #endif

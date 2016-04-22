@@ -1,4 +1,4 @@
--- Copyright (C) 2016 Tomoyuki Fujimori <moyu@dromozoa.com>
+-- Copyright (C) 2015 Tomoyuki Fujimori <moyu@dromozoa.com>
 --
 -- This file is part of dromozoa-unix.
 --
@@ -16,23 +16,18 @@
 -- along with dromozoa-unix.  If not, see <http://www.gnu.org/licenses/>.
 
 local unix = require "dromozoa.unix"
+local gettimeofday = unix.gettimeofday
 
-local selector = unix.selector(1024, unix.O_CLOEXEC)
+local t1 = os.time()
+local t2 = unix.gettimeofday()
+local t3 = unix.gettimeofday()
 
-local asio = unix.asio(selector)
+assert(os.difftime(t2.tv_sec, t1) < 2)
 
-function asio:error(message, level)
-  return nil, message
+local u = t3.tv_usec - t2.tv_usec
+local s = t3.tv_sec - t2.tv_sec
+if u < 0 then
+  u = u + 1000000
+  s = s - 1
 end
-
-asio:resume(function ()
-  print("foo")
-  asio:wait()
-  print("bar")
-  error("baz")
-end)
-
-local a, b = asio:dispatch()
-print(a, b)
-
-selector:close()
+assert(s == 0)

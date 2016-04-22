@@ -22,8 +22,10 @@
 #include <dromozoa/compat_strerror.hpp>
 
 int main(int, char*[]) {
-  std::cerr << dromozoa::compat_strerror(ENOENT) << "\n";
-  std::cerr << dromozoa::compat_strerror(0) << "\n";
-  std::cerr << dromozoa::compat_strerror(65535) << "\n";
+  std::cout
+      << "strerror(ENOENT)=\"" << dromozoa::compat_strerror(ENOENT) << "\"\n"
+      << "strerror(-1)=\"" << dromozoa::compat_strerror(-1) << "\"\n"
+      << "strerror(0)=\"" << dromozoa::compat_strerror(0) << "\"\n"
+      << "strerror(65535)=\"" << dromozoa::compat_strerror(65535) << "\"\n";
   return 0;
 }

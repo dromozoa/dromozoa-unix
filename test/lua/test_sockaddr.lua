@@ -17,13 +17,14 @@
 
 local unix = require "dromozoa.unix"
 
-local addrinfo = assert(unix.getaddrinfo("127.0.0.1", "http", { ai_family = unix.AF_INET, ai_socktype = unix.SOCK_STREAM }))
-assert(#addrinfo == 1)
+assert(not pcall(unix.sockaddr_un, ("0123456789abcdef"):rep(4096)))
 
-local ai = addrinfo[1]
-local host, serv = assert(ai.ai_addr:getnameinfo(unix.NI_NUMERICHOST + unix.NI_NUMERICSERV))
-assert(ai.ai_socktype == unix.SOCK_STREAM)
-assert(ai.ai_addr:family() == unix.AF_INET)
-assert(host == "127.0.0.1")
-assert(tonumber(serv) == 80)
--- print(ai.ai_addr:family(), host, serv)
+local sa = assert(unix.sockaddr_un("test.sock"))
+assert(sa:family() == unix.AF_UNIX)
+assert(sa:path() == "test.sock")
+
+local sa = assert(unix.sockaddr_un("\0test.sock"))
+assert(sa:family() == unix.AF_UNIX)
+assert(sa:path() == "\0test.sock")
+
+assert(not pcall(unix.sockaddr_un, ("x"):rep(sa:size() * 2)))

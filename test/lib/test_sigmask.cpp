@@ -15,11 +15,12 @@
 // You should have received a copy of the GNU General Public License
 // along with dromozoa-unix.  If not, see <http://www.gnu.org/licenses/>.
 
-#include <assert.h>
 #include <signal.h>
 
 #include <dromozoa/compat_sigmask.hpp>
 #include <dromozoa/sigmask.hpp>
+
+#include "assert.hpp"
 
 void test_sigmask1() {
   sigset_t mask1;

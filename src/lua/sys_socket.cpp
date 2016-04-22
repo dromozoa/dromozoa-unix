@@ -17,59 +17,63 @@
 
 #include <sys/socket.h>
 
+#include <dromozoa/compat_socket.hpp>
+
 #include "common.hpp"
 
 namespace dromozoa {
   namespace {
-    int impl_socket(lua_State* L) {
-      int domain = luaL_checkinteger(L, 1);
-      int type = luaL_checkinteger(L, 2);
-      int protocol = luaL_optinteger(L, 3, 0);
-      int result = socket(domain, type, protocol);
+    void impl_socket(lua_State* L) {
+      int domain = luaX_check_integer<int>(L, 1);
+      int type = luaX_check_integer<int>(L, 2);
+      int protocol = luaX_opt_integer<int>(L, 3, 0);
+      int result = compat_socket(domain, type, protocol);
       if (result == -1) {
-        return push_error(L);
+        push_error(L);
       } else {
-        return new_fd(L, result);
+        new_fd(L, result);
       }
     }
 
-    int impl_socketpair(lua_State* L) {
-      int domain = luaL_checkinteger(L, 1);
-      int type = luaL_checkinteger(L, 2);
-      int protocol = luaL_optinteger(L, 3, 0);
+    void impl_socketpair(lua_State* L) {
+      int domain = luaX_check_integer<int>(L, 1);
+      int type = luaX_check_integer<int>(L, 2);
+      int protocol = luaX_opt_integer<int>(L, 3, 0);
       int fd[2] = { -1, -1 };
-      if (socketpair(domain, type, protocol, fd) == -1) {
-        return push_error(L);
+      if (compat_socketpair(domain, type, protocol, fd) == -1) {
+        push_error(L);
       } else {
         new_fd(L, fd[0]);
         new_fd(L, fd[1]);
-        return 2;
       }
     }
   }
 
   void initialize_sys_socket(lua_State* L) {
-    function<impl_socket>::set_field(L, "socket");
-    function<impl_socketpair>::set_field(L, "socketpair");
+    luaX_set_field(L, -1, "socket", impl_socket);
+    luaX_set_field(L, -1, "socketpair", impl_socketpair);
 
-    DROMOZOA_BIND_SET_FIELD(L, AF_INET);
-    DROMOZOA_BIND_SET_FIELD(L, AF_INET6);
-    DROMOZOA_BIND_SET_FIELD(L, AF_UNIX);
-    DROMOZOA_BIND_SET_FIELD(L, AF_UNSPEC);
+    luaX_set_field(L, -1, "AF_INET", AF_INET);
+    luaX_set_field(L, -1, "AF_INET6", AF_INET6);
+    luaX_set_field(L, -1, "AF_UNIX", AF_UNIX);
+    luaX_set_field(L, -1, "AF_UNSPEC", AF_UNSPEC);
 
-    DROMOZOA_BIND_SET_FIELD(L, SOCK_STREAM);
-    DROMOZOA_BIND_SET_FIELD(L, SOCK_DGRAM);
+    luaX_set_field<int>(L, -1, "SOCK_STREAM", SOCK_STREAM);
+    luaX_set_field<int>(L, -1, "SOCK_DGRAM", SOCK_DGRAM);
+    luaX_set_field<int>(L, -1, "SOCK_SEQPACKET", SOCK_SEQPACKET);
+    luaX_set_field(L, -1, "SOCK_CLOEXEC", COMPAT_SOCK_CLOEXEC);
+    luaX_set_field(L, -1, "SOCK_NONBLOCK", COMPAT_SOCK_NONBLOCK);
 
-    DROMOZOA_BIND_SET_FIELD(L, SOMAXCONN);
+    luaX_set_field(L, -1, "SOMAXCONN", SOMAXCONN);
 
-    DROMOZOA_BIND_SET_FIELD(L, SHUT_RD);
-    DROMOZOA_BIND_SET_FIELD(L, SHUT_WR);
-    DROMOZOA_BIND_SET_FIELD(L, SHUT_RDWR);
+    luaX_set_field<int>(L, -1, "SHUT_RD", SHUT_RD);
+    luaX_set_field<int>(L, -1, "SHUT_WR", SHUT_WR);
+    luaX_set_field<int>(L, -1, "SHUT_RDWR", SHUT_RDWR);
 
-    DROMOZOA_BIND_SET_FIELD(L, SOL_SOCKET);
-    DROMOZOA_BIND_SET_FIELD(L, SO_ERROR);
-    DROMOZOA_BIND_SET_FIELD(L, SO_RCVBUF);
-    DROMOZOA_BIND_SET_FIELD(L, SO_REUSEADDR);
-    DROMOZOA_BIND_SET_FIELD(L, SO_SNDBUF);
+    luaX_set_field(L, -1, "SOL_SOCKET", SOL_SOCKET);
+    luaX_set_field(L, -1, "SO_ERROR", SO_ERROR);
+    luaX_set_field(L, -1, "SO_RCVBUF", SO_RCVBUF);
+    luaX_set_field(L, -1, "SO_REUSEADDR", SO_REUSEADDR);
+    luaX_set_field(L, -1, "SO_SNDBUF", SO_SNDBUF);
   }
 }

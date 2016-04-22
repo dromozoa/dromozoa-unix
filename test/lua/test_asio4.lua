@@ -17,9 +17,6 @@
 
 local unix = require "dromozoa.unix"
 
-unix.set_log_level(2)
-unix.set_raise_error(true)
-
 local reader, writer = unix.socketpair(unix.AF_UNIX, unix.SOCK_STREAM)
 reader:ndelay_on()
 writer:ndelay_on()

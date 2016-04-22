@@ -1,4 +1,4 @@
--- Copyright (C) 2015 Tomoyuki Fujimori <moyu@dromozoa.com>
+-- Copyright (C) 2016 Tomoyuki Fujimori <moyu@dromozoa.com>
 --
 -- This file is part of dromozoa-unix.
 --
@@ -16,19 +16,16 @@
 -- along with dromozoa-unix.  If not, see <http://www.gnu.org/licenses/>.
 
 local unix = require "dromozoa.unix"
-local gettimeofday = unix.gettimeofday
 
-local t1 = os.time()
-local t2 = gettimeofday()
-local t3 = gettimeofday()
+assert(unix.ignore_signal(unix.SIGPIPE))
 
-assert(os.difftime(t2.tv_sec, t1) < 2)
+local reader, writer = unix.pipe()
 
-local u = t3.tv_usec - t2.tv_usec
-local s = t3.tv_sec - t2.tv_sec
-if u < 0 then
-  u = u + 1000000
-  s = s - 1
-end
-assert(s == 0)
--- print(("%d.%06d"):format(s, u))
+assert(reader:close())
+local a, b, c = writer:write("x")
+assert(a == nil)
+assert(c == unix.EPIPE)
+print(b)
+
+assert(unix.kill(unix.getpid(), 0))
+assert(unix.kill(-unix.getpgrp(), 0))
