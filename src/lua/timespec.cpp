@@ -25,66 +25,6 @@
 
 namespace dromozoa {
   namespace {
-    void impl_call(lua_State* L) {
-      struct timespec tv = {};
-      check_timespec(L, 2, tv);
-      new_timespec(L, tv);
-    }
-
-    void impl_now(lua_State* L) {
-      struct timeval tv = {};
-      if (gettimeofday(&tv, 0) == -1) {
-        push_error(L);
-      } else {
-        lua_newtable(L);
-        luaX_set_field(L, -1, "tv_sec", tv.tv_sec);
-        luaX_set_field(L, -1, "tv_nsec", tv.tv_usec * 1000);
-        luaX_set_metatable(L, "dromozoa.unix.timespec");
-      }
-    }
-
-    void impl_tostring(lua_State* L) {
-      struct timespec tv = {};
-      check_timespec(L, 1, tv);
-      bool utc = lua_toboolean(L, 2);
-      struct tm tm = {};
-      if (utc) {
-        if (!gmtime_r(&tv.tv_sec, &tm)) {
-          push_error(L);
-          return;
-        }
-      } else {
-        if (!localtime_r(&tv.tv_sec, &tm)) {
-          push_error(L);
-          return;
-        }
-      }
-      std::ostringstream out;
-      out << std::setfill('0')
-          << (tm.tm_year + 1900)
-          << "-" << std::setw(2) << (tm.tm_mon + 1)
-          << "-" << std::setw(2) << tm.tm_mday
-          << "T" << std::setw(2) << tm.tm_hour
-          << ":" << std::setw(2) << tm.tm_min
-          << ":" << std::setw(2) << tm.tm_sec
-          << "." << std::setw(9) << tv.tv_nsec;
-      if (utc) {
-        out << "Z";
-      } else {
-        char buffer[8] = { 0 };
-        strftime(buffer, 8, "%z", &tm);
-        out << buffer;
-      }
-      std::string s = out.str();
-      lua_pushlstring(L, s.data(), s.size());
-    }
-
-    void impl_tonumber(lua_State* L) {
-      struct timespec tv = {};
-      check_timespec(L, 1, tv);
-      lua_pushnumber(L, tv.tv_sec + tv.tv_nsec * 0.000000001);
-    }
-
     void impl_add(lua_State* L) {
       struct timespec tv1 = {};
       struct timespec tv2 = {};
@@ -144,6 +84,66 @@ namespace dromozoa {
         return luaX_push(L, tv1.tv_sec <= tv2.tv_sec);
       }
     }
+
+    void impl_call(lua_State* L) {
+      struct timespec tv = {};
+      check_timespec(L, 2, tv);
+      new_timespec(L, tv);
+    }
+
+    void impl_now(lua_State* L) {
+      struct timeval tv = {};
+      if (gettimeofday(&tv, 0) == -1) {
+        push_error(L);
+      } else {
+        lua_newtable(L);
+        luaX_set_field(L, -1, "tv_sec", tv.tv_sec);
+        luaX_set_field(L, -1, "tv_nsec", tv.tv_usec * 1000);
+        luaX_set_metatable(L, "dromozoa.unix.timespec");
+      }
+    }
+
+    void impl_tostring(lua_State* L) {
+      struct timespec tv = {};
+      check_timespec(L, 1, tv);
+      bool utc = lua_toboolean(L, 2);
+      struct tm tm = {};
+      if (utc) {
+        if (!gmtime_r(&tv.tv_sec, &tm)) {
+          push_error(L);
+          return;
+        }
+      } else {
+        if (!localtime_r(&tv.tv_sec, &tm)) {
+          push_error(L);
+          return;
+        }
+      }
+      std::ostringstream out;
+      out << std::setfill('0')
+          << (tm.tm_year + 1900)
+          << "-" << std::setw(2) << (tm.tm_mon + 1)
+          << "-" << std::setw(2) << tm.tm_mday
+          << "T" << std::setw(2) << tm.tm_hour
+          << ":" << std::setw(2) << tm.tm_min
+          << ":" << std::setw(2) << tm.tm_sec
+          << "." << std::setw(9) << tv.tv_nsec;
+      if (utc) {
+        out << "Z";
+      } else {
+        char buffer[6] = { 0 };
+        strftime(buffer, 6, "%z", &tm);
+        out << buffer;
+      }
+      std::string s = out.str();
+      lua_pushlstring(L, s.data(), s.size());
+    }
+
+    void impl_tonumber(lua_State* L) {
+      struct timespec tv = {};
+      check_timespec(L, 1, tv);
+      lua_pushnumber(L, tv.tv_sec + tv.tv_nsec * 0.000000001);
+    }
   }
 
   void new_timespec(lua_State* L, const timespec& tv) {
@@ -184,6 +184,7 @@ namespace dromozoa {
       luaX_set_field(L, -1, "__eq", impl_eq);
       luaX_set_field(L, -1, "__lt", impl_lt);
       luaX_set_field(L, -1, "__le", impl_le);
+      luaX_set_field(L, -1, "__tostring", impl_tostring);
       lua_pop(L, 1);
 
       luaX_set_metafield(L, "__call", impl_call);

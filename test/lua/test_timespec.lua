@@ -22,21 +22,28 @@ assert(t.tv_sec == 1)
 assert(t.tv_nsec == 250000000)
 
 local t1 = unix.timespec.now()
-unix.nanosleep(unix.timespec(0.2))
+unix.nanosleep(0.2)
 local t2 = unix.timespec.now()
 assert(t1 == t1)
 assert(t1 < t2)
 
 local t = t2 - t1
-print(t:tonumber())
-print(t1:tostring())
-print(t2:tostring(true))
+assert(t1 + t == t2)
 assert(t.tv_sec == 0)
 assert(100000000 < t.tv_nsec and t.tv_nsec < 300000000)
-assert(t1 + t == t2)
+assert(0.1 < t:tonumber() and t:tonumber() < 0.3)
 
 local t1 = unix.timespec({ tv_sec = 1, tv_nsec = 0 })
 local t2 = unix.timespec({ tv_sec = 1, tv_nsec = 1 })
 assert(t1 <= t1)
 assert(t1 <= t2)
 
+local t = unix.timespec(1 / 3)
+local l = t:tostring()
+local u = t:tostring(true)
+assert(l:match("^([^%.]+)") == os.date("%Y-%m-%dT%H:%M:%S", 0))
+assert(u:match("^([^%.]+)") == os.date("!%Y-%m-%dT%H:%M:%S", 0))
+assert(l == tostring(t))
+
+print(unix.timespec.tostring(os.time()))
+print(unix.timespec.now():tostring())
