@@ -31,3 +31,6 @@ assert(reader:close())
 
 local process2 = assert(unix.process())
 assert(process2:forkexec(path, { arg[-1], "test/lua/unix_client.lua" }))
+
+assert(unix.wait())
+assert(unix.wait())
