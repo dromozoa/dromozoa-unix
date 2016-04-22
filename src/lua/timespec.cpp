@@ -15,6 +15,10 @@
 // You should have received a copy of the GNU General Public License
 // along with dromozoa-unix.  If not, see <http://www.gnu.org/licenses/>.
 
+#ifdef HAVE_CONFIG_H
+#include "config.h"
+#endif
+
 #include <math.h>
 #include <sys/time.h>
 
@@ -91,6 +95,16 @@ namespace dromozoa {
       new_timespec(L, tv);
     }
 
+#ifdef HAVE_CLOCK_GETTIME
+    void impl_now(lua_State* L) {
+      struct timespec tv = {};
+      if (clock_gettime(CLOCK_REALTIME, &tv) == -1) {
+        push_error(L);
+      } else {
+        new_timespec(L, tv);
+      }
+    }
+#else
     void impl_now(lua_State* L) {
       struct timeval tv = {};
       if (gettimeofday(&tv, 0) == -1) {
@@ -102,6 +116,7 @@ namespace dromozoa {
         luaX_set_metatable(L, "dromozoa.unix.timespec");
       }
     }
+#endif
 
     void impl_tostring(lua_State* L) {
       struct timespec tv = {};
