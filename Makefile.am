@@ -22,12 +22,8 @@ EXTRA_DIST = \
 	.gitignore \
 	README.md \
 	bind \
-	dromozoa \
 	dromozoa-unix-*.rockspec \
 	include \
 	m4/update \
 	test \
 	test.sh
-
-nobase_lua_DATA = \
-	dromozoa/unix/asio.lua
