@@ -18,15 +18,6 @@
 #include "common.hpp"
 
 namespace dromozoa {
-  void initialize_asio(lua_State* L) {
-    lua_getglobal(L, "require");
-    lua_pushliteral(L, "dromozoa.unix.asio");
-    lua_call(L, 1, 1);
-    lua_pushvalue(L, -2);
-    luaX_set_field(L, -2, "super");
-    luaX_set_field(L, -2, "asio");
-  }
-
   void initialize_error(lua_State* L);
   void initialize_fcntl(lua_State* L);
   void initialize_fd(lua_State* L);
@@ -42,14 +33,12 @@ namespace dromozoa {
   void initialize_stdlib(lua_State* L);
   void initialize_sys_socket(lua_State* L);
   void initialize_sys_stat(lua_State* L);
-  void initialize_sys_time(lua_State* L);
   void initialize_sys_wait(lua_State* L);
   void initialize_time(lua_State* L);
   void initialize_timespec(lua_State* L);
   void initialize_unistd(lua_State* L);
 
   void initialize(lua_State* L) {
-    initialize_asio(L);
     initialize_error(L);
     initialize_fcntl(L);
     initialize_fd(L);
@@ -65,7 +54,6 @@ namespace dromozoa {
     initialize_stdlib(L);
     initialize_sys_socket(L);
     initialize_sys_stat(L);
-    initialize_sys_time(L);
     initialize_sys_wait(L);
     initialize_time(L);
     initialize_timespec(L);

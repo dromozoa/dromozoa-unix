@@ -43,7 +43,6 @@ unix_la_SOURCES = \
 	stdlib.cpp \
 	sys_socket.cpp \
 	sys_stat.cpp \
-	sys_time.cpp \
 	sys_wait.cpp \
 	time.cpp \
 	timespec.cpp \
