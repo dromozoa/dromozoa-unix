@@ -22,7 +22,7 @@ case x$1 in
   *) lua=$1;;
 esac
 
-for i in test/test*.lua
+for i in test/lua/test*.lua
 do
   "$lua" "$i"
 done
