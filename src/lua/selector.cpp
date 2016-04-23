@@ -33,8 +33,8 @@ typedef dromozoa::selector_kqueue selector_impl;
 
 namespace dromozoa {
   namespace {
-    selector* check_selector(lua_State* L, int n) {
-      return luaX_check_udata<selector>(L, n, "dromozoa.unix.selector");
+    selector* check_selector(lua_State* L, int arg) {
+      return luaX_check_udata<selector>(L, arg, "dromozoa.unix.selector");
     }
 
     void impl_call(lua_State* L) {

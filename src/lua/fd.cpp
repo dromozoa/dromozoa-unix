@@ -26,8 +26,8 @@ namespace dromozoa {
       luaX_set_metatable(L, "dromozoa.unix.fd_ref");
     }
 
-    file_descriptor* check_file_descriptor(lua_State* L, int n) {
-      return luaX_check_udata<file_descriptor>(L, n, "dromozoa.unix.fd_ref", "dromozoa.unix.fd");
+    file_descriptor* check_file_descriptor(lua_State* L, int arg) {
+      return luaX_check_udata<file_descriptor>(L, arg, "dromozoa.unix.fd_ref", "dromozoa.unix.fd");
     }
 
     void impl_gc(lua_State* L) {
@@ -78,11 +78,11 @@ namespace dromozoa {
     return -1;
   }
 
-  int check_fd(lua_State* L, int n) {
-    if (lua_isuserdata(L, n)) {
-      return check_file_descriptor(L, n)->get();
+  int check_fd(lua_State* L, int arg) {
+    if (lua_isuserdata(L, arg)) {
+      return check_file_descriptor(L, arg)->get();
     } else {
-      return luaX_check_integer<int>(L, n);
+      return luaX_check_integer<int>(L, arg);
     }
   }
 
