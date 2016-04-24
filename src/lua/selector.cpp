@@ -127,7 +127,7 @@ namespace dromozoa {
       luaX_set_field(L, -1, "__gc", impl_gc);
       lua_pop(L, 1);
 
-      luaX_set_metafield(L, "__call", impl_call);
+      luaX_set_metafield(L, -1, "__call", impl_call);
       luaX_set_field(L, -1, "close", impl_close);
       luaX_set_field(L, -1, "add", impl_add);
       luaX_set_field(L, -1, "mod", impl_mod);

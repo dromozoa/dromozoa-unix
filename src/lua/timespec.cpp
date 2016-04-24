@@ -202,7 +202,7 @@ namespace dromozoa {
       luaX_set_field(L, -1, "__tostring", impl_tostring);
       lua_pop(L, 1);
 
-      luaX_set_metafield(L, "__call", impl_call);
+      luaX_set_metafield(L, -1, "__call", impl_call);
       luaX_set_field(L, -1, "now", impl_now);
       luaX_set_field(L, -1, "tostring", impl_tostring);
       luaX_set_field(L, -1, "tonumber", impl_tonumber);
