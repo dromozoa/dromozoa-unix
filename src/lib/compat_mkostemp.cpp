@@ -24,7 +24,8 @@
 #include <stdlib.h>
 #include <unistd.h>
 
-#include <dromozoa/bind.hpp>
+#include <dromozoa/bind/unexpected.hpp>
+
 #include <dromozoa/coe.hpp>
 #include <dromozoa/compat_mkostemp.hpp>
 #include <dromozoa/compat_strerror.hpp>

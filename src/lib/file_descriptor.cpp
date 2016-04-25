@@ -18,7 +18,8 @@
 #include <errno.h>
 #include <unistd.h>
 
-#include <dromozoa/bind.hpp>
+#include <dromozoa/bind/unexpected.hpp>
+
 #include <dromozoa/compat_strerror.hpp>
 #include <dromozoa/errno_saver.hpp>
 #include <dromozoa/file_descriptor.hpp>

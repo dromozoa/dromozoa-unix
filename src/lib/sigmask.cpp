@@ -17,7 +17,8 @@
 
 #include <errno.h>
 
-#include <dromozoa/bind.hpp>
+#include <dromozoa/bind/unexpected.hpp>
+
 #include <dromozoa/compat_strerror.hpp>
 #include <dromozoa/compat_sigmask.hpp>
 #include <dromozoa/errno_saver.hpp>
