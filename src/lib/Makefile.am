@@ -17,7 +17,7 @@
 
 noinst_LTLIBRARIES = libdromozoa-unix.la
 
-libdromozoa_unix_la_CPPFLAGS = -I$(top_srcdir)/include
+libdromozoa_unix_la_CPPFLAGS = -I$(top_srcdir)/bind -I$(top_srcdir)/include
 libdromozoa_unix_la_LDFLAGS = -static
 libdromozoa_unix_la_SOURCES = \
 	argument_vector.cpp \
@@ -37,8 +37,7 @@ libdromozoa_unix_la_SOURCES = \
 	selector.cpp \
 	selfpipe.cpp \
 	sigmask.cpp \
-	socket_address.cpp \
-	unexpected.cpp
+	socket_address.cpp
 
 if HAVE_EPOLL
 libdromozoa_unix_la_SOURCES += selector_epoll.cpp

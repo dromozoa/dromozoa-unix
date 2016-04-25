@@ -18,10 +18,10 @@
 #include <errno.h>
 #include <unistd.h>
 
+#include <dromozoa/bind.hpp>
 #include <dromozoa/compat_strerror.hpp>
 #include <dromozoa/errno_saver.hpp>
 #include <dromozoa/file_descriptor.hpp>
-#include <dromozoa/unexpected.hpp>
 
 namespace dromozoa {
   file_descriptor::file_descriptor() : fd_(-1) {}
