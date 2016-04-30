@@ -34,15 +34,15 @@ namespace dromozoa {
       const socket_address* self = check_sockaddr(L, 1);
       if (self->family() == AF_UNIX) {
         const struct sockaddr_un* sun = reinterpret_cast<const struct sockaddr_un*>(self->get());
-        socklen_t n = self->size() - offsetof(struct sockaddr_un, sun_path);
-        if (n > 0) {
+        socklen_t arg = self->size() - offsetof(struct sockaddr_un, sun_path);
+        if (arg > 0) {
           const char* path = sun->sun_path;
           socklen_t i = 0;
           // abstract socket address
-          if (n > 1 && path[0] == '\0' && path[1] != '\0') {
+          if (arg > 1 && path[0] == '\0' && path[1] != '\0') {
             i = 1;
           }
-          for (; i < n && path[i] != '\0'; ++i) {}
+          for (; i < arg && path[i] != '\0'; ++i) {}
           lua_pushlstring(L, path, i);
         } else {
           luaX_push(L, "");
@@ -77,8 +77,8 @@ namespace dromozoa {
     luaX_set_metatable(L, "dromozoa.unix.sockaddr");
   }
 
-  const socket_address* check_sockaddr(lua_State* L, int n) {
-    return luaX_check_udata<socket_address>(L, n, "dromozoa.unix.sockaddr");
+  const socket_address* check_sockaddr(lua_State* L, int arg) {
+    return luaX_check_udata<socket_address>(L, arg, "dromozoa.unix.sockaddr");
   }
 
   void initialize_sockaddr_netdb(lua_State* L);

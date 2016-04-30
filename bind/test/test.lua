@@ -117,6 +117,15 @@ assert(not pcall(bind.opt_integer, 0, 0, -1))
 assert(not pcall(bind.opt_integer, 0, 0, 0, -1))
 assert(not pcall(bind.opt_integer, 0, 0, 0, 256))
 
+bind.check_enum(bind.ENUM42)
+bind.check_enum(bind.ENUM69)
+assert(not pcall(bind.check_enum, "foo"))
+
+assert(bind.opt_enum() == bind.ENUM42)
+assert(bind.opt_enum(bind.ENUM42) == bind.ENUM42)
+assert(bind.opt_enum(bind.ENUM69) == bind.ENUM69)
+assert(not pcall(bind.check_enum, "foo"))
+
 assert(bind.opt_integer_field({}) == 0)
 assert(bind.opt_integer_field({ foo = 42 }) == 42)
 assert(not pcall(bind.opt_integer_field, { foo = "bar" }))
@@ -133,6 +142,35 @@ assert(not pcall(bind.field_error1))
 assert(not pcall(bind.field_error2))
 assert(not pcall(bind.field_error3))
 
+local a, b = bind.set_metafield()
+assert(getmetatable(a).a == "a")
+assert(getmetatable(a).b == "b")
+assert(b == nil)
+
+local DBL_MAX = 1.7976931348623157e+308
+local DBL_DENORM_MIN = 4.9406564584124654e-324
+local DBL_MIN = 2.2250738585072014e-308
+local DBL_EPSILON = 2.2204460492503131e-16
+
+assert(bind.is_integer(42))
+assert(bind.is_integer(42 / 2))
+assert(not bind.is_integer(1.25))
+assert(bind.is_integer(1.25e6))
+assert(bind.is_integer(1.25e12))
+assert(bind.is_integer(1.25e18))
+assert(not bind.is_integer(1.25e24))
+
+assert(not bind.is_integer(DBL_MAX))
+assert(not bind.is_integer(DBL_DENORM_MIN))
+assert(not bind.is_integer(DBL_MIN))
+assert(not bind.is_integer(DBL_EPSILON))
+assert(not bind.is_integer(math.pi))
+
+assert(bind.is_integer(-1 / math.huge)) -- -0
+assert(not bind.is_integer(math.huge))  -- inf
+assert(not bind.is_integer(-math.huge)) -- -inf
+assert(not bind.is_integer(0 / 0))      -- nan
+
 assert(bind():get() == 0)
 assert(bind():set(42):get() == 42)
 assert(bind(42):get() == 42)
@@ -142,3 +180,5 @@ assert(bind(42):to("dromozoa.bind.int", "bar", "baz", "qux") == 42)
 assert(bind(42):to("foo", "dromozoa.bind.int", "baz", "qux") == 42)
 assert(bind(42):to("foo", "bar", "dromozoa.bind.int", "qux") == 42)
 assert(bind(42):to("foo", "bar", "baz", "dromozoa.bind.int") == 42)
+
+bind.unexpected()

@@ -26,17 +26,17 @@
 #include <dromozoa/socket_address.hpp>
 
 namespace dromozoa {
-  argument_vector to_argument_vector(lua_State* L, int n);
+  argument_vector to_argument_vector(lua_State* L, int arg);
   void push_error(lua_State* L);
   void push_error(lua_State* L, int code);
   void new_fd(lua_State* L, int fd);
   int to_fd(lua_State* L, int index);
-  int check_fd(lua_State* L, int n);
+  int check_fd(lua_State* L, int arg);
   void new_sockaddr(lua_State* L, const socket_address& address);
   void new_sockaddr(lua_State* L, const struct sockaddr* address, socklen_t size);
-  const socket_address* check_sockaddr(lua_State* L, int n);
+  const socket_address* check_sockaddr(lua_State* L, int arg);
   void new_timespec(lua_State* L, const timespec& tv);
-  bool check_timespec(lua_State* L, int n, struct timespec& tv);
+  bool check_timespec(lua_State* L, int arg, struct timespec& tv);
 }
 
 #endif

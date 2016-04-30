@@ -17,11 +17,12 @@
 
 #include <errno.h>
 
+#include <dromozoa/bind/unexpected.hpp>
+
 #include <dromozoa/compat_strerror.hpp>
 #include <dromozoa/compat_sigmask.hpp>
 #include <dromozoa/errno_saver.hpp>
 #include <dromozoa/sigmask.hpp>
-#include <dromozoa/unexpected.hpp>
 
 namespace dromozoa {
   int sigmask_block_all_signals(sigset_t* old_mask) {
