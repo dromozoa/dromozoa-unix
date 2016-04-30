@@ -24,6 +24,8 @@
 #include <stdlib.h>
 #include <unistd.h>
 
+#include <dromozoa/bind/unexpected.hpp>
+
 #include <dromozoa/coe.hpp>
 #include <dromozoa/compat_mkostemp.hpp>
 #include <dromozoa/compat_strerror.hpp>
@@ -31,7 +33,6 @@
 #include <dromozoa/file_descriptor.hpp>
 #include <dromozoa/ndelay.hpp>
 #include <dromozoa/sigmask.hpp>
-#include <dromozoa/unexpected.hpp>
 
 namespace dromozoa {
 #ifdef HAVE_MKOSTEMP

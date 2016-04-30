@@ -168,22 +168,22 @@ namespace dromozoa {
     luaX_set_metatable(L, "dromozoa.unix.timespec");
   }
 
-  bool check_timespec(lua_State* L, int n, struct timespec& tv) {
-    if (lua_isnoneornil(L, n)) {
+  bool check_timespec(lua_State* L, int arg, struct timespec& tv) {
+    if (lua_isnoneornil(L, arg)) {
       return false;
-    } else if (lua_isnumber(L, n)) {
-      double t = lua_tonumber(L, n);
+    } else if (lua_isnumber(L, arg)) {
+      double t = lua_tonumber(L, arg);
       double i = 0;
       double f = modf(t, &i);
       tv.tv_sec = i;
       tv.tv_nsec = f * 1000000000;
       return true;
-    } else if (lua_istable(L, n)) {
-      tv.tv_sec = luaX_opt_integer_field<time_t>(L, n, "tv_sec", 0);
-      tv.tv_nsec = luaX_opt_integer_field<long>(L, n, "tv_nsec", 0, 0L, 999999999L);
+    } else if (lua_istable(L, arg)) {
+      tv.tv_sec = luaX_opt_integer_field<time_t>(L, arg, "tv_sec", 0);
+      tv.tv_nsec = luaX_opt_integer_field<long>(L, arg, "tv_nsec", 0, 0L, 999999999L);
       return true;
     } else {
-      luaL_argerror(L, n, "nil, number or table expected");
+      luaL_argerror(L, arg, "nil, number or table expected");
       return false;
     }
   }
@@ -202,7 +202,7 @@ namespace dromozoa {
       luaX_set_field(L, -1, "__tostring", impl_tostring);
       lua_pop(L, 1);
 
-      luaX_set_metafield(L, "__call", impl_call);
+      luaX_set_metafield(L, -1, "__call", impl_call);
       luaX_set_field(L, -1, "now", impl_now);
       luaX_set_field(L, -1, "tostring", impl_tostring);
       luaX_set_field(L, -1, "tonumber", impl_tonumber);
