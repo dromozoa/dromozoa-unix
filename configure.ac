@@ -29,6 +29,7 @@ AC_CHECK_FUNCS([accept4])
 AC_CHECK_FUNCS([epoll_create1])
 AC_CHECK_FUNCS([epoll_create])
 AC_CHECK_FUNCS([kqueue])
+AC_CHECK_FUNCS([mach_absolute_time])
 AC_CHECK_FUNCS([mkostemp])
 AC_CHECK_FUNCS([pipe2])
 
