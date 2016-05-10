@@ -38,12 +38,16 @@ libdromozoa_unix_la_SOURCES = \
 	selfpipe.cpp \
 	sigmask.cpp \
 	socket_address.cpp \
-	timer.cpp \
-	timer_mach_absolute_time.cpp
+	timer.cpp
 
 if HAVE_EPOLL
 libdromozoa_unix_la_SOURCES += selector_epoll.cpp
-endif
+else
 if HAVE_KQUEUE
 libdromozoa_unix_la_SOURCES += selector_kqueue.cpp
+endif
+endif
+
+if HAVE_MACH_ABSOLUTE_TIME
+libdromozoa_unix_la_SOURCES += timer_mach_absolute_time.cpp
 endif
