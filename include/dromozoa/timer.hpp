@@ -22,9 +22,9 @@ namespace dromozoa {
   class timer {
   public:
     virtual ~timer();
-    virtual int start();
-    virtual int stop();
-    virtual double elapsed() const;
+    virtual int start() = 0;
+    virtual int stop() = 0;
+    virtual double elapsed() const = 0;
   };
 }
 

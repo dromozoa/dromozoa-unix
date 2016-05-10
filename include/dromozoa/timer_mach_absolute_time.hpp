@@ -20,8 +20,10 @@
 
 #include <stdint.h>
 
+#include <dromozoa/timer.hpp>
+
 namespace dromozoa {
-  class timer_mach_absolute_time {
+  class timer_mach_absolute_time : public timer {
   public:
     timer_mach_absolute_time();
     virtual ~timer_mach_absolute_time();
