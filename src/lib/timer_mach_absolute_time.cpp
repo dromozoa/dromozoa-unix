@@ -15,17 +15,26 @@
 // You should have received a copy of the GNU General Public License
 // along with dromozoa-unix.  If not, see <http://www.gnu.org/licenses/>.
 
-#ifndef DROMOZOA_TIMER_HPP
-#define DROMOZOA_TIMER_HPP
+#include <mach/mach_time.h>
+
+#include <dromozoa/timer_mach_absolute_time.hpp>
 
 namespace dromozoa {
-  class timer {
-  public:
-    virtual ~timer();
-    virtual int start();
-    virtual int stop();
-    virtual double elapsed() const;
-  };
-}
+  timer_mach_absolute_time::timer_mach_absolute_time() : start_(), stop_() {}
 
-#endif
+  timer_mach_absolute_time::~timer_mach_absolute_time() {}
+
+  int timer_mach_absolute_time::start() {
+    start_ = mach_absolute_time();
+    return 0;
+  }
+
+  int timer_mach_absolute_time::stop() {
+    stop_ = mach_absolute_time();
+    return 0;
+  }
+
+  double timer_mach_absolute_time::elapsed() const {
+    return (stop_ - start_) * 0.000000001;
+  }
+}

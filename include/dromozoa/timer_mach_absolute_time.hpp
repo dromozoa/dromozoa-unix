@@ -18,6 +18,8 @@
 #ifndef DROMOZOA_TIMER_MACH_ABSOLUTE_TIME_HPP
 #define DROMOZOA_TIMER_MACH_ABSOLUTE_TIME_HPP
 
+#include <stdint.h>
+
 namespace dromozoa {
   class timer_mach_absolute_time {
   public:
@@ -25,10 +27,12 @@ namespace dromozoa {
     virtual ~timer_mach_absolute_time();
     virtual int start();
     virtual int stop();
-    virtual double elapsed();
+    virtual double elapsed() const;
   private:
     uint64_t start_;
     uint64_t stop_;
+    timer_mach_absolute_time(const timer_mach_absolute_time&);
+    timer_mach_absolute_time& operator=(const timer_mach_absolute_time&);
   };
 }
 

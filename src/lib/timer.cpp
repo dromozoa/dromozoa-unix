@@ -15,17 +15,8 @@
 // You should have received a copy of the GNU General Public License
 // along with dromozoa-unix.  If not, see <http://www.gnu.org/licenses/>.
 
-#ifndef DROMOZOA_TIMER_HPP
-#define DROMOZOA_TIMER_HPP
+#include <dromozoa/timer.hpp>
 
 namespace dromozoa {
-  class timer {
-  public:
-    virtual ~timer();
-    virtual int start();
-    virtual int stop();
-    virtual double elapsed() const;
-  };
+  timer::~timer() {}
 }
-
-#endif
