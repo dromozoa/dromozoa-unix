@@ -36,6 +36,7 @@ unix_la_SOURCES = \
 	pathexec.cpp \
 	pipe.cpp \
 	process.cpp \
+	sched.cpp \
 	selector.cpp \
 	selfpipe.cpp \
 	signal.cpp \
