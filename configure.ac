@@ -32,6 +32,8 @@ AC_CHECK_FUNCS([kqueue])
 AC_CHECK_FUNCS([mach_absolute_time])
 AC_CHECK_FUNCS([mkostemp])
 AC_CHECK_FUNCS([pipe2])
+AC_CHECK_FUNCS([sched_getaffinity])
+AC_CHECK_FUNCS([sched_setaffinity])
 
 AC_SEARCH_LIBS([clock_gettime], [rt], [AC_DEFINE(HAVE_CLOCK_GETTIME, 1, [Define to 1 if you have the 'clock_gettime' function.]) ])
 

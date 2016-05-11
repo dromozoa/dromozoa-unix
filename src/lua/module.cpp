@@ -26,11 +26,13 @@ namespace dromozoa {
   void initialize_pathexec(lua_State* L);
   void initialize_pipe(lua_State* L);
   void initialize_process(lua_State* L);
+  void initialize_sched(lua_State* L);
   void initialize_selector(lua_State* L);
   void initialize_selfpipe(lua_State* L);
   void initialize_signal(lua_State* L);
   void initialize_sockaddr(lua_State* L);
   void initialize_stdlib(lua_State* L);
+  void initialize_sys_mman(lua_State* L);
   void initialize_sys_socket(lua_State* L);
   void initialize_sys_stat(lua_State* L);
   void initialize_sys_wait(lua_State* L);
@@ -48,11 +50,13 @@ namespace dromozoa {
     initialize_pathexec(L);
     initialize_pipe(L);
     initialize_process(L);
+    initialize_sched(L);
     initialize_selector(L);
     initialize_selfpipe(L);
     initialize_signal(L);
     initialize_sockaddr(L);
     initialize_stdlib(L);
+    initialize_sys_mman(L);
     initialize_sys_socket(L);
     initialize_sys_stat(L);
     initialize_sys_wait(L);

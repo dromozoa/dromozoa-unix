@@ -36,11 +36,13 @@ unix_la_SOURCES = \
 	pathexec.cpp \
 	pipe.cpp \
 	process.cpp \
+	sched.cpp \
 	selector.cpp \
 	selfpipe.cpp \
 	signal.cpp \
 	sockaddr.cpp \
 	stdlib.cpp \
+	sys_mman.cpp \
 	sys_socket.cpp \
 	sys_stat.cpp \
 	sys_wait.cpp \
