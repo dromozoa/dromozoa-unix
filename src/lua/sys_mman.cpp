@@ -15,6 +15,8 @@
 // You should have received a copy of the GNU General Public License
 // along with dromozoa-unix.  If not, see <http://www.gnu.org/licenses/>.
 
+#include <alloca.h>
+#include <string.h>
 #include <sys/mman.h>
 
 #include "common.hpp"
@@ -22,9 +24,15 @@
 namespace dromozoa {
   namespace {
     void impl_mlockall(lua_State* L) {
-      if (mlockall(luaX_check_integer<int>(L, 1)) == -1) {
+      int flags = luaX_check_integer<int>(L, 1);
+      size_t preservation_size = luaX_opt_integer<size_t>(L, 2, 0);
+      if (mlockall(flags) == -1) {
         push_error(L);
       } else {
+        if (preservation_size > 0) {
+          void* buffer = alloca(preservation_size);
+          memset(buffer, 0, preservation_size);
+        }
         luaX_push_success(L);
       }
     }
