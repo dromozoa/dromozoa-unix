@@ -15,29 +15,36 @@
 // You should have received a copy of the GNU General Public License
 // along with dromozoa-unix.  If not, see <http://www.gnu.org/licenses/>.
 
-#include <mach/mach_time.h>
-
-#include <dromozoa/timer_mach_absolute_time.hpp>
+#include <dromozoa/timer_clock_gettime.hpp>
 
 namespace dromozoa {
-  timer_mach_absolute_time::timer_mach_absolute_time() : start_(), stop_() {}
-
-  timer_mach_absolute_time::~timer_mach_absolute_time() {}
-
-  int timer_mach_absolute_time::start() {
-    start_ = mach_absolute_time();
-    return 0;
+  namespace {
+#ifdef CLOCK_MONOTONIC_RAW
+    static const clockid_t compat_clock_monotonic = CLOCK_MONOTONIC_RAW;
+#else
+    static const clockid_t compat_clock_monotonic = CLOCK_MONOTONIC;
+#endif
   }
 
-  int timer_mach_absolute_time::stop() {
-    stop_ = mach_absolute_time();
-    return 0;
+  timer_clock_gettime::timer_clock_gettime() : start_(), stop_() {}
+
+  timer_clock_gettime::~timer_clock_gettime() {}
+
+  int timer_clock_gettime::start() {
+    return clock_gettime(compat_clock_monotonic, &start_);
   }
 
-  double timer_mach_absolute_time::elapsed() const {
-    mach_timebase_info_data_t timebase = {};
-    mach_timebase_info(&timebase);
-    uint64_t n = (stop_ - start_) * timebase.numer / timebase.denom;
-    return n * 0.000000001;
+  int timer_clock_gettime::stop() {
+    return clock_gettime(compat_clock_monotonic, &stop_);
+  }
+
+  double timer_clock_gettime::elapsed() const {
+    time_t s = stop_.tv_sec - start_.tv_sec;
+    long n = stop_.tv_nsec - start_.tv_nsec;
+    if (n < 0) {
+      --s;
+      n += 1000000000;
+    }
+    return s + n * 0.000000001;
   }
 }

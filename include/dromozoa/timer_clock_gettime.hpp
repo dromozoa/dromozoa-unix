@@ -15,29 +15,27 @@
 // You should have received a copy of the GNU General Public License
 // along with dromozoa-unix.  If not, see <http://www.gnu.org/licenses/>.
 
-#include <mach/mach_time.h>
+#ifndef DROMOZOA_TIMER_CLOCK_GETTIME_HPP
+#define DROMOZOA_TIMER_CLOCK_GETTIME_HPP
 
-#include <dromozoa/timer_mach_absolute_time.hpp>
+#include <time.h>
+
+#include <dromozoa/timer.hpp>
 
 namespace dromozoa {
-  timer_mach_absolute_time::timer_mach_absolute_time() : start_(), stop_() {}
-
-  timer_mach_absolute_time::~timer_mach_absolute_time() {}
-
-  int timer_mach_absolute_time::start() {
-    start_ = mach_absolute_time();
-    return 0;
-  }
-
-  int timer_mach_absolute_time::stop() {
-    stop_ = mach_absolute_time();
-    return 0;
-  }
-
-  double timer_mach_absolute_time::elapsed() const {
-    mach_timebase_info_data_t timebase = {};
-    mach_timebase_info(&timebase);
-    uint64_t n = (stop_ - start_) * timebase.numer / timebase.denom;
-    return n * 0.000000001;
-  }
+  class timer_clock_gettime : public timer {
+  public:
+    timer_clock_gettime();
+    virtual ~timer_clock_gettime();
+    virtual int start();
+    virtual int stop();
+    virtual double elapsed() const;
+  private:
+    struct timespec start_;
+    struct timespec stop_;
+    timer_clock_gettime(const timer_clock_gettime&);
+    timer_clock_gettime& operator=(const timer_clock_gettime&);
+  };
 }
+
+#endif
