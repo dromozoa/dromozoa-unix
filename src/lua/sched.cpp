@@ -75,7 +75,7 @@ namespace dromozoa {
     }
 #endif
 
-#ifdef HAVE_SCHED_GETAFFINITY
+#ifdef HAVE_SCHED_SETAFFINITY
     void impl_sched_setaffinity(lua_State* L) {
       pid_t pid = luaX_check_integer<pid_t>(L, 1);
       cpu_set_t mask;
@@ -100,6 +100,17 @@ namespace dromozoa {
       }
     }
 #endif
+
+#ifdef HAVE_SCHED_SETSCHEDULER
+    void impl_sched_setscheduler(lua_State* L) {
+      pid_t pid = luaX_check_integer<pid_t>(L, 1);
+      int policy = luaX_check_integer<int>(L, 2);
+      struct sched_param param = {};
+      param.sched_priority = luaX_check_integer_field<int>(L, 3, "sched_priority");
+
+      // int priority = 
+    }
+#endif
   }
 
   void initialize_sched(lua_State* L) {
@@ -109,7 +120,7 @@ namespace dromozoa {
 #ifdef HAVE_SCHED_GETAFFINITY
     luaX_set_field(L, -1, "sched_getaffinity", impl_sched_getaffinity);
 #endif
-#ifdef HAVE_SCHED_GETAFFINITY
+#ifdef HAVE_SCHED_SETAFFINITY
     luaX_set_field(L, -1, "sched_setaffinity", impl_sched_setaffinity);
 #endif
 

@@ -15,10 +15,17 @@
 -- You should have received a copy of the GNU General Public License
 -- along with dromozoa-unix.  If not, see <http://www.gnu.org/licenses/>.
 
+local json = require "dromozoa.commons.json"
 local unix = require "dromozoa.unix"
 
 assert(unix.sched_get_priority_min(unix.SCHED_OTHER))
 assert(unix.sched_get_priority_max(unix.SCHED_OTHER))
 assert(unix.sched_yield())
-print(unix.sched_getaffinity)
-print(unix.sched_setaffinity)
+if unix.sched_getaffinity then
+  local affinity = assert(unix.sched_getaffinity(0))
+  print(json.encode(affinity))
+  if unix.sched_setaffinity then
+    assert(unix.sched_setaffinity(0, { affinity[1] }))
+  end
+end
+
