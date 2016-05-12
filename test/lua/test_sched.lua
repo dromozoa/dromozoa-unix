@@ -18,9 +18,19 @@
 local json = require "dromozoa.commons.json"
 local unix = require "dromozoa.unix"
 
-assert(unix.sched_get_priority_min(unix.SCHED_OTHER))
-assert(unix.sched_get_priority_max(unix.SCHED_OTHER))
+local priority_min = assert(unix.sched_get_priority_min(unix.SCHED_OTHER))
+local priority_max = assert(unix.sched_get_priority_max(unix.SCHED_OTHER))
+print(priority_min, priority_max)
 assert(unix.sched_yield())
+
+if unix.sched_getscheduler then
+  print(unix.SCHED_OTHER)
+  print(unix.sched_getscheduler(0))
+  print(json.encode(assert(unix.sched_getparam(0))))
+  assert(unix.sched_setscheduler(0, unix.SCHED_OTHER, { sched_priority = (priority_min + priority_max) * 0.5 }))
+  print(json.encode(assert(unix.sched_getparam(0))))
+end
+
 if unix.sched_getaffinity then
   local affinity = assert(unix.sched_getaffinity(0))
   print(json.encode(affinity))
