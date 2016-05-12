@@ -20,7 +20,7 @@ local sequence_writer = require "dromozoa.commons.sequence_writer"
 local unix = require "dromozoa.unix"
 
 local PATH = os.getenv("PATH")
-local envp = unix.environ()
+local envp = unix.get_environ()
 sequence.push(envp, "foo=bar")
 
 local reader, writer = assert(unix.pipe())

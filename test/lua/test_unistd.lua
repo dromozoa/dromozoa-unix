@@ -18,7 +18,7 @@
 local sequence = require "dromozoa.commons.sequence"
 local unix = require "dromozoa.unix"
 
-for i in sequence.each(assert(unix.environ())) do
+for i in sequence.each(assert(unix.get_environ())) do
   local k, v = i:match("([^=]+)=(.*)")
   assert(os.getenv(k) == v)
 end
@@ -40,3 +40,6 @@ assert(unix.getegid() > 0)
 assert(unix.getpid() > 0)
 assert(unix.getpgrp() > 0)
 assert(unix.getppid() > 0)
+
+assert(unix.sysconf(unix["_SC_NPROCESSORS_CONF"]))
+assert(unix.sysconf(unix["_SC_NPROCESSORS_ONLN"]))

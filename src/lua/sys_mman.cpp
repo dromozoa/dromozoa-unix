@@ -25,14 +25,9 @@ namespace dromozoa {
   namespace {
     void impl_mlockall(lua_State* L) {
       int flags = luaX_check_integer<int>(L, 1);
-      size_t preservation_size = luaX_opt_integer<size_t>(L, 2, 0);
       if (mlockall(flags) == -1) {
         push_error(L);
       } else {
-        if (preservation_size > 0) {
-          void* buffer = alloca(preservation_size);
-          memset(buffer, 0, preservation_size);
-        }
         luaX_push_success(L);
       }
     }
@@ -44,11 +39,19 @@ namespace dromozoa {
         luaX_push_success(L);
       }
     }
+
+    void impl_reserve_stack_pages(lua_State* L) {
+      size_t size = luaX_check_integer<size_t>(L, 1);
+      void* buffer = alloca(size);
+      memset(buffer, 0, size);
+      luaX_push_success(L);
+    }
   }
 
   void initialize_sys_mman(lua_State* L) {
     luaX_set_field(L, -1, "mlockall", impl_mlockall);
     luaX_set_field(L, -1, "munlockall", impl_munlockall);
+    luaX_set_field(L, -1, "reserve_stack_pages", impl_reserve_stack_pages);
 
     luaX_set_field(L, -1, "MCL_CURRENT", MCL_CURRENT);
     luaX_set_field(L, -1, "MCL_FUTURE", MCL_FUTURE);
