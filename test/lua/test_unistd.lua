@@ -40,3 +40,6 @@ assert(unix.getegid() > 0)
 assert(unix.getpid() > 0)
 assert(unix.getpgrp() > 0)
 assert(unix.getppid() > 0)
+
+assert(unix.sysconf(unix["_SC_NPROCESSORS_CONF"]))
+assert(unix.sysconf(unix["_SC_NPROCESSORS_ONLN"]))
