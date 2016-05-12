@@ -17,5 +17,6 @@
 
 local unix = require "dromozoa.unix"
 
-print(unix.mlockall(unix.MCL_CURRENT, 4096))
+assert(unix.reserve_stack_pages(4096))
+print(unix.mlockall(unix.MCL_CURRENT))
 print(unix.munlockall())
