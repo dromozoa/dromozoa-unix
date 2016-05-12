@@ -25,7 +25,7 @@ extern char** environ;
 
 namespace dromozoa {
   namespace {
-    void impl_environ(lua_State* L) {
+    void impl_get_environ(lua_State* L) {
       lua_newtable(L);
       for (int i = 0; ; ++i) {
         if (const char* p = environ[i]) {
@@ -89,7 +89,7 @@ namespace dromozoa {
   }
 
   void initialize_unistd(lua_State* L) {
-    luaX_set_field(L, -1, "environ", impl_environ);
+    luaX_set_field(L, -1, "get_environ", impl_get_environ);
     luaX_set_field(L, -1, "chdir", impl_chdir);
     luaX_set_field(L, -1, "getcwd", impl_getcwd);
     luaX_set_field(L, -1, "getuid", impl_getuid);

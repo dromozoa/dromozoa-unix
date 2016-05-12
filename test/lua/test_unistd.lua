@@ -18,7 +18,7 @@
 local sequence = require "dromozoa.commons.sequence"
 local unix = require "dromozoa.unix"
 
-for i in sequence.each(assert(unix.environ())) do
+for i in sequence.each(assert(unix.get_environ())) do
   local k, v = i:match("([^=]+)=(.*)")
   assert(os.getenv(k) == v)
 end
