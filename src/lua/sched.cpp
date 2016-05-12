@@ -19,7 +19,6 @@
 #include "config.h"
 #endif
 
-#include <errno.h>
 #include <sched.h>
 
 #include "common.hpp"
@@ -132,7 +131,7 @@ namespace dromozoa {
           }
         }
       }
-      if (sched_getaffinity(pid, sizeof(mask), &mask) == -1) {
+      if (sched_setaffinity(pid, sizeof(mask), &mask) == -1) {
         push_error(L);
       } else {
         luaX_push_success(L);
