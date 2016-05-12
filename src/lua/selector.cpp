@@ -37,6 +37,10 @@ namespace dromozoa {
       return luaX_check_udata<selector>(L, arg, "dromozoa.unix.selector");
     }
 
+    void impl_gc(lua_State* L) {
+      check_selector(L, 1)->~selector();
+    }
+
     void impl_call(lua_State* L) {
       size_t size = luaX_check_integer<size_t>(L, 2);
       int flags = luaX_opt_integer<int>(L, 3, SELECTOR_CLOEXEC);
@@ -47,10 +51,6 @@ namespace dromozoa {
       } else {
         push_error(L);
       }
-    }
-
-    void impl_gc(lua_State* L) {
-      check_selector(L, 1)->~selector();
     }
 
     void impl_close(lua_State* L) {

@@ -29,8 +29,14 @@ AC_CHECK_FUNCS([accept4])
 AC_CHECK_FUNCS([epoll_create1])
 AC_CHECK_FUNCS([epoll_create])
 AC_CHECK_FUNCS([kqueue])
+AC_CHECK_FUNCS([mach_absolute_time])
 AC_CHECK_FUNCS([mkostemp])
 AC_CHECK_FUNCS([pipe2])
+AC_CHECK_FUNCS([sched_getaffinity])
+AC_CHECK_FUNCS([sched_getparam])
+AC_CHECK_FUNCS([sched_getscheduler])
+AC_CHECK_FUNCS([sched_setaffinity])
+AC_CHECK_FUNCS([sched_setscheduler])
 
 AC_SEARCH_LIBS([clock_gettime], [rt], [AC_DEFINE(HAVE_CLOCK_GETTIME, 1, [Define to 1 if you have the 'clock_gettime' function.]) ])
 
@@ -45,5 +51,8 @@ AX_LUA_LIBS([], [AC_MSG_ERROR([could not find lua])])
 
 AM_CONDITIONAL([HAVE_EPOLL], [test "x$ac_cv_func_epoll_create" = xyes || test "x$ac_cv_func_epoll_create1" = xyes])
 AM_CONDITIONAL([HAVE_KQUEUE], [test "x$ac_cv_func_kqueue" = xyes])
+
+AM_CONDITIONAL([HAVE_CLOCK_GETTIME], [test "x$ac_cv_search_clock_gettime" != xno])
+AM_CONDITIONAL([HAVE_MACH_ABSOLUTE_TIME], [test "x$ac_cv_func_mach_absolute_time" = xyes])
 
 AC_OUTPUT

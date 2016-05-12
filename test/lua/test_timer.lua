@@ -15,31 +15,10 @@
 -- You should have received a copy of the GNU General Public License
 -- along with dromozoa-unix.  If not, see <http://www.gnu.org/licenses/>.
 
-local sequence = require "dromozoa.commons.sequence"
 local unix = require "dromozoa.unix"
 
-for i in sequence.each(assert(unix.get_environ())) do
-  local k, v = i:match("([^=]+)=(.*)")
-  assert(os.getenv(k) == v)
-end
-
-assert(unix.getcwd() == unix.realpath("."))
-
-local tmpdir = assert(unix.mkdtemp("tmp-XXXXXX"))
-assert(unix.chdir(tmpdir))
-assert(os.remove(unix.getcwd()))
-
-local a, b, c = unix.getcwd()
-assert(a == nil)
-assert(c == unix.ENOENT)
-
-assert(unix.getuid() > 0)
-assert(unix.getgid() > 0)
-assert(unix.geteuid() > 0)
-assert(unix.getegid() > 0)
-assert(unix.getpid() > 0)
-assert(unix.getpgrp() > 0)
-assert(unix.getppid() > 0)
-
-assert(unix.sysconf(unix["_SC_NPROCESSORS_CONF"]))
-assert(unix.sysconf(unix["_SC_NPROCESSORS_ONLN"]))
+local timer = unix.timer()
+timer:start()
+unix.nanosleep(0.2)
+timer:stop()
+print(timer:elapsed())

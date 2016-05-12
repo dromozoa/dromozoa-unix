@@ -15,6 +15,7 @@
 // You should have received a copy of the GNU General Public License
 // along with dromozoa-unix.  If not, see <http://www.gnu.org/licenses/>.
 
+#include <errno.h>
 #include <unistd.h>
 
 #include <vector>
@@ -25,7 +26,7 @@ extern char** environ;
 
 namespace dromozoa {
   namespace {
-    void impl_environ(lua_State* L) {
+    void impl_get_environ(lua_State* L) {
       lua_newtable(L);
       for (int i = 0; ; ++i) {
         if (const char* p = environ[i]) {
@@ -86,10 +87,21 @@ namespace dromozoa {
     void impl_getppid(lua_State* L) {
       luaX_push(L, getppid());
     }
+
+    void impl_sysconf(lua_State* L) {
+      int name = luaX_check_integer<int>(L, 1);
+      errno = 0;
+      long result = sysconf(name);
+      if (errno == 0) {
+        luaX_push(L, result);
+      } else {
+        push_error(L);
+      }
+    }
   }
 
   void initialize_unistd(lua_State* L) {
-    luaX_set_field(L, -1, "environ", impl_environ);
+    luaX_set_field(L, -1, "get_environ", impl_get_environ);
     luaX_set_field(L, -1, "chdir", impl_chdir);
     luaX_set_field(L, -1, "getcwd", impl_getcwd);
     luaX_set_field(L, -1, "getuid", impl_getuid);
@@ -99,9 +111,13 @@ namespace dromozoa {
     luaX_set_field(L, -1, "getpid", impl_getpid);
     luaX_set_field(L, -1, "getpgrp", impl_getpgrp);
     luaX_set_field(L, -1, "getppid", impl_getppid);
+    luaX_set_field(L, -1, "sysconf", impl_sysconf);
 
     luaX_set_field(L, -1, "STDIN_FILENO", STDIN_FILENO);
     luaX_set_field(L, -1, "STDOUT_FILENO", STDOUT_FILENO);
     luaX_set_field(L, -1, "STDERR_FILENO", STDERR_FILENO);
+
+    luaX_set_field<int>(L, -1, "_SC_NPROCESSORS_CONF", _SC_NPROCESSORS_CONF);
+    luaX_set_field<int>(L, -1, "_SC_NPROCESSORS_ONLN", _SC_NPROCESSORS_ONLN);
   }
 }
