@@ -18,13 +18,20 @@
 #ifndef DROMOZOA_TIMER_HPP
 #define DROMOZOA_TIMER_HPP
 
+#include <time.h>
+
 namespace dromozoa {
   class timer {
   public:
-    virtual ~timer();
-    virtual int start() = 0;
-    virtual int stop() = 0;
-    virtual double elapsed() const = 0;
+    timer();
+    int start();
+    int stop();
+    double elapsed() const;
+  private:
+    struct timespec start_;
+    struct timespec stop_;
+    timer(const timer&);
+    timer& operator=(const timer&);
   };
 }
 

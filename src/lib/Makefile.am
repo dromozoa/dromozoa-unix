@@ -23,6 +23,7 @@ libdromozoa_unix_la_SOURCES = \
 	argument_vector.cpp \
 	coe.cpp \
 	compat_accept4.cpp \
+	compat_clock_gettime.cpp \
 	compat_mkostemp.cpp \
 	compat_pipe2.cpp \
 	compat_sigmask.cpp \
@@ -45,13 +46,5 @@ libdromozoa_unix_la_SOURCES += selector_epoll.cpp
 else
 if HAVE_KQUEUE
 libdromozoa_unix_la_SOURCES += selector_kqueue.cpp
-endif
-endif
-
-if HAVE_CLOCK_GETTIME
-libdromozoa_unix_la_SOURCES += timer_clock_gettime.cpp
-else
-if HAVE_MACH_ABSOLUTE_TIME
-libdromozoa_unix_la_SOURCES += timer_mach_absolute_time.cpp
 endif
 endif

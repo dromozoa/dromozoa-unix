@@ -15,8 +15,27 @@
 // You should have received a copy of the GNU General Public License
 // along with dromozoa-unix.  If not, see <http://www.gnu.org/licenses/>.
 
+#include <dromozoa/compat_clock_gettime.hpp>
 #include <dromozoa/timer.hpp>
 
 namespace dromozoa {
-  timer::~timer() {}
+  timer::timer() : start_(), stop_() {}
+
+  int timer::start() {
+    return compat_clock_gettime(COMPAT_CLOCK_MONOTONIC_RAW, &start_);
+  }
+
+  int timer::stop() {
+    return compat_clock_gettime(COMPAT_CLOCK_MONOTONIC_RAW, &stop_);
+  }
+
+  double timer::elapsed() const {
+    time_t s = stop_.tv_sec - start_.tv_sec;
+    long n = stop_.tv_nsec - start_.tv_nsec;
+    if (n < 0) {
+      --s;
+      n += 1000000000;
+    }
+    return s + n * 0.000000001;
+  }
 }

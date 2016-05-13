@@ -37,9 +37,12 @@ if unix.sched_getscheduler and unix.sched_getparam and unix.sched_setscheduler t
   assert(other_priority_min <= param.sched_priority)
   assert(param.sched_priority <= other_priority_max)
   local priority = math.min(fifo_priority_min + 1, fifo_priority_max)
-  assert(unix.sched_setscheduler(0, unix.SCHED_FIFO, { sched_priority = priority }))
-  local param = assert(unix.sched_getparam(0))
-  assert(param.sched_priority == priority)
+  local a, b, c = unix.sched_setscheduler(0, unix.SCHED_FIFO, { sched_priority = priority })
+  print(a, b, c)
+  if a then
+    local param = assert(unix.sched_getparam(0))
+    assert(param.sched_priority == priority)
+  end
 end
 
 if unix.sched_getaffinity and unix.sched_setaffinity then

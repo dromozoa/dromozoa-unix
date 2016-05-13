@@ -24,9 +24,14 @@ local PATH = os.getenv("PATH")
 
 assert(unix.nanosleep(0.2))
 
+print(unix.TIMESPEC_TYPE_REALTIME)
+print(unix.TIMESPEC_TYPE_MONOTONIC)
+print(unix.TIMESPEC_TYPE_DURATION)
+print(unix.TIMESPEC_TYPE_UNKNOWN)
+
 local a, b, c, d = unix.nanosleep(-1)
 assert(a == nil)
-assert(d == unix.timespec())
+assert(d == unix.timespec(0))
 print(b)
 
 local process = assert(unix.process())
@@ -47,5 +52,9 @@ local a, b, c = assert(unix.wait())
 assert(a == process[1])
 assert(b == "exit")
 assert(c == 0)
+
+local t1 = assert(unix.clock_gettime(unix.CLOCK_MONOTONIC))
+local t2 = assert(unix.clock_gettime(unix.CLOCK_MONOTONIC))
+assert(t1 < t2)
 
 assert(unix.selfpipe.close())

@@ -91,12 +91,13 @@ namespace dromozoa {
     }
 
     void impl_select(lua_State* L) {
-      struct timespec tv = {};
       int result = -1;
-      if (check_timespec(L, 2, tv)) {
-        result = check_selector(L, 1)->select(&tv);
-      } else {
+      if (lua_isnoneornil(L, 2)) {
         result = check_selector(L, 1)->select(0);
+      } else {
+        struct timespec tv = {};
+        check_timespec(L, 2, tv);
+        result = check_selector(L, 1)->select(&tv);
       }
       if (result == -1) {
         push_error(L);

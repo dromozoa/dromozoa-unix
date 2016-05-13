@@ -52,7 +52,4 @@ AX_LUA_LIBS([], [AC_MSG_ERROR([could not find lua])])
 AM_CONDITIONAL([HAVE_EPOLL], [test "x$ac_cv_func_epoll_create" = xyes || test "x$ac_cv_func_epoll_create1" = xyes])
 AM_CONDITIONAL([HAVE_KQUEUE], [test "x$ac_cv_func_kqueue" = xyes])
 
-AM_CONDITIONAL([HAVE_CLOCK_GETTIME], [test "x$ac_cv_search_clock_gettime" != xno])
-AM_CONDITIONAL([HAVE_MACH_ABSOLUTE_TIME], [test "x$ac_cv_func_mach_absolute_time" = xyes])
-
 AC_OUTPUT
