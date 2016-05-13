@@ -24,12 +24,12 @@ namespace dromozoa {
     void impl_nanosleep(lua_State* L) {
       struct timespec tv1 = {};
       struct timespec tv2 = {};
-      check_timespec(L, 1, tv1);
+      check_timespec(L, 1, tv1, 0);
       if (nanosleep(&tv1, &tv2) != -1) {
         luaX_push_success(L);
       } else {
         push_error(L);
-        new_timespec(L, tv2);
+        new_timespec(L, tv2, TIMESPEC_TYPE_DURATION);
       }
     }
 
@@ -39,7 +39,11 @@ namespace dromozoa {
       if (compat_clock_gettime(clock_id, &tv) == -1) {
         push_error(L);
       } else {
-        new_timespec(L, tv);
+        if (clock_id == COMPAT_CLOCK_REALTIME) {
+          new_timespec(L, tv, TIMESPEC_TYPE_REALTIME);
+        } else {
+          new_timespec(L, tv, TIMESPEC_TYPE_MONOTONIC);
+        }
       }
     }
   }

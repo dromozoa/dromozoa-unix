@@ -29,47 +29,71 @@
 
 namespace dromozoa {
   namespace {
+    static const int R = TIMESPEC_TYPE_REALTIME;
+    static const int M = TIMESPEC_TYPE_MONOTONIC;
+    static const int D = TIMESPEC_TYPE_DURATION;
+    static const int U = TIMESPEC_TYPE_UNKNOWN;
+    static const int TIMESPEC_TYPE_MIN = R;
+    static const int TIMESPEC_TYPE_MAX = U;
+    static const int TIMESPEC_TYPE_SIZE = U + 1;
+
     void impl_add(lua_State* L) {
+      static const int matrix[] = {
+        D, U, R, U,
+        U, D, M, U,
+        U, U, D, D,
+        D, D, U, U,
+      };
       struct timespec tv1 = {};
       struct timespec tv2 = {};
-      check_timespec(L, 1, tv1);
-      check_timespec(L, 2, tv2);
+      int type1 = U;
+      int type2 = U;
+      check_timespec(L, 1, tv1, &type1);
+      check_timespec(L, 2, tv2, &type2);
       tv1.tv_sec += tv2.tv_sec;
       tv1.tv_nsec += tv2.tv_nsec;
       if (tv1.tv_nsec > 999999999) {
         ++tv1.tv_sec;
         tv1.tv_nsec -= 1000000000;
       }
-      new_timespec(L, tv1);
+      new_timespec(L, tv1, matrix[type1 * TIMESPEC_TYPE_SIZE + type2]);
     }
 
     void impl_sub(lua_State* L) {
+      static const int matrix[] = {
+        U, U, R, R,
+        U, U, M, M,
+        R, M, D, U,
+        R, M, U, U,
+      };
       struct timespec tv1 = {};
       struct timespec tv2 = {};
-      check_timespec(L, 1, tv1);
-      check_timespec(L, 2, tv2);
+      int type1 = U;
+      int type2 = U;
+      check_timespec(L, 1, tv1, &type1);
+      check_timespec(L, 2, tv2, &type2);
       tv1.tv_sec -= tv2.tv_sec;
       tv1.tv_nsec -= tv2.tv_nsec;
       if (tv1.tv_nsec < 0) {
         --tv1.tv_sec;
         tv1.tv_nsec += 1000000000;
       }
-      new_timespec(L, tv1);
+      new_timespec(L, tv1, matrix[type1 * TIMESPEC_TYPE_SIZE + type2]);
     }
 
     void impl_eq(lua_State* L) {
       struct timespec tv1 = {};
       struct timespec tv2 = {};
-      check_timespec(L, 1, tv1);
-      check_timespec(L, 2, tv2);
+      check_timespec(L, 1, tv1, 0);
+      check_timespec(L, 2, tv2, 0);
       luaX_push(L, tv1.tv_sec == tv2.tv_sec && tv1.tv_nsec == tv2.tv_nsec);
     }
 
     void impl_lt(lua_State* L) {
       struct timespec tv1 = {};
       struct timespec tv2 = {};
-      check_timespec(L, 1, tv1);
-      check_timespec(L, 2, tv2);
+      check_timespec(L, 1, tv1, 0);
+      check_timespec(L, 2, tv2, 0);
       if (tv1.tv_sec == tv2.tv_sec) {
         return luaX_push(L, tv1.tv_nsec < tv2.tv_nsec);
       } else {
@@ -80,8 +104,8 @@ namespace dromozoa {
     void impl_le(lua_State* L) {
       struct timespec tv1 = {};
       struct timespec tv2 = {};
-      check_timespec(L, 1, tv1);
-      check_timespec(L, 2, tv2);
+      check_timespec(L, 1, tv1, 0);
+      check_timespec(L, 2, tv2, 0);
       if (tv1.tv_sec == tv2.tv_sec) {
         return luaX_push(L, tv1.tv_nsec <= tv2.tv_nsec);
       } else {
@@ -91,8 +115,9 @@ namespace dromozoa {
 
     void impl_call(lua_State* L) {
       struct timespec tv = {};
-      check_timespec(L, 2, tv);
-      new_timespec(L, tv);
+      int type = U;
+      check_timespec(L, 2, tv, &type);
+      new_timespec(L, tv, type);
     }
 
 #ifdef HAVE_CLOCK_GETTIME
@@ -101,7 +126,7 @@ namespace dromozoa {
       if (clock_gettime(CLOCK_REALTIME, &tv) == -1) {
         push_error(L);
       } else {
-        new_timespec(L, tv);
+        new_timespec(L, tv, R);
       }
     }
 #else
@@ -113,6 +138,7 @@ namespace dromozoa {
         lua_newtable(L);
         luaX_set_field(L, -1, "tv_sec", tv.tv_sec);
         luaX_set_field(L, -1, "tv_nsec", tv.tv_usec * 1000);
+        luaX_set_field(L, -1, "type", R);
         luaX_set_metatable(L, "dromozoa.unix.timespec");
       }
     }
@@ -120,7 +146,8 @@ namespace dromozoa {
 
     void impl_tostring(lua_State* L) {
       struct timespec tv = {};
-      check_timespec(L, 1, tv);
+      int type = U;
+      check_timespec(L, 1, tv, &type);
       bool utc = lua_toboolean(L, 2);
       struct tm tm = {};
       if (utc) {
@@ -156,19 +183,20 @@ namespace dromozoa {
 
     void impl_tonumber(lua_State* L) {
       struct timespec tv = {};
-      check_timespec(L, 1, tv);
+      check_timespec(L, 1, tv, 0);
       lua_pushnumber(L, tv.tv_sec + tv.tv_nsec * 0.000000001);
     }
   }
 
-  void new_timespec(lua_State* L, const timespec& tv) {
+  void new_timespec(lua_State* L, const timespec& tv, int type) {
     lua_newtable(L);
     luaX_set_field(L, -1, "tv_sec", tv.tv_sec);
     luaX_set_field(L, -1, "tv_nsec", tv.tv_nsec);
+    luaX_set_field(L, -1, "type", type);
     luaX_set_metatable(L, "dromozoa.unix.timespec");
   }
 
-  bool check_timespec(lua_State* L, int arg, struct timespec& tv) {
+  bool check_timespec(lua_State* L, int arg, struct timespec& tv, int* type) {
     if (lua_isnoneornil(L, arg)) {
       return false;
     } else if (lua_isnumber(L, arg)) {
@@ -177,10 +205,16 @@ namespace dromozoa {
       double f = modf(t, &i);
       tv.tv_sec = i;
       tv.tv_nsec = f * 1000000000;
+      if (type) {
+        *type = U;
+      }
       return true;
     } else if (lua_istable(L, arg)) {
       tv.tv_sec = luaX_opt_integer_field<time_t>(L, arg, "tv_sec", 0);
       tv.tv_nsec = luaX_opt_integer_field<long>(L, arg, "tv_nsec", 0, 0L, 999999999L);
+      if (type) {
+        *type = luaX_opt_integer_field<int>(L, arg, "type", U, TIMESPEC_TYPE_MIN, TIMESPEC_TYPE_MAX);
+      }
       return true;
     } else {
       luaL_argerror(L, arg, "nil, number or table expected");
