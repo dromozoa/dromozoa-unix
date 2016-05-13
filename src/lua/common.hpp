@@ -42,6 +42,7 @@ namespace dromozoa {
   static const int TIMESPEC_TYPE_UNKNOWN = 3;
   void new_timespec(lua_State* L, const timespec& tv, int type);
   int check_timespec(lua_State* L, int arg, struct timespec& tv);
+  int check_timespec(lua_State* L, int arg, struct timespec& tv, int type_nil);
 }
 
 #endif

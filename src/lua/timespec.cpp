@@ -178,8 +178,12 @@ namespace dromozoa {
   }
 
   int check_timespec(lua_State* L, int arg, struct timespec& tv) {
+    return check_timespec(L, arg, tv, TIMESPEC_TYPE_UNKNOWN);
+  }
+
+  int check_timespec(lua_State* L, int arg, struct timespec& tv, int type_nil) {
     if (lua_isnoneornil(L, arg)) {
-      return -1;
+      return type_nil;
     } else if (lua_isnumber(L, arg)) {
       double t = lua_tonumber(L, arg);
       double i = 0;
@@ -193,7 +197,7 @@ namespace dromozoa {
       return luaX_opt_integer_field<int>(L, arg, "type", TIMESPEC_TYPE_UNKNOWN, TIMESPEC_TYPE_MIN, TIMESPEC_TYPE_MAX);
     } else {
       luaL_argerror(L, arg, "nil, number or table expected");
-      return -1;
+      return TIMESPEC_TYPE_UNKNOWN;
     }
   }
 
