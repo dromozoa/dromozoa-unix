@@ -15,12 +15,7 @@
 // You should have received a copy of the GNU General Public License
 // along with dromozoa-unix.  If not, see <http://www.gnu.org/licenses/>.
 
-#ifdef HAVE_CONFIG_H
-#include "config.h"
-#endif
-
 #include <math.h>
-#include <sys/time.h>
 
 #include <iomanip>
 #include <sstream>
@@ -29,13 +24,14 @@
 
 namespace dromozoa {
   namespace {
+    static const int TIMESPEC_TYPE_MIN = TIMESPEC_TYPE_REALTIME;
+    static const int TIMESPEC_TYPE_MAX = TIMESPEC_TYPE_UNKNOWN;
+    static const int TIMESPEC_TYPE_SIZE = TIMESPEC_TYPE_UNKNOWN + 1;
+
     static const int R = TIMESPEC_TYPE_REALTIME;
     static const int M = TIMESPEC_TYPE_MONOTONIC;
     static const int D = TIMESPEC_TYPE_DURATION;
     static const int U = TIMESPEC_TYPE_UNKNOWN;
-    static const int TIMESPEC_TYPE_MIN = R;
-    static const int TIMESPEC_TYPE_MAX = U;
-    static const int TIMESPEC_TYPE_SIZE = U + 1;
 
     void impl_add(lua_State* L) {
       static const int matrix[] = {
@@ -46,8 +42,8 @@ namespace dromozoa {
       };
       struct timespec tv1 = {};
       struct timespec tv2 = {};
-      int type1 = U;
-      int type2 = U;
+      int type1 = TIMESPEC_TYPE_UNKNOWN;
+      int type2 = TIMESPEC_TYPE_UNKNOWN;
       check_timespec(L, 1, tv1, &type1);
       check_timespec(L, 2, tv2, &type2);
       tv1.tv_sec += tv2.tv_sec;
@@ -68,8 +64,8 @@ namespace dromozoa {
       };
       struct timespec tv1 = {};
       struct timespec tv2 = {};
-      int type1 = U;
-      int type2 = U;
+      int type1 = TIMESPEC_TYPE_UNKNOWN;
+      int type2 = TIMESPEC_TYPE_UNKNOWN;
       check_timespec(L, 1, tv1, &type1);
       check_timespec(L, 2, tv2, &type2);
       tv1.tv_sec -= tv2.tv_sec;
@@ -114,71 +110,62 @@ namespace dromozoa {
     }
 
     void impl_call(lua_State* L) {
+      static const int matrix[] = {
+        R, M, D, R,
+        R, M, D, M,
+        R, M, D, D,
+        R, M, D, U,
+      };
       struct timespec tv = {};
-      int type = U;
-      check_timespec(L, 2, tv, &type);
-      new_timespec(L, tv, type);
+      int type1 = TIMESPEC_TYPE_UNKNOWN;
+      check_timespec(L, 2, tv, &type1);
+      int type2 = luaX_opt_integer<int>(L, 3, TIMESPEC_TYPE_UNKNOWN, TIMESPEC_TYPE_MIN, TIMESPEC_TYPE_MAX);
+      new_timespec(L, tv, matrix[type1 * TIMESPEC_TYPE_SIZE + type2]);
     }
-
-#ifdef HAVE_CLOCK_GETTIME
-    void impl_now(lua_State* L) {
-      struct timespec tv = {};
-      if (clock_gettime(CLOCK_REALTIME, &tv) == -1) {
-        push_error(L);
-      } else {
-        new_timespec(L, tv, R);
-      }
-    }
-#else
-    void impl_now(lua_State* L) {
-      struct timeval tv = {};
-      if (gettimeofday(&tv, 0) == -1) {
-        push_error(L);
-      } else {
-        lua_newtable(L);
-        luaX_set_field(L, -1, "tv_sec", tv.tv_sec);
-        luaX_set_field(L, -1, "tv_nsec", tv.tv_usec * 1000);
-        luaX_set_field(L, -1, "type", R);
-        luaX_set_metatable(L, "dromozoa.unix.timespec");
-      }
-    }
-#endif
 
     void impl_tostring(lua_State* L) {
       struct timespec tv = {};
-      int type = U;
+      int type = TIMESPEC_TYPE_UNKNOWN;
       check_timespec(L, 1, tv, &type);
-      bool utc = lua_toboolean(L, 2);
-      struct tm tm = {};
-      if (utc) {
-        if (!gmtime_r(&tv.tv_sec, &tm)) {
-          push_error(L);
-          return;
+      if (type == TIMESPEC_TYPE_REALTIME) {
+        bool utc = lua_toboolean(L, 2);
+        struct tm tm = {};
+        if (utc) {
+          if (!gmtime_r(&tv.tv_sec, &tm)) {
+            push_error(L);
+            return;
+          }
+        } else {
+          if (!localtime_r(&tv.tv_sec, &tm)) {
+            push_error(L);
+            return;
+          }
         }
-      } else {
-        if (!localtime_r(&tv.tv_sec, &tm)) {
-          push_error(L);
-          return;
+        std::ostringstream out;
+        out << std::setfill('0')
+            << (tm.tm_year + 1900)
+            << "-" << std::setw(2) << (tm.tm_mon + 1)
+            << "-" << std::setw(2) << tm.tm_mday
+            << "T" << std::setw(2) << tm.tm_hour
+            << ":" << std::setw(2) << tm.tm_min
+            << ":" << std::setw(2) << tm.tm_sec
+            << "." << std::setw(9) << tv.tv_nsec;
+        if (utc) {
+          out << "Z";
+        } else {
+          char buffer[6] = { 0 };
+          strftime(buffer, 6, "%z", &tm);
+          out << buffer;
         }
-      }
-      std::ostringstream out;
-      out << std::setfill('0')
-          << (tm.tm_year + 1900)
-          << "-" << std::setw(2) << (tm.tm_mon + 1)
-          << "-" << std::setw(2) << tm.tm_mday
-          << "T" << std::setw(2) << tm.tm_hour
-          << ":" << std::setw(2) << tm.tm_min
-          << ":" << std::setw(2) << tm.tm_sec
-          << "." << std::setw(9) << tv.tv_nsec;
-      if (utc) {
-        out << "Z";
+        std::string s = out.str();
+        lua_pushlstring(L, s.data(), s.size());
       } else {
-        char buffer[6] = { 0 };
-        strftime(buffer, 6, "%z", &tm);
-        out << buffer;
+        std::ostringstream out;
+        out << std::setfill('0')
+            << tv.tv_sec << "." << std::setw(9) << tv.tv_nsec;
+        std::string s = out.str();
+        lua_pushlstring(L, s.data(), s.size());
       }
-      std::string s = out.str();
-      lua_pushlstring(L, s.data(), s.size());
     }
 
     void impl_tonumber(lua_State* L) {
@@ -206,14 +193,14 @@ namespace dromozoa {
       tv.tv_sec = i;
       tv.tv_nsec = f * 1000000000;
       if (type) {
-        *type = U;
+        *type = TIMESPEC_TYPE_UNKNOWN;
       }
       return true;
     } else if (lua_istable(L, arg)) {
       tv.tv_sec = luaX_opt_integer_field<time_t>(L, arg, "tv_sec", 0);
       tv.tv_nsec = luaX_opt_integer_field<long>(L, arg, "tv_nsec", 0, 0L, 999999999L);
       if (type) {
-        *type = luaX_opt_integer_field<int>(L, arg, "type", U, TIMESPEC_TYPE_MIN, TIMESPEC_TYPE_MAX);
+        *type = luaX_opt_integer_field<int>(L, arg, "type", TIMESPEC_TYPE_UNKNOWN, TIMESPEC_TYPE_MIN, TIMESPEC_TYPE_MAX);
       }
       return true;
     } else {
@@ -237,10 +224,14 @@ namespace dromozoa {
       lua_pop(L, 1);
 
       luaX_set_metafield(L, -1, "__call", impl_call);
-      luaX_set_field(L, -1, "now", impl_now);
       luaX_set_field(L, -1, "tostring", impl_tostring);
       luaX_set_field(L, -1, "tonumber", impl_tonumber);
     }
     luaX_set_field(L, -2, "timespec");
+
+    luaX_set_field(L, -1, "TIMESPEC_TYPE_REALTIME", TIMESPEC_TYPE_REALTIME);
+    luaX_set_field(L, -1, "TIMESPEC_TYPE_MONOTONIC", TIMESPEC_TYPE_MONOTONIC);
+    luaX_set_field(L, -1, "TIMESPEC_TYPE_DURATION", TIMESPEC_TYPE_DURATION);
+    luaX_set_field(L, -1, "TIMESPEC_TYPE_UNKNOWN", TIMESPEC_TYPE_UNKNOWN);
   }
 }
