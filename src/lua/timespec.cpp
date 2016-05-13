@@ -35,10 +35,10 @@ namespace dromozoa {
 
     void impl_add(lua_State* L) {
       static const int matrix[] = {
-        D, U, R, U,
-        U, D, M, U,
-        U, U, D, D,
-        D, D, U, U,
+        U, U, R, R,
+        U, U, M, M,
+        R, M, D, U,
+        R, M, U, U,
       };
       struct timespec tv1 = {};
       struct timespec tv2 = {};
@@ -57,10 +57,10 @@ namespace dromozoa {
 
     void impl_sub(lua_State* L) {
       static const int matrix[] = {
-        U, U, R, R,
-        U, U, M, M,
-        R, M, D, U,
-        R, M, U, U,
+        D, U, R, U,
+        U, D, M, U,
+        U, U, D, D,
+        D, D, U, U,
       };
       struct timespec tv1 = {};
       struct timespec tv2 = {};
