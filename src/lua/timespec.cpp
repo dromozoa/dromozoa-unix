@@ -172,7 +172,7 @@ namespace dromozoa {
     lua_newtable(L);
     luaX_set_field(L, -1, "tv_sec", tv.tv_sec);
     luaX_set_field(L, -1, "tv_nsec", tv.tv_nsec);
-    luaX_set_field(L, -1, "type", type);
+    luaX_set_field(L, -1, "tv_type", type);
     luaX_set_metatable(L, "dromozoa.unix.timespec");
   }
 
@@ -187,7 +187,7 @@ namespace dromozoa {
     } else if (lua_istable(L, arg)) {
       tv.tv_sec = luaX_opt_integer_field<time_t>(L, arg, "tv_sec", 0);
       tv.tv_nsec = luaX_opt_integer_field<long>(L, arg, "tv_nsec", 0, 0L, 999999999L);
-      return luaX_opt_integer_field<int>(L, arg, "type", TIMESPEC_TYPE_UNKNOWN, TIMESPEC_TYPE_MIN, TIMESPEC_TYPE_MAX);
+      return luaX_opt_integer_field<int>(L, arg, "tv_type", TIMESPEC_TYPE_UNKNOWN, TIMESPEC_TYPE_MIN, TIMESPEC_TYPE_MAX);
     } else {
       luaL_argerror(L, arg, "number or table expected");
       return TIMESPEC_TYPE_UNKNOWN;

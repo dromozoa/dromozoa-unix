@@ -92,7 +92,7 @@ namespace dromozoa {
 
     void impl_select(lua_State* L) {
       int result = -1;
-      if (lua_isnil(L, 2)) {
+      if (lua_isnoneornil(L, 2)) {
         result = check_selector(L, 1)->select(0);
       } else {
         struct timespec tv = {};
