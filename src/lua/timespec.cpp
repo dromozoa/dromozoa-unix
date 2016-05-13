@@ -124,6 +124,9 @@ namespace dromozoa {
     void impl_tostring(lua_State* L) {
       struct timespec tv = {};
       int type = check_timespec(L, 1, tv);
+
+      std::ostringstream out;
+      out << std::setfill('0');
       if (type == TIMESPEC_TYPE_REALTIME) {
         bool utc = lua_toboolean(L, 2);
         struct tm tm = {};
@@ -138,9 +141,7 @@ namespace dromozoa {
             return;
           }
         }
-        std::ostringstream out;
-        out << std::setfill('0')
-            << (tm.tm_year + 1900)
+        out << (tm.tm_year + 1900)
             << "-" << std::setw(2) << (tm.tm_mon + 1)
             << "-" << std::setw(2) << tm.tm_mday
             << "T" << std::setw(2) << tm.tm_hour
@@ -154,15 +155,11 @@ namespace dromozoa {
           strftime(buffer, 6, "%z", &tm);
           out << buffer;
         }
-        std::string s = out.str();
-        lua_pushlstring(L, s.data(), s.size());
       } else {
-        std::ostringstream out;
-        out << std::setfill('0')
-            << tv.tv_sec << "." << std::setw(9) << tv.tv_nsec;
-        std::string s = out.str();
-        lua_pushlstring(L, s.data(), s.size());
+        out << tv.tv_sec << "." << std::setw(9) << tv.tv_nsec;
       }
+      std::string s = out.str();
+      lua_pushlstring(L, s.data(), s.size());
     }
 
     void impl_tonumber(lua_State* L) {
