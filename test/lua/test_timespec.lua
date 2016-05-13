@@ -51,13 +51,15 @@ print(tostring(unix.clock_gettime(unix.CLOCK_MONOTONIC)))
 
 local t = unix.clock_gettime(unix.CLOCK_REALTIME)
 assert(t.type == unix.TIMESPEC_TYPE_REALTIME)
-local t = t + unix.timespec();
+local t = t + unix.timespec(0);
 assert(t.type == unix.TIMESPEC_TYPE_REALTIME)
 local t = t + unix.clock_gettime(unix.CLOCK_MONOTONIC)
 assert(t.type == unix.TIMESPEC_TYPE_UNKNOWN)
 local t = t - unix.clock_gettime(unix.CLOCK_MONOTONIC_RAW)
 assert(t.type == unix.TIMESPEC_TYPE_DURATION)
-local t = t - unix.timespec(nil, unix.TIMESPEC_TYPE_DURATION)
+local t = t - unix.timespec(0, unix.TIMESPEC_TYPE_DURATION)
 assert(t.type == unix.TIMESPEC_TYPE_DURATION)
 local t = t - unix.clock_gettime(unix.CLOCK_MONOTONIC_RAW)
 assert(t.type == unix.TIMESPEC_TYPE_UNKNOWN)
+
+assert(not pcall(unix.timespec))
