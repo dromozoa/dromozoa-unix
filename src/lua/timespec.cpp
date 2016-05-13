@@ -124,7 +124,6 @@ namespace dromozoa {
     void impl_tostring(lua_State* L) {
       struct timespec tv = {};
       int type = check_timespec(L, 1, tv);
-
       std::ostringstream out;
       out << std::setfill('0');
       if (type == TIMESPEC_TYPE_REALTIME) {
@@ -165,7 +164,7 @@ namespace dromozoa {
     void impl_tonumber(lua_State* L) {
       struct timespec tv = {};
       check_timespec(L, 1, tv);
-      lua_pushnumber(L, tv.tv_sec + tv.tv_nsec * 0.000000001);
+      luaX_push(L, tv.tv_sec + tv.tv_nsec * 0.000000001);
     }
   }
 
@@ -173,14 +172,12 @@ namespace dromozoa {
     lua_newtable(L);
     luaX_set_field(L, -1, "tv_sec", tv.tv_sec);
     luaX_set_field(L, -1, "tv_nsec", tv.tv_nsec);
-    luaX_set_field(L, -1, "type", type);
+    luaX_set_field(L, -1, "tv_type", type);
     luaX_set_metatable(L, "dromozoa.unix.timespec");
   }
 
   int check_timespec(lua_State* L, int arg, struct timespec& tv) {
-    if (lua_isnoneornil(L, arg)) {
-      return -1;
-    } else if (lua_isnumber(L, arg)) {
+    if (lua_isnumber(L, arg)) {
       double t = lua_tonumber(L, arg);
       double i = 0;
       double f = modf(t, &i);
@@ -190,10 +187,10 @@ namespace dromozoa {
     } else if (lua_istable(L, arg)) {
       tv.tv_sec = luaX_opt_integer_field<time_t>(L, arg, "tv_sec", 0);
       tv.tv_nsec = luaX_opt_integer_field<long>(L, arg, "tv_nsec", 0, 0L, 999999999L);
-      return luaX_opt_integer_field<int>(L, arg, "type", TIMESPEC_TYPE_UNKNOWN, TIMESPEC_TYPE_MIN, TIMESPEC_TYPE_MAX);
+      return luaX_opt_integer_field<int>(L, arg, "tv_type", TIMESPEC_TYPE_UNKNOWN, TIMESPEC_TYPE_MIN, TIMESPEC_TYPE_MAX);
     } else {
-      luaL_argerror(L, arg, "nil, number or table expected");
-      return -1;
+      luaL_argerror(L, arg, "number or table expected");
+      return TIMESPEC_TYPE_UNKNOWN;
     }
   }
 
@@ -212,6 +209,11 @@ namespace dromozoa {
       lua_pop(L, 1);
 
       luaX_set_metafield(L, -1, "__call", impl_call);
+      luaX_set_field(L, -1, "add", impl_add);
+      luaX_set_field(L, -1, "sub", impl_sub);
+      luaX_set_field(L, -1, "eq", impl_eq);
+      luaX_set_field(L, -1, "lt", impl_lt);
+      luaX_set_field(L, -1, "le", impl_le);
       luaX_set_field(L, -1, "tostring", impl_tostring);
       luaX_set_field(L, -1, "tonumber", impl_tonumber);
     }
