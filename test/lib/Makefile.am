@@ -21,6 +21,7 @@ noinst_HEADERS = assert.hpp
 
 check_PROGRAMS = \
 	test_argument_vector.exe \
+	test_compat_clock_gettime.exe \
 	test_compat_pipe2.exe \
 	test_compat_socket.exe \
 	test_compat_strerror.exe \
@@ -29,12 +30,15 @@ check_PROGRAMS = \
 	test_pathexec.exe \
 	test_selfpipe.exe \
 	test_sigmask.exe \
-	test_socket_address.exe \
-	test_unexpected.exe
+	test_socket_address.exe
 
 test_argument_vector_exe_CPPFLAGS = -I$(top_srcdir)/include
 test_argument_vector_exe_LDADD = $(top_builddir)/src/lib/libdromozoa-unix.la
 test_argument_vector_exe_SOURCES = test_argument_vector.cpp
+
+test_compat_clock_gettime_exe_CPPFLAGS = -I$(top_srcdir)/include
+test_compat_clock_gettime_exe_LDADD = $(top_builddir)/src/lib/libdromozoa-unix.la
+test_compat_clock_gettime_exe_SOURCES = test_compat_clock_gettime.cpp
 
 test_compat_pipe2_exe_CPPFLAGS = -I$(top_srcdir)/include
 test_compat_pipe2_exe_LDADD = $(top_builddir)/src/lib/libdromozoa-unix.la
@@ -71,7 +75,3 @@ test_sigmask_exe_SOURCES = test_sigmask.cpp
 test_socket_address_exe_CPPFLAGS = -I$(top_srcdir)/include
 test_socket_address_exe_LDADD = $(top_builddir)/src/lib/libdromozoa-unix.la
 test_socket_address_exe_SOURCES = test_socket_address.cpp
-
-test_unexpected_exe_CPPFLAGS = -I$(top_srcdir)/include
-test_unexpected_exe_LDADD = $(top_builddir)/src/lib/libdromozoa-unix.la
-test_unexpected_exe_SOURCES = test_unexpected.cpp
