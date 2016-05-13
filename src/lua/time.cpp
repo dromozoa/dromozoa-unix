@@ -17,6 +17,8 @@
 
 #include "common.hpp"
 
+#include <dromozoa/compat_clock_gettime.hpp>
+
 namespace dromozoa {
   namespace {
     void impl_nanosleep(lua_State* L) {
@@ -30,9 +32,24 @@ namespace dromozoa {
         new_timespec(L, tv2);
       }
     }
+
+    void impl_clock_gettime(lua_State* L) {
+      int clock_id = luaX_check_integer<int>(L, 1);
+      struct timespec tv = {};
+      if (compat_clock_gettime(clock_id, &tv) == -1) {
+        push_error(L);
+      } else {
+        new_timespec(L, tv);
+      }
+    }
   }
 
   void initialize_time(lua_State* L) {
     luaX_set_field(L, -1, "nanosleep", impl_nanosleep);
+    luaX_set_field(L, -1, "clock_gettime", impl_clock_gettime);
+
+    luaX_set_field(L, -1, "CLOCK_REALTIME", COMPAT_CLOCK_REALTIME);
+    luaX_set_field(L, -1, "CLOCK_MONOTONIC", COMPAT_CLOCK_MONOTONIC);
+    luaX_set_field(L, -1, "CLOCK_MONOTONIC_RAW", COMPAT_CLOCK_MONOTONIC_RAW);
   }
 }

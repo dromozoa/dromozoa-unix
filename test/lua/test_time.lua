@@ -48,4 +48,8 @@ assert(a == process[1])
 assert(b == "exit")
 assert(c == 0)
 
+local t1 = assert(unix.clock_gettime(unix.CLOCK_MONOTONIC))
+local t2 = assert(unix.clock_gettime(unix.CLOCK_MONOTONIC))
+assert(t1 < t2)
+
 assert(unix.selfpipe.close())
