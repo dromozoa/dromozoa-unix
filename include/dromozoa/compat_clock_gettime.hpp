@@ -15,29 +15,16 @@
 // You should have received a copy of the GNU General Public License
 // along with dromozoa-unix.  If not, see <http://www.gnu.org/licenses/>.
 
-#include <mach/mach_time.h>
+#ifndef DROMOZOA_COMPAT_CLOCK_GETTIME_HPP
+#define DROMOZOA_COMPAT_CLOCK_GETTIME_HPP
 
-#include <dromozoa/timer_mach_absolute_time.hpp>
+#include <time.h>
 
 namespace dromozoa {
-  timer_mach_absolute_time::timer_mach_absolute_time() : start_(), stop_() {}
-
-  timer_mach_absolute_time::~timer_mach_absolute_time() {}
-
-  int timer_mach_absolute_time::start() {
-    start_ = mach_absolute_time();
-    return 0;
-  }
-
-  int timer_mach_absolute_time::stop() {
-    stop_ = mach_absolute_time();
-    return 0;
-  }
-
-  double timer_mach_absolute_time::elapsed() const {
-    mach_timebase_info_data_t timebase = {};
-    mach_timebase_info(&timebase);
-    uint64_t n = (stop_ - start_) * timebase.numer / timebase.denom;
-    return n * 0.000000001;
-  }
+  extern const int COMPAT_CLOCK_REALTIME;
+  extern const int COMPAT_CLOCK_MONOTONIC;
+  extern const int COMPAT_CLOCK_MONOTONIC_RAW;
+  int compat_clock_gettime(int clock_id, struct timespec* tp);
 }
+
+#endif

@@ -35,8 +35,13 @@ namespace dromozoa {
   void new_sockaddr(lua_State* L, const socket_address& address);
   void new_sockaddr(lua_State* L, const struct sockaddr* address, socklen_t size);
   const socket_address* check_sockaddr(lua_State* L, int arg);
-  void new_timespec(lua_State* L, const timespec& tv);
-  bool check_timespec(lua_State* L, int arg, struct timespec& tv);
+
+  static const int TIMESPEC_TYPE_REALTIME = 0;
+  static const int TIMESPEC_TYPE_MONOTONIC = 1;
+  static const int TIMESPEC_TYPE_DURATION = 2;
+  static const int TIMESPEC_TYPE_UNKNOWN = 3;
+  void new_timespec(lua_State* L, const timespec& tv, int type);
+  int check_timespec(lua_State* L, int arg, struct timespec& tv);
 }
 
 #endif

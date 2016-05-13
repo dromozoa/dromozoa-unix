@@ -21,14 +21,6 @@
 
 #include <dromozoa/timer.hpp>
 
-#if defined(HAVE_CLOCK_GETTIME)
-#include <dromozoa/timer_clock_gettime.hpp>
-typedef dromozoa::timer_clock_gettime timer_impl;
-#elif defined(HAVE_MACH_ABSOLUTE_TIME)
-#include <dromozoa/timer_mach_absolute_time.hpp>
-typedef dromozoa::timer_mach_absolute_time timer_impl;
-#endif
-
 #include "common.hpp"
 
 namespace dromozoa {
@@ -42,7 +34,7 @@ namespace dromozoa {
     }
 
     void impl_call(lua_State* L) {
-      luaX_new<timer_impl>(L);
+      luaX_new<timer>(L);
       luaX_set_metatable(L, "dromozoa.unix.timer");
     }
 
