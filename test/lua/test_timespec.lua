@@ -63,3 +63,9 @@ local t = t - unix.clock_gettime(unix.CLOCK_MONOTONIC_RAW)
 assert(t.tv_type == unix.TIMESPEC_TYPE_UNKNOWN)
 
 assert(not pcall(unix.timespec))
+
+local t = unix.timespec(42)
+local t = t:add(2.5)
+local t = t:sub(1.25)
+assert(t.tv_sec == 43)
+assert(t.tv_nsec == 250000000)

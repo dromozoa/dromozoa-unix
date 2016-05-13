@@ -164,7 +164,7 @@ namespace dromozoa {
     void impl_tonumber(lua_State* L) {
       struct timespec tv = {};
       check_timespec(L, 1, tv);
-      lua_pushnumber(L, tv.tv_sec + tv.tv_nsec * 0.000000001);
+      luaX_push(L, tv.tv_sec + tv.tv_nsec * 0.000000001);
     }
   }
 
@@ -209,6 +209,11 @@ namespace dromozoa {
       lua_pop(L, 1);
 
       luaX_set_metafield(L, -1, "__call", impl_call);
+      luaX_set_field(L, -1, "add", impl_add);
+      luaX_set_field(L, -1, "sub", impl_sub);
+      luaX_set_field(L, -1, "eq", impl_eq);
+      luaX_set_field(L, -1, "lt", impl_lt);
+      luaX_set_field(L, -1, "le", impl_le);
       luaX_set_field(L, -1, "tostring", impl_tostring);
       luaX_set_field(L, -1, "tonumber", impl_tonumber);
     }
