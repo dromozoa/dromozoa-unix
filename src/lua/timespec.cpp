@@ -33,13 +33,28 @@ namespace dromozoa {
     static const int D = TIMESPEC_TYPE_DURATION;
     static const int U = TIMESPEC_TYPE_UNKNOWN;
 
+    static const int TIMESPEC_TYPE_MATRIX_ADD[] = {
+      U, U, R, R,
+      U, U, M, M,
+      R, M, D, U,
+      R, M, U, U,
+    };
+
+    static const int TIMESPEC_TYPE_MATRIX_SUB[] = {
+      D, U, R, U,
+      U, D, M, U,
+      U, U, D, D,
+      D, D, U, U,
+    };
+
+    static const int TIMESPEC_TYPE_MATRIX_CALL[] = {
+      R, M, D, R,
+      R, M, D, M,
+      R, M, D, D,
+      R, M, D, U,
+    };
+
     void impl_add(lua_State* L) {
-      static const int matrix[] = {
-        U, U, R, R,
-        U, U, M, M,
-        R, M, D, U,
-        R, M, U, U,
-      };
       struct timespec tv1 = {};
       struct timespec tv2 = {};
       int type1 = TIMESPEC_TYPE_UNKNOWN;
@@ -52,16 +67,10 @@ namespace dromozoa {
         ++tv1.tv_sec;
         tv1.tv_nsec -= 1000000000;
       }
-      new_timespec(L, tv1, matrix[type1 * TIMESPEC_TYPE_SIZE + type2]);
+      new_timespec(L, tv1, TIMESPEC_TYPE_MATRIX_ADD[type1 * TIMESPEC_TYPE_SIZE + type2]);
     }
 
     void impl_sub(lua_State* L) {
-      static const int matrix[] = {
-        D, U, R, U,
-        U, D, M, U,
-        U, U, D, D,
-        D, D, U, U,
-      };
       struct timespec tv1 = {};
       struct timespec tv2 = {};
       int type1 = TIMESPEC_TYPE_UNKNOWN;
@@ -74,7 +83,7 @@ namespace dromozoa {
         --tv1.tv_sec;
         tv1.tv_nsec += 1000000000;
       }
-      new_timespec(L, tv1, matrix[type1 * TIMESPEC_TYPE_SIZE + type2]);
+      new_timespec(L, tv1, TIMESPEC_TYPE_MATRIX_SUB[type1 * TIMESPEC_TYPE_SIZE + type2]);
     }
 
     void impl_eq(lua_State* L) {
@@ -110,17 +119,11 @@ namespace dromozoa {
     }
 
     void impl_call(lua_State* L) {
-      static const int matrix[] = {
-        R, M, D, R,
-        R, M, D, M,
-        R, M, D, D,
-        R, M, D, U,
-      };
       struct timespec tv = {};
       int type1 = TIMESPEC_TYPE_UNKNOWN;
       check_timespec(L, 2, tv, &type1);
       int type2 = luaX_opt_integer<int>(L, 3, TIMESPEC_TYPE_UNKNOWN, TIMESPEC_TYPE_MIN, TIMESPEC_TYPE_MAX);
-      new_timespec(L, tv, matrix[type1 * TIMESPEC_TYPE_SIZE + type2]);
+      new_timespec(L, tv, TIMESPEC_TYPE_MATRIX_CALL[type1 * TIMESPEC_TYPE_SIZE + type2]);
     }
 
     void impl_tostring(lua_State* L) {
