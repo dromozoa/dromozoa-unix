@@ -57,8 +57,10 @@ namespace dromozoa {
     void impl_add(lua_State* L) {
       struct timespec tv1 = {};
       struct timespec tv2 = {};
-      int type1 = check_timespec(L, 1, tv1);
-      int type2 = check_timespec(L, 2, tv2);
+      int type1 = TIMESPEC_TYPE_UNKNOWN;
+      int type2 = TIMESPEC_TYPE_UNKNOWN;
+      check_timespec(L, 1, tv1, type1);
+      check_timespec(L, 2, tv2, type2);
       tv1.tv_sec += tv2.tv_sec;
       tv1.tv_nsec += tv2.tv_nsec;
       if (tv1.tv_nsec > 999999999) {
@@ -71,8 +73,10 @@ namespace dromozoa {
     void impl_sub(lua_State* L) {
       struct timespec tv1 = {};
       struct timespec tv2 = {};
-      int type1 = check_timespec(L, 1, tv1);
-      int type2 = check_timespec(L, 2, tv2);
+      int type1 = TIMESPEC_TYPE_UNKNOWN;
+      int type2 = TIMESPEC_TYPE_UNKNOWN;
+      check_timespec(L, 1, tv1, type1);
+      check_timespec(L, 2, tv2, type2);
       tv1.tv_sec -= tv2.tv_sec;
       tv1.tv_nsec -= tv2.tv_nsec;
       if (tv1.tv_nsec < 0) {
@@ -116,15 +120,16 @@ namespace dromozoa {
 
     void impl_call(lua_State* L) {
       struct timespec tv = {};
-      int type1 = check_timespec(L, 2, tv);
+      int type1 = TIMESPEC_TYPE_UNKNOWN;
+      check_timespec(L, 2, tv, type1);
       int type2 = luaX_opt_integer<int>(L, 3, TIMESPEC_TYPE_UNKNOWN, TIMESPEC_TYPE_MIN, TIMESPEC_TYPE_MAX);
       new_timespec(L, tv, TIMESPEC_TYPE_MATRIX_CALL[type1 * TIMESPEC_TYPE_SIZE + type2]);
     }
 
     void impl_tostring(lua_State* L) {
       struct timespec tv = {};
-      int type = check_timespec(L, 1, tv);
-
+      int type = TIMESPEC_TYPE_UNKNOWN;
+      check_timespec(L, 1, tv, type);
       std::ostringstream out;
       out << std::setfill('0');
       if (type == TIMESPEC_TYPE_REALTIME) {
@@ -177,27 +182,31 @@ namespace dromozoa {
     luaX_set_metatable(L, "dromozoa.unix.timespec");
   }
 
-  int check_timespec(lua_State* L, int arg, struct timespec& tv) {
-    return check_timespec(L, arg, tv, TIMESPEC_TYPE_UNKNOWN);
+  bool check_timespec(lua_State* L, int arg, struct timespec& tv) {
+    int type = TIMESPEC_TYPE_UNKNOWN;
+    return check_timespec(L, arg, tv, type);
   }
 
-  int check_timespec(lua_State* L, int arg, struct timespec& tv, int type_nil) {
+  bool check_timespec(lua_State* L, int arg, struct timespec& tv, int& type) {
     if (lua_isnoneornil(L, arg)) {
-      return type_nil;
+      type = TIMESPEC_TYPE_UNKNOWN;
+      return false;
     } else if (lua_isnumber(L, arg)) {
       double t = lua_tonumber(L, arg);
       double i = 0;
       double f = modf(t, &i);
       tv.tv_sec = i;
       tv.tv_nsec = f * 1000000000;
-      return TIMESPEC_TYPE_UNKNOWN;
+      type = TIMESPEC_TYPE_UNKNOWN;
+      return true;
     } else if (lua_istable(L, arg)) {
       tv.tv_sec = luaX_opt_integer_field<time_t>(L, arg, "tv_sec", 0);
       tv.tv_nsec = luaX_opt_integer_field<long>(L, arg, "tv_nsec", 0, 0L, 999999999L);
-      return luaX_opt_integer_field<int>(L, arg, "type", TIMESPEC_TYPE_UNKNOWN, TIMESPEC_TYPE_MIN, TIMESPEC_TYPE_MAX);
+      type = luaX_opt_integer_field<int>(L, arg, "type", TIMESPEC_TYPE_UNKNOWN, TIMESPEC_TYPE_MIN, TIMESPEC_TYPE_MAX);
+      return true;
     } else {
       luaL_argerror(L, arg, "nil, number or table expected");
-      return TIMESPEC_TYPE_UNKNOWN;
+      return false;
     }
   }
 
