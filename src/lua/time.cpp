@@ -24,7 +24,7 @@ namespace dromozoa {
     void impl_nanosleep(lua_State* L) {
       struct timespec tv1 = {};
       struct timespec tv2 = {};
-      check_timespec(L, 1, tv1, 0);
+      check_timespec(L, 1, tv1);
       if (nanosleep(&tv1, &tv2) != -1) {
         luaX_push_success(L);
       } else {
