@@ -51,10 +51,19 @@ namespace dromozoa {
         luaX_push(L, 0);
       }
     }
+
+    void impl_fsync(lua_State* L) {
+      if (fsync(check_fd(L, 1)) == -1) {
+        push_error(L);
+      } else {
+        luaX_push_success(L);
+      }
+    }
   }
 
   void initialize_fd_unistd(lua_State* L) {
     luaX_set_field(L, -1, "read", impl_read);
     luaX_set_field(L, -1, "write", impl_write);
+    luaX_set_field(L, -1, "fsync", impl_fsync);
   }
 }
