@@ -45,6 +45,7 @@ unix_la_SOURCES = \
 	sys_mman.cpp \
 	sys_socket.cpp \
 	sys_stat.cpp \
+	sys_statvfs.cpp \
 	sys_wait.cpp \
 	time.cpp \
 	timer.cpp \
