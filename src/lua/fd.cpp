@@ -88,6 +88,7 @@ namespace dromozoa {
 
   void initialize_fd_djb(lua_State* L);
   void initialize_fd_socket(lua_State* L);
+  void initialize_fd_stat(lua_State* L);
   void initialize_fd_statvfs(lua_State* L);
   void initialize_fd_unistd(lua_State* L);
 
@@ -111,6 +112,7 @@ namespace dromozoa {
 
       initialize_fd_djb(L);
       initialize_fd_socket(L);
+      initialize_fd_stat(L);
       initialize_fd_statvfs(L);
       initialize_fd_unistd(L);
     }
