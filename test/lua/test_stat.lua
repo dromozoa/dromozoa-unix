@@ -15,12 +15,32 @@
 -- You should have received a copy of the GNU General Public License
 -- along with dromozoa-unix.  If not, see <http://www.gnu.org/licenses/>.
 
+local equal = require "dromozoa.commons.equal"
 local json = require "dromozoa.commons.json"
 local unix = require "dromozoa.unix"
 
 local fd, tmpname = assert(unix.mkstemp("tmp-XXXXXX"))
 
-print(json.encode(assert(fd:fstat())))
-print(json.encode(assert(unix.stat(tmpname))))
+local current_time = assert(unix.clock_gettime(unix.CLOCK_REALTIME))
 
+local st1 = assert(fd:fstat())
+local st2 = assert(unix.stat(tmpname))
+assert(equal(st1, st2))
+assert(st1.st_size == 0)
+assert(st2.st_size == 0)
+assert(st1.st_ctim <= current_time)
+assert(st1.st_mtim <= current_time)
+assert(st2.st_ctim <= current_time)
+assert(st2.st_mtim <= current_time)
+
+assert(fd:write("foobarbazqux"))
+assert(fd:fsync())
+
+local st1 = assert(fd:fstat())
+local st2 = assert(unix.stat(tmpname))
+assert(equal(st1, st2))
+assert(st1.st_size == 12)
+assert(st2.st_size == 12)
+
+fd:close()
 assert(os.remove(tmpname))

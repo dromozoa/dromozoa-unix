@@ -38,6 +38,13 @@ AC_CHECK_FUNCS([sched_getscheduler])
 AC_CHECK_FUNCS([sched_setaffinity])
 AC_CHECK_FUNCS([sched_setscheduler])
 
+AC_CHECK_MEMBERS([struct stat.st_atim])
+AC_CHECK_MEMBERS([struct stat.st_atimespec])
+AC_CHECK_MEMBERS([struct stat.st_ctim])
+AC_CHECK_MEMBERS([struct stat.st_ctimespec])
+AC_CHECK_MEMBERS([struct stat.st_mtim])
+AC_CHECK_MEMBERS([struct stat.st_mtimespec])
+
 AC_SEARCH_LIBS([clock_gettime], [rt], [AC_DEFINE(HAVE_CLOCK_GETTIME, 1, [Define to 1 if you have the 'clock_gettime' function.]) ])
 
 AX_PTHREAD()

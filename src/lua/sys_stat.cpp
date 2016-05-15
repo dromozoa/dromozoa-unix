@@ -15,6 +15,10 @@
 // You should have received a copy of the GNU General Public License
 // along with dromozoa-unix.  If not, see <http://www.gnu.org/licenses/>.
 
+#ifdef HAVE_CONFIG_H
+#include "config.h"
+#endif
+
 #include <sys/stat.h>
 
 #include "common.hpp"
@@ -31,15 +35,40 @@ namespace dromozoa {
       luaX_set_field(L, -1, "st_gid", buf.st_gid);
       luaX_set_field(L, -1, "st_rdev", buf.st_rdev);
       luaX_set_field(L, -1, "st_size", buf.st_size);
-      luaX_set_field(L, -1, "st_atime", buf.st_atime);
-      luaX_set_field(L, -1, "st_ctime", buf.st_ctime);
-      luaX_set_field(L, -1, "st_mtime", buf.st_mtime);
-      // new_timespec(L, buf.st_atim, TIMESPEC_TYPE_REALTIME);
-      // luaX_set_field(L, -2, "st_atim");
-      // new_timespec(L, buf.st_mtim, TIMESPEC_TYPE_REALTIME);
-      // luaX_set_field(L, -2, "st_mtim");
-      // new_timespec(L, buf.st_ctim, TIMESPEC_TYPE_REALTIME);
-      // luaX_set_field(L, -2, "st_ctim");
+
+#if defined(HAVE_STRUCT_STAT_ST_ATIM)
+      new_timespec(L, buf.st_atim, TIMESPEC_TYPE_REALTIME);
+#elif defined(HAVE_STRUCT_STAT_ST_ATIMESPEC)
+      new_timespec(L, buf.st_atimespec, TIMESPEC_TYPE_REALTIME);
+#else
+      struct timespec atim = {};
+      atim.tv_sec = buf.st_atime;
+      new_timespec(L, atim, TIMESPEC_TYPE_REALTIME);
+#endif
+      luaX_set_field(L, -2, "st_atim");
+
+#if defined(HAVE_STRUCT_STAT_ST_MTIM)
+      new_timespec(L, buf.st_mtim, TIMESPEC_TYPE_REALTIME);
+#elif defined(HAVE_STRUCT_STAT_ST_MTIMESPEC)
+      new_timespec(L, buf.st_mtimespec, TIMESPEC_TYPE_REALTIME);
+#else
+      struct timespec mtim = {};
+      mtim.tv_sec = buf.st_mtime;
+      new_timespec(L, mtim, TIMESPEC_TYPE_REALTIME);
+#endif
+      luaX_set_field(L, -2, "st_mtim");
+
+#if defined(HAVE_STRUCT_STAT_ST_CTIM)
+      new_timespec(L, buf.st_ctim, TIMESPEC_TYPE_REALTIME);
+#elif defined(HAVE_STRUCT_STAT_ST_CTIMESPEC)
+      new_timespec(L, buf.st_ctimespec, TIMESPEC_TYPE_REALTIME);
+#else
+      struct timespec ctim = {};
+      ctim.tv_sec = buf.st_ctime;
+      new_timespec(L, ctim, TIMESPEC_TYPE_REALTIME);
+#endif
+      luaX_set_field(L, -2, "st_ctim");
+
       luaX_set_field(L, -1, "st_blksize", buf.st_blksize);
       luaX_set_field(L, -1, "st_blocks", buf.st_blocks);
     }

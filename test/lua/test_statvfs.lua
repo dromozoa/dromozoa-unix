@@ -21,3 +21,4 @@ local unix = require "dromozoa.unix"
 local fd = assert(unix.open("."))
 print(json.encode(assert(fd:fstatvfs())))
 print(json.encode(assert(unix.statvfs("."))))
+fd:close()

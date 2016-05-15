@@ -59,8 +59,8 @@ namespace dromozoa {
   void initialize_sys_statvfs(lua_State* L) {
     luaX_set_field(L, -1, "statvfs", impl_statvfs);
 
-    luaX_set_field(L, -1, "ST_RDONLY", ST_RDONLY);
-    luaX_set_field(L, -1, "ST_NOSUID", ST_NOSUID);
+    luaX_set_field<unsigned long>(L, -1, "ST_RDONLY", ST_RDONLY);
+    luaX_set_field<unsigned long>(L, -1, "ST_NOSUID", ST_NOSUID);
   }
 
   void initialize_fd_statvfs(lua_State* L) {
