@@ -15,8 +15,7 @@
 // You should have received a copy of the GNU General Public License
 // along with dromozoa-unix.  If not, see <http://www.gnu.org/licenses/>.
 
-#include <errno.h>
-
+#include <dromozoa/errno_saver.hpp>
 #include <dromozoa/forkexec.hpp>
 
 #include "common.hpp"
@@ -45,13 +44,16 @@ namespace dromozoa {
 
       pid_t pid = -1;
       int result = forkexec(path, argv.get(), envp.get(), chdir, dup2_stdio, pid);
-      int code = errno;
 
-      if (pid != -1) {
-        luaX_set_field(L, 1, 1, pid);
+      {
+        errno_saver save;
+        if (pid != -1) {
+          luaX_set_field(L, 1, 1, pid);
+        }
       }
+
       if (result == -1) {
-        push_error(L, code);
+        push_error(L);
       } else {
         luaX_push_success(L);
       }
@@ -67,16 +69,19 @@ namespace dromozoa {
       pid_t pid1 = -1;
       pid_t pid2 = -1;
       int result = forkexec_daemon(path, argv.get(), envp.get(), chdir, pid1, pid2);
-      int code = errno;
 
-      if (pid1 != -1) {
-        luaX_set_field(L, 1, 1, pid1);
+      {
+        errno_saver save;
+        if (pid1 != -1) {
+          luaX_set_field(L, 1, 1, pid1);
+        }
+        if (pid2 != -1) {
+          luaX_set_field(L, 1, 2, pid2);
+        }
       }
-      if (pid2 != -1) {
-        luaX_set_field(L, 1, 2, pid2);
-      }
+
       if (result == -1) {
-        push_error(L, code);
+        push_error(L);
       } else {
         luaX_push_success(L);
       }
