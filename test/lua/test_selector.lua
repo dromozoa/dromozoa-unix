@@ -20,7 +20,7 @@ local unix = require "dromozoa.unix"
 
 local reader, writer = assert(unix.pipe(uint32.bor(unix.O_CLOEXEC, unix.O_NONBLOCK)))
 
-local selector = assert(unix.selector(1024))
+local selector = assert(unix.selector())
 assert(selector:add(reader, unix.SELECTOR_READ))
 
 assert(selector:select(0.2) == 0)

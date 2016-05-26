@@ -18,7 +18,6 @@
 #ifndef DROMOZOA_SELECTOR_KQUEUE_HPP
 #define DROMOZOA_SELECTOR_KQUEUE_HPP
 
-#include <stddef.h>
 #include <time.h>
 #include <sys/event.h>
 #include <sys/time.h>
@@ -34,8 +33,8 @@ namespace dromozoa {
 
   class selector_kqueue : public selector {
   public:
-    static int open(size_t size, int flags);
-    selector_kqueue(int fd, size_t size);
+    static int open(int flags);
+    selector_kqueue(int fd);
     virtual ~selector_kqueue();
     virtual int close();
     virtual bool valid() const;

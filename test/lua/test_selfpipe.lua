@@ -24,7 +24,7 @@ assert(unix.selfpipe.get() ~= -1)
 
 local PATH = os.getenv("PATH")
 
-local selector = assert(unix.selector(1024))
+local selector = assert(unix.selector())
 assert(selector:add(unix.selfpipe.get(), unix.SELECTOR_READ))
 
 local process1 = assert(unix.process())

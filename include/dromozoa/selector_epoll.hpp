@@ -18,7 +18,6 @@
 #ifndef DROMOZOA_SELECTOR_EPOLL_HPP
 #define DROMOZOA_SELECTOR_EPOLL_HPP
 
-#include <stddef.h>
 #include <time.h>
 #include <sys/epoll.h>
 
@@ -32,8 +31,8 @@ namespace dromozoa {
 
   class selector_epoll : public selector {
   public:
-    static int open(size_t size, int flags);
-    selector_epoll(int fd, size_t size);
+    static int open(int flags);
+    selector_epoll(int fd);
     virtual ~selector_epoll();
     virtual int close();
     virtual bool valid() const;

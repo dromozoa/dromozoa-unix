@@ -25,7 +25,6 @@
 
 #include <iostream>
 
-#include <dromozoa/compat_pipe2.hpp>
 #include <dromozoa/selfpipe.hpp>
 #include <dromozoa/forkexec.hpp>
 #include <dromozoa/selector.hpp>
@@ -43,32 +42,14 @@ typedef dromozoa::selector_kqueue selector_impl;
 int main(int, char*[]) {
   assert(dromozoa::selfpipe_open() == 0);
 
-  int fd = selector_impl::open(1, dromozoa::SELECTOR_CLOEXEC);
+  int fd = selector_impl::open(dromozoa::SELECTOR_CLOEXEC);
   std::cout << fd << "\n";
   assert(fd != -1);
   assert_coe(fd);
   assert_ndelay_off(fd);
 
-  selector_impl selector(fd, 1);
+  selector_impl selector(fd);
   assert(selector.add(dromozoa::selfpipe_get(), dromozoa::SELECTOR_READ) == 0);
-
-  {
-    int fd[2] = { -1, -1 };
-    assert(dromozoa::compat_pipe2(fd, O_CLOEXEC) != -1);
-    assert(selector.add(fd[0], dromozoa::SELECTOR_READ) == 0);
-    assert(selector.add(fd[1], dromozoa::SELECTOR_WRITE) == 0);
-
-    assert(write(fd[1], "x", 1) == 1);
-
-    assert(selector.select(0) == 1);
-    assert(selector.select(0) == 2);
-
-    assert(selector.del(fd[0]) == 0);
-    assert(selector.del(fd[1]) == 0);
-
-    assert(close(fd[0]) != -1);
-    assert(close(fd[1]) != -1);
-  }
 
   const char* path = getenv("PATH");
   const char* argv[] = { "env", 0 };
