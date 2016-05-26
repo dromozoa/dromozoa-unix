@@ -24,9 +24,17 @@
 
 namespace dromozoa {
   namespace {
+    void set_last_errno(lua_State* L, int code) {
+      luaX_set_field(L, LUA_REGISTRYINDEX, "dromozoa.unix.last_errno", code);
+    }
+
+    int get_last_errno(lua_State* L) {
+      return luaX_opt_integer_field<int>(L, LUA_REGISTRYINDEX, "dromozoa.unix.last_errno", 0);
+    }
+
     void impl_strerror(lua_State* L) {
       errno_saver save;
-      std::string message = compat_strerror(luaX_opt_integer<int>(L, 1, errno));
+      std::string message = compat_strerror(luaX_opt_integer<int>(L, 1, save.get()));
       lua_pushlstring(L, message.c_str(), message.size());
     }
 
@@ -38,24 +46,50 @@ namespace dromozoa {
     void impl_get_errno(lua_State* L) {
       luaX_push(L, errno);
     }
+
+    void impl_get_error(lua_State* L) {
+      errno_saver save;
+      std::string message = compat_strerror(save.get());
+      luaX_push(L, luaX_nil);
+      lua_pushlstring(L, message.c_str(), message.size());
+      luaX_push(L, save.get());
+    }
+
+    void impl_set_last_errno(lua_State* L) {
+      set_last_errno(L, luaX_check_integer<int>(L, 1));
+      luaX_push_success(L);
+    }
+
+    void impl_get_last_errno(lua_State* L) {
+      luaX_push(L, get_last_errno(L));
+    }
+
+    void impl_get_last_error(lua_State* L) {
+      int code = get_last_errno(L);
+      std::string message = compat_strerror(code);
+      luaX_push(L, luaX_nil);
+      lua_pushlstring(L, message.c_str(), message.size());
+      luaX_push(L, code);
+    }
   }
 
   void push_error(lua_State* L) {
-    push_error(L, errno);
-  }
-
-  void push_error(lua_State* L, int code) {
     errno_saver save;
-    std::string message = compat_strerror(code);
-    lua_pushnil(L);
+    set_last_errno(L, save.get());
+    std::string message = compat_strerror(save.get());
+    luaX_push(L, luaX_nil);
     lua_pushlstring(L, message.c_str(), message.size());
-    lua_pushinteger(L, code);
+    luaX_push(L, save.get());
   }
 
   void initialize_error(lua_State* L) {
     luaX_set_field(L, -1, "strerror", impl_strerror);
     luaX_set_field(L, -1, "set_errno", impl_set_errno);
     luaX_set_field(L, -1, "get_errno", impl_get_errno);
+    luaX_set_field(L, -1, "get_error", impl_get_error);
+    luaX_set_field(L, -1, "set_last_errno", impl_set_last_errno);
+    luaX_set_field(L, -1, "get_last_errno", impl_get_last_errno);
+    luaX_set_field(L, -1, "get_last_error", impl_get_last_error);
 
     luaX_set_field(L, -1, "EAGAIN", EAGAIN);
     luaX_set_field(L, -1, "ECHILD", ECHILD);

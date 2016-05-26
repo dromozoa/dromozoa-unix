@@ -32,11 +32,11 @@ namespace dromozoa {
 #ifdef PATH_MAX
       std::vector<char> buffer(PATH_MAX);
       if (const char* result = realpath(path, &buffer[0])) {
-        lua_pushstring(L, result);
+        luaX_push(L, result);
       }
 #else
       if (char* result = realpath(path, 0)) {
-        lua_pushstring(L, result);
+        luaX_push(L, result);
         free(result);
       }
 #endif
@@ -50,7 +50,7 @@ namespace dromozoa {
       const char* tmpl = luaL_checklstring(L, 1, &size);
       std::vector<char> buffer(tmpl, tmpl + size + 1);
       if (const char* result = mkdtemp(&buffer[0])) {
-        lua_pushstring(L, result);
+        luaX_push(L, result);
       } else {
         push_error(L);
       }
@@ -66,7 +66,7 @@ namespace dromozoa {
         push_error(L);
       } else {
         new_fd(L, result);
-        lua_pushstring(L, &buffer[0]);
+        luaX_push(L, &buffer[0]);
       }
     }
   }

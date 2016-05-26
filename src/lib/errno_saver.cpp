@@ -25,4 +25,8 @@ namespace dromozoa {
   errno_saver::~errno_saver() {
     errno = code_;
   }
+
+  int errno_saver::get() const {
+    return code_;
+  }
 }

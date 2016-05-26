@@ -23,6 +23,7 @@ namespace dromozoa {
   public:
     errno_saver();
     ~errno_saver();
+    int get() const;
   private:
     int code_;
     errno_saver(const errno_saver&);

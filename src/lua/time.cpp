@@ -25,11 +25,11 @@ namespace dromozoa {
       struct timespec tv1 = {};
       struct timespec tv2 = {};
       check_timespec(L, 1, tv1);
-      if (nanosleep(&tv1, &tv2) != -1) {
-        luaX_push_success(L);
-      } else {
+      if (nanosleep(&tv1, &tv2) == -1) {
         push_error(L);
         new_timespec(L, tv2, TIMESPEC_TYPE_DURATION);
+      } else {
+        luaX_push_success(L);
       }
     }
 
