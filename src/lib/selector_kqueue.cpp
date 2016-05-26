@@ -98,6 +98,9 @@ namespace dromozoa {
   }
 
   int selector_kqueue::select(const struct timespec* timeout) {
+    if (result_ == static_cast<int>(buffer_.size())) {
+      buffer_.resize(result_ * 2);
+    }
     result_ = kevent(fd_.get(), 0, 0, &buffer_[0], buffer_.size(), timeout);
     return result_;
   }

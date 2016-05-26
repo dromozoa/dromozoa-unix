@@ -105,6 +105,9 @@ namespace dromozoa {
     if (timeout) {
       t = timeout->tv_sec * 1000 + timeout->tv_nsec / 1000000;
     }
+    if (result_ == static_cast<int>(buffer_.size())) {
+      buffer_.resize(result_ * 2);
+    }
     result_ = epoll_wait(fd_.get(), &buffer_[0], buffer_.size(), t);
     return result_;
   }
