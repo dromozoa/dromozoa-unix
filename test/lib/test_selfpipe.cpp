@@ -42,13 +42,13 @@ typedef dromozoa::selector_kqueue selector_impl;
 int main(int, char*[]) {
   assert(dromozoa::selfpipe_open() == 0);
 
-  int fd = selector_impl::open(16, dromozoa::SELECTOR_CLOEXEC);
+  int fd = selector_impl::open(dromozoa::SELECTOR_CLOEXEC);
   std::cout << fd << "\n";
   assert(fd != -1);
   assert_coe(fd);
   assert_ndelay_off(fd);
 
-  selector_impl selector(fd, 16);
+  selector_impl selector(fd);
   assert(selector.add(dromozoa::selfpipe_get(), dromozoa::SELECTOR_READ) == 0);
 
   const char* path = getenv("PATH");

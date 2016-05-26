@@ -17,6 +17,7 @@
 
 #include <errno.h>
 #include <fcntl.h>
+#include <stddef.h>
 #include <sys/epoll.h>
 
 #include <dromozoa/coe.hpp>
@@ -24,6 +25,11 @@
 #include <dromozoa/sigmask.hpp>
 
 namespace dromozoa {
+  namespace {
+    static const size_t INITIAL_BUFFER_SIZE = 32;
+    static const int MAX_BUFFER_SIZE = 4096;
+  }
+
 #ifdef EPOLL_CLOEXEC
   const int SELECTOR_CLOEXEC = EPOLL_CLOEXEC;
 #else
@@ -31,18 +37,18 @@ namespace dromozoa {
 #endif
 
 #ifdef HAVE_EPOLL_CREATE1
-  int selector_epoll::open(size_t, int flags) {
+  int selector_epoll::open(int flags) {
     return epoll_create1(flags);
   }
 #else
-  int selector_epoll::open(size_t size, int flags) {
+  int selector_epoll::open(int flags) {
     sigset_t mask;
     if (sigmask_block_all_signals(&mask) == -1) {
       return -1;
     }
     sigmask_saver save_mask(mask);
 
-    file_descriptor fd(epoll_create(size));
+    file_descriptor fd(epoll_create(1));
     if (!fd.valid()) {
       return -1;
     }
@@ -57,9 +63,7 @@ namespace dromozoa {
   }
 #endif
 
-  selector_epoll::selector_epoll(int fd, size_t size) : fd_(fd), result_(-1) {
-    buffer_.resize(size);
-  }
+  selector_epoll::selector_epoll(int fd) : fd_(fd), result_(-1), buffer_(INITIAL_BUFFER_SIZE) {}
 
   selector_epoll::~selector_epoll() {}
 
@@ -105,7 +109,12 @@ namespace dromozoa {
     if (timeout) {
       t = timeout->tv_sec * 1000 + timeout->tv_nsec / 1000000;
     }
-    result_ = epoll_wait(fd_.get(), &buffer_[0], buffer_.size(), t);
+    int size = buffer_.size();
+    if (result_ == size && size < MAX_BUFFER_SIZE) {
+      size *= 2;
+      buffer_.resize(size);
+    }
+    result_ = epoll_wait(fd_.get(), &buffer_[0], size, t);
     return result_;
   }
 
