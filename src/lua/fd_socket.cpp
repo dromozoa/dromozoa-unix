@@ -89,7 +89,7 @@ namespace dromozoa {
       if (getsockopt(check_fd(L, 1), level, name, &value, &size) == -1) {
         push_error(L);
       } else {
-        lua_pushinteger(L, value);
+        luaX_push(L, value);
       }
     }
 

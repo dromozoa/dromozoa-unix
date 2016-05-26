@@ -18,12 +18,25 @@
 local unix = require "dromozoa.unix"
 
 unix.set_errno(0)
-assert(unix.get_errno() == 0)
 print(unix.strerror())
+assert(unix.get_errno() == 0)
 
 unix.set_errno(unix.EAGAIN)
-assert(unix.get_errno() == unix.EAGAIN)
 assert(unix.strerror() == unix.strerror(unix.EAGAIN))
+assert(unix.get_errno() == unix.EAGAIN)
+
 print(unix.strerror(unix.EAGAIN))
 print(unix.strerror(unix.EINTR))
 assert(unix.get_errno() == unix.EAGAIN)
+local a, b, c = unix.get_error()
+assert(a == nil)
+assert(b == unix.strerror(unix.EAGAIN))
+assert(c == unix.EAGAIN)
+
+assert(unix.get_last_errno() == 0)
+assert(unix.open("no such file", unix.O_RDONLY) == nil)
+assert(unix.get_last_errno() == unix.ENOENT)
+local a, b, c = unix.get_last_error()
+assert(a == nil)
+assert(b == unix.strerror(unix.ENOENT))
+assert(c == unix.ENOENT)
