@@ -9,9 +9,6 @@ description = {
   homepage = "https://github.com/dromozoa/dromozoa-unix/";
   maintainer = "Tomoyuki Fujimori <moyu@dromozoa.com>";
 }
-dependencies = {
-  "dromozoa-commons";
-}
 build = {
   type = "command";
   build_command = "env PATH=\"$(LUA_BINDIR):$PATH\" CPPFLAGS='-I$(LUA_INCDIR)' CXXFLAGS='-Wall -W -Wno-missing-field-initializers $(CFLAGS)' LDFLAGS='-L$(LUA_LIBDIR)' LUA='$(LUA)' ./configure --prefix='$(PREFIX)' && make";
