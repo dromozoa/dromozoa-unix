@@ -25,5 +25,5 @@ EXTRA_DIST = \
 	dromozoa-unix-*.rockspec \
 	include \
 	m4/update \
-	test \
+	test/lua \
 	test.sh
