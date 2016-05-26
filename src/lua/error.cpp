@@ -47,6 +47,14 @@ namespace dromozoa {
       luaX_push(L, errno);
     }
 
+    void impl_get_error(lua_State* L) {
+      errno_saver save;
+      std::string message = compat_strerror(save.get());
+      luaX_push(L, luaX_nil);
+      lua_pushlstring(L, message.c_str(), message.size());
+      luaX_push(L, save.get());
+    }
+
     void impl_set_last_errno(lua_State* L) {
       set_last_errno(L, luaX_check_integer<int>(L, 1));
       luaX_push_success(L);
@@ -78,6 +86,7 @@ namespace dromozoa {
     luaX_set_field(L, -1, "strerror", impl_strerror);
     luaX_set_field(L, -1, "set_errno", impl_set_errno);
     luaX_set_field(L, -1, "get_errno", impl_get_errno);
+    luaX_set_field(L, -1, "get_error", impl_get_error);
     luaX_set_field(L, -1, "set_last_errno", impl_set_last_errno);
     luaX_set_field(L, -1, "get_last_errno", impl_get_last_errno);
     luaX_set_field(L, -1, "get_last_error", impl_get_last_error);
