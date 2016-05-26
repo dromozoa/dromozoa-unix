@@ -38,6 +38,10 @@ namespace dromozoa {
     void impl_get_errno(lua_State* L) {
       luaX_push(L, errno);
     }
+
+    void impl_get_error_result(lua_State* L) {
+      push_error(L, luaX_opt_integer<int>(L, 1, errno));
+    }
   }
 
   void push_error(lua_State* L) {
@@ -56,6 +60,7 @@ namespace dromozoa {
     luaX_set_field(L, -1, "strerror", impl_strerror);
     luaX_set_field(L, -1, "set_errno", impl_set_errno);
     luaX_set_field(L, -1, "get_errno", impl_get_errno);
+    luaX_set_field(L, -1, "get_error_result", impl_get_error_result);
 
     luaX_set_field(L, -1, "EAGAIN", EAGAIN);
     luaX_set_field(L, -1, "ECHILD", ECHILD);
