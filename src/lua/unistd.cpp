@@ -53,7 +53,7 @@ namespace dromozoa {
       } else {
         std::vector<char> buffer(path_max);
         if (const char* result = getcwd(&buffer[0], buffer.size())) {
-          lua_pushstring(L, result);
+          luaX_push(L, result);
         } else {
           push_error(L);
         }
