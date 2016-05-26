@@ -16,6 +16,7 @@
 // along with dromozoa-unix.  If not, see <http://www.gnu.org/licenses/>.
 
 #include <errno.h>
+#include <stddef.h>
 #include <fcntl.h>
 
 #include <dromozoa/coe.hpp>
@@ -23,9 +24,14 @@
 #include <dromozoa/sigmask.hpp>
 
 namespace dromozoa {
+  namespace {
+    static const size_t INITIAL_BUFFER_SIZE = 64;
+    static const int MAX_BUFFER_SIZE = 8192;
+  }
+
   const int SELECTOR_CLOEXEC = O_CLOEXEC;
 
-  int selector_kqueue::open(size_t, int flags) {
+  int selector_kqueue::open(int flags) {
     sigset_t mask;
     if (sigmask_block_all_signals(&mask) == -1) {
       return -1;
@@ -46,9 +52,7 @@ namespace dromozoa {
     return fd.release();
   }
 
-  selector_kqueue::selector_kqueue(int fd, size_t size) : fd_(fd), result_(-1)  {
-    buffer_.resize(size);
-  }
+  selector_kqueue::selector_kqueue(int fd) : fd_(fd), result_(-1), buffer_(INITIAL_BUFFER_SIZE) {}
 
   selector_kqueue::~selector_kqueue() {}
 
@@ -98,7 +102,12 @@ namespace dromozoa {
   }
 
   int selector_kqueue::select(const struct timespec* timeout) {
-    result_ = kevent(fd_.get(), 0, 0, &buffer_[0], buffer_.size(), timeout);
+    int size = buffer_.size();
+    if (size == result_ && size < MAX_BUFFER_SIZE) {
+      size *= 2;
+      buffer_.resize(size);
+    }
+    result_ = kevent(fd_.get(), 0, 0, &buffer_[0], size, timeout);
     return result_;
   }
 
