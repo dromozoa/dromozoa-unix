@@ -138,6 +138,7 @@ namespace dromozoa {
     luaX_set_field(L, -2, "selector");
 
     luaX_set_field(L, -1, "SELECTOR_READ", SELECTOR_READ);
+    luaX_set_field(L, -1, "SELECTOR_READ_WRITE", SELECTOR_READ | SELECTOR_WRITE);
     luaX_set_field(L, -1, "SELECTOR_WRITE", SELECTOR_WRITE);
     luaX_set_field(L, -1, "SELECTOR_CLOEXEC", SELECTOR_CLOEXEC);
   }
