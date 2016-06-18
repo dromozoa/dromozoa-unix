@@ -28,3 +28,19 @@ assert(sa:family() == unix.AF_UNIX)
 assert(sa:path() == "\0test.sock")
 
 assert(not pcall(unix.sockaddr_un, ("x"):rep(sa:size() * 2)))
+
+local addrinfo = assert(unix.getaddrinfo("127.0.0.1", "http", {
+  ai_family = unix.AF_INET;
+  ai_socktype = unix.SOCK_STREAM;
+}))
+local ai = addrinfo[1]
+assert(ai.ai_addr:addr() == "\127\0\0\1")
+assert(ai.ai_addr:port() == "\0\80")
+
+local addrinfo = assert(unix.getaddrinfo("::1", "http", {
+  ai_family = unix.AF_INET6;
+  ai_socktype = unix.SOCK_STREAM;
+}))
+local ai = addrinfo[1]
+assert(ai.ai_addr:addr() == ("\0"):rep(15) .. "\1")
+assert(ai.ai_addr:port() == "\0\80")
