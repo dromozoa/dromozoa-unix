@@ -16,6 +16,7 @@
 // along with dromozoa-unix.  If not, see <http://www.gnu.org/licenses/>.
 
 #include <string.h>
+#include <netinet/in.h>
 #include <sys/un.h>
 
 #include "common.hpp"
@@ -28,6 +29,28 @@ namespace dromozoa {
 
     void impl_family(lua_State* L) {
       luaX_push(L, check_sockaddr(L, 1)->family());
+    }
+
+    void impl_addr(lua_State* L) {
+      const socket_address* self = check_sockaddr(L, 1);
+      if (self->family() == AF_INET) {
+        const struct sockaddr_in* sin = reinterpret_cast<const struct sockaddr_in*>(self->get());
+        lua_pushlstring(L, reinterpret_cast<const char*>(&sin->sin_addr.s_addr), sizeof(in_addr_t));
+      } else if (self->family() == AF_INET6) {
+        const struct sockaddr_in6* sin6 = reinterpret_cast<const struct sockaddr_in6*>(self->get());
+        lua_pushlstring(L, reinterpret_cast<const char*>(&sin6->sin6_addr.s6_addr), 16);
+      }
+    }
+
+    void impl_port(lua_State* L) {
+      const socket_address* self = check_sockaddr(L, 1);
+      if (self->family() == AF_INET) {
+        const struct sockaddr_in* sin = reinterpret_cast<const struct sockaddr_in*>(self->get());
+        lua_pushlstring(L, reinterpret_cast<const char*>(&sin->sin_port), sizeof(in_port_t));
+      } else if (self->family() == AF_INET6) {
+        const struct sockaddr_in6* sin6 = reinterpret_cast<const struct sockaddr_in6*>(self->get());
+        lua_pushlstring(L, reinterpret_cast<const char*>(&sin6->sin6_port), sizeof(in_port_t));
+      }
     }
 
     void impl_path(lua_State* L) {
@@ -93,6 +116,8 @@ namespace dromozoa {
 
       luaX_set_field(L, -1, "size", impl_size);
       luaX_set_field(L, -1, "family", impl_family);
+      luaX_set_field(L, -1, "addr", impl_addr);
+      luaX_set_field(L, -1, "port", impl_port);
       luaX_set_field(L, -1, "path", impl_path);
 
       initialize_sockaddr_netdb(L);
