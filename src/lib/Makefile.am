@@ -21,6 +21,8 @@ libdromozoa_unix_la_CPPFLAGS = -I$(top_srcdir)/bind -I$(top_srcdir)/include
 libdromozoa_unix_la_LDFLAGS = -static
 libdromozoa_unix_la_SOURCES = \
 	argument_vector.cpp \
+	async_service.cpp \
+	async_task.cpp \
 	coe.cpp \
 	compat_accept4.cpp \
 	compat_clock_gettime.cpp \
