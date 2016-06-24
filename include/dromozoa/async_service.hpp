@@ -21,6 +21,7 @@
 #include <pthread.h>
 
 #include <deque>
+#include <vector>
 
 #include <dromozoa/file_descriptor.hpp>
 
@@ -42,7 +43,7 @@ namespace dromozoa {
     file_descriptor reader_;
     file_descriptor writer_;
 
-    pthread_t thread_;
+    std::vector<pthread_t> thread_;
     pthread_cond_t condition_;
     std::deque<async_task*> queue_;
     pthread_mutex_t queue_mutex_;

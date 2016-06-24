@@ -65,7 +65,7 @@ namespace dromozoa {
     };
   }
 
-  async_service::async_service() {}
+  async_service::async_service() : thread_(1) {}
 
   async_service::~async_service() {}
 
@@ -99,9 +99,13 @@ namespace dromozoa {
       errno = result;
       return -1;
     }
-    if (int result = pthread_create(&thread_, &attr, &async_service::start_routine, this)) {
-      errno = result;
-      return -1;
+    std::vector<pthread_t>::iterator i = thread_.begin();
+    std::vector<pthread_t>::iterator end = thread_.end();
+    for (; i != end; ++i) {
+      if (int result = pthread_create(&*i, &attr, &async_service::start_routine, this)) {
+        errno = result;
+        return -1;
+      }
     }
 
     reader_.swap(fd0);
