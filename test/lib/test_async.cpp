@@ -15,6 +15,8 @@
 // You should have received a copy of the GNU General Public License
 // along with dromozoa-unix.  If not, see <http://www.gnu.org/licenses/>.
 
+#include <errno.h>
+
 #include <iostream>
 
 #include <dromozoa/async_service.hpp>
@@ -52,17 +54,14 @@ int main(int, char*[]) {
     service.push(&task2);
     service.push(&task3);
 
-    int popped = 0;
-    while (popped < 3) {
-      if (dromozoa::async_task* task = service.pop()) {
-        std::cout << "pop:" << task << "\n";
-        ++popped;
-      } else {
-        wait(170);
-      }
+    wait(300);
+
+    std::cout << service.close() << " " << errno << std::endl;
+
+    while (dromozoa::async_task* task = service.pop()) {
+      std::cout << "pop:" << task << "\n";
     }
 
-    service.close();
     return 0;
   } catch (const std::exception& e) {
     std::cerr << e.what() << "\n";

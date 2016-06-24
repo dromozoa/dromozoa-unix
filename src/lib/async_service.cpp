@@ -90,19 +90,10 @@ namespace dromozoa {
       return -1;
     }
 
-    pthread_attr_t attr;
-    if (int result = pthread_attr_init(&attr)) {
-      errno = result;
-      return -1;
-    }
-    if (int result = pthread_attr_setdetachstate(&attr, PTHREAD_CREATE_DETACHED)) {
-      errno = result;
-      return -1;
-    }
     std::vector<pthread_t>::iterator i = thread_.begin();
     std::vector<pthread_t>::iterator end = thread_.end();
     for (; i != end; ++i) {
-      if (int result = pthread_create(&*i, &attr, &async_service::start_routine, this)) {
+      if (int result = pthread_create(&*i, 0, &async_service::start_routine, this)) {
         errno = result;
         return -1;
       }
@@ -118,6 +109,26 @@ namespace dromozoa {
     file_descriptor fd1;
     fd0.swap(reader_);
     fd1.swap(writer_);
+
+    {
+      scoped_lock queue_lock(&queue_mutex_);
+      queue_.clear();
+      queue_.push_back(0);
+      if (int result = pthread_cond_broadcast(&condition_)) {
+        errno = result;
+        return -1;
+      }
+    }
+
+    std::vector<pthread_t>::const_iterator i = thread_.begin();
+    std::vector<pthread_t>::const_iterator end = thread_.end();
+    for (; i != end; ++i) {
+      if (int result = pthread_join(*i, 0)) {
+        errno = result;
+        return -1;
+      }
+    }
+    thread_.clear();
 
     if (fd0.close() == -1) {
       return -1;
@@ -181,6 +192,9 @@ namespace dromozoa {
         }
         if (!queue_.empty()) {
           task = queue_.front();
+          if (!task) {
+            break;
+          }
           queue_.pop_front();
         }
       }
