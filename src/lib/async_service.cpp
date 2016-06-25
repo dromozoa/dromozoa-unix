@@ -183,7 +183,7 @@ namespace dromozoa {
 
   class async_service::impl {
   public:
-    static void* start_cb(void* self) {
+    static void* start_routine(void* self) {
       return static_cast<impl*>(self)->start();
     }
 
@@ -199,16 +199,16 @@ namespace dromozoa {
       file_descriptor fd0(fd[0]);
       file_descriptor fd1(fd[1]);
 
-      std::vector<thread> t(size);
-      std::vector<thread>::iterator i = t.begin();
-      std::vector<thread>::iterator end = t.end();
+      std::vector<thread> thread_pool(size);
+      std::vector<thread>::iterator i = thread_pool.begin();
+      std::vector<thread>::iterator end = thread_pool.end();
       for (; i != end; ++i) {
-        thread(&start_cb, this).swap(*i);
+        thread(&start_routine, this).swap(*i);
       }
 
       reader_.swap(fd0);
       writer_.swap(fd1);
-      thread_.swap(t);
+      thread_pool_.swap(thread_pool);
       return 0;
     }
 
@@ -225,12 +225,12 @@ namespace dromozoa {
         condition_.notify_all();
       }
 
-      std::vector<thread>::iterator i = thread_.begin();
-      std::vector<thread>::iterator end = thread_.end();
+      std::vector<thread>::iterator i = thread_pool_.begin();
+      std::vector<thread>::iterator end = thread_pool_.end();
       for (; i != end; ++i) {
         i->join();
       }
-      thread_.clear();
+      thread_pool_.clear();
 
       if (fd0.close() == -1) {
         return -1;
@@ -310,7 +310,7 @@ namespace dromozoa {
   private:
     file_descriptor reader_;
     file_descriptor writer_;
-    std::vector<thread> thread_;
+    std::vector<thread> thread_pool_;
     conditional_variable condition_;
     std::deque<async_task*> queue_;
     mutex queue_mutex_;
