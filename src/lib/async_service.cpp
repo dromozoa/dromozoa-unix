@@ -83,10 +83,45 @@ namespace dromozoa {
       thread& operator=(const thread&);
     };
 
+    class mutex_attr {
+    public:
+      mutex_attr() : attr_() {
+        if (int result = pthread_mutexattr_init(&attr_)) {
+          throw system_error(result);
+        }
+      }
+
+      ~mutex_attr() {
+        if (int result = pthread_mutexattr_destroy(&attr_)) {
+          throw system_error(result);
+        }
+      }
+
+      mutex_attr& set_error_check() {
+        return set_type(PTHREAD_MUTEX_ERRORCHECK);
+      }
+
+      pthread_mutexattr_t* get() {
+        return &attr_;
+      }
+
+    private:
+      pthread_mutexattr_t attr_;
+      mutex_attr(const mutex_attr&);
+      mutex_attr& operator=(const mutex_attr&);
+
+      mutex_attr& set_type(int kind) {
+        if (int result = pthread_mutexattr_settype(&attr_, kind)) {
+          throw system_error(result);
+        }
+        return *this;
+      }
+    };
+
     class mutex {
     public:
-      mutex() {
-        if (int result = pthread_mutex_init(&mutex_, 0)) {
+      mutex() : mutex_() {
+        if (int result = pthread_mutex_init(&mutex_, mutex_attr().set_error_check().get())) {
           throw system_error(result);
         }
       }
@@ -142,7 +177,7 @@ namespace dromozoa {
 
     class conditional_variable {
     public:
-      conditional_variable() {
+      conditional_variable() : cond_() {
         if (int result = pthread_cond_init(&cond_, 0)) {
           throw system_error(result);
         }
@@ -183,10 +218,6 @@ namespace dromozoa {
 
   class async_service::impl {
   public:
-    static void* start_routine(void* self) {
-      return static_cast<impl*>(self)->start();
-    }
-
     explicit impl() {}
 
     ~impl() {}
@@ -277,7 +308,22 @@ namespace dromozoa {
       return task;
     }
 
-    void* start() {
+  private:
+    file_descriptor reader_;
+    file_descriptor writer_;
+    std::vector<thread> thread_pool_;
+    conditional_variable condition_;
+    std::deque<async_task*> queue_;
+    mutex queue_mutex_;
+    std::deque<async_task*> ready_;
+    mutex ready_mutex_;
+
+    static void* start_routine(void* self) {
+      static_cast<impl*>(self)->start();
+      return 0;
+    }
+
+    void start() {
       while (true) {
         async_task* task = 0;
         {
@@ -304,18 +350,7 @@ namespace dromozoa {
           write(writer_.get(), "", 1);
         }
       }
-      return 0;
     }
-
-  private:
-    file_descriptor reader_;
-    file_descriptor writer_;
-    std::vector<thread> thread_pool_;
-    conditional_variable condition_;
-    std::deque<async_task*> queue_;
-    mutex queue_mutex_;
-    std::deque<async_task*> ready_;
-    mutex ready_mutex_;
   };
 
   async_service::impl* async_service::open(size_t size) {
