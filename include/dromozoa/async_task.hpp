@@ -19,7 +19,6 @@
 #define DROMOZOA_ASYNC_TASK_HPP
 
 namespace dromozoa {
-  class async_service;
   class async_task {
   public:
     virtual ~async_task() = 0;

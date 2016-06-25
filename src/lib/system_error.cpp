@@ -15,29 +15,26 @@
 // You should have received a copy of the GNU General Public License
 // along with dromozoa-unix.  If not, see <http://www.gnu.org/licenses/>.
 
-#ifndef DROMOZOA_ASYNC_SERVICE_HPP
-#define DROMOZOA_ASYNC_SERVICE_HPP
-
-#include <dromozoa/async_task.hpp>
+#include <dromozoa/compat_strerror.hpp>
+#include <dromozoa/system_error.hpp>
 
 namespace dromozoa {
-  class async_service {
-  public:
-    class impl;
-    static impl* open(size_t size);
-    async_service(impl* impl);
-    ~async_service();
-    int close();
-    bool valid() const;
-    int get() const;
-    int read() const;
-    int push(async_task* task);
-    async_task* pop();
-  private:
-    impl* impl_;
-    async_service(const async_service&);
-    async_service& operator=(const async_service&);
-  };
-}
+  system_error::system_error(int code) : code_(code) {}
 
-#endif
+  system_error::~system_error() throw() {}
+
+  const char* system_error::what() const throw() {
+    try {
+      if (what_.empty()) {
+        what_ = compat_strerror(code_);
+      }
+      return what_.c_str();
+    } catch (const std::exception e) {
+      return e.what();
+    }
+  }
+
+  int system_error::code() const {
+    return code_;
+  }
+}

@@ -22,6 +22,7 @@
 #include <dromozoa/async_service.hpp>
 #include <dromozoa/async_task.hpp>
 #include <dromozoa/compat_strerror.hpp>
+#include <dromozoa/system_error.hpp>
 
 void wait(int msec) {
   struct timespec tv = {};
@@ -43,13 +44,12 @@ public:
 
 int main(int, char*[]) {
   try {
-    dromozoa::async_service service;
+    dromozoa::async_service service(dromozoa::async_service::open(1));
 
     async_test_task task1;
     async_test_task task2;
     async_test_task task3;
 
-    service.open();
     service.push(&task1);
     service.push(&task2);
     service.push(&task3);
@@ -61,6 +61,9 @@ int main(int, char*[]) {
     while (dromozoa::async_task* task = service.pop()) {
       std::cout << "pop:" << task << "\n";
     }
+
+    dromozoa::system_error e(ENOENT);
+    std::cout << e.what() << " " << e.code() << "\n";
 
     return 0;
   } catch (const std::exception& e) {
