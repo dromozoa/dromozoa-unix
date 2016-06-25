@@ -39,6 +39,12 @@ namespace dromozoa {
     public:
       thread() : thread_(), joinable_() {}
 
+      thread(const thread& that) : thread_(), joinable_() {
+        if (that.joinable_) {
+          std::terminate();
+        }
+      }
+
       thread(void* (*start_routine)(void*), void* arg) : thread_(), joinable_() {
         if (int result = pthread_create(&thread_, 0, start_routine, arg)) {
           throw system_error(result);
@@ -79,7 +85,6 @@ namespace dromozoa {
     private:
       pthread_t thread_;
       bool joinable_;
-      thread(const thread&);
       thread& operator=(const thread&);
     };
 
