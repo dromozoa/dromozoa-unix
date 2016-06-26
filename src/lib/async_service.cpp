@@ -27,7 +27,6 @@
 
 #include <dromozoa/async_service.hpp>
 #include <dromozoa/async_task.hpp>
-#include <dromozoa/file_descriptor.hpp>
 #include <dromozoa/compat_pipe2.hpp>
 #include <dromozoa/compat_strerror.hpp>
 #include <dromozoa/file_descriptor.hpp>
