@@ -34,6 +34,7 @@ libdromozoa_unix_la_SOURCES = \
 	errno_saver.cpp \
 	file_descriptor.cpp \
 	forkexec.cpp \
+	hardware_concurrency.cpp \
 	lock.cpp \
 	ndelay.cpp \
 	pathexec.cpp \

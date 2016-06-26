@@ -22,6 +22,7 @@
 #include <dromozoa/async_service.hpp>
 #include <dromozoa/async_task.hpp>
 #include <dromozoa/compat_strerror.hpp>
+#include <dromozoa/hardware_concurrency.hpp>
 #include <dromozoa/system_error.hpp>
 
 void wait(int msec) {
@@ -44,6 +45,8 @@ public:
 
 int main(int, char*[]) {
   try {
+    std::cout << "hardware_concurrency:" << dromozoa::hardware_concurrency() << "\n";
+
     dromozoa::async_service service(dromozoa::async_service::open(1));
 
     async_test_task task1;
