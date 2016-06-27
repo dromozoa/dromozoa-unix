@@ -41,39 +41,46 @@ namespace dromozoa {
       luaX_push(L, code);
     }
 
+    struct addrinfo* check_hints(lua_State* L, int arg, struct addrinfo* hints) {
+      if (lua_isnoneornil(L, arg)) {
+        return 0;
+      } else {
+        hints->ai_flags = luaX_opt_integer_field<int>(L, arg, "ai_flags", AI_V4MAPPED | AI_ADDRCONFIG);
+        hints->ai_family = luaX_opt_integer_field<int>(L, arg, "ai_family", AF_UNSPEC);
+        hints->ai_socktype = luaX_opt_integer_field<int>(L, arg, "ai_socktype", 0);
+        hints->ai_protocol = luaX_opt_integer_field<int>(L, arg, "ai_protocol", 0);
+        return hints;
+      }
+    }
+
+    void new_result(lua_State* L, const struct addrinfo* result) {
+      lua_newtable(L);
+      int i = 1;
+      for (const struct addrinfo* ai = result; ai; ai = ai->ai_next, ++i) {
+        lua_newtable(L);
+        luaX_set_field(L, -1, "ai_family", ai->ai_family);
+        luaX_set_field(L, -1, "ai_socktype", ai->ai_socktype);
+        luaX_set_field(L, -1, "ai_protocol", ai->ai_protocol);
+        luaX_set_field(L, -1, "ai_addrlen", ai->ai_addrlen);
+        if (ai->ai_addr) {
+          new_sockaddr(L, ai->ai_addr, ai->ai_addrlen);
+          luaX_set_field(L, -2, "ai_addr");
+        }
+        if (ai->ai_canonname) {
+          luaX_set_field(L, -1, "ai_canonname", ai->ai_canonname);
+        }
+        luaX_set_field(L, -2, i);
+      }
+    }
+
     void impl_getaddrinfo(lua_State* L) {
       const char* nodename = lua_tostring(L, 1);
       const char* servname = lua_tostring(L, 2);
+      struct addrinfo hints = {};
       struct addrinfo* result = 0;
-      int code = 0;
-      if (lua_isnoneornil(L, 3)) {
-        code = getaddrinfo(nodename, servname, 0, &result);
-      } else {
-        struct addrinfo hints = {};
-        hints.ai_flags = luaX_opt_integer_field<int>(L, 3, "ai_flags", AI_V4MAPPED | AI_ADDRCONFIG);
-        hints.ai_family = luaX_opt_integer_field<int>(L, 3, "ai_family", AF_UNSPEC);
-        hints.ai_socktype = luaX_opt_integer_field<int>(L, 3, "ai_socktype", 0);
-        hints.ai_protocol = luaX_opt_integer_field<int>(L, 3, "ai_protocol", 0);
-        code = getaddrinfo(nodename, servname, &hints, &result);
-      }
+      int code = getaddrinfo(nodename, servname, check_hints(L, 3, &hints), &result);
       if (code == 0) {
-        lua_newtable(L);
-        int i = 1;
-        for (const struct addrinfo* ai = result; ai; ai = ai->ai_next, ++i) {
-          lua_newtable(L);
-          luaX_set_field(L, -1, "ai_family", ai->ai_family);
-          luaX_set_field(L, -1, "ai_socktype", ai->ai_socktype);
-          luaX_set_field(L, -1, "ai_protocol", ai->ai_protocol);
-          luaX_set_field(L, -1, "ai_addrlen", ai->ai_addrlen);
-          if (ai->ai_addr) {
-            new_sockaddr(L, ai->ai_addr, ai->ai_addrlen);
-            luaX_set_field(L, -2, "ai_addr");
-          }
-          if (ai->ai_canonname) {
-            luaX_set_field(L, -1, "ai_canonname", ai->ai_canonname);
-          }
-          luaX_set_field(L, -2, i);
-        }
+        new_result(L, result);
         freeaddrinfo(result);
       } else {
         push_netdb_error(L, code);
