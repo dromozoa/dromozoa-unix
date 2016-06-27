@@ -15,7 +15,6 @@
 // You should have received a copy of the GNU General Public License
 // along with dromozoa-unix.  If not, see <http://www.gnu.org/licenses/>.
 
-#include <errno.h>
 #include <fcntl.h>
 #include <unistd.h>
 
@@ -28,7 +27,6 @@
 #include <dromozoa/async_service.hpp>
 #include <dromozoa/async_task.hpp>
 #include <dromozoa/compat_pipe2.hpp>
-#include <dromozoa/compat_strerror.hpp>
 #include <dromozoa/file_descriptor.hpp>
 #include <dromozoa/system_error.hpp>
 
@@ -218,6 +216,31 @@ namespace dromozoa {
     private:
       pthread_cond_t cond_;
     };
+
+    template <class T>
+    class scoped_ptr {
+    public:
+      explicit scoped_ptr(T* ptr) : ptr_(ptr) {}
+
+      ~scoped_ptr() {
+        delete ptr_;
+      }
+
+      T* operator->() const {
+        return ptr_;
+      }
+
+      T* release() {
+        T* ptr = ptr_;
+        ptr_ = 0;
+        return ptr;
+      }
+
+    private:
+      T* ptr_;
+      scoped_ptr(const scoped_ptr&);
+      scoped_ptr& operator=(const scoped_ptr&);
+    };
   }
 
   class async_service::impl {
@@ -226,7 +249,7 @@ namespace dromozoa {
 
     ~impl() {}
 
-    int open(size_t size) {
+    int open(unsigned int concurrency) {
       int fd[2] = { -1, -1 };
       if (compat_pipe2(fd, O_CLOEXEC | O_NONBLOCK) == -1) {
         return -1;
@@ -234,15 +257,19 @@ namespace dromozoa {
       file_descriptor fd0(fd[0]);
       file_descriptor fd1(fd[1]);
 
-      std::vector<thread> thread_pool(size);
+      std::vector<thread> thread_pool(concurrency);
       std::vector<thread>::iterator i = thread_pool.begin();
       std::vector<thread>::iterator end = thread_pool.end();
       for (; i != end; ++i) {
         thread(&start_routine, this).swap(*i);
       }
 
-      reader_.swap(fd0);
-      writer_.swap(fd1);
+      {
+        scoped_lock<mutex> ready_lock(ready_mutex_);
+        reader_.swap(fd0);
+        writer_.swap(fd1);
+      }
+
       thread_pool_.swap(thread_pool);
       return 0;
     }
@@ -250,8 +277,12 @@ namespace dromozoa {
     int close() {
       file_descriptor fd0;
       file_descriptor fd1;
-      fd0.swap(reader_);
-      fd1.swap(writer_);
+
+      {
+        scoped_lock<mutex> ready_lock(ready_mutex_);
+        fd0.swap(reader_);
+        fd1.swap(writer_);
+      }
 
       {
         scoped_lock<mutex> queue_lock(queue_mutex_);
@@ -260,12 +291,15 @@ namespace dromozoa {
         condition_.notify_all();
       }
 
-      std::vector<thread>::iterator i = thread_pool_.begin();
-      std::vector<thread>::iterator end = thread_pool_.end();
+      std::vector<thread> thread_pool;
+      thread_pool.swap(thread_pool_);
+
+      std::vector<thread>::iterator i = thread_pool.begin();
+      std::vector<thread>::iterator end = thread_pool.end();
       for (; i != end; ++i) {
-        i->join();
+        (*i).join();
       }
-      thread_pool_.clear();
+      thread_pool.clear();
 
       if (fd0.close() == -1) {
         return -1;
@@ -294,9 +328,11 @@ namespace dromozoa {
     }
 
     int push(async_task* task) {
-      scoped_lock<mutex> queue_lock(queue_mutex_);
-      queue_.push_back(task);
-      condition_.notify_one();
+      {
+        scoped_lock<mutex> queue_lock(queue_mutex_);
+        queue_.push_back(task);
+        condition_.notify_one();
+      }
       return 0;
     }
 
@@ -330,25 +366,26 @@ namespace dromozoa {
     void start() {
       while (true) {
         async_task* task = 0;
+
         {
           scoped_lock<mutex> queue_lock(queue_mutex_);
-          if (queue_.empty()) {
+          while (queue_.empty()) {
             condition_.wait(queue_lock);
           }
-          if (!queue_.empty()) {
-            task = queue_.front();
-            if (!task) {
-              break;
-            }
-            queue_.pop_front();
+          task = queue_.front();
+          if (!task) {
+            return;
           }
+          queue_.pop_front();
         }
-        if (task) {
-          try {
-            task->dispatch();
-          } catch (const std::exception& e) {
-            DROMOZOA_UNEXPECTED(e.what());
-          }
+
+        try {
+          task->dispatch();
+        } catch (const std::exception& e) {
+          DROMOZOA_UNEXPECTED(e.what());
+        }
+
+        {
           scoped_lock<mutex> ready_lock(ready_mutex_);
           ready_.push_back(task);
           write(writer_.get(), "", 1);
@@ -357,13 +394,13 @@ namespace dromozoa {
     }
   };
 
-  async_service::impl* async_service::open(size_t size) {
-    async_service::impl* impl = new async_service::impl();
-    if (impl->open(size) == -1) {
-      delete impl;
+  async_service::impl* async_service::open(unsigned int concurrency) {
+    scoped_ptr<async_service::impl> impl(new async_service::impl());
+    if (impl->open(concurrency) == -1) {
       return 0;
+    } else {
+      return impl.release();
     }
-    return impl;
   }
 
   async_service::async_service(impl* impl) : impl_(impl) {}

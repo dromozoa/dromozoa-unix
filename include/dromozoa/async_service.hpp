@@ -24,7 +24,7 @@ namespace dromozoa {
   class async_service {
   public:
     class impl;
-    static impl* open(size_t size);
+    static impl* open(unsigned int concurrency);
     async_service(impl* impl);
     ~async_service();
     int close();
