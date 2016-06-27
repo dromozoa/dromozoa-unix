@@ -15,6 +15,7 @@
 // You should have received a copy of the GNU General Public License
 // along with dromozoa-unix.  If not, see <http://www.gnu.org/licenses/>.
 
+#include <assert.h>
 #include <errno.h>
 
 #include <iostream>
@@ -43,31 +44,27 @@ public:
   }
 };
 
+void test1() {
+  async_test_task task1;
+  async_test_task task2;
+  async_test_task task3;
+
+  dromozoa::async_service::impl* impl = dromozoa::async_service::open(1);
+  assert(impl);
+  dromozoa::async_service service(impl);
+  service.push(&task1);
+  service.push(&task2);
+  service.push(&task3);
+
+  wait(100);
+  service.close();
+
+  std::cout << "done\n";
+}
+
 int main(int, char*[]) {
   try {
-    std::cout << "hardware_concurrency:" << dromozoa::hardware_concurrency() << "\n";
-
-    dromozoa::async_service service(dromozoa::async_service::open(1));
-
-    async_test_task task1;
-    async_test_task task2;
-    async_test_task task3;
-
-    service.push(&task1);
-    service.push(&task2);
-    service.push(&task3);
-
-    wait(300);
-
-    std::cout << service.close() << " " << errno << std::endl;
-
-    while (dromozoa::async_task* task = service.pop()) {
-      std::cout << "pop:" << task << "\n";
-    }
-
-    dromozoa::system_error e(ENOENT);
-    std::cout << e.what() << " " << e.code() << "\n";
-
+    test1();
     return 0;
   } catch (const std::exception& e) {
     std::cerr << e.what() << "\n";

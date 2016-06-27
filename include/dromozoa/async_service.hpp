@@ -31,7 +31,7 @@ namespace dromozoa {
     bool valid() const;
     int get() const;
     int read() const;
-    int push(async_task* task);
+    void push(async_task* task);
     bool cancel(async_task* task);
     async_task* pop();
   private:
