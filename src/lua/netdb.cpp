@@ -19,6 +19,8 @@
 
 #include <vector>
 
+#include <dromozoa/async_task.hpp>
+
 #include "common.hpp"
 
 #ifndef NI_MAXHOST
@@ -41,15 +43,47 @@ namespace dromozoa {
       luaX_push(L, code);
     }
 
-    struct addrinfo* check_hints(lua_State* L, int arg, struct addrinfo* hints) {
+    template <class T>
+    class optional {
+    public:
+      optional() : initialized_() {}
+
+      template <class U>
+      explicit optional(const U& value) : initialized_(true), value_(value) {}
+
+      const T* get() const {
+        if (initialized_) {
+          return &value_;
+        } else {
+          return 0;
+        }
+      }
+
+    private:
+      bool initialized_;
+      T value_;
+    };
+
+    template <class T>
+    inline optional<T> make_optional() {
+      return optional<T>();
+    }
+
+    template <class T>
+    inline optional<T> make_optional(const T& value) {
+      return optional<T>(value);
+    }
+
+    optional<struct addrinfo> check_hints(lua_State* L, int arg) {
       if (lua_isnoneornil(L, arg)) {
-        return 0;
+        return make_optional<struct addrinfo>();
       } else {
-        hints->ai_flags = luaX_opt_integer_field<int>(L, arg, "ai_flags", AI_V4MAPPED | AI_ADDRCONFIG);
-        hints->ai_family = luaX_opt_integer_field<int>(L, arg, "ai_family", AF_UNSPEC);
-        hints->ai_socktype = luaX_opt_integer_field<int>(L, arg, "ai_socktype", 0);
-        hints->ai_protocol = luaX_opt_integer_field<int>(L, arg, "ai_protocol", 0);
-        return hints;
+        struct addrinfo hints = {};
+        hints.ai_flags = luaX_opt_integer_field<int>(L, arg, "ai_flags", AI_V4MAPPED | AI_ADDRCONFIG);
+        hints.ai_family = luaX_opt_integer_field<int>(L, arg, "ai_family", AF_UNSPEC);
+        hints.ai_socktype = luaX_opt_integer_field<int>(L, arg, "ai_socktype", 0);
+        hints.ai_protocol = luaX_opt_integer_field<int>(L, arg, "ai_protocol", 0);
+        return make_optional(hints);
       }
     }
 
@@ -76,9 +110,9 @@ namespace dromozoa {
     void impl_getaddrinfo(lua_State* L) {
       const char* nodename = lua_tostring(L, 1);
       const char* servname = lua_tostring(L, 2);
-      struct addrinfo hints = {};
+      optional<struct addrinfo> hints = check_hints(L, 3);
       struct addrinfo* result = 0;
-      int code = getaddrinfo(nodename, servname, check_hints(L, 3, &hints), &result);
+      int code = getaddrinfo(nodename, servname, hints.get(), &result);
       if (code == 0) {
         new_result(L, result);
         freeaddrinfo(result);
@@ -99,6 +133,53 @@ namespace dromozoa {
       } else {
         push_netdb_error(L, code);
       }
+    }
+
+    class async_getaddrinfo : public async_task {
+    public:
+      async_getaddrinfo(const char* nodename, const char* servname, const optional<struct addrinfo>& hints) : hints_(hints), result_(), code_() {
+        if (nodename) {
+          nodename_ = make_optional<std::string>(nodename);
+        }
+        if (servname) {
+          servname_ = make_optional<std::string>(servname);
+        }
+      }
+
+      ~async_getaddrinfo() {
+        if (result_) {
+          freeaddrinfo(result_);
+        }
+      }
+
+      virtual void dispatch() {
+        const char* nodename = nodename_.get() ? nodename_.get()->c_str() : 0;
+        const char* servname = servname_.get() ? servname_.get()->c_str() : 0;
+        code_ = getaddrinfo(nodename, servname, hints_.get(), &result_);
+      }
+
+      virtual void finalize() {
+        // lua_State* L = static_cast<lua_State*>(result);
+        // if (code_ == 0) {
+        //   new_result(L, result_);
+        // } else {
+        //   push_netdb_error(L, code);
+        // }
+      }
+
+    private:
+      optional<std::string> nodename_;
+      optional<std::string> servname_;
+      optional<struct addrinfo> hints_;
+      struct addrinfo* result_;
+      int code_;
+    };
+
+    void impl_async_getaddrinfo(lua_State* L) {
+      const char* nodename = lua_tostring(L, 2);
+      const char* servname = lua_tostring(L, 3);
+      optional<struct addrinfo> hints = check_hints(L, 4);
+      async_getaddrinfo task(nodename, servname, hints);
     }
   }
 

@@ -23,6 +23,7 @@ namespace dromozoa {
   public:
     virtual ~async_task() = 0;
     virtual void dispatch() = 0;
+    virtual void finalize() = 0;
   };
 }
 
