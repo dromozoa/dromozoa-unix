@@ -256,7 +256,11 @@ namespace dromozoa {
 
     explicit impl() {}
 
-    ~impl() {}
+    ~impl() {
+      if (valid()) {
+        close();
+      }
+    }
 
     int open(unsigned int concurrency) {
       int fd[2] = { -1, -1 };
