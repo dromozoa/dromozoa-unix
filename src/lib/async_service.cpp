@@ -415,7 +415,9 @@ namespace dromozoa {
         {
           scoped_lock<mutex> ready_lock(ready_mutex_);
           ready_.push_back(task);
-          write(writer_.get(), "", 1);
+          if (writer_.valid()) {
+            write(writer_.get(), "", 1);
+          }
         }
       }
     }
