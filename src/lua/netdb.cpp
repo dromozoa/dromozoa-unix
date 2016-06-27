@@ -137,7 +137,7 @@ namespace dromozoa {
 
     class async_getaddrinfo : public async_task {
     public:
-      async_getaddrinfo(const char* nodename, const char* servname, const optional<struct addrinfo>& hints) : hints_(hints), result_(), code_() {
+      async_getaddrinfo(lua_State* L, const char* nodename, const char* servname, const optional<struct addrinfo>& hints) : L_(L), hints_(hints), result_(), code_() {
         if (nodename) {
           nodename_ = make_optional<std::string>(nodename);
         }
@@ -159,15 +159,15 @@ namespace dromozoa {
       }
 
       virtual void finalize() {
-        // lua_State* L = static_cast<lua_State*>(result);
-        // if (code_ == 0) {
-        //   new_result(L, result_);
-        // } else {
-        //   push_netdb_error(L, code);
-        // }
+        if (result_) {
+          new_result(L_, result_);
+        } else {
+          push_netdb_error(L_, code_);
+        }
       }
 
     private:
+      lua_State* L_;
       optional<std::string> nodename_;
       optional<std::string> servname_;
       optional<struct addrinfo> hints_;
@@ -176,15 +176,17 @@ namespace dromozoa {
     };
 
     void impl_async_getaddrinfo(lua_State* L) {
-      const char* nodename = lua_tostring(L, 2);
-      const char* servname = lua_tostring(L, 3);
-      optional<struct addrinfo> hints = check_hints(L, 4);
-      async_getaddrinfo task(nodename, servname, hints);
+      const char* nodename = lua_tostring(L, 1);
+      const char* servname = lua_tostring(L, 2);
+      optional<struct addrinfo> hints = check_hints(L, 3);
+      luaX_new<async_getaddrinfo>(L, L, nodename, servname, hints);
+      luaX_set_metatable(L, "dromozoa.unix.async_task");
     }
   }
 
   void initialize_netdb(lua_State* L) {
     luaX_set_field(L, -1, "getaddrinfo", impl_getaddrinfo);
+    luaX_set_field(L, -1, "async_getaddrinfo", impl_async_getaddrinfo);
 
     luaX_set_field(L, -1, "AI_PASSIVE", AI_PASSIVE);
     luaX_set_field(L, -1, "AI_CANONNAME", AI_CANONNAME);

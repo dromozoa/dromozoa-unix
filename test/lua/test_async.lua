@@ -15,6 +15,7 @@
 -- You should have received a copy of the GNU General Public License
 -- along with dromozoa-unix.  If not, see <http://www.gnu.org/licenses/>.
 
+local dumper = require "dromozoa.commons.dumper"
 local unix = require "dromozoa.unix"
 
 local service = unix.async_service()
@@ -22,4 +23,13 @@ local service = unix.async_service()
 print(service:get())
 print(service:read())
 
+local task = unix.async_getaddrinfo(nil, "80")
+print(task)
+
+assert(service:push(task))
+unix.nanosleep(0.1)
+print(service:cancel(task))
+
 assert(service:close())
+
+print(dumper.encode(task:finalize()))

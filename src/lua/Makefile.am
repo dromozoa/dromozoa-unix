@@ -25,6 +25,7 @@ unix_la_LIBADD = $(top_srcdir)/src/lib/libdromozoa-unix.la
 unix_la_SOURCES = \
 	argument_vector.cpp \
 	async_service.cpp \
+	async_task.cpp \
 	error.cpp \
 	fcntl.cpp \
 	fd.cpp \

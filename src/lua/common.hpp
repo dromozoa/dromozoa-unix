@@ -24,13 +24,18 @@
 
 #include <dromozoa/argument_vector.hpp>
 #include <dromozoa/async_service.hpp>
+#include <dromozoa/async_task.hpp>
+
 #include <dromozoa/socket_address.hpp>
 
 namespace dromozoa {
   argument_vector to_argument_vector(lua_State* L, int arg);
+
   void push_error(lua_State* L);
 
   async_service* check_async_service(lua_State* L, int arg);
+
+  async_task* check_async_task(lua_State* L, int arg);
 
   void new_fd(lua_State* L, int fd);
   int to_fd(lua_State* L, int index);
