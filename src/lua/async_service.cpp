@@ -15,12 +15,17 @@
 // You should have received a copy of the GNU General Public License
 // along with dromozoa-unix.  If not, see <http://www.gnu.org/licenses/>.
 
+#include <dromozoa/async_service.hpp>
 #include <dromozoa/hardware_concurrency.hpp>
 
 #include "common.hpp"
 
 namespace dromozoa {
   namespace {
+    async_service* check_async_service(lua_State* L, int arg) {
+      return luaX_check_udata<async_service>(L, arg, "dromozoa.unix.async_service");
+    }
+
     void impl_gc(lua_State* L) {
       check_async_service(L, 1)->~async_service();
     }
@@ -68,10 +73,6 @@ namespace dromozoa {
         task->finalize();
       }
     }
-  }
-
-  async_service* check_async_service(lua_State* L, int arg) {
-    return luaX_check_udata<async_service>(L, arg, "dromozoa.unix.async_service");
   }
 
   void initialize_async_service(lua_State* L) {
