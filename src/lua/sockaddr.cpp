@@ -75,6 +75,40 @@ namespace dromozoa {
       }
     }
 
+    void impl_sockaddr_in(lua_State* L) {
+      size_t size = 0;
+      const char* addr = luaL_checklstring(L, 1, &size);
+      if (size != sizeof(in_addr_t)) {
+        luaL_argerror(L, 1, "invalid string length");
+      }
+      const char* port = luaL_checklstring(L, 2, &size);
+      if (size != sizeof(in_port_t)) {
+        luaL_argerror(L, 2, "invalid string length");
+      }
+      struct sockaddr_in sin = {};
+      sin.sin_family = AF_INET;
+      memcpy(&sin.sin_addr.s_addr, addr, sizeof(in_addr_t));
+      memcpy(&sin.sin_port, port, sizeof(in_port_t));
+      new_sockaddr(L, reinterpret_cast<const struct sockaddr*>(&sin), sizeof(sin));
+    }
+
+    void impl_sockaddr_in6(lua_State* L) {
+      size_t size = 0;
+      const char* addr = luaL_checklstring(L, 1, &size);
+      if (size != 16) {
+        luaL_argerror(L, 1, "invalid string length");
+      }
+      const char* port = luaL_checklstring(L, 2, &size);
+      if (size != sizeof(in_port_t)) {
+        luaL_argerror(L, 2, "invalid string length");
+      }
+      struct sockaddr_in6 sin6 = {};
+      sin6.sin6_family = AF_INET6;
+      memcpy(&sin6.sin6_addr.s6_addr, addr, 16);
+      memcpy(&sin6.sin6_port, port, sizeof(in_port_t));
+      new_sockaddr(L, reinterpret_cast<const struct sockaddr*>(&sin6), sizeof(sin6));
+    }
+
     void impl_sockaddr_un(lua_State* L) {
       size_t size = 0;
       const char* path = luaL_checklstring(L, 1, &size);
@@ -124,6 +158,8 @@ namespace dromozoa {
     }
     luaX_set_field(L, -2, "sockaddr");
 
+    luaX_set_field(L, -1, "sockaddr_in", impl_sockaddr_in);
+    luaX_set_field(L, -1, "sockaddr_in6", impl_sockaddr_in6);
     luaX_set_field(L, -1, "sockaddr_un", impl_sockaddr_un);
   }
 }
