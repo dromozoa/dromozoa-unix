@@ -158,7 +158,11 @@ namespace dromozoa {
         code_ = getaddrinfo(nodename, servname, hints_.get(), &result_);
       }
 
-      virtual void finalize() {
+      virtual void cancel() {
+        unref_async_task(L_, this);
+      }
+
+      virtual void result() {
         if (result_) {
           new_result(L_, result_);
         } else {

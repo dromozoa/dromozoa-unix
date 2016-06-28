@@ -290,30 +290,45 @@ namespace dromozoa {
     int close() {
       file_descriptor fd0;
       file_descriptor fd1;
-
       {
         scoped_lock<mutex> ready_lock(ready_mutex_);
         fd0.swap(reader_);
         fd1.swap(writer_);
       }
 
+      queue_type queue;
+      queue.push_back(0);
       {
         scoped_lock<mutex> queue_lock(queue_mutex_);
-        queue_.clear();
-        queue_.push_back(0);
+        queue.swap(queue_);
         queue_index_.clear();
         condition_.notify_all();
       }
 
+      {
+        queue_iterator i = queue.begin();
+        queue_iterator end = queue.end();
+        for (; i != end; ++i) {
+          async_task* task = *i;
+          try {
+            task->cancel();
+          } catch (const std::exception& e) {
+            DROMOZOA_UNEXPECTED(e.what());
+          }
+        }
+        queue.clear();
+      }
+
       std::vector<thread> thread_pool;
       thread_pool.swap(thread_pool_);
-
-      std::vector<thread>::iterator i = thread_pool.begin();
-      std::vector<thread>::iterator end = thread_pool.end();
-      for (; i != end; ++i) {
-        i->join();
+      {
+        std::vector<thread>::iterator i = thread_pool.begin();
+        std::vector<thread>::iterator end = thread_pool.end();
+        for (; i != end; ++i) {
+          i->join();
+        }
+        thread_pool.clear();
       }
-      thread_pool.clear();
 
       if (fd0.close() == -1) {
         return -1;
@@ -349,15 +364,21 @@ namespace dromozoa {
     }
 
     bool cancel(async_task* task) {
-      scoped_lock<mutex> queue_lock(queue_mutex_);
-      queue_index_iterator i = queue_index_.find(task);
-      if (i == queue_index_.end()) {
-        return false;
-      } else {
+      {
+        scoped_lock<mutex> queue_lock(queue_mutex_);
+        queue_index_iterator i = queue_index_.find(task);
+        if (i == queue_index_.end()) {
+          return false;
+        }
         queue_.erase(i->second);
         queue_index_.erase(i);
-        return true;
       }
+      try {
+        task->cancel();
+      } catch (const std::exception& e) {
+        DROMOZOA_UNEXPECTED(e.what());
+      }
+      return true;
     }
 
     async_task* pop() {

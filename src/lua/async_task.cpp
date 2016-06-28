@@ -23,13 +23,19 @@ namespace dromozoa {
       check_async_task(L, 1)->~async_task();
     }
 
-    void impl_finalize(lua_State* L) {
-      check_async_task(L, 1)->finalize();
+    void impl_result(lua_State* L) {
+      check_async_task(L, 1)->result();
     }
   }
 
   async_task* check_async_task(lua_State* L, int arg) {
     return luaX_check_udata<async_task>(L, arg, "dromozoa.unix.async_task");
+  }
+
+  void unref_async_task(lua_State* L, async_task* task) {
+    lua_pushlightuserdata(L, task);
+    luaX_push(L, luaX_nil);
+    lua_settable(L, LUA_REGISTRYINDEX);
   }
 
   void initialize_async_task(lua_State* L) {
@@ -41,7 +47,7 @@ namespace dromozoa {
       luaX_set_field(L, -1, "__gc", impl_gc);
       lua_pop(L, 1);
 
-      luaX_set_field(L, -1, "finalize", impl_finalize);
+      luaX_set_field(L, -1, "result", impl_result);
     }
     luaX_set_field(L, -2, "async_task");
   }

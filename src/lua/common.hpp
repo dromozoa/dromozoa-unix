@@ -33,6 +33,7 @@ namespace dromozoa {
   void push_error(lua_State* L);
 
   async_task* check_async_task(lua_State* L, int arg);
+  void unref_async_task(lua_State* L, async_task* task);
 
   void new_fd(lua_State* L, int fd);
   int to_fd(lua_State* L, int index);

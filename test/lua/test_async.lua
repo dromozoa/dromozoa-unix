@@ -16,6 +16,7 @@
 -- along with dromozoa-unix.  If not, see <http://www.gnu.org/licenses/>.
 
 local dumper = require "dromozoa.commons.dumper"
+local pairs = require "dromozoa.commons.pairs"
 local unix = require "dromozoa.unix"
 
 local service = unix.async_service()
@@ -30,6 +31,18 @@ assert(service:push(task))
 unix.nanosleep(0.1)
 print(service:cancel(task))
 
+print(("-"):rep(80))
+for k, v in pairs(debug.getregistry()) do
+  print(k, v)
+end
+print(("-"):rep(80))
+
 assert(service:close())
 
-print(dumper.encode(task:finalize()))
+print(dumper.encode(service:pop():result()))
+
+print(("-"):rep(80))
+for k, v in pairs(debug.getregistry()) do
+  print(k, v)
+end
+print(("-"):rep(80))

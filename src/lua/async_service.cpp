@@ -58,6 +58,9 @@ namespace dromozoa {
 
     void impl_push(lua_State* L) {
       async_task* task = check_async_task(L, 2);
+      lua_pushlightuserdata(L, task);
+      lua_pushvalue(L, 2);
+      lua_settable(L, LUA_REGISTRYINDEX);
       check_async_service(L, 1)->push(task);
       luaX_push_success(L);
     }
@@ -70,7 +73,9 @@ namespace dromozoa {
     void impl_pop(lua_State* L) {
       async_task* task = check_async_service(L, 1)->pop();
       if (task) {
-        task->finalize();
+        lua_pushlightuserdata(L, task);
+        lua_gettable(L, LUA_REGISTRYINDEX);
+        unref_async_task(L, task);
       }
     }
   }
@@ -90,6 +95,7 @@ namespace dromozoa {
       luaX_set_field(L, -1, "read", impl_read);
       luaX_set_field(L, -1, "push", impl_push);
       luaX_set_field(L, -1, "cancel", impl_cancel);
+      luaX_set_field(L, -1, "pop", impl_pop);
     }
     luaX_set_field(L, -2, "async_service");
   }

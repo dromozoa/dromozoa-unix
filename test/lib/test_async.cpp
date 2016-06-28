@@ -33,10 +33,16 @@ public:
     finished_ = true;
   }
 
-  virtual void finalize() {
+  virtual void cancel() {
     std::cout
-        << "dipatched: " << thread_
-        << "finalized: " << pthread_self() << "\n";
+        << "  dipatch: " << thread_ << "\n"
+        << "  cancel: " << pthread_self() << "\n";
+  }
+
+  virtual void result() {
+    std::cout
+        << "dipatch: " << thread_ << "\n"
+        << "result: " << pthread_self() << "\n";
   }
 
   pthread_t thread() const {
@@ -87,10 +93,10 @@ void test1() {
   assert(!task3.finished());
   assert(!task4.finished());
 
-  task1.finalize();
-  task2.finalize();
-  task3.finalize();
-  task4.finalize();
+  task1.result();
+  task2.result();
+  task3.result();
+  task4.result();
 
   assert(pthread_equal(task1.thread(), task2.thread()) != 0);
   assert(pthread_equal(task1.thread(), task3.thread()) == 0);
@@ -118,10 +124,10 @@ void test2() {
   assert(task3.finished());
   assert(task4.finished());
 
-  task1.finalize();
-  task2.finalize();
-  task3.finalize();
-  task4.finalize();
+  task1.result();
+  task2.result();
+  task3.result();
+  task4.result();
 
   assert(pthread_equal(task1.thread(), task2.thread()) == 0);
   assert(pthread_equal(task1.thread(), task3.thread()) == 0);
@@ -157,10 +163,10 @@ void test3() {
   assert(!task3.finished());
   assert(task4.finished());
 
-  task1.finalize();
-  task2.finalize();
-  task3.finalize();
-  task4.finalize();
+  task1.result();
+  task2.result();
+  task3.result();
+  task4.result();
 
   assert(pthread_equal(task1.thread(), task2.thread()) != 0);
   assert(pthread_equal(task1.thread(), task3.thread()) == 0);
@@ -169,8 +175,11 @@ void test3() {
 
 int main(int, char*[]) {
   try {
+    std::cout << "--\n";
     test1();
+    std::cout << "--\n";
     test2();
+    std::cout << "--\n";
     test3();
     return 0;
   } catch (const std::exception& e) {
