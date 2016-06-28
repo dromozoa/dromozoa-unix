@@ -69,4 +69,30 @@ while true do
   end
 end
 
+local tasks = {
+  unix.async_nanosleep(0.25);
+  unix.async_nanosleep(0.25);
+  unix.async_nanosleep(0.25);
+  unix.async_nanosleep(0.25);
+}
+
+for _, task in ipairs(tasks) do
+  assert(service:push(task))
+end
+service:cancel(tasks[2])
+
+while true do
+  local task = service:pop()
+  if task then
+    assert(task == tasks[1])
+    break
+  else
+    unix.nanosleep(0.05)
+  end
+end
+unix.nanosleep(0.05)
+
 assert(service:close())
+
+assert(service:pop() == tasks[3])
+assert(not service:pop())
