@@ -16,6 +16,7 @@
 -- along with dromozoa-unix.  If not, see <http://www.gnu.org/licenses/>.
 
 local dumper = require "dromozoa.commons.dumper"
+local ipairs = require "dromozoa.commons.ipairs"
 local unix = require "dromozoa.unix"
 
 local service = unix.async_service(1)
@@ -35,18 +36,27 @@ local count = 5
 
 while true do
   local result = selector:select()
-  print("select", result)
+  -- print("select", result)
   for i = 1, result do
     local fd, event = selector:event(i)
-    print("event", fd, event)
+    -- print("event", fd, event)
     if fd == service:get() then
       local result = service:read()
-      print("read", result)
+      -- print("read", result)
       while true do
         local task = service:pop()
-        print(task)
+        -- print(task)
         if task then
-          print(dumper.encode(task:result()))
+          local a, b = task:result()
+          if type(a) == "table" then
+            print(dumper.encode(a))
+            for i, ai in ipairs(a) do
+              assert(service:push(ai.ai_addr:async_getnameinfo()))
+              count = count + 1
+            end
+          else
+            print(a, b)
+          end
           count = count - 1
         else
           break

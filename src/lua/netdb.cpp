@@ -177,6 +177,8 @@ namespace dromozoa {
       optional<struct addrinfo> hints_;
       struct addrinfo* result_;
       int code_;
+      async_getaddrinfo(const async_getaddrinfo&);
+      async_getaddrinfo& operator=(const async_getaddrinfo&);
     };
 
     void impl_async_getaddrinfo(lua_State* L) {
@@ -184,6 +186,45 @@ namespace dromozoa {
       const char* servname = lua_tostring(L, 2);
       optional<struct addrinfo> hints = check_hints(L, 3);
       luaX_new<async_getaddrinfo>(L, L, nodename, servname, hints);
+      luaX_set_metatable(L, "dromozoa.unix.async_task");
+    }
+
+    class async_getnameinfo : public async_task {
+    public:
+      async_getnameinfo(lua_State* L, const socket_address& address, int flags) : L_(L), address_(address), nodename_(NI_MAXHOST), servname_(NI_MAXSERV), flags_(flags) {}
+
+      virtual void dispatch() {
+        code_ = getnameinfo(address_.get(), address_.size(), &nodename_[0], nodename_.size(), &servname_[0], servname_.size(), flags_);
+      }
+
+      virtual void cancel() {
+        unref_async_task(L_, this);
+      }
+
+      virtual void result() {
+        if (code_ == 0) {
+          luaX_push(L_, &nodename_[0]);
+          luaX_push(L_, &servname_[0]);
+        } else {
+          push_netdb_error(L_, code_);
+        }
+      }
+
+    private:
+      lua_State* L_;
+      socket_address address_;
+      std::vector<char> nodename_;
+      std::vector<char> servname_;
+      int flags_;
+      int code_;
+      async_getnameinfo(const async_getnameinfo&);
+      async_getnameinfo& operator=(const async_getnameinfo&);
+    };
+
+    void impl_async_getnameinfo(lua_State* L) {
+      const socket_address* address = check_sockaddr(L, 1);
+      int flags = luaX_opt_integer<int>(L, 2, 0);
+      luaX_new<async_getnameinfo>(L, L, *address, flags);
       luaX_set_metatable(L, "dromozoa.unix.async_task");
     }
   }
@@ -212,5 +253,6 @@ namespace dromozoa {
 
   void initialize_sockaddr_netdb(lua_State* L) {
     luaX_set_field(L, -1, "getnameinfo", impl_getnameinfo);
+    luaX_set_field(L, -1, "async_getnameinfo", impl_async_getnameinfo);
   }
 }
