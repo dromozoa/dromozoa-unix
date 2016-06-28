@@ -1,0 +1,48 @@
+-- Copyright (C) 2016 Tomoyuki Fujimori <moyu@dromozoa.com>
+--
+-- This file is part of dromozoa-unix.
+--
+-- dromozoa-unix is free software: you can redistribute it and/or modify
+-- it under the terms of the GNU General Public License as published by
+-- the Free Software Foundation, either version 3 of the License, or
+-- (at your option) any later version.
+--
+-- dromozoa-unix is distributed in the hope that it will be useful,
+-- but WITHOUT ANY WARRANTY; without even the implied warranty of
+-- MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+-- GNU General Public License for more details.
+--
+-- You should have received a copy of the GNU General Public License
+-- along with dromozoa-unix.  If not, see <http://www.gnu.org/licenses/>.
+
+local dumper = require "dromozoa.commons.dumper"
+local pairs = require "dromozoa.commons.pairs"
+local unix = require "dromozoa.unix"
+
+local service = unix.async_service()
+
+print(service:get())
+print(service:read())
+
+local task = unix.async_getaddrinfo(nil, "80")
+print(task)
+
+assert(service:push(task))
+unix.nanosleep(0.1)
+print(service:cancel(task))
+
+print(("-"):rep(80))
+for k, v in pairs(debug.getregistry()) do
+  print(k, v)
+end
+print(("-"):rep(80))
+
+assert(service:close())
+
+print(dumper.encode(service:pop():result()))
+
+print(("-"):rep(80))
+for k, v in pairs(debug.getregistry()) do
+  print(k, v)
+end
+print(("-"):rep(80))
