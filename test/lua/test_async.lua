@@ -16,33 +16,47 @@
 -- along with dromozoa-unix.  If not, see <http://www.gnu.org/licenses/>.
 
 local dumper = require "dromozoa.commons.dumper"
-local pairs = require "dromozoa.commons.pairs"
 local unix = require "dromozoa.unix"
 
-local service = unix.async_service()
+local service = unix.async_service(1)
+local selector = unix.selector()
 
-print(service:get())
-print(service:read())
+assert(selector:add(service:get(), unix.SELECTOR_READ))
 
-local task = unix.async_getaddrinfo(nil, "80")
-print(task)
+local hints = {
+  ai_socktype = unix.SOCK_STREAM;
+}
+assert(service:push(unix.async_getaddrinfo("github.com", "https", hints)))
+assert(service:push(unix.async_getaddrinfo("luarocks.org", "https", hints)))
+assert(service:push(unix.async_getaddrinfo("www.lua.org", "https", hints)))
+assert(service:push(unix.async_getaddrinfo("www.google.com", "https", hints)))
+assert(service:push(unix.async_getaddrinfo("test-ipv6.com", "https", hints)))
+local count = 5
 
-assert(service:push(task))
-unix.nanosleep(0.1)
-print(service:cancel(task))
-
-print(("-"):rep(80))
-for k, v in pairs(debug.getregistry()) do
-  print(k, v)
+while true do
+  local result = selector:select()
+  print("select", result)
+  for i = 1, result do
+    local fd, event = selector:event(i)
+    print("event", fd, event)
+    if fd == service:get() then
+      local result = service:read()
+      print("read", result)
+      while true do
+        local task = service:pop()
+        print(task)
+        if task then
+          print(dumper.encode(task:result()))
+          count = count - 1
+        else
+          break
+        end
+      end
+    end
+  end
+  if count == 0 then
+    break
+  end
 end
-print(("-"):rep(80))
 
 assert(service:close())
-
-print(dumper.encode(service:pop():result()))
-
-print(("-"):rep(80))
-for k, v in pairs(debug.getregistry()) do
-  print(k, v)
-end
-print(("-"):rep(80))
