@@ -39,8 +39,7 @@ extern "C" void dromozoa_selfpipe_trigger(int) {
 namespace dromozoa {
   int selfpipe_open() {
     if (selfpipe_valid()) {
-      errno = 0;
-      return -1;
+      return 0;
     }
 
     int fd[2] = { -1, -1 };
@@ -63,8 +62,7 @@ namespace dromozoa {
 
   int selfpipe_close() {
     if (!selfpipe_valid()) {
-      errno = 0;
-      return -1;
+      return 0;
     }
 
     file_descriptor fd0(reader);

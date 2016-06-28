@@ -37,6 +37,7 @@ AC_CHECK_FUNCS([sched_getparam])
 AC_CHECK_FUNCS([sched_getscheduler])
 AC_CHECK_FUNCS([sched_setaffinity])
 AC_CHECK_FUNCS([sched_setscheduler])
+AC_CHECK_FUNCS([sysctlbyname])
 
 AC_CHECK_MEMBERS([struct stat.st_atim])
 AC_CHECK_MEMBERS([struct stat.st_atimespec])

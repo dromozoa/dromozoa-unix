@@ -19,6 +19,8 @@
 
 #include <vector>
 
+#include <dromozoa/async_task.hpp>
+
 #include "common.hpp"
 
 #ifndef NI_MAXHOST
@@ -41,39 +43,78 @@ namespace dromozoa {
       luaX_push(L, code);
     }
 
+    template <class T>
+    class optional {
+    public:
+      optional() : initialized_() {}
+
+      template <class U>
+      explicit optional(const U& value) : initialized_(true), value_(value) {}
+
+      const T* get() const {
+        if (initialized_) {
+          return &value_;
+        } else {
+          return 0;
+        }
+      }
+
+    private:
+      bool initialized_;
+      T value_;
+    };
+
+    template <class T>
+    inline optional<T> make_optional() {
+      return optional<T>();
+    }
+
+    template <class T>
+    inline optional<T> make_optional(const T& value) {
+      return optional<T>(value);
+    }
+
+    optional<struct addrinfo> check_hints(lua_State* L, int arg) {
+      if (lua_isnoneornil(L, arg)) {
+        return make_optional<struct addrinfo>();
+      } else {
+        struct addrinfo hints = {};
+        hints.ai_flags = luaX_opt_integer_field<int>(L, arg, "ai_flags", AI_V4MAPPED | AI_ADDRCONFIG);
+        hints.ai_family = luaX_opt_integer_field<int>(L, arg, "ai_family", AF_UNSPEC);
+        hints.ai_socktype = luaX_opt_integer_field<int>(L, arg, "ai_socktype", 0);
+        hints.ai_protocol = luaX_opt_integer_field<int>(L, arg, "ai_protocol", 0);
+        return make_optional(hints);
+      }
+    }
+
+    void new_result(lua_State* L, const struct addrinfo* result) {
+      lua_newtable(L);
+      int i = 1;
+      for (const struct addrinfo* ai = result; ai; ai = ai->ai_next, ++i) {
+        lua_newtable(L);
+        luaX_set_field(L, -1, "ai_family", ai->ai_family);
+        luaX_set_field(L, -1, "ai_socktype", ai->ai_socktype);
+        luaX_set_field(L, -1, "ai_protocol", ai->ai_protocol);
+        luaX_set_field(L, -1, "ai_addrlen", ai->ai_addrlen);
+        if (ai->ai_addr) {
+          new_sockaddr(L, ai->ai_addr, ai->ai_addrlen);
+          luaX_set_field(L, -2, "ai_addr");
+        }
+        if (ai->ai_canonname) {
+          luaX_set_field(L, -1, "ai_canonname", ai->ai_canonname);
+        }
+        luaX_set_field(L, -2, i);
+      }
+    }
+
     void impl_getaddrinfo(lua_State* L) {
       const char* nodename = lua_tostring(L, 1);
       const char* servname = lua_tostring(L, 2);
+      optional<struct addrinfo> hints = check_hints(L, 3);
       struct addrinfo* result = 0;
-      int code = 0;
-      if (lua_isnoneornil(L, 3)) {
-        code = getaddrinfo(nodename, servname, 0, &result);
-      } else {
-        struct addrinfo hints = {};
-        hints.ai_flags = luaX_opt_integer_field<int>(L, 3, "ai_flags", AI_V4MAPPED | AI_ADDRCONFIG);
-        hints.ai_family = luaX_opt_integer_field<int>(L, 3, "ai_family", AF_UNSPEC);
-        hints.ai_socktype = luaX_opt_integer_field<int>(L, 3, "ai_socktype", 0);
-        hints.ai_protocol = luaX_opt_integer_field<int>(L, 3, "ai_protocol", 0);
-        code = getaddrinfo(nodename, servname, &hints, &result);
-      }
+      int code = getaddrinfo(nodename, servname, hints.get(), &result);
       if (code == 0) {
-        lua_newtable(L);
-        int i = 1;
-        for (const struct addrinfo* ai = result; ai; ai = ai->ai_next, ++i) {
-          lua_newtable(L);
-          luaX_set_field(L, -1, "ai_family", ai->ai_family);
-          luaX_set_field(L, -1, "ai_socktype", ai->ai_socktype);
-          luaX_set_field(L, -1, "ai_protocol", ai->ai_protocol);
-          luaX_set_field(L, -1, "ai_addrlen", ai->ai_addrlen);
-          if (ai->ai_addr) {
-            new_sockaddr(L, ai->ai_addr, ai->ai_addrlen);
-            luaX_set_field(L, -2, "ai_addr");
-          }
-          if (ai->ai_canonname) {
-            luaX_set_field(L, -1, "ai_canonname", ai->ai_canonname);
-          }
-          luaX_set_field(L, -2, i);
-        }
+        new_result(L, result);
         freeaddrinfo(result);
       } else {
         push_netdb_error(L, code);
@@ -93,10 +134,104 @@ namespace dromozoa {
         push_netdb_error(L, code);
       }
     }
+
+    class async_getaddrinfo : public async_task {
+    public:
+      async_getaddrinfo(lua_State* L, const char* nodename, const char* servname, const optional<struct addrinfo>& hints) : L_(L), hints_(hints), result_(), code_() {
+        if (nodename) {
+          nodename_ = make_optional<std::string>(nodename);
+        }
+        if (servname) {
+          servname_ = make_optional<std::string>(servname);
+        }
+      }
+
+      ~async_getaddrinfo() {
+        if (result_) {
+          freeaddrinfo(result_);
+        }
+      }
+
+      virtual void dispatch() {
+        const char* nodename = nodename_.get() ? nodename_.get()->c_str() : 0;
+        const char* servname = servname_.get() ? servname_.get()->c_str() : 0;
+        code_ = getaddrinfo(nodename, servname, hints_.get(), &result_);
+      }
+
+      virtual void cancel() {
+        unref_async_task(L_, this);
+      }
+
+      virtual void result() {
+        if (result_) {
+          new_result(L_, result_);
+        } else {
+          push_netdb_error(L_, code_);
+        }
+      }
+
+    private:
+      lua_State* L_;
+      optional<std::string> nodename_;
+      optional<std::string> servname_;
+      optional<struct addrinfo> hints_;
+      struct addrinfo* result_;
+      int code_;
+      async_getaddrinfo(const async_getaddrinfo&);
+      async_getaddrinfo& operator=(const async_getaddrinfo&);
+    };
+
+    void impl_async_getaddrinfo(lua_State* L) {
+      const char* nodename = lua_tostring(L, 1);
+      const char* servname = lua_tostring(L, 2);
+      optional<struct addrinfo> hints = check_hints(L, 3);
+      luaX_new<async_getaddrinfo>(L, L, nodename, servname, hints);
+      luaX_set_metatable(L, "dromozoa.unix.async_task");
+    }
+
+    class async_getnameinfo : public async_task {
+    public:
+      async_getnameinfo(lua_State* L, const socket_address& address, int flags) : L_(L), address_(address), nodename_(NI_MAXHOST), servname_(NI_MAXSERV), flags_(flags) {}
+
+      virtual void dispatch() {
+        code_ = getnameinfo(address_.get(), address_.size(), &nodename_[0], nodename_.size(), &servname_[0], servname_.size(), flags_);
+      }
+
+      virtual void cancel() {
+        unref_async_task(L_, this);
+      }
+
+      virtual void result() {
+        if (code_ == 0) {
+          luaX_push(L_, &nodename_[0]);
+          luaX_push(L_, &servname_[0]);
+        } else {
+          push_netdb_error(L_, code_);
+        }
+      }
+
+    private:
+      lua_State* L_;
+      socket_address address_;
+      std::vector<char> nodename_;
+      std::vector<char> servname_;
+      int flags_;
+      int code_;
+      async_getnameinfo(const async_getnameinfo&);
+      async_getnameinfo& operator=(const async_getnameinfo&);
+    };
+
+    void impl_async_getnameinfo(lua_State* L) {
+      const socket_address* address = check_sockaddr(L, 1);
+      int flags = luaX_opt_integer<int>(L, 2, 0);
+      luaX_new<async_getnameinfo>(L, L, *address, flags);
+      luaX_set_metatable(L, "dromozoa.unix.async_task");
+    }
   }
 
   void initialize_netdb(lua_State* L) {
     luaX_set_field(L, -1, "getaddrinfo", impl_getaddrinfo);
+    luaX_set_field(L, -1, "async_getaddrinfo", impl_async_getaddrinfo);
 
     luaX_set_field(L, -1, "AI_PASSIVE", AI_PASSIVE);
     luaX_set_field(L, -1, "AI_CANONNAME", AI_CANONNAME);
@@ -118,5 +253,6 @@ namespace dromozoa {
 
   void initialize_sockaddr_netdb(lua_State* L) {
     luaX_set_field(L, -1, "getnameinfo", impl_getnameinfo);
+    luaX_set_field(L, -1, "async_getnameinfo", impl_async_getnameinfo);
   }
 }

@@ -1,0 +1,72 @@
+-- Copyright (C) 2016 Tomoyuki Fujimori <moyu@dromozoa.com>
+--
+-- This file is part of dromozoa-unix.
+--
+-- dromozoa-unix is free software: you can redistribute it and/or modify
+-- it under the terms of the GNU General Public License as published by
+-- the Free Software Foundation, either version 3 of the License, or
+-- (at your option) any later version.
+--
+-- dromozoa-unix is distributed in the hope that it will be useful,
+-- but WITHOUT ANY WARRANTY; without even the implied warranty of
+-- MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+-- GNU General Public License for more details.
+--
+-- You should have received a copy of the GNU General Public License
+-- along with dromozoa-unix.  If not, see <http://www.gnu.org/licenses/>.
+
+local dumper = require "dromozoa.commons.dumper"
+local ipairs = require "dromozoa.commons.ipairs"
+local unix = require "dromozoa.unix"
+
+local service = unix.async_service(1)
+local selector = unix.selector()
+
+assert(selector:add(service:get(), unix.SELECTOR_READ))
+
+local hints = {
+  ai_socktype = unix.SOCK_STREAM;
+}
+assert(service:push(unix.async_getaddrinfo("github.com", "https", hints)))
+assert(service:push(unix.async_getaddrinfo("luarocks.org", "https", hints)))
+assert(service:push(unix.async_getaddrinfo("www.lua.org", "https", hints)))
+assert(service:push(unix.async_getaddrinfo("www.google.com", "https", hints)))
+assert(service:push(unix.async_getaddrinfo("test-ipv6.com", "https", hints)))
+local count = 5
+
+while true do
+  local result = selector:select()
+  -- print("select", result)
+  for i = 1, result do
+    local fd, event = selector:event(i)
+    -- print("event", fd, event)
+    if fd == service:get() then
+      local result = service:read()
+      -- print("read", result)
+      while true do
+        local task = service:pop()
+        -- print(task)
+        if task then
+          local a, b = task:result()
+          if type(a) == "table" then
+            print(dumper.encode(a))
+            for i, ai in ipairs(a) do
+              assert(service:push(ai.ai_addr:async_getnameinfo()))
+              count = count + 1
+            end
+          else
+            print(a, b)
+          end
+          count = count - 1
+        else
+          break
+        end
+      end
+    end
+  end
+  if count == 0 then
+    break
+  end
+end
+
+assert(service:close())

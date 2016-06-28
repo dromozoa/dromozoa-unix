@@ -23,14 +23,22 @@
 #include <dromozoa/bind.hpp>
 
 #include <dromozoa/argument_vector.hpp>
+#include <dromozoa/async_task.hpp>
+
 #include <dromozoa/socket_address.hpp>
 
 namespace dromozoa {
   argument_vector to_argument_vector(lua_State* L, int arg);
+
   void push_error(lua_State* L);
+
+  async_task* check_async_task(lua_State* L, int arg);
+  void unref_async_task(lua_State* L, async_task* task);
+
   void new_fd(lua_State* L, int fd);
   int to_fd(lua_State* L, int index);
   int check_fd(lua_State* L, int arg);
+
   void new_sockaddr(lua_State* L, const socket_address& address);
   void new_sockaddr(lua_State* L, const struct sockaddr* address, socklen_t size);
   const socket_address* check_sockaddr(lua_State* L, int arg);

@@ -18,6 +18,8 @@
 #include "common.hpp"
 
 namespace dromozoa {
+  void initialize_async_service(lua_State* L);
+  void initialize_async_task(lua_State* L);
   void initialize_error(lua_State* L);
   void initialize_fcntl(lua_State* L);
   void initialize_fd(lua_State* L);
@@ -43,6 +45,8 @@ namespace dromozoa {
   void initialize_unistd(lua_State* L);
 
   void initialize(lua_State* L) {
+    initialize_async_service(L);
+    initialize_async_task(L);
     initialize_error(L);
     initialize_fcntl(L);
     initialize_fd(L);

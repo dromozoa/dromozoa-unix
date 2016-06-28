@@ -21,6 +21,7 @@ noinst_HEADERS = assert.hpp
 
 check_PROGRAMS = \
 	test_argument_vector.exe \
+	test_async.exe \
 	test_compat_clock_gettime.exe \
 	test_compat_pipe2.exe \
 	test_compat_socket.exe \
@@ -35,6 +36,10 @@ check_PROGRAMS = \
 test_argument_vector_exe_CPPFLAGS = -I$(top_srcdir)/include
 test_argument_vector_exe_LDADD = $(top_builddir)/src/lib/libdromozoa-unix.la
 test_argument_vector_exe_SOURCES = test_argument_vector.cpp
+
+test_async_exe_CPPFLAGS = -I$(top_srcdir)/include
+test_async_exe_LDADD = $(top_builddir)/src/lib/libdromozoa-unix.la
+test_async_exe_SOURCES = test_async.cpp
 
 test_compat_clock_gettime_exe_CPPFLAGS = -I$(top_srcdir)/include
 test_compat_clock_gettime_exe_LDADD = $(top_builddir)/src/lib/libdromozoa-unix.la
