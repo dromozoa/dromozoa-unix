@@ -162,11 +162,12 @@ namespace dromozoa {
         unref_async_task(L_, this);
       }
 
-      virtual void result() {
+      virtual void result(void* state) {
+        lua_State* L = static_cast<lua_State*>(state);
         if (result_) {
-          new_result(L_, result_);
+          new_result(L, result_);
         } else {
-          push_netdb_error(L_, code_);
+          push_netdb_error(L, code_);
         }
       }
 
@@ -201,12 +202,13 @@ namespace dromozoa {
         unref_async_task(L_, this);
       }
 
-      virtual void result() {
+      virtual void result(void* state) {
+        lua_State* L = static_cast<lua_State*>(state);
         if (code_ == 0) {
-          luaX_push(L_, &nodename_[0]);
-          luaX_push(L_, &servname_[0]);
+          luaX_push(L, &nodename_[0]);
+          luaX_push(L, &servname_[0]);
         } else {
-          push_netdb_error(L_, code_);
+          push_netdb_error(L, code_);
         }
       }
 

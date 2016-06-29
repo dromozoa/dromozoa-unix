@@ -24,7 +24,7 @@ namespace dromozoa {
     virtual ~async_task() = 0;
     virtual void dispatch() = 0;
     virtual void cancel() = 0;
-    virtual void result() = 0;
+    virtual void result(void* state) = 0;
   };
 }
 

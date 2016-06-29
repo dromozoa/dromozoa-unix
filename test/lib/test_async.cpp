@@ -39,7 +39,7 @@ public:
         << "  cancel: " << pthread_self() << "\n";
   }
 
-  virtual void result() {
+  virtual void result(void*) {
     std::cout
         << "dipatch: " << thread_ << "\n"
         << "result: " << pthread_self() << "\n";
@@ -93,10 +93,10 @@ void test1() {
   assert(!task3.finished());
   assert(!task4.finished());
 
-  task1.result();
-  task2.result();
-  task3.result();
-  task4.result();
+  task1.result(0);
+  task2.result(0);
+  task3.result(0);
+  task4.result(0);
 
   assert(pthread_equal(task1.thread(), task2.thread()) != 0);
   assert(pthread_equal(task1.thread(), task3.thread()) == 0);
@@ -124,10 +124,10 @@ void test2() {
   assert(task3.finished());
   assert(task4.finished());
 
-  task1.result();
-  task2.result();
-  task3.result();
-  task4.result();
+  task1.result(0);
+  task2.result(0);
+  task3.result(0);
+  task4.result(0);
 
   assert(pthread_equal(task1.thread(), task2.thread()) == 0);
   assert(pthread_equal(task1.thread(), task3.thread()) == 0);
@@ -163,10 +163,10 @@ void test3() {
   assert(!task3.finished());
   assert(task4.finished());
 
-  task1.result();
-  task2.result();
-  task3.result();
-  task4.result();
+  task1.result(0);
+  task2.result(0);
+  task3.result(0);
+  task4.result(0);
 
   assert(pthread_equal(task1.thread(), task2.thread()) != 0);
   assert(pthread_equal(task1.thread(), task3.thread()) == 0);

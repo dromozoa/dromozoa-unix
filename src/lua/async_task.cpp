@@ -24,7 +24,7 @@ namespace dromozoa {
     }
 
     void impl_result(lua_State* L) {
-      check_async_task(L, 1)->result();
+      check_async_task(L, 1)->result(L);
     }
   }
 

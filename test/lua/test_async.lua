@@ -55,6 +55,7 @@ while true do
               count = count + 1
             end
           else
+            assert(a)
             print(a, b)
           end
           count = count - 1
@@ -96,3 +97,9 @@ assert(service:close())
 
 assert(service:pop() == tasks[3])
 assert(not service:pop())
+
+local thread = coroutine.create(function ()
+  assert(tasks[1]:result())
+  assert(tasks[3]:result())
+end)
+assert(coroutine.resume(thread))
