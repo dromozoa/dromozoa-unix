@@ -65,13 +65,14 @@ namespace dromozoa {
         unref_async_task(L_, this);
       }
 
-      virtual void result() {
+      virtual void result(void* state) {
+        lua_State* L = static_cast<lua_State*>(state);
         if (result_ == -1) {
           errno = code_;
-          push_error(L_);
-          new_timespec(L_, tv2_, TIMESPEC_TYPE_DURATION);
+          push_error(L);
+          new_timespec(L, tv2_, TIMESPEC_TYPE_DURATION);
         } else {
-          luaX_push_success(L_);
+          luaX_push_success(L);
         }
       }
 
