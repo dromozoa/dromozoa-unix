@@ -40,15 +40,14 @@ namespace dromozoa {
       const char* buffer = luaL_checklstring(L, 2, &size);
       size_t i = luaX_opt_range_i(L, 3, size);
       size_t j = luaX_opt_range_j(L, 4, size);
-      if (i < j) {
-        ssize_t result = write(check_fd(L, 1), buffer + i, j - i);
-        if (result == -1) {
-          push_error(L);
-        } else {
-          luaX_push(L, result);
-        }
+      if (j < i) {
+        j = i;
+      }
+      ssize_t result = write(check_fd(L, 1), buffer + i, j - i);
+      if (result == -1) {
+        push_error(L);
       } else {
-        luaX_push(L, 0);
+        luaX_push(L, result);
       }
     }
 
