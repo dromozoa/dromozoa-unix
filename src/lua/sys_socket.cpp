@@ -71,9 +71,15 @@ namespace dromozoa {
     luaX_set_field<int>(L, -1, "SHUT_RDWR", SHUT_RDWR);
 
     luaX_set_field(L, -1, "SOL_SOCKET", SOL_SOCKET);
+    luaX_set_field(L, -1, "SO_BROADCAST", SO_BROADCAST);
     luaX_set_field(L, -1, "SO_ERROR", SO_ERROR);
     luaX_set_field(L, -1, "SO_RCVBUF", SO_RCVBUF);
     luaX_set_field(L, -1, "SO_REUSEADDR", SO_REUSEADDR);
     luaX_set_field(L, -1, "SO_SNDBUF", SO_SNDBUF);
+
+    luaX_set_field<int>(L, -1, "MSG_EOR", MSG_EOR);
+    luaX_set_field<int>(L, -1, "MSG_OOB", MSG_OOB);
+    luaX_set_field<int>(L, -1, "MSG_PEEK", MSG_PEEK);
+    luaX_set_field<int>(L, -1, "MSG_WAITALL", MSG_WAITALL);
   }
 }

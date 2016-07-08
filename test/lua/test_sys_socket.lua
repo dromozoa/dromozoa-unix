@@ -58,3 +58,5 @@ assert(fd1:close())
 assert(fd2:read(4) == "foo")
 assert(fd2:read(4) == "")
 assert(fd2:close())
+
+assert(unix.SO_BROADCAST)
