@@ -113,6 +113,19 @@ namespace dromozoa {
       }
     }
 
+    void impl_recv(lua_State* L) {
+      int fd = check_fd(L, 1);
+      size_t size = luaX_check_integer<size_t>(L, 2);
+      int flags = luaX_opt_integer<int>(L, 3, 0);
+      std::vector<char> buffer(size);
+      ssize_t result = recv(fd, &buffer[0], buffer.size(), flags);
+      if (result == -1) {
+        push_error(L);
+      } else {
+        lua_pushlstring(L, &buffer[0], result);
+      }
+    }
+
     void impl_recvfrom(lua_State* L) {
       int fd = check_fd(L, 1);
       size_t size = luaX_check_integer<size_t>(L, 2);
@@ -125,6 +138,23 @@ namespace dromozoa {
       } else {
         lua_pushlstring(L, &buffer[0], result);
         new_sockaddr(L, address);
+      }
+    }
+
+    void impl_send(lua_State* L) {
+      size_t size = 0;
+      const char* buffer = luaL_checklstring(L, 2, &size);
+      size_t i = luaX_opt_range_i(L, 3, size);
+      size_t j = luaX_opt_range_j(L, 4, size);
+      if (j < i) {
+        j = i;
+      }
+      int flags = luaX_opt_integer<int>(L, 5, 0);
+      ssize_t result = send(check_fd(L, 1), buffer + i, j - i, flags);
+      if (result == -1) {
+        push_error(L);
+      } else {
+        luaX_push(L, result);
       }
     }
 
@@ -163,7 +193,9 @@ namespace dromozoa {
     luaX_set_field(L, -1, "getsockopt", impl_getsockopt);
     luaX_set_field(L, -1, "getsockname", impl_getsockname);
     luaX_set_field(L, -1, "getpeername", impl_getpeername);
+    luaX_set_field(L, -1, "recv", impl_recv);
     luaX_set_field(L, -1, "recvfrom", impl_recvfrom);
+    luaX_set_field(L, -1, "send", impl_send);
     luaX_set_field(L, -1, "sendto", impl_sendto);
   }
 }

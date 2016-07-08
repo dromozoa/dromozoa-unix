@@ -38,10 +38,10 @@ assert(result == "foobarbaz")
 print(recv_address:getnameinfo(uint32.bor(unix.NI_NUMERICHOST, unix.NI_NUMERICSERV)))
 
 assert(client_fd:sendto("foobarbaz", 4, 6, nil, address) == 3)
-assert(server_fd:recvfrom(16) == "bar")
+assert(server_fd:recv(16) == "bar")
 
 assert(client_fd:sendto("foobarbaz", -6, -4, nil, address) == 3)
-assert(server_fd:recvfrom(16) == "bar")
+assert(server_fd:recv(16) == "bar")
 
 assert(client_fd:sendto("foobarbaz", 6, 4, nil, address) == 0)
 
