@@ -24,8 +24,6 @@
 #include <utility>
 #include <vector>
 
-#include <iostream>
-
 #include <dromozoa/bind/unexpected.hpp>
 
 #include <dromozoa/async_service.hpp>

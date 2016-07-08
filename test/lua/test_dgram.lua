@@ -1,0 +1,49 @@
+-- Copyright (C) 2016 Tomoyuki Fujimori <moyu@dromozoa.com>
+--
+-- This file is part of dromozoa-unix.
+--
+-- dromozoa-unix is free software: you can redistribute it and/or modify
+-- it under the terms of the GNU General Public License as published by
+-- the Free Software Foundation, either version 3 of the License, or
+-- (at your option) any later version.
+--
+-- dromozoa-unix is distributed in the hope that it will be useful,
+-- but WITHOUT ANY WARRANTY; without even the implied warranty of
+-- MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+-- GNU General Public License for more details.
+--
+-- You should have received a copy of the GNU General Public License
+-- along with dromozoa-unix.  If not, see <http://www.gnu.org/licenses/>.
+
+local ipairs = require "dromozoa.commons.ipairs"
+local uint32 = require "dromozoa.commons.uint32"
+local unix = require "dromozoa.unix"
+
+local addrinfo = assert(unix.getaddrinfo("127.0.0.1", nil, {
+  ai_socktype = unix.SOCK_DGRAM;
+  ai_flags = unix.AI_PASSIVE;
+}))
+local ai = addrinfo[1]
+local server_fd = assert(unix.socket(ai.ai_family, uint32.bor(ai.ai_socktype, unix.SOCK_CLOEXEC), ai.ai_protocol))
+assert(server_fd:bind(ai.ai_addr))
+
+local address = assert(server_fd:getsockname())
+print(address:getnameinfo(uint32.bor(unix.NI_NUMERICHOST, unix.NI_NUMERICSERV)))
+
+local client_fd = assert(unix.socket(ai.ai_family, uint32.bor(ai.ai_socktype, unix.SOCK_CLOEXEC), ai.ai_protocol))
+
+assert(client_fd:sendto("foobarbaz", nil, nil, nil, address) == 9)
+local result, recv_address = server_fd:recvfrom(16)
+assert(result == "foobarbaz")
+print(recv_address:getnameinfo(uint32.bor(unix.NI_NUMERICHOST, unix.NI_NUMERICSERV)))
+
+assert(client_fd:sendto("foobarbaz", 4, 6, nil, address) == 3)
+assert(server_fd:recv(16) == "bar")
+
+assert(client_fd:sendto("foobarbaz", -6, -4, nil, address) == 3)
+assert(server_fd:recv(16) == "bar")
+
+assert(client_fd:sendto("foobarbaz", 6, 4, nil, address) == 0)
+
+assert(client_fd:close())
+assert(server_fd:close())
