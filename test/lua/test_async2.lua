@@ -16,7 +16,14 @@
 -- along with dromozoa-unix.  If not, see <http://www.gnu.org/licenses/>.
 
 local dumper = require "dromozoa.commons.dumper"
+local uint32 = require "dromozoa.commons.uint32"
+local dyld = require "dromozoa.dyld"
 local unix = require "dromozoa.unix"
+
+local symbol = dyld.RTLD_DEFAULT:dlsym("pthread_create")
+if not symbol or symbol:is_null() then
+  dyld.dlopen("libpthread.so.0", uint32.bor(dyld.RTLD_LAZY, dyld.RTLD_GLOBAL))
+end
 
 local service = unix.async_service(8)
 
