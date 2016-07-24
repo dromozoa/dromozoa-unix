@@ -157,8 +157,7 @@ namespace dromozoa {
       } else {
         out << tv.tv_sec << "." << std::setw(9) << tv.tv_nsec;
       }
-      std::string s = out.str();
-      lua_pushlstring(L, s.data(), s.size());
+      luaX_push(L, out.str());
     }
 
     void impl_tonumber(lua_State* L) {
