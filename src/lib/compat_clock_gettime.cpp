@@ -53,7 +53,7 @@ namespace dromozoa {
 
 #ifdef HAVE_CLOCK_GETTIME
   int compat_clock_gettime(int clock_id, struct timespec* tp) {
-    return clock_gettime(clock_id, tp);
+    return clock_gettime(static_cast<clockid_t>(clock_id), tp);
   }
 #else
   namespace {
