@@ -38,6 +38,7 @@ namespace dromozoa {
     virtual ~selector_kqueue();
     virtual int close();
     virtual bool valid() const;
+    virtual int get() const;
     virtual int add(int fd, int event);
     virtual int mod(int fd, int event);
     virtual int del(int fd);
