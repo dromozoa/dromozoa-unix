@@ -60,6 +60,10 @@ namespace dromozoa {
       }
     }
 
+    void impl_get(lua_State* L) {
+      luaX_push(L, check_selector(L, 1)->get());
+    }
+
     void impl_add(lua_State* L) {
       int fd = check_fd(L, 2);
       int event = luaX_check_integer<int>(L, 3);
@@ -129,6 +133,7 @@ namespace dromozoa {
 
       luaX_set_metafield(L, -1, "__call", impl_call);
       luaX_set_field(L, -1, "close", impl_close);
+      luaX_set_field(L, -1, "get", impl_get);
       luaX_set_field(L, -1, "add", impl_add);
       luaX_set_field(L, -1, "mod", impl_mod);
       luaX_set_field(L, -1, "del", impl_del);

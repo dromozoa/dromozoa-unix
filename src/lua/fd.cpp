@@ -72,7 +72,7 @@ namespace dromozoa {
       if (file_descriptor* self = luaX_to_udata<file_descriptor>(L, index, "dromozoa.unix.fd_ref", "dromozoa.unix.fd")) {
         return self->get();
       }
-    } else if (lua_isnumber(L, index)) {
+    } else if (luaX_is_integer(L, index)) {
       return lua_tointeger(L, index);
     }
     return -1;

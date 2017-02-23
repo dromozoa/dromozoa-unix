@@ -23,6 +23,7 @@ local reader, writer = assert(unix.pipe(uint32.bor(unix.O_CLOEXEC, unix.O_NONBLO
 assert(unix.SELECTOR_READ_WRITE == 3)
 
 local selector = assert(unix.selector())
+assert(selector:get() ~= -1)
 assert(selector:add(reader, unix.SELECTOR_READ))
 
 assert(selector:select(0.2) == 0)

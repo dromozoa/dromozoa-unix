@@ -75,6 +75,10 @@ namespace dromozoa {
     return fd_.valid();
   }
 
+  int selector_epoll::get() const {
+    return fd_.get();
+  }
+
   int selector_epoll::add(int fd, int event) {
     struct epoll_event ev = {};
     ev.data.fd = fd;

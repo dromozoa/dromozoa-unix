@@ -64,6 +64,10 @@ namespace dromozoa {
     return fd_.valid();
   }
 
+  int selector_kqueue::get() const {
+    return fd_.get();
+  }
+
   int selector_kqueue::add(int fd, int event) {
     struct kevent kev[2];
     if (event & SELECTOR_READ) {

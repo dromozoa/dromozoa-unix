@@ -29,6 +29,7 @@ namespace dromozoa {
     virtual ~selector();
     virtual int close() = 0;
     virtual bool valid() const = 0;
+    virtual int get() const = 0;
     virtual int add(int fd, int event) = 0;
     virtual int mod(int fd, int event) = 0;
     virtual int del(int fd) = 0;

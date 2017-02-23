@@ -21,7 +21,7 @@ namespace dromozoa {
   argument_vector to_argument_vector(lua_State* L, int index) {
     argument_vector result;
     if (lua_istable(L, index)) {
-      result.clear();
+      result.clear(); // make empty (not null)
       for (int i = 1; ; ++i) {
         luaX_get_field(L, index, i);
         if (const char* p = lua_tostring(L, -1)) {
