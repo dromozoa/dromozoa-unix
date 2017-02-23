@@ -121,7 +121,7 @@ namespace dromozoa {
       if (lua_istable(L, 2)) {
         for (int i = 1; ; ++i) {
           luaX_get_field(L, 2, i);
-          if (lua_isnumber(L, -1)) {
+          if (luaX_is_integer(L, -1)) {
             int cpu = lua_tointeger(L, -1);
             CPU_SET(cpu, &mask);
             lua_pop(L, 1);
