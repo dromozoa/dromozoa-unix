@@ -1,4 +1,4 @@
-// Copyright (C) 2016,2017 Tomoyuki Fujimori <moyu@dromozoa.com>
+// Copyright (C) 2016 Tomoyuki Fujimori <moyu@dromozoa.com>
 //
 // This file is part of dromozoa-unix.
 //
@@ -121,7 +121,7 @@ namespace dromozoa {
       if (lua_istable(L, 2)) {
         for (int i = 1; ; ++i) {
           luaX_get_field(L, 2, i);
-          if (luaX_is_integer(L, -1)) {
+          if (lua_isnumber(L, -1)) {
             int cpu = lua_tointeger(L, -1);
             CPU_SET(cpu, &mask);
             lua_pop(L, 1);

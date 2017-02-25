@@ -1,4 +1,4 @@
-// Copyright (C) 2016,2017 Tomoyuki Fujimori <moyu@dromozoa.com>
+// Copyright (C) 2016 Tomoyuki Fujimori <moyu@dromozoa.com>
 //
 // This file is part of dromozoa-unix.
 //
@@ -72,7 +72,7 @@ namespace dromozoa {
       if (file_descriptor* self = luaX_to_udata<file_descriptor>(L, index, "dromozoa.unix.fd_ref", "dromozoa.unix.fd")) {
         return self->get();
       }
-    } else if (luaX_is_integer(L, index)) {
+    } else if (lua_isnumber(L, index)) {
       return lua_tointeger(L, index);
     }
     return -1;
