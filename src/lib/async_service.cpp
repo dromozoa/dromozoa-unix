@@ -36,8 +36,6 @@ namespace dromozoa {
   namespace {
     class thread {
     public:
-      thread() : thread_(), joinable_() {}
-
       thread(void* (*start_routine)(void*), void* arg) : thread_(), joinable_() {
         if (int result = pthread_create(&thread_, 0, start_routine, arg)) {
           throw system_error(result);
@@ -74,12 +72,12 @@ namespace dromozoa {
       }
 
       void swap(thread& that) {
-        bool joinable = joinable_;
-        joinable_ = that.joinable_;
-        that.joinable_ = joinable;
         pthread_t thread = thread_;
         thread_ = that.thread_;
         that.thread_ = thread;
+        bool joinable = joinable_;
+        joinable_ = that.joinable_;
+        that.joinable_ = joinable;
       }
 
     private:
@@ -274,8 +272,7 @@ namespace dromozoa {
           scoped_lock<mutex> counter_lock(counter_mutex_);
           ++spare_threads_;
         }
-        thread t(&start_routine, this);
-        t.detach();
+        thread(&start_routine, this).detach();
       }
 
       {
@@ -437,8 +434,8 @@ namespace dromozoa {
 
         {
           scoped_lock<mutex> counter_lock(counter_mutex_);
-          ++active_threads_;
           --spare_threads_;
+          ++active_threads_;
         }
 
         try {
@@ -457,8 +454,8 @@ namespace dromozoa {
 
         {
           scoped_lock<mutex> counter_lock(counter_mutex_);
-          --active_threads_;
           ++spare_threads_;
+          --active_threads_;
         }
       }
     }
