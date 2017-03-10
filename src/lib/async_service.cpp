@@ -38,12 +38,6 @@ namespace dromozoa {
     public:
       thread() : thread_(), joinable_() {}
 
-      thread(const thread& that) : thread_(), joinable_() {
-        if (that.joinable_) {
-          std::terminate();
-        }
-      }
-
       thread(void* (*start_routine)(void*), void* arg) : thread_(), joinable_() {
         if (int result = pthread_create(&thread_, 0, start_routine, arg)) {
           throw system_error(result);
@@ -68,17 +62,24 @@ namespace dromozoa {
         joinable_ = false;
       }
 
+      void detach() {
+        if (int result = pthread_detach(thread_)) {
+          throw system_error(result);
+        }
+        joinable_ = false;
+      }
+
       pthread_t native_handle() {
         return thread_;
       }
 
       void swap(thread& that) {
-        pthread_t thread = thread_;
         bool joinable = joinable_;
-        thread_ = that.thread_;
         joinable_ = that.joinable_;
-        that.thread_ = thread;
         that.joinable_ = joinable;
+        pthread_t thread = thread_;
+        thread_ = that.thread_;
+        that.thread_ = thread;
       }
 
     private:
@@ -252,7 +253,7 @@ namespace dromozoa {
     typedef std::map<async_task*, queue_iterator> queue_index_type;
     typedef queue_index_type::iterator queue_index_iterator;
 
-    explicit impl() {}
+    explicit impl() : spare_threads_(), active_threads_() {}
 
     ~impl() {
       if (valid()) {
@@ -268,11 +269,13 @@ namespace dromozoa {
       file_descriptor fd0(fd[0]);
       file_descriptor fd1(fd[1]);
 
-      std::vector<thread> thread_pool(concurrency);
-      std::vector<thread>::iterator i = thread_pool.begin();
-      std::vector<thread>::iterator end = thread_pool.end();
-      for (; i != end; ++i) {
-        thread(&start_routine, this).swap(*i);
+      for (unsigned int i = 0; i < concurrency; ++i) {
+        {
+          scoped_lock<mutex> counter_lock(counter_mutex_);
+          ++spare_threads_;
+        }
+        thread t(&start_routine, this);
+        t.detach();
       }
 
       {
@@ -281,7 +284,6 @@ namespace dromozoa {
         writer_.swap(fd1);
       }
 
-      thread_pool_.swap(thread_pool);
       return 0;
     }
 
@@ -317,15 +319,11 @@ namespace dromozoa {
         queue.clear();
       }
 
-      std::vector<thread> thread_pool;
-      thread_pool.swap(thread_pool_);
       {
-        std::vector<thread>::iterator i = thread_pool.begin();
-        std::vector<thread>::iterator end = thread_pool.end();
-        for (; i != end; ++i) {
-          i->join();
+        scoped_lock<mutex> counter_lock(counter_mutex_);
+        while (active_threads_ > 0 || spare_threads_ > 0) {
+          counter_condition_.wait(counter_lock);
         }
-        thread_pool.clear();
       }
 
       if (fd0.close() == -1) {
@@ -393,13 +391,19 @@ namespace dromozoa {
   private:
     file_descriptor reader_;
     file_descriptor writer_;
-    std::vector<thread> thread_pool_;
+
+    size_t spare_threads_;
+    size_t active_threads_;
+    mutex counter_mutex_;
+    conditional_variable counter_condition_;
+
     conditional_variable condition_;
     mutex queue_mutex_;
     queue_type queue_;
     queue_index_type queue_index_;
     mutex ready_mutex_;
     queue_type ready_;
+
     impl(const impl&);
     impl& operator=(const impl&);
 
@@ -418,11 +422,23 @@ namespace dromozoa {
             condition_.wait(queue_lock);
           }
           task = queue_.front();
-          if (!task) {
-            return;
+          if (task) {
+            queue_.pop_front();
+            queue_index_.erase(task);
           }
-          queue_.pop_front();
-          queue_index_.erase(task);
+        }
+
+        if (!task) {
+          scoped_lock<mutex> counter_lock(counter_mutex_);
+          --spare_threads_;
+          counter_condition_.notify_one();
+          return;
+        }
+
+        {
+          scoped_lock<mutex> counter_lock(counter_mutex_);
+          ++active_threads_;
+          --spare_threads_;
         }
 
         try {
@@ -437,6 +453,12 @@ namespace dromozoa {
           if (writer_.valid()) {
             write(writer_.get(), "", 1);
           }
+        }
+
+        {
+          scoped_lock<mutex> counter_lock(counter_mutex_);
+          --active_threads_;
+          ++spare_threads_;
         }
       }
     }
