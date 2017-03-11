@@ -36,6 +36,7 @@ namespace dromozoa {
     void push(async_task* task);
     bool cancel(async_task* task);
     async_task* pop();
+    void info(unsigned int& spare_threads, unsigned int& active_threads);
   private:
     impl* impl_;
     async_service(const async_service&);

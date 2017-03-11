@@ -354,7 +354,7 @@ namespace dromozoa {
     void push(async_task* task) {
       {
         scoped_lock<mutex> counter_lock(counter_mutex_);
-        if (spare_threads_ == 0 && active_threads_ < max_threads_) {
+        if (spare_threads_ < max_spare_threads_ && spare_threads_ + active_threads_ < max_threads_) {
           ++spare_threads_;
           thread(&start_routine, this).detach();
         }
@@ -393,6 +393,12 @@ namespace dromozoa {
         ready_.pop_front();
         return task;
       }
+    }
+
+    void info(unsigned int& spare_threads, unsigned int& active_threads) {
+      scoped_lock<mutex> counter_lock(counter_mutex_);
+      spare_threads = spare_threads_;
+      active_threads = active_threads_;
     }
 
   private:
@@ -536,5 +542,9 @@ namespace dromozoa {
 
   async_task* async_service::pop() {
     return impl_->pop();
+  }
+
+  void async_service::info(unsigned int& spare_threads, unsigned int& active_threads) {
+    impl_->info(spare_threads, active_threads);
   }
 }
