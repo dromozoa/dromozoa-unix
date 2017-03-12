@@ -31,8 +31,34 @@ namespace dromozoa {
     }
 
     void impl_call(lua_State* L) {
-      int concurrency = luaX_opt_integer<int>(L, 2, hardware_concurrency());
-      if (async_service::impl* impl = async_service::open(concurrency)) {
+      async_service::impl* impl = 0;
+      switch (lua_gettop(L)) {
+        case 0:
+        case 1:
+          {
+            unsigned int max_threads = hardware_concurrency();
+            if (max_threads < 2) {
+              max_threads = 2;
+            }
+            impl = async_service::open(0, max_threads, max_threads / 2);
+          }
+          break;
+        case 2:
+          impl = async_service::open(
+              luaX_check_integer<unsigned int>(L, 2));
+          break;
+        case 3:
+          impl = async_service::open(
+              luaX_check_integer<unsigned int>(L, 2),
+              luaX_check_integer<unsigned int>(L, 3));
+          break;
+        default:
+          impl = async_service::open(
+              luaX_check_integer<unsigned int>(L, 2),
+              luaX_check_integer<unsigned int>(L, 3),
+              luaX_check_integer<unsigned int>(L, 4));
+      }
+      if (impl) {
         luaX_new<async_service>(L, impl);
         luaX_set_metatable(L, "dromozoa.unix.async_service");
       } else {

@@ -62,8 +62,7 @@ while true do
               count = count + 1
             end
           else
-            assert(a)
-            print(a, b)
+            assert(a, b)
           end
           count = count - 1
         else
