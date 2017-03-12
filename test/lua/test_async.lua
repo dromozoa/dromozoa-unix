@@ -1,4 +1,4 @@
--- Copyright (C) 2016 Tomoyuki Fujimori <moyu@dromozoa.com>
+-- Copyright (C) 2016,2017 Tomoyuki Fujimori <moyu@dromozoa.com>
 --
 -- This file is part of dromozoa-unix.
 --
@@ -28,6 +28,11 @@ end
 
 local service = unix.async_service(1)
 local selector = unix.selector()
+
+local info = service:info()
+assert(info.spare_threads == 1)
+assert(info.current_threads == 1)
+assert(info.current_tasks == 0)
 
 assert(selector:add(service:get(), unix.SELECTOR_READ))
 
@@ -62,8 +67,7 @@ while true do
               count = count + 1
             end
           else
-            assert(a)
-            print(a, b)
+            assert(a, b)
           end
           count = count - 1
         else

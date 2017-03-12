@@ -1,4 +1,4 @@
-// Copyright (C) 2016 Tomoyuki Fujimori <moyu@dromozoa.com>
+// Copyright (C) 2016,2017 Tomoyuki Fujimori <moyu@dromozoa.com>
 //
 // This file is part of dromozoa-unix.
 //
@@ -36,14 +36,6 @@ namespace dromozoa {
   namespace {
     class thread {
     public:
-      thread() : thread_(), joinable_() {}
-
-      thread(const thread& that) : thread_(), joinable_() {
-        if (that.joinable_) {
-          std::terminate();
-        }
-      }
-
       thread(void* (*start_routine)(void*), void* arg) : thread_(), joinable_() {
         if (int result = pthread_create(&thread_, 0, start_routine, arg)) {
           throw system_error(result);
@@ -68,16 +60,23 @@ namespace dromozoa {
         joinable_ = false;
       }
 
+      void detach() {
+        if (int result = pthread_detach(thread_)) {
+          throw system_error(result);
+        }
+        joinable_ = false;
+      }
+
       pthread_t native_handle() {
         return thread_;
       }
 
       void swap(thread& that) {
         pthread_t thread = thread_;
-        bool joinable = joinable_;
         thread_ = that.thread_;
-        joinable_ = that.joinable_;
         that.thread_ = thread;
+        bool joinable = joinable_;
+        joinable_ = that.joinable_;
         that.joinable_ = joinable;
       }
 
@@ -252,7 +251,12 @@ namespace dromozoa {
     typedef std::map<async_task*, queue_iterator> queue_index_type;
     typedef queue_index_type::iterator queue_index_iterator;
 
-    explicit impl() {}
+    explicit impl(unsigned int max_threads, unsigned int max_spare_threads)
+      : max_threads_(max_threads),
+        max_spare_threads_(max_spare_threads),
+        spare_threads_(),
+        current_threads_(),
+        current_tasks_() {}
 
     ~impl() {
       if (valid()) {
@@ -260,7 +264,7 @@ namespace dromozoa {
       }
     }
 
-    int open(unsigned int concurrency) {
+    int open(unsigned int start_threads) {
       int fd[2] = { -1, -1 };
       if (compat_pipe2(fd, O_CLOEXEC | O_NONBLOCK) == -1) {
         return -1;
@@ -268,11 +272,13 @@ namespace dromozoa {
       file_descriptor fd0(fd[0]);
       file_descriptor fd1(fd[1]);
 
-      std::vector<thread> thread_pool(concurrency);
-      std::vector<thread>::iterator i = thread_pool.begin();
-      std::vector<thread>::iterator end = thread_pool.end();
-      for (; i != end; ++i) {
-        thread(&start_routine, this).swap(*i);
+      {
+        scoped_lock<mutex> counter_lock(counter_mutex_);
+        spare_threads_ += start_threads;
+        current_threads_ += start_threads;
+        for (unsigned int i = 0; i < start_threads; ++i) {
+          thread(&start_routine, this).detach();
+        }
       }
 
       {
@@ -281,7 +287,6 @@ namespace dromozoa {
         writer_.swap(fd1);
       }
 
-      thread_pool_.swap(thread_pool);
       return 0;
     }
 
@@ -300,9 +305,10 @@ namespace dromozoa {
         scoped_lock<mutex> queue_lock(queue_mutex_);
         queue.swap(queue_);
         queue_index_.clear();
-        condition_.notify_all();
+        queue_condition_.notify_all();
       }
 
+      size_t canceled_tasks = 0;
       {
         queue_iterator i = queue.begin();
         queue_iterator end = queue.end();
@@ -314,18 +320,16 @@ namespace dromozoa {
             DROMOZOA_UNEXPECTED(e.what());
           }
         }
+        canceled_tasks = queue.size();
         queue.clear();
       }
 
-      std::vector<thread> thread_pool;
-      thread_pool.swap(thread_pool_);
       {
-        std::vector<thread>::iterator i = thread_pool.begin();
-        std::vector<thread>::iterator end = thread_pool.end();
-        for (; i != end; ++i) {
-          i->join();
+        scoped_lock<mutex> counter_lock(counter_mutex_);
+        current_tasks_ -= canceled_tasks;
+        while (current_threads_ > 0) {
+          counter_condition_.wait(counter_lock);
         }
-        thread_pool.clear();
       }
 
       if (fd0.close() == -1) {
@@ -355,10 +359,22 @@ namespace dromozoa {
     }
 
     void push(async_task* task) {
-      scoped_lock<mutex> queue_lock(queue_mutex_);
-      queue_iterator i = queue_.insert(queue_.end(), task);
-      queue_index_.insert(std::make_pair(task, i));
-      condition_.notify_one();
+      {
+        scoped_lock<mutex> counter_lock(counter_mutex_);
+        ++current_tasks_;
+        if (current_threads_ < current_tasks_ && current_threads_ < max_threads_) {
+          ++spare_threads_;
+          ++current_threads_;
+          thread(&start_routine, this).detach();
+        }
+      }
+
+      {
+        scoped_lock<mutex> queue_lock(queue_mutex_);
+        queue_iterator i = queue_.insert(queue_.end(), task);
+        queue_index_.insert(std::make_pair(task, i));
+        queue_condition_.notify_one();
+      }
     }
 
     bool cancel(async_task* task) {
@@ -371,11 +387,18 @@ namespace dromozoa {
         queue_.erase(i->second);
         queue_index_.erase(i);
       }
+
       try {
         task->cancel();
       } catch (const std::exception& e) {
         DROMOZOA_UNEXPECTED(e.what());
       }
+
+      {
+        scoped_lock<mutex> counter_lock(counter_mutex_);
+        --current_tasks_;
+      }
+
       return true;
     }
 
@@ -390,16 +413,32 @@ namespace dromozoa {
       }
     }
 
+    void info(unsigned int& spare_threads, unsigned int& current_threads, unsigned int& current_tasks) {
+      scoped_lock<mutex> counter_lock(counter_mutex_);
+      spare_threads = spare_threads_;
+      current_threads = current_threads_;
+      current_tasks = current_tasks_;
+    }
+
   private:
-    file_descriptor reader_;
-    file_descriptor writer_;
-    std::vector<thread> thread_pool_;
-    conditional_variable condition_;
+    unsigned int max_threads_;
+    unsigned int max_spare_threads_;
+    unsigned int spare_threads_;
+    unsigned int current_threads_;
+    unsigned int current_tasks_;
+    mutex counter_mutex_;
+    conditional_variable counter_condition_;
+
     mutex queue_mutex_;
     queue_type queue_;
     queue_index_type queue_index_;
+    conditional_variable queue_condition_;
+
     mutex ready_mutex_;
     queue_type ready_;
+    file_descriptor reader_;
+    file_descriptor writer_;
+
     impl(const impl&);
     impl& operator=(const impl&);
 
@@ -415,14 +454,25 @@ namespace dromozoa {
         {
           scoped_lock<mutex> queue_lock(queue_mutex_);
           while (queue_.empty()) {
-            condition_.wait(queue_lock);
+            queue_condition_.wait(queue_lock);
           }
           task = queue_.front();
-          if (!task) {
+          if (task) {
+            queue_.pop_front();
+            queue_index_.erase(task);
+          }
+        }
+
+        {
+          scoped_lock<mutex> counter_lock(counter_mutex_);
+          if (task) {
+            --spare_threads_;
+          } else {
+            --spare_threads_;
+            --current_threads_;
+            counter_condition_.notify_one();
             return;
           }
-          queue_.pop_front();
-          queue_index_.erase(task);
         }
 
         try {
@@ -438,13 +488,43 @@ namespace dromozoa {
             write(writer_.get(), "", 1);
           }
         }
+
+        {
+          scoped_lock<mutex> counter_lock(counter_mutex_);
+          --current_tasks_;
+          if (current_threads_ <= current_tasks_ || spare_threads_ < max_spare_threads_) {
+            ++spare_threads_;
+          } else {
+            --current_threads_;
+            counter_condition_.notify_one();
+            return;
+          }
+        }
       }
     }
   };
 
-  async_service::impl* async_service::open(unsigned int concurrency) {
-    scoped_ptr<async_service::impl> impl(new async_service::impl());
-    if (impl->open(concurrency) == -1) {
+  async_service::impl* async_service::open(unsigned int start_threads) {
+    scoped_ptr<async_service::impl> impl(new async_service::impl(start_threads, start_threads));
+    if (impl->open(start_threads) == -1) {
+      return 0;
+    } else {
+      return impl.release();
+    }
+  }
+
+  async_service::impl* async_service::open(unsigned int start_threads, unsigned int max_threads) {
+    scoped_ptr<async_service::impl> impl(new async_service::impl(max_threads, max_threads));
+    if (impl->open(start_threads) == -1) {
+      return 0;
+    } else {
+      return impl.release();
+    }
+  }
+
+  async_service::impl* async_service::open(unsigned int start_threads, unsigned int max_threads, unsigned int max_spare_threads) {
+    scoped_ptr<async_service::impl> impl(new async_service::impl(max_threads, max_spare_threads));
+    if (impl->open(start_threads) == -1) {
       return 0;
     } else {
       return impl.release();
@@ -483,5 +563,9 @@ namespace dromozoa {
 
   async_task* async_service::pop() {
     return impl_->pop();
+  }
+
+  void async_service::info(unsigned int& spare_threads, unsigned int& current_threads, unsigned int& current_tasks) {
+    impl_->info(spare_threads, current_threads, current_tasks);
   }
 }

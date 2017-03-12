@@ -1,4 +1,4 @@
--- Copyright (C) 2016 Tomoyuki Fujimori <moyu@dromozoa.com>
+-- Copyright (C) 2016,2017 Tomoyuki Fujimori <moyu@dromozoa.com>
 --
 -- This file is part of dromozoa-unix.
 --
@@ -43,3 +43,4 @@ assert(unix.getppid() > 0)
 
 assert(unix.sysconf(unix["_SC_NPROCESSORS_CONF"]))
 assert(unix.sysconf(unix["_SC_NPROCESSORS_ONLN"]))
+assert(unix.hardware_concurrency())

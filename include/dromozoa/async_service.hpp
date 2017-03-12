@@ -1,4 +1,4 @@
-// Copyright (C) 2016 Tomoyuki Fujimori <moyu@dromozoa.com>
+// Copyright (C) 2016,2017 Tomoyuki Fujimori <moyu@dromozoa.com>
 //
 // This file is part of dromozoa-unix.
 //
@@ -24,7 +24,9 @@ namespace dromozoa {
   class async_service {
   public:
     class impl;
-    static impl* open(unsigned int concurrency);
+    static impl* open(unsigned int start_threads);
+    static impl* open(unsigned int start_threads, unsigned int max_threads);
+    static impl* open(unsigned int start_threads, unsigned int max_threads, unsigned int max_spare_threads);
     async_service(impl* impl);
     ~async_service();
     int close();
@@ -34,6 +36,7 @@ namespace dromozoa {
     void push(async_task* task);
     bool cancel(async_task* task);
     async_task* pop();
+    void info(unsigned int& spare_threads, unsigned int& current_threads, unsigned int& current_tasks);
   private:
     impl* impl_;
     async_service(const async_service&);
