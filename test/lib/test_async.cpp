@@ -176,13 +176,14 @@ void test3() {
 void test4() {
   unsigned int spare_threads = 0;
   unsigned int active_threads = 0;
+  unsigned int active_tasks = 0;
 
   nanosleep_task task1(make_timespec(0, 400000000));
   nanosleep_task task2(make_timespec(0, 400000000));
 
   dromozoa::async_service service(dromozoa::async_service::open(0, 2, 2));
 
-  service.info(spare_threads, active_threads);
+  service.info(spare_threads, active_threads, active_tasks);
   std::cout << spare_threads << "," << active_threads << "\n";
   assert(spare_threads == 0);
   assert(active_threads == 0);
@@ -190,7 +191,7 @@ void test4() {
   service.push(&task1);
   service.push(&task2);
 
-  service.info(spare_threads, active_threads);
+  service.info(spare_threads, active_threads, active_tasks);
   std::cout << spare_threads << "," << active_threads << "\n";
   assert(spare_threads + active_threads == 2);
 
@@ -199,7 +200,7 @@ void test4() {
     nanosleep(&tv, 0);
   }
 
-  service.info(spare_threads, active_threads);
+  service.info(spare_threads, active_threads, active_tasks);
   std::cout << spare_threads << "," << active_threads << "\n";
   assert(spare_threads == 0);
   assert(active_threads == 2);
@@ -209,7 +210,7 @@ void test4() {
     nanosleep(&tv, 0);
   }
 
-  service.info(spare_threads, active_threads);
+  service.info(spare_threads, active_threads, active_tasks);
   std::cout << spare_threads << "," << active_threads << "\n";
   assert(spare_threads == 2);
   assert(active_threads == 0);
@@ -220,13 +221,14 @@ void test4() {
 void test5() {
   unsigned int spare_threads = 0;
   unsigned int active_threads = 0;
+  unsigned int active_tasks = 0;
 
   nanosleep_task task1(make_timespec(0, 400000000));
   nanosleep_task task2(make_timespec(0, 400000000));
 
   dromozoa::async_service service(dromozoa::async_service::open(0, 2, 1));
 
-  service.info(spare_threads, active_threads);
+  service.info(spare_threads, active_threads, active_tasks);
   std::cout << spare_threads << "," << active_threads << "\n";
   assert(spare_threads == 0);
   assert(active_threads == 0);
@@ -238,7 +240,7 @@ void test5() {
     nanosleep(&tv, 0);
   }
 
-  service.info(spare_threads, active_threads);
+  service.info(spare_threads, active_threads, active_tasks);
   std::cout << spare_threads << "," << active_threads << "\n";
   assert(spare_threads == 0);
   assert(active_threads == 1);
@@ -250,7 +252,7 @@ void test5() {
     nanosleep(&tv, 0);
   }
 
-  service.info(spare_threads, active_threads);
+  service.info(spare_threads, active_threads, active_tasks);
   std::cout << spare_threads << "," << active_threads << "\n";
   assert(spare_threads == 0);
   assert(active_threads == 2);
@@ -260,7 +262,7 @@ void test5() {
     nanosleep(&tv, 0);
   }
 
-  service.info(spare_threads, active_threads);
+  service.info(spare_threads, active_threads, active_tasks);
   std::cout << spare_threads << "," << active_threads << "\n";
   assert(spare_threads == 1);
   assert(active_threads == 1);
@@ -270,7 +272,7 @@ void test5() {
     nanosleep(&tv, 0);
   }
 
-  service.info(spare_threads, active_threads);
+  service.info(spare_threads, active_threads, active_tasks);
   std::cout << spare_threads << "," << active_threads << "\n";
   assert(spare_threads == 1);
   assert(active_threads == 0);
