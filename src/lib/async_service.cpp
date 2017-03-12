@@ -272,11 +272,13 @@ namespace dromozoa {
       file_descriptor fd0(fd[0]);
       file_descriptor fd1(fd[1]);
 
-      for (unsigned int i = 0; i < start_threads; ++i) {
+      {
         scoped_lock<mutex> counter_lock(counter_mutex_);
-        ++spare_threads_;
-        ++current_threads_;
-        thread(&start_routine, this).detach();
+        spare_threads_ += start_threads;
+        current_threads_ += start_threads;
+        for (unsigned int i = 0; i < start_threads; ++i) {
+          thread(&start_routine, this).detach();
+        }
       }
 
       {
