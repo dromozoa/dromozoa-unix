@@ -31,8 +31,34 @@ namespace dromozoa {
     }
 
     void impl_call(lua_State* L) {
-      int concurrency = luaX_opt_integer<int>(L, 2, hardware_concurrency());
-      if (async_service::impl* impl = async_service::open(concurrency)) {
+      async_service::impl* impl = 0;
+      switch (lua_gettop(L)) {
+        case 0:
+        case 1:
+          {
+            unsigned int max_threads = hardware_concurrency();
+            if (max_threads < 2) {
+              max_threads = 2;
+            }
+            impl = async_service::open(0, max_threads, max_threads / 2);
+          }
+          break;
+        case 2:
+          impl = async_service::open(
+              luaX_check_integer<unsigned int>(L, 2));
+          break;
+        case 3:
+          impl = async_service::open(
+              luaX_check_integer<unsigned int>(L, 2),
+              luaX_check_integer<unsigned int>(L, 3));
+          break;
+        default:
+          impl = async_service::open(
+              luaX_check_integer<unsigned int>(L, 2),
+              luaX_check_integer<unsigned int>(L, 3),
+              luaX_check_integer<unsigned int>(L, 4));
+      }
+      if (impl) {
         luaX_new<async_service>(L, impl);
         luaX_set_metatable(L, "dromozoa.unix.async_service");
       } else {
@@ -78,6 +104,17 @@ namespace dromozoa {
         unref_async_task(L, task);
       }
     }
+
+    void impl_info(lua_State* L) {
+      unsigned int spare_threads = 0;
+      unsigned int current_threads = 0;
+      unsigned int current_tasks = 0;
+      check_async_service(L, 1)->info(spare_threads, current_threads, current_tasks);
+      lua_newtable(L);
+      luaX_set_field(L, -1, "spare_threads", spare_threads);
+      luaX_set_field(L, -1, "current_threads", current_threads);
+      luaX_set_field(L, -1, "current_tasks", current_tasks);
+    }
   }
 
   void initialize_async_service(lua_State* L) {
@@ -96,6 +133,7 @@ namespace dromozoa {
       luaX_set_field(L, -1, "push", impl_push);
       luaX_set_field(L, -1, "cancel", impl_cancel);
       luaX_set_field(L, -1, "pop", impl_pop);
+      luaX_set_field(L, -1, "info", impl_info);
     }
     luaX_set_field(L, -2, "async_service");
   }
