@@ -43,3 +43,4 @@ assert(unix.getppid() > 0)
 
 assert(unix.sysconf(unix["_SC_NPROCESSORS_CONF"]))
 assert(unix.sysconf(unix["_SC_NPROCESSORS_ONLN"]))
+assert(unix.hardware_concurrency())
