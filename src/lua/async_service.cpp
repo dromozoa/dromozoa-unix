@@ -104,6 +104,17 @@ namespace dromozoa {
         unref_async_task(L, task);
       }
     }
+
+    void impl_info(lua_State* L) {
+      unsigned int spare_threads = 0;
+      unsigned int current_threads = 0;
+      unsigned int current_tasks = 0;
+      check_async_service(L, 1)->info(spare_threads, current_threads, current_tasks);
+      lua_newtable(L);
+      luaX_set_field(L, -1, "spare_threads", spare_threads);
+      luaX_set_field(L, -1, "current_threads", current_threads);
+      luaX_set_field(L, -1, "current_tasks", current_tasks);
+    }
   }
 
   void initialize_async_service(lua_State* L) {
@@ -122,6 +133,7 @@ namespace dromozoa {
       luaX_set_field(L, -1, "push", impl_push);
       luaX_set_field(L, -1, "cancel", impl_cancel);
       luaX_set_field(L, -1, "pop", impl_pop);
+      luaX_set_field(L, -1, "info", impl_info);
     }
     luaX_set_field(L, -2, "async_service");
   }

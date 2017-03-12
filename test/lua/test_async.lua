@@ -29,6 +29,11 @@ end
 local service = unix.async_service(1)
 local selector = unix.selector()
 
+local info = service:info()
+assert(info.spare_threads == 1)
+assert(info.current_threads == 1)
+assert(info.current_tasks == 0)
+
 assert(selector:add(service:get(), unix.SELECTOR_READ))
 
 local hints = {
