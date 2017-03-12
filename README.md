@@ -8,7 +8,7 @@ This library itself links pthread. However, glibc cannot detect pthread function
 
 1. rebuild lua with pthread.
 2. use environment variable `LD_PRELOAD` to load pthread.
-3. use [dromozoa-dlyd](https://github.com/dromozoa-dyld/).
+3. use [dromozoa-dyld](https://github.com/dromozoa/dromozoa-dyld/).
 
 ### use environment variable
 
