@@ -1,4 +1,4 @@
-// Copyright (C) 2016 Tomoyuki Fujimori <moyu@dromozoa.com>
+// Copyright (C) 2016,2017 Tomoyuki Fujimori <moyu@dromozoa.com>
 //
 // This file is part of dromozoa-unix.
 //
@@ -32,31 +32,30 @@ namespace dromozoa {
 
     void impl_call(lua_State* L) {
       async_service::impl* impl = 0;
-      switch (lua_gettop(L)) {
-        case 0:
-        case 1:
-          {
-            unsigned int max_threads = hardware_concurrency();
-            if (max_threads < 2) {
-              max_threads = 2;
-            }
-            impl = async_service::open(0, max_threads, max_threads / 2);
-          }
-          break;
-        case 2:
-          impl = async_service::open(
-              luaX_check_integer<unsigned int>(L, 2));
-          break;
-        case 3:
-          impl = async_service::open(
-              luaX_check_integer<unsigned int>(L, 2),
-              luaX_check_integer<unsigned int>(L, 3));
-          break;
-        default:
-          impl = async_service::open(
-              luaX_check_integer<unsigned int>(L, 2),
-              luaX_check_integer<unsigned int>(L, 3),
-              luaX_check_integer<unsigned int>(L, 4));
+      int top = lua_gettop(L);
+      if (top < 2) {
+        unsigned int concurrency = hardware_concurrency();
+        if (concurrency < 1) {
+          concurrency = 1;
+        }
+        impl = async_service::open(concurrency);
+      } else {
+        switch (top) {
+          case 2:
+            impl = async_service::open(
+                luaX_check_integer<unsigned int>(L, 2));
+            break;
+          case 3:
+            impl = async_service::open(
+                luaX_check_integer<unsigned int>(L, 2),
+                luaX_check_integer<unsigned int>(L, 3));
+            break;
+          default:
+            impl = async_service::open(
+                luaX_check_integer<unsigned int>(L, 2),
+                luaX_check_integer<unsigned int>(L, 3),
+                luaX_check_integer<unsigned int>(L, 4));
+        }
       }
       if (impl) {
         luaX_new<async_service>(L, impl);

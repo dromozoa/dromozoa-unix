@@ -1,4 +1,4 @@
-// Copyright (C) 2016 Tomoyuki Fujimori <moyu@dromozoa.com>
+// Copyright (C) 2016,2017 Tomoyuki Fujimori <moyu@dromozoa.com>
 //
 // This file is part of dromozoa-unix.
 //
@@ -19,6 +19,8 @@
 #include <unistd.h>
 
 #include <vector>
+
+#include <dromozoa/hardware_concurrency.hpp>
 
 #include "common.hpp"
 
@@ -98,6 +100,10 @@ namespace dromozoa {
         push_error(L);
       }
     }
+
+    void impl_hardware_concurrency(lua_State* L) {
+      luaX_push(L, hardware_concurrency());
+    }
   }
 
   void initialize_unistd(lua_State* L) {
@@ -112,6 +118,7 @@ namespace dromozoa {
     luaX_set_field(L, -1, "getpgrp", impl_getpgrp);
     luaX_set_field(L, -1, "getppid", impl_getppid);
     luaX_set_field(L, -1, "sysconf", impl_sysconf);
+    luaX_set_field(L, -1, "hardware_concurrency", impl_hardware_concurrency);
 
     luaX_set_field(L, -1, "STDIN_FILENO", STDIN_FILENO);
     luaX_set_field(L, -1, "STDOUT_FILENO", STDOUT_FILENO);
