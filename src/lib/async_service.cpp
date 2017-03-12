@@ -255,7 +255,8 @@ namespace dromozoa {
       : max_threads_(max_threads),
         max_spare_threads_(max_spare_threads),
         spare_threads_(),
-        active_threads_() {}
+        active_threads_(),
+        active_tasks_() {}
 
     ~impl() {
       if (valid()) {
@@ -304,6 +305,7 @@ namespace dromozoa {
         queue_condition_.notify_all();
       }
 
+      size_t canceled_tasks = 0;
       {
         queue_iterator i = queue.begin();
         queue_iterator end = queue.end();
@@ -315,11 +317,13 @@ namespace dromozoa {
             DROMOZOA_UNEXPECTED(e.what());
           }
         }
+        canceled_tasks = queue.size();
         queue.clear();
       }
 
       {
         scoped_lock<mutex> counter_lock(counter_mutex_);
+        active_tasks_ -= canceled_tasks;
         while (active_threads_ > 0 || spare_threads_ > 0) {
           counter_condition_.wait(counter_lock);
         }
@@ -354,16 +358,20 @@ namespace dromozoa {
     void push(async_task* task) {
       {
         scoped_lock<mutex> counter_lock(counter_mutex_);
-        if (spare_threads_ < max_spare_threads_ && spare_threads_ + active_threads_ < max_threads_) {
+        unsigned int current_threads = spare_threads_ + active_threads_;
+        ++active_tasks_;
+        if (current_threads < active_tasks_ && current_threads < max_threads_) {
           ++spare_threads_;
           thread(&start_routine, this).detach();
         }
       }
 
-      scoped_lock<mutex> queue_lock(queue_mutex_);
-      queue_iterator i = queue_.insert(queue_.end(), task);
-      queue_index_.insert(std::make_pair(task, i));
-      queue_condition_.notify_one();
+      {
+        scoped_lock<mutex> queue_lock(queue_mutex_);
+        queue_iterator i = queue_.insert(queue_.end(), task);
+        queue_index_.insert(std::make_pair(task, i));
+        queue_condition_.notify_one();
+      }
     }
 
     bool cancel(async_task* task) {
@@ -376,11 +384,18 @@ namespace dromozoa {
         queue_.erase(i->second);
         queue_index_.erase(i);
       }
+
       try {
         task->cancel();
       } catch (const std::exception& e) {
         DROMOZOA_UNEXPECTED(e.what());
       }
+
+      {
+        scoped_lock<mutex> counter_lock(counter_mutex_);
+        --active_tasks_;
+      }
+
       return true;
     }
 
@@ -406,6 +421,7 @@ namespace dromozoa {
     unsigned int max_spare_threads_;
     unsigned int spare_threads_;
     unsigned int active_threads_;
+    unsigned int active_tasks_;
     mutex counter_mutex_;
     conditional_variable counter_condition_;
 
@@ -445,10 +461,11 @@ namespace dromozoa {
 
         {
           scoped_lock<mutex> counter_lock(counter_mutex_);
-          --spare_threads_;
           if (task) {
+            --spare_threads_;
             ++active_threads_;
           } else {
+            --spare_threads_;
             counter_condition_.notify_one();
             return;
           }
@@ -470,7 +487,9 @@ namespace dromozoa {
 
         {
           scoped_lock<mutex> counter_lock(counter_mutex_);
-          if (spare_threads_ < max_spare_threads_ && spare_threads_ + active_threads_ <= max_threads_) {
+          unsigned int current_threads = spare_threads_ + active_threads_;
+          --active_tasks_;
+          if (current_threads <= active_tasks_ || spare_threads_ < max_spare_threads_) {
             ++spare_threads_;
             --active_threads_;
           } else {
