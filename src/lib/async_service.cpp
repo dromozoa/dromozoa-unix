@@ -255,7 +255,7 @@ namespace dromozoa {
       : max_threads_(max_threads),
         max_spare_threads_(max_spare_threads),
         spare_threads_(),
-        active_threads_(),
+        current_threads_(),
         current_tasks_() {}
 
     ~impl() {
@@ -275,6 +275,7 @@ namespace dromozoa {
       for (unsigned int i = 0; i < start_threads; ++i) {
         scoped_lock<mutex> counter_lock(counter_mutex_);
         ++spare_threads_;
+        ++current_threads_;
         thread(&start_routine, this).detach();
       }
 
@@ -324,7 +325,7 @@ namespace dromozoa {
       {
         scoped_lock<mutex> counter_lock(counter_mutex_);
         current_tasks_ -= canceled_tasks;
-        while (active_threads_ > 0 || spare_threads_ > 0) {
+        while (current_threads_ > 0) {
           counter_condition_.wait(counter_lock);
         }
       }
@@ -358,10 +359,10 @@ namespace dromozoa {
     void push(async_task* task) {
       {
         scoped_lock<mutex> counter_lock(counter_mutex_);
-        unsigned int current_threads = spare_threads_ + active_threads_;
         ++current_tasks_;
-        if (current_threads < current_tasks_ && current_threads < max_threads_) {
+        if (current_threads_ < current_tasks_ && current_threads_ < max_threads_) {
           ++spare_threads_;
+          ++current_threads_;
           thread(&start_routine, this).detach();
         }
       }
@@ -410,10 +411,10 @@ namespace dromozoa {
       }
     }
 
-    void info(unsigned int& spare_threads, unsigned int& active_threads, unsigned int& current_tasks) {
+    void info(unsigned int& spare_threads, unsigned int& current_threads, unsigned int& current_tasks) {
       scoped_lock<mutex> counter_lock(counter_mutex_);
       spare_threads = spare_threads_;
-      active_threads = active_threads_;
+      current_threads = current_threads_;
       current_tasks = current_tasks_;
     }
 
@@ -421,7 +422,7 @@ namespace dromozoa {
     unsigned int max_threads_;
     unsigned int max_spare_threads_;
     unsigned int spare_threads_;
-    unsigned int active_threads_;
+    unsigned int current_threads_;
     unsigned int current_tasks_;
     mutex counter_mutex_;
     conditional_variable counter_condition_;
@@ -464,9 +465,9 @@ namespace dromozoa {
           scoped_lock<mutex> counter_lock(counter_mutex_);
           if (task) {
             --spare_threads_;
-            ++active_threads_;
           } else {
             --spare_threads_;
+            --current_threads_;
             counter_condition_.notify_one();
             return;
           }
@@ -488,13 +489,11 @@ namespace dromozoa {
 
         {
           scoped_lock<mutex> counter_lock(counter_mutex_);
-          unsigned int current_threads = spare_threads_ + active_threads_;
           --current_tasks_;
-          if (current_threads <= current_tasks_ || spare_threads_ < max_spare_threads_) {
+          if (current_threads_ <= current_tasks_ || spare_threads_ < max_spare_threads_) {
             ++spare_threads_;
-            --active_threads_;
           } else {
-            --active_threads_;
+            --current_threads_;
             counter_condition_.notify_one();
             return;
           }
@@ -564,7 +563,7 @@ namespace dromozoa {
     return impl_->pop();
   }
 
-  void async_service::info(unsigned int& spare_threads, unsigned int& active_threads, unsigned int& current_tasks) {
-    impl_->info(spare_threads, active_threads, current_tasks);
+  void async_service::info(unsigned int& spare_threads, unsigned int& current_threads, unsigned int& current_tasks) {
+    impl_->info(spare_threads, current_threads, current_tasks);
   }
 }
