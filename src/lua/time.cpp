@@ -1,4 +1,4 @@
-// Copyright (C) 2015,2016 Tomoyuki Fujimori <moyu@dromozoa.com>
+// Copyright (C) 2015-2017 Tomoyuki Fujimori <moyu@dromozoa.com>
 //
 // This file is part of dromozoa-unix.
 //
@@ -50,9 +50,9 @@ namespace dromozoa {
       }
     }
 
-    class async_nanosleep : public async_task {
+    class async_nanosleep : public async_task_impl {
     public:
-      explicit async_nanosleep(lua_State* L, const struct timespec& tv1) : L_(L), tv1_(tv1), tv2_(), result_(), code_() {}
+      explicit async_nanosleep(const struct timespec& tv1) : tv1_(tv1), tv2_(), result_(), code_() {}
 
       virtual void dispatch() {
         result_ = nanosleep(&tv1_, &tv2_);
@@ -61,12 +61,7 @@ namespace dromozoa {
         }
       }
 
-      virtual void cancel() {
-        unref_async_task(L_, this);
-      }
-
-      virtual void result(void* state) {
-        lua_State* L = static_cast<lua_State*>(state);
+      virtual void impl_result(lua_State* L) {
         if (result_ == -1) {
           errno = code_;
           push_error(L);
@@ -77,7 +72,6 @@ namespace dromozoa {
       }
 
     private:
-      lua_State* L_;
       struct timespec tv1_;
       struct timespec tv2_;
       int result_;
@@ -89,7 +83,7 @@ namespace dromozoa {
     void impl_async_nanosleep(lua_State* L) {
       struct timespec tv1 = {};
       check_timespec(L, 1, tv1);
-      luaX_new<async_nanosleep>(L, L, tv1);
+      luaX_new<async_nanosleep>(L, tv1);
       luaX_set_metatable(L, "dromozoa.unix.async_task");
     }
   }
