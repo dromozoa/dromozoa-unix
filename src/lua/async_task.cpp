@@ -1,4 +1,4 @@
-// Copyright (C) 2016 Tomoyuki Fujimori <moyu@dromozoa.com>
+// Copyright (C) 2016,2017 Tomoyuki Fujimori <moyu@dromozoa.com>
 //
 // This file is part of dromozoa-unix.
 //
@@ -18,6 +18,27 @@
 #include "common.hpp"
 
 namespace dromozoa {
+  async_task_impl::async_task_impl() {}
+
+  void async_task_impl::cancel() {
+    unref(false);
+  }
+
+  void async_task_impl::result(void* state) {
+    impl_result(static_cast<lua_State*>(state));
+  }
+
+  void async_task_impl::ref(lua_State* L, int index) {
+    luaX_reference<1>(L, index).swap(ref_);
+  }
+
+  void async_task_impl::unref(bool get_field) {
+    if (get_field) {
+      ref_.get_field();
+    }
+    luaX_reference<1>().swap(ref_);
+  }
+
   namespace {
     void impl_gc(lua_State* L) {
       check_async_task(L, 1)->~async_task();
@@ -30,12 +51,6 @@ namespace dromozoa {
 
   async_task* check_async_task(lua_State* L, int arg) {
     return luaX_check_udata<async_task>(L, arg, "dromozoa.unix.async_task");
-  }
-
-  void unref_async_task(lua_State* L, async_task* task) {
-    lua_pushlightuserdata(L, task);
-    luaX_push(L, luaX_nil);
-    lua_settable(L, LUA_REGISTRYINDEX);
   }
 
   void initialize_async_task(lua_State* L) {
