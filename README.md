@@ -2,12 +2,15 @@
 
 Lua bindings for UNIX system interface.
 
-## pthread issues
+## pthread workarounds
 
-This library itself links pthread. However, glibc cannot detect pthread functions because most of lua are not built with pthread. There are two workarounds:
+This library itself links pthread. However, glibc cannot detect pthread functions because most of lua are not built with pthread. I want to solve the problem [Question about BZ#10652: Dynamic loading a library that is linked with pthread crashes app compiled without pthread in getaddrinfo](https://sourceware.org/ml/libc-alpha/2012-10/msg00224.html). There are workarounds:
 
 1. rebuild lua with pthread.
-2. use environment LD_PRELOAD to load pthread.
+2. use environment variable `LD_PRELOAD` to load pthread.
+3. use [dromozoa-dyld](https://github.com/dromozoa/dromozoa-dyld/).
+
+### use environment variable
 
 ```
 % ldd /usr/bin/lua

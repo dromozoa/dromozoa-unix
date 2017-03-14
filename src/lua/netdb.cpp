@@ -1,4 +1,4 @@
-// Copyright (C) 2016 Tomoyuki Fujimori <moyu@dromozoa.com>
+// Copyright (C) 2016,2017 Tomoyuki Fujimori <moyu@dromozoa.com>
 //
 // This file is part of dromozoa-unix.
 //
@@ -18,8 +18,6 @@
 #include <netdb.h>
 
 #include <vector>
-
-#include <dromozoa/async_task.hpp>
 
 #include "common.hpp"
 
@@ -135,9 +133,9 @@ namespace dromozoa {
       }
     }
 
-    class async_getaddrinfo : public async_task {
+    class async_getaddrinfo : public async_task_impl {
     public:
-      async_getaddrinfo(lua_State* L, const char* nodename, const char* servname, const optional<struct addrinfo>& hints) : L_(L), hints_(hints), result_(), code_() {
+      async_getaddrinfo(const char* nodename, const char* servname, const optional<struct addrinfo>& hints) : hints_(hints), result_(), code_() {
         if (nodename) {
           nodename_ = make_optional<std::string>(nodename);
         }
@@ -158,12 +156,7 @@ namespace dromozoa {
         code_ = getaddrinfo(nodename, servname, hints_.get(), &result_);
       }
 
-      virtual void cancel() {
-        unref_async_task(L_, this);
-      }
-
-      virtual void result(void* state) {
-        lua_State* L = static_cast<lua_State*>(state);
+      virtual void impl_result(lua_State* L) {
         if (result_) {
           new_result(L, result_);
         } else {
@@ -172,7 +165,6 @@ namespace dromozoa {
       }
 
     private:
-      lua_State* L_;
       optional<std::string> nodename_;
       optional<std::string> servname_;
       optional<struct addrinfo> hints_;
@@ -186,24 +178,19 @@ namespace dromozoa {
       const char* nodename = lua_tostring(L, 1);
       const char* servname = lua_tostring(L, 2);
       optional<struct addrinfo> hints = check_hints(L, 3);
-      luaX_new<async_getaddrinfo>(L, L, nodename, servname, hints);
+      luaX_new<async_getaddrinfo>(L, nodename, servname, hints);
       luaX_set_metatable(L, "dromozoa.unix.async_task");
     }
 
-    class async_getnameinfo : public async_task {
+    class async_getnameinfo : public async_task_impl {
     public:
-      async_getnameinfo(lua_State* L, const socket_address& address, int flags) : L_(L), address_(address), nodename_(NI_MAXHOST), servname_(NI_MAXSERV), flags_(flags) {}
+      async_getnameinfo(const socket_address& address, int flags) : address_(address), nodename_(NI_MAXHOST), servname_(NI_MAXSERV), flags_(flags) {}
 
       virtual void dispatch() {
         code_ = getnameinfo(address_.get(), address_.size(), &nodename_[0], nodename_.size(), &servname_[0], servname_.size(), flags_);
       }
 
-      virtual void cancel() {
-        unref_async_task(L_, this);
-      }
-
-      virtual void result(void* state) {
-        lua_State* L = static_cast<lua_State*>(state);
+      virtual void impl_result(lua_State* L) {
         if (code_ == 0) {
           luaX_push(L, &nodename_[0]);
           luaX_push(L, &servname_[0]);
@@ -213,7 +200,6 @@ namespace dromozoa {
       }
 
     private:
-      lua_State* L_;
       socket_address address_;
       std::vector<char> nodename_;
       std::vector<char> servname_;
@@ -226,7 +212,7 @@ namespace dromozoa {
     void impl_async_getnameinfo(lua_State* L) {
       const socket_address* address = check_sockaddr(L, 1);
       int flags = luaX_opt_integer<int>(L, 2, 0);
-      luaX_new<async_getnameinfo>(L, L, *address, flags);
+      luaX_new<async_getnameinfo>(L, *address, flags);
       luaX_set_metatable(L, "dromozoa.unix.async_task");
     }
   }
