@@ -17,7 +17,6 @@
 
 #include <errno.h>
 
-#include <dromozoa/async_task.hpp>
 #include <dromozoa/compat_clock_gettime.hpp>
 
 #include "common.hpp"

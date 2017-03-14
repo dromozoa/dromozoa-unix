@@ -19,8 +19,6 @@
 
 #include <vector>
 
-#include <dromozoa/async_task.hpp>
-
 #include "common.hpp"
 
 #ifndef NI_MAXHOST
