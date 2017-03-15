@@ -41,7 +41,7 @@ namespace dromozoa {
     async_task_impl();
     virtual void impl_result(lua_State* L) = 0;
   private:
-    luaX_reference<1> ref_;
+    luaX_reference<> ref_;
   };
 
   async_task* check_async_task(lua_State* L, int arg);
