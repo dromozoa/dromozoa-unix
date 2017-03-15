@@ -96,7 +96,8 @@ namespace dromozoa {
     void impl_pop(lua_State* L) {
       async_task_impl* task = static_cast<async_task_impl*>(check_async_service(L, 1)->pop());
       if (task) {
-        task->unref(true);
+        task->get_field(L);
+        task->unref();
       }
     }
 
