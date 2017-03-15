@@ -29,14 +29,14 @@ namespace dromozoa {
   }
 
   void async_task_impl::ref(lua_State* L, int index) {
-    luaX_reference<1>(L, index).swap(ref_);
+    luaX_reference<>(L, index).swap(ref_);
   }
 
   void async_task_impl::unref(bool get_field) {
     if (get_field) {
       ref_.get_field();
     }
-    luaX_reference<1>().swap(ref_);
+    luaX_reference<>().swap(ref_);
   }
 
   namespace {
