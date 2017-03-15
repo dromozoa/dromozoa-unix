@@ -21,7 +21,7 @@ namespace dromozoa {
   async_task_impl::async_task_impl() {}
 
   void async_task_impl::cancel() {
-    unref(false);
+    unref();
   }
 
   void async_task_impl::result(void* state) {
@@ -32,11 +32,12 @@ namespace dromozoa {
     luaX_reference<>(L, index).swap(ref_);
   }
 
-  void async_task_impl::unref(bool get_field) {
-    if (get_field) {
-      ref_.get_field();
-    }
+  void async_task_impl::unref() {
     luaX_reference<>().swap(ref_);
+  }
+
+  void async_task_impl::get_field(lua_State* L) {
+    ref_.get_field(L);
   }
 
   namespace {
