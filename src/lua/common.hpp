@@ -29,14 +29,13 @@
 namespace dromozoa {
   argument_vector to_argument_vector(lua_State* L, int arg);
 
-  void push_error(lua_State* L);
-
   class async_task_impl : public async_task {
   public:
     virtual void cancel();
     virtual void result(void* state);
     void ref(lua_State* L, int index);
-    void unref(bool get_field);
+    void unref();
+    void get_field(lua_State* L);
   protected:
     async_task_impl();
     virtual void impl_result(lua_State* L) = 0;
@@ -45,6 +44,8 @@ namespace dromozoa {
   };
 
   async_task* check_async_task(lua_State* L, int arg);
+
+  void push_error(lua_State* L);
 
   void new_fd(lua_State* L, int fd);
   int to_fd(lua_State* L, int index);
