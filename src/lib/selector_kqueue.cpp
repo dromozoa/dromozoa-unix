@@ -80,7 +80,11 @@ namespace dromozoa {
     } else {
       EV_SET(kev + 1, fd, EVFILT_WRITE, EV_ADD | EV_DISABLE, 0, 0, 0);
     }
-    return kevent(fd_.get(), kev, 2, 0, 0, 0);
+    int result = kevent(fd_.get(), kev, 2, 0, 0, 0);
+    if (result == -1 && errno == EPIPE) {
+      result = 0;
+    }
+    return result;
   }
 
   int selector_kqueue::mod(int fd, int event) {
@@ -95,14 +99,22 @@ namespace dromozoa {
     } else {
       EV_SET(kev + 1, fd, EVFILT_WRITE, EV_DISABLE, 0, 0, 0);
     }
-    return kevent(fd_.get(), kev, 2, 0, 0, 0);
+    int result = kevent(fd_.get(), kev, 2, 0, 0, 0);
+    if (result == -1 && errno == EPIPE) {
+      result = 0;
+    }
+    return result;
   }
 
   int selector_kqueue::del(int fd) {
     struct kevent kev[2];
     EV_SET(kev, fd, EVFILT_READ, EV_DELETE, 0, 0, 0);
     EV_SET(kev + 1, fd, EVFILT_WRITE, EV_DELETE, 0, 0, 0);
-    return kevent(fd_.get(), kev, 2, 0, 0, 0);
+    int result = kevent(fd_.get(), kev, 2, 0, 0, 0);
+    if (result == -1 && errno == ENOENT) {
+      result = 0;
+    }
+    return result;
   }
 
   int selector_kqueue::select(const struct timespec* timeout) {
