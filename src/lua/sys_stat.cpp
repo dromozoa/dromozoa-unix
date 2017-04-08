@@ -1,4 +1,4 @@
-// Copyright (C) 2016 Tomoyuki Fujimori <moyu@dromozoa.com>
+// Copyright (C) 2016,2017 Tomoyuki Fujimori <moyu@dromozoa.com>
 //
 // This file is part of dromozoa-unix.
 //
@@ -95,11 +95,42 @@ namespace dromozoa {
     void impl_umask(lua_State* L) {
       luaX_push(L, umask(luaX_check_integer<mode_t>(L, 1)));
     }
+
+    void impl_mkdir(lua_State* L) {
+      const char* path = luaL_checkstring(L, 1);
+      mode_t mode = luaX_opt_integer<mode_t>(L, 2, 0777);
+      if (mkdir(path, mode) == -1) {
+        push_error(L);
+      } else {
+        luaX_push_success(L);
+      }
+    }
+
+    void impl_mkfifo(lua_State* L) {
+      const char* path = luaL_checkstring(L, 1);
+      mode_t mode = luaX_opt_integer<mode_t>(L, 2, 0666);
+      if (mkfifo(path, mode) == -1) {
+        push_error(L);
+      } else {
+        luaX_push_success(L);
+      }
+    }
   }
 
   void initialize_sys_stat(lua_State* L) {
     luaX_set_field(L, -1, "stat", impl_stat);
     luaX_set_field(L, -1, "umask", impl_umask);
+    luaX_set_field(L, -1, "mkdir", impl_mkdir);
+    luaX_set_field(L, -1, "mkfifo", impl_mkfifo);
+
+    luaX_set_field<mode_t>(L, -1, "S_IFMT", S_IFMT);
+    luaX_set_field<mode_t>(L, -1, "S_IFBLK", S_IFBLK);
+    luaX_set_field<mode_t>(L, -1, "S_IFCHR", S_IFCHR);
+    luaX_set_field<mode_t>(L, -1, "S_IFIFO", S_IFIFO);
+    luaX_set_field<mode_t>(L, -1, "S_IFREG", S_IFREG);
+    luaX_set_field<mode_t>(L, -1, "S_IFDIR", S_IFDIR);
+    luaX_set_field<mode_t>(L, -1, "S_IFLNK", S_IFLNK);
+    luaX_set_field<mode_t>(L, -1, "S_IFSOCK", S_IFSOCK);
   }
 
   void initialize_fd_stat(lua_State* L) {
