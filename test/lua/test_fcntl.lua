@@ -1,4 +1,4 @@
--- Copyright (C) 2016 Tomoyuki Fujimori <moyu@dromozoa.com>
+-- Copyright (C) 2016,2017 Tomoyuki Fujimori <moyu@dromozoa.com>
 --
 -- This file is part of dromozoa-unix.
 --
@@ -30,7 +30,18 @@ fd:write("foo\n")
 fd:close()
 
 local fd = assert(unix.open("test.txt"))
+local st = assert(fd:fstat())
+assert(st.st_mode == uint32.bor(unix.S_IFREG, tonumber("0644", 8)))
 assert(fd:is_coe())
 assert(fd:is_ndelay_off())
 assert(fd:read(4) == "foo\n")
 fd:close()
+
+assert(os.remove("test.txt"))
+
+local fd = assert(unix.open("test.txt", uint32.bor(unix.O_WRONLY, unix.O_CREAT, unix.O_CLOEXEC), tonumber("0606", 8)))
+local st = assert(fd:fstat())
+assert(st.st_mode == uint32.bor(unix.S_IFREG, tonumber("0604", 8)))
+fd:close()
+
+assert(os.remove("test.txt"))
