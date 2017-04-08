@@ -1,4 +1,4 @@
--- Copyright (C) 2016 Tomoyuki Fujimori <moyu@dromozoa.com>
+-- Copyright (C) 2016,2017 Tomoyuki Fujimori <moyu@dromozoa.com>
 --
 -- This file is part of dromozoa-unix.
 --
@@ -15,8 +15,27 @@
 -- You should have received a copy of the GNU General Public License
 -- along with dromozoa-unix.  If not, see <http://www.gnu.org/licenses/>.
 
+local uint32 = require "dromozoa.commons.uint32"
 local unix = require "dromozoa.unix"
 
 local mask = unix.umask(tonumber("022", 8))
 assert(mask == tonumber("022", 8))
 assert(unix.umask(mask) == tonumber("022", 8))
+
+assert(unix.mkdir("test.dir"))
+local st = unix.stat("test.dir")
+assert(st.st_mode == uint32.bor(unix.S_IFDIR, tonumber("0755", 8)))
+
+assert(os.remove("test.dir"))
+
+assert(unix.mkdir("test.dir", tonumber("0707", 8)))
+local st = unix.stat("test.dir")
+assert(st.st_mode == uint32.bor(unix.S_IFDIR, tonumber("0705", 8)))
+
+assert(os.remove("test.dir"))
+
+assert(unix.mkfifo("test.fifo"))
+local st = unix.stat("test.fifo")
+assert(st.st_mode == uint32.bor(unix.S_IFIFO, tonumber("0644", 8)))
+
+assert(os.remove("test.fifo"))
