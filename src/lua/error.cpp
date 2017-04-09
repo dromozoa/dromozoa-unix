@@ -98,5 +98,6 @@ namespace dromozoa {
     luaX_set_field(L, -1, "ENOENT", ENOENT);
     luaX_set_field(L, -1, "EPIPE", EPIPE);
     luaX_set_field(L, -1, "EWOULDBLOCK", EWOULDBLOCK);
+    luaX_set_field(L, -1, "EEXIST", EEXIST);
   }
 }
