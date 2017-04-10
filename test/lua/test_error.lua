@@ -40,3 +40,7 @@ local a, b, c = unix.get_last_error()
 assert(a == nil)
 assert(b == unix.strerror(unix.ENOENT))
 assert(c == unix.ENOENT)
+
+unix.set_errno(unix.EEXIST)
+assert(unix.strerror() == unix.strerror(unix.EEXIST))
+assert(unix.get_errno() == unix.EEXIST)
