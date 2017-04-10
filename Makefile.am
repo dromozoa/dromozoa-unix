@@ -23,6 +23,7 @@ EXTRA_DIST = \
 	README.md \
 	bind \
 	dromozoa-unix-*.rockspec \
+	generate.lua \
 	include \
 	m4/update \
 	test/lua \

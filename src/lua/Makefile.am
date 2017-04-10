@@ -26,6 +26,7 @@ unix_la_SOURCES = \
 	argument_vector.cpp \
 	async_service.cpp \
 	async_task.cpp \
+	errno.cpp \
 	error.cpp \
 	fcntl.cpp \
 	fd.cpp \
