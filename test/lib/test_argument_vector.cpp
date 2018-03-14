@@ -1,4 +1,4 @@
-// Copyright (C) 2016 Tomoyuki Fujimori <moyu@dromozoa.com>
+// Copyright (C) 2016,2018 Tomoyuki Fujimori <moyu@dromozoa.com>
 //
 // This file is part of dromozoa-unix.
 //
@@ -24,7 +24,7 @@
 void test1() {
   dromozoa::argument_vector args;
   const char* const* argv = args.get();
-  assert(argv == 0);
+  assert(!argv);
 }
 
 void test2() {

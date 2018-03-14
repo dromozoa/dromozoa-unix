@@ -1,4 +1,4 @@
-// Copyright (C) 2016,2017 Tomoyuki Fujimori <moyu@dromozoa.com>
+// Copyright (C) 2016-2018 Tomoyuki Fujimori <moyu@dromozoa.com>
 //
 // This file is part of dromozoa-unix.
 //
@@ -18,30 +18,28 @@
 #include <dromozoa/argument_vector.hpp>
 
 namespace dromozoa {
-  argument_vector::argument_vector() : is_null_(true) {}
+  argument_vector::argument_vector() : initialized_() {}
 
   void argument_vector::clear() {
+    initialized_ = true;
     str_.clear();
     ptr_.clear();
-    is_null_ = false;
   }
 
   void argument_vector::push_back(const char* value) {
+    initialized_ = true;
     str_.push_back(value);
     ptr_.clear();
-    is_null_ = false;
   }
 
   void argument_vector::push_back(const std::string& value) {
+    initialized_ = true;
     str_.push_back(value);
     ptr_.clear();
-    is_null_ = false;
   }
 
-  const char* const* argument_vector::get() {
-    if (is_null_) {
-      return 0;
-    } else {
+  const char* const* argument_vector::get() const {
+    if (initialized_) {
       if (ptr_.empty()) {
         ptr_.reserve(str_.size() + 1);
         std::vector<std::string>::const_iterator i = str_.begin();
@@ -52,6 +50,8 @@ namespace dromozoa {
         ptr_.push_back(0);
       }
       return &ptr_[0];
+    } else {
+      return 0;
     }
   }
 }
