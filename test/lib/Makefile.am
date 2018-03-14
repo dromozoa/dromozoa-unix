@@ -28,6 +28,7 @@ check_PROGRAMS = \
 	test_compat_strerror.exe \
 	test_djb.exe \
 	test_errno_saver.exe \
+	test_file_descriptor.exe \
 	test_forkexec.exe \
 	test_pathexec.exe \
 	test_selector.exe \
@@ -66,6 +67,10 @@ test_djb_exe_SOURCES = test_djb.cpp
 test_errno_saver_exe_CPPFLAGS = -I$(top_srcdir)/include
 test_errno_saver_exe_LDADD = $(top_builddir)/src/lib/libdromozoa-unix.la
 test_errno_saver_exe_SOURCES = test_errno_saver.cpp
+
+test_file_descriptor_exe_CPPFLAGS = -I$(top_srcdir)/include
+test_file_descriptor_exe_LDADD = $(top_builddir)/src/lib/libdromozoa-unix.la
+test_file_descriptor_exe_SOURCES = test_file_descriptor.cpp
 
 test_forkexec_exe_CPPFLAGS = -I$(top_srcdir)/include
 test_forkexec_exe_LDADD = $(top_builddir)/src/lib/libdromozoa-unix.la
