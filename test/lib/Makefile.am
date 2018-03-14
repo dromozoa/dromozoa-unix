@@ -1,4 +1,4 @@
-# Copyright (C) 2016 Tomoyuki Fujimori <moyu@dromozoa.com>
+# Copyright (C) 2016,2018 Tomoyuki Fujimori <moyu@dromozoa.com>
 #
 # This file is part of dromozoa-unix.
 #
@@ -26,6 +26,7 @@ check_PROGRAMS = \
 	test_compat_pipe2.exe \
 	test_compat_socket.exe \
 	test_compat_strerror.exe \
+	test_djb.exe \
 	test_errno_saver.exe \
 	test_forkexec.exe \
 	test_pathexec.exe \
@@ -57,6 +58,10 @@ test_compat_socket_exe_SOURCES = test_compat_socket.cpp
 test_compat_strerror_exe_CPPFLAGS = -I$(top_srcdir)/include
 test_compat_strerror_exe_LDADD = $(top_builddir)/src/lib/libdromozoa-unix.la
 test_compat_strerror_exe_SOURCES = test_compat_strerror.cpp
+
+test_djb_exe_CPPFLAGS = -I$(top_srcdir)/include
+test_djb_exe_LDADD = $(top_builddir)/src/lib/libdromozoa-unix.la
+test_djb_exe_SOURCES = test_djb.cpp
 
 test_errno_saver_exe_CPPFLAGS = -I$(top_srcdir)/include
 test_errno_saver_exe_LDADD = $(top_builddir)/src/lib/libdromozoa-unix.la
