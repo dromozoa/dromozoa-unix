@@ -30,6 +30,7 @@ check_PROGRAMS = \
 	test_errno_saver.exe \
 	test_file_descriptor.exe \
 	test_forkexec.exe \
+	test_hardware_concurrency.exe \
 	test_pathexec.exe \
 	test_selector.exe \
 	test_selfpipe.exe \
@@ -75,6 +76,10 @@ test_file_descriptor_exe_SOURCES = test_file_descriptor.cpp
 test_forkexec_exe_CPPFLAGS = -I$(top_srcdir)/include
 test_forkexec_exe_LDADD = $(top_builddir)/src/lib/libdromozoa-unix.la
 test_forkexec_exe_SOURCES = test_forkexec.cpp
+
+test_hardware_concurrency_exe_CPPFLAGS = -I$(top_srcdir)/include
+test_hardware_concurrency_exe_LDADD = $(top_builddir)/src/lib/libdromozoa-unix.la
+test_hardware_concurrency_exe_SOURCES = test_hardware_concurrency.cpp
 
 test_pathexec_exe_CPPFLAGS = -I$(top_srcdir)/include
 test_pathexec_exe_LDADD = $(top_builddir)/src/lib/libdromozoa-unix.la
