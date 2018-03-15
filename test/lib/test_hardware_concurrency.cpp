@@ -1,4 +1,4 @@
-// Copyright (C) 2016,2018 Tomoyuki Fujimori <moyu@dromozoa.com>
+// Copyright (C) 2018 Tomoyuki Fujimori <moyu@dromozoa.com>
 //
 // This file is part of dromozoa-unix.
 //
@@ -15,25 +15,11 @@
 // You should have received a copy of the GNU General Public License
 // along with dromozoa-unix.  If not, see <http://www.gnu.org/licenses/>.
 
-#ifndef DROMOZOA_ARGUMENT_VECTOR_HPP
-#define DROMOZOA_ARGUMENT_VECTOR_HPP
+#include <iostream>
 
-#include <string>
-#include <vector>
+#include <dromozoa/hardware_concurrency.hpp>
 
-namespace dromozoa {
-  class argument_vector {
-  public:
-    argument_vector();
-    void clear();
-    void push_back(const char* value);
-    void push_back(const std::string& value);
-    const char* const* get() const;
-  private:
-    bool initialized_;
-    std::vector<std::string> str_;
-    mutable std::vector<const char*> ptr_;
-  };
+int main(int, char*[]) {
+  std::cout << dromozoa::hardware_concurrency() << "\n";
+  return 0;
 }
-
-#endif

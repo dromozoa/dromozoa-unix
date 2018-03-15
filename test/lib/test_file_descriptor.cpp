@@ -1,4 +1,4 @@
-// Copyright (C) 2016,2018 Tomoyuki Fujimori <moyu@dromozoa.com>
+// Copyright (C) 2018 Tomoyuki Fujimori <moyu@dromozoa.com>
 //
 // This file is part of dromozoa-unix.
 //
@@ -16,19 +16,35 @@
 // along with dromozoa-unix.  If not, see <http://www.gnu.org/licenses/>.
 
 #include <assert.hpp>
-#include <errno.h>
+#include <unistd.h>
 
-#include <dromozoa/errno_saver.hpp>
+#include <iostream>
+
+#include <dromozoa/file_descriptor.hpp>
 
 int main(int, char*[]) {
-  errno = ENOENT;
-  assert(errno == ENOENT);
-  {
-    dromozoa::errno_saver save;
-    assert(errno == ENOENT);
-    errno = EINTR;
-    assert(errno == EINTR);
-  }
-  assert(errno == ENOENT);
+  int fd[2] = { -1, -1 };
+  assert(pipe(fd) != -1);
+  std::cout << fd[0] << ", " << fd[1] << "\n";
+  dromozoa::file_descriptor fd0(fd[0]);
+  dromozoa::file_descriptor fd1;
+  assert(fd0.get() == fd[0]);
+  assert(fd0.valid());
+  assert(fd1.get() == -1);
+  assert(!fd1.valid());
+
+  dromozoa::file_descriptor(fd[1]).swap(fd1);
+  assert(fd1.get() == fd[1]);
+  assert(fd1.valid());
+
+  assert(fd0.release() == fd[0]);
+  assert(fd0.get() == -1);
+  assert(!fd0.valid());
+
+  assert(close(fd[0]) != -1);
+  assert(close(fd[1]) != -1);
+
+  // unexpected
+
   return 0;
 }

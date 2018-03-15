@@ -1,6 +1,6 @@
 #! /bin/sh -e
 
-# Copyright (C) 2015,2017 Tomoyuki Fujimori <moyu@dromozoa.com>
+# Copyright (C) 2015,2017,2018 Tomoyuki Fujimori <moyu@dromozoa.com>
 #
 # This file is part of dromozoa-unix.
 #
@@ -21,6 +21,9 @@ case x$1 in
   x) lua=lua;;
   *) lua=$1;;
 esac
+
+LUA_PATH="?.lua;;"
+export LUA_PATH
 
 for i in test/lua/test*.lua
 do
