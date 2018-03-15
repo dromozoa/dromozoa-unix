@@ -1,4 +1,4 @@
-// Copyright (C) 2016,2017 Tomoyuki Fujimori <moyu@dromozoa.com>
+// Copyright (C) 2016-2018 Tomoyuki Fujimori <moyu@dromozoa.com>
 //
 // This file is part of dromozoa-unix.
 //
@@ -22,7 +22,6 @@
 #include <list>
 #include <map>
 #include <utility>
-#include <vector>
 
 #include <dromozoa/bind/unexpected.hpp>
 
@@ -72,17 +71,14 @@ namespace dromozoa {
       }
 
       void swap(thread& that) {
-        pthread_t thread = thread_;
-        thread_ = that.thread_;
-        that.thread_ = thread;
-        bool joinable = joinable_;
-        joinable_ = that.joinable_;
-        that.joinable_ = joinable;
+        std::swap(thread_, that.thread_);
+        std::swap(joinable_, that.joinable_);
       }
 
     private:
       pthread_t thread_;
       bool joinable_;
+      thread(const thread&);
       thread& operator=(const thread&);
     };
 
@@ -426,6 +422,7 @@ namespace dromozoa {
     unsigned int spare_threads_;
     unsigned int current_threads_;
     unsigned int current_tasks_;
+
     mutex counter_mutex_;
     conditional_variable counter_condition_;
 
