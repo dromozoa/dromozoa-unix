@@ -19,6 +19,7 @@
 #include "config.h"
 #endif
 
+#include <errno.h>
 #include <fcntl.h>
 #include <unistd.h>
 
