@@ -1,4 +1,4 @@
-// Copyright (C) 2016 Tomoyuki Fujimori <moyu@dromozoa.com>
+// Copyright (C) 2016,2018 Tomoyuki Fujimori <moyu@dromozoa.com>
 //
 // This file is part of dromozoa-unix.
 //
@@ -50,7 +50,7 @@ namespace dromozoa {
   sigmask_saver::sigmask_saver(const sigset_t& mask) : mask_(mask) {}
 
   sigmask_saver::~sigmask_saver() {
-    errno_saver save;
+    errno_saver save_errno;
     if (compat_sigmask(SIG_SETMASK, &mask_, 0) == -1) {
       DROMOZOA_UNEXPECTED(compat_strerror(errno));
     }

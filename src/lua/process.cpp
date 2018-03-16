@@ -1,4 +1,4 @@
-// Copyright (C) 2016 Tomoyuki Fujimori <moyu@dromozoa.com>
+// Copyright (C) 2016,2018 Tomoyuki Fujimori <moyu@dromozoa.com>
 //
 // This file is part of dromozoa-unix.
 //
@@ -46,7 +46,7 @@ namespace dromozoa {
       int result = forkexec(path, argv.get(), envp.get(), chdir, dup2_stdio, pid);
 
       {
-        errno_saver save;
+        errno_saver save_errno;
         if (pid != -1) {
           luaX_set_field(L, 1, 1, pid);
         }
@@ -71,7 +71,7 @@ namespace dromozoa {
       int result = forkexec_daemon(path, argv.get(), envp.get(), chdir, pid1, pid2);
 
       {
-        errno_saver save;
+        errno_saver save_errno;
         if (pid1 != -1) {
           luaX_set_field(L, 1, 1, pid1);
         }

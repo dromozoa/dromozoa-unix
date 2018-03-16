@@ -33,7 +33,7 @@ namespace dromozoa {
 
   file_descriptor::~file_descriptor() {
     if (fd_ != -1) {
-      errno_saver save;
+      errno_saver save_errno;
       if (close() == -1) {
         DROMOZOA_UNEXPECTED(compat_strerror(errno));
       }
