@@ -1,4 +1,4 @@
-// Copyright (C) 2016 Tomoyuki Fujimori <moyu@dromozoa.com>
+// Copyright (C) 2016,2018 Tomoyuki Fujimori <moyu@dromozoa.com>
 //
 // This file is part of dromozoa-unix.
 //
@@ -75,38 +75,38 @@ void test_compat_socketpair2() {
 void dump() {
   static const size_t width = sizeof(int) * 4;
   std::cout << std::hex << std::setfill('0')
-      << "O_CLOEXEC=0x" << std::setw(width) << O_CLOEXEC << "\n"
-      << "O_NONBLOCK=0x" << std::setw(width) << O_NONBLOCK << "\n"
-      << "SOCK_STREAM=0x" << std::setw(width) << SOCK_STREAM << "\n"
-      << "SOCK_DGRAM=0x" << std::setw(width) << SOCK_DGRAM << "\n"
-      << "SOCK_SEQPACKET=0x" << std::setw(width) << SOCK_SEQPACKET << "\n"
+      << "O_CLOEXEC            0x" << std::setw(width) << O_CLOEXEC << "\n"
+      << "O_NONBLOCK           0x" << std::setw(width) << O_NONBLOCK << "\n"
+      << "SOCK_STREAM          0x" << std::setw(width) << SOCK_STREAM << "\n"
+      << "SOCK_DGRAM           0x" << std::setw(width) << SOCK_DGRAM << "\n"
+      << "SOCK_SEQPACKET       0x" << std::setw(width) << SOCK_SEQPACKET << "\n"
 #ifdef SOCK_RAW
-      << "SOCK_RAW=0x" << std::setw(width) << SOCK_RAW << "\n"
+      << "SOCK_RAW             0x" << std::setw(width) << SOCK_RAW << "\n"
 #else
-      << "SOCK_RAW not defined\n"
+      << "SOCK_RAW             not defined\n"
 #endif
 #ifdef SOCK_RDM
-      << "SOCK_RDM=0x" << std::setw(width) << SOCK_RDM << "\n"
+      << "SOCK_RDM             0x" << std::setw(width) << SOCK_RDM << "\n"
 #else
-      << "SOCK_RDM not defined\n"
+      << "SOCK_RDM             not defined\n"
 #endif
 #ifdef SOCK_PACKET
-      << "SOCK_PACKET=0x" << std::setw(width) << SOCK_PACKET << "\n"
+      << "SOCK_PACKET          0x" << std::setw(width) << SOCK_PACKET << "\n"
 #else
-      << "SOCK_PACKET not defined\n"
+      << "SOCK_PACKET          not defined\n"
 #endif
 #ifdef SOCK_CLOEXEC
-      << "SOCK_CLOEXEC=0x" << std::setw(width) << SOCK_CLOEXEC << "\n"
+      << "SOCK_CLOEXEC         0x" << std::setw(width) << SOCK_CLOEXEC << "\n"
 #else
-      << "SOCK_CLOEXEC not defined\n"
+      << "SOCK_CLOEXEC         not defined\n"
 #endif
 #ifdef SOCK_NONBLOCK
-      << "SOCK_NONBLOCK=0x" << std::setw(width) << SOCK_NONBLOCK << "\n"
+      << "SOCK_NONBLOCK        0x" << std::setw(width) << SOCK_NONBLOCK << "\n"
 #else
-      << "SOCK_NONBLOCK not defined\n"
+      << "SOCK_NONBLOCK        not defined\n"
 #endif
-      << "COMPAT_SOCK_CLOEXEC=0x" << std::setw(width) << dromozoa::COMPAT_SOCK_CLOEXEC << "\n"
-      << "COMPAT_SOCK_NONBLOCK=0x" << std::setw(width) << dromozoa::COMPAT_SOCK_NONBLOCK << "\n"
+      << "COMPAT_SOCK_CLOEXEC  0x" << std::setw(width) << dromozoa::COMPAT_SOCK_CLOEXEC << "\n"
+      << "COMPAT_SOCK_NONBLOCK 0x" << std::setw(width) << dromozoa::COMPAT_SOCK_NONBLOCK << "\n"
       ;
 }
 
