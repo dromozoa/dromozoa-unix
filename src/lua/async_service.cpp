@@ -1,4 +1,4 @@
-// Copyright (C) 2016,2017 Tomoyuki Fujimori <moyu@dromozoa.com>
+// Copyright (C) 2016-2018 Tomoyuki Fujimori <moyu@dromozoa.com>
 //
 // This file is part of dromozoa-unix.
 //
@@ -31,7 +31,7 @@ namespace dromozoa {
     }
 
     void impl_call(lua_State* L) {
-      async_service::impl* impl = 0;
+      async_service_impl* impl = 0;
       int top = lua_gettop(L);
       if (top < 2) {
         unsigned int concurrency = hardware_concurrency();

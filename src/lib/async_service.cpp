@@ -240,21 +240,21 @@ namespace dromozoa {
     };
   }
 
-  class async_service::impl {
+  class async_service_impl {
   public:
     typedef std::list<async_task*> queue_type;
     typedef queue_type::iterator queue_iterator;
     typedef std::map<async_task*, queue_iterator> queue_index_type;
     typedef queue_index_type::iterator queue_index_iterator;
 
-    explicit impl(unsigned int max_threads, unsigned int max_spare_threads)
+    explicit async_service_impl(unsigned int max_threads, unsigned int max_spare_threads)
       : max_threads_(max_threads),
         max_spare_threads_(max_spare_threads),
         spare_threads_(),
         current_threads_(),
         current_tasks_() {}
 
-    ~impl() {
+    ~async_service_impl() {
       if (valid()) {
         close();
       }
@@ -436,11 +436,11 @@ namespace dromozoa {
     file_descriptor reader_;
     file_descriptor writer_;
 
-    impl(const impl&);
-    impl& operator=(const impl&);
+    async_service_impl(const async_service_impl&);
+    async_service_impl& operator=(const async_service_impl&);
 
     static void* start_routine(void* self) {
-      static_cast<impl*>(self)->start();
+      static_cast<async_service_impl*>(self)->start();
       return 0;
     }
 
@@ -501,8 +501,8 @@ namespace dromozoa {
     }
   };
 
-  async_service::impl* async_service::open(unsigned int start_threads) {
-    scoped_ptr<async_service::impl> impl(new async_service::impl(start_threads, start_threads));
+  async_service_impl* async_service::open(unsigned int start_threads) {
+    scoped_ptr<async_service_impl> impl(new async_service_impl(start_threads, start_threads));
     if (impl->open(start_threads) == -1) {
       return 0;
     } else {
@@ -510,8 +510,8 @@ namespace dromozoa {
     }
   }
 
-  async_service::impl* async_service::open(unsigned int start_threads, unsigned int max_threads) {
-    scoped_ptr<async_service::impl> impl(new async_service::impl(max_threads, max_threads));
+  async_service_impl* async_service::open(unsigned int start_threads, unsigned int max_threads) {
+    scoped_ptr<async_service_impl> impl(new async_service_impl(max_threads, max_threads));
     if (impl->open(start_threads) == -1) {
       return 0;
     } else {
@@ -519,8 +519,8 @@ namespace dromozoa {
     }
   }
 
-  async_service::impl* async_service::open(unsigned int start_threads, unsigned int max_threads, unsigned int max_spare_threads) {
-    scoped_ptr<async_service::impl> impl(new async_service::impl(max_threads, max_spare_threads));
+  async_service_impl* async_service::open(unsigned int start_threads, unsigned int max_threads, unsigned int max_spare_threads) {
+    scoped_ptr<async_service_impl> impl(new async_service_impl(max_threads, max_spare_threads));
     if (impl->open(start_threads) == -1) {
       return 0;
     } else {
@@ -528,7 +528,7 @@ namespace dromozoa {
     }
   }
 
-  async_service::async_service(impl* impl) : impl_(impl) {}
+  async_service::async_service(async_service_impl* impl) : impl_(impl) {}
 
   async_service::~async_service() {
     delete impl_;
