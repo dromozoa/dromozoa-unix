@@ -174,15 +174,15 @@ namespace dromozoa {
       scoped_lock& operator=(const scoped_lock&);
     };
 
-    class conditional_variable {
+    class condition_variable {
     public:
-      conditional_variable() : cond_() {
+      condition_variable() : cond_() {
         if (int result = pthread_cond_init(&cond_, 0)) {
           throw system_error(result);
         }
       }
 
-      ~conditional_variable() {
+      ~condition_variable() {
         if (int result = pthread_cond_destroy(&cond_)) {
           throw system_error(result);
         }
@@ -240,21 +240,21 @@ namespace dromozoa {
     };
   }
 
-  class async_service::impl {
+  class async_service_impl {
   public:
     typedef std::list<async_task*> queue_type;
     typedef queue_type::iterator queue_iterator;
     typedef std::map<async_task*, queue_iterator> queue_index_type;
     typedef queue_index_type::iterator queue_index_iterator;
 
-    explicit impl(unsigned int max_threads, unsigned int max_spare_threads)
+    explicit async_service_impl(unsigned int max_threads, unsigned int max_spare_threads)
       : max_threads_(max_threads),
         max_spare_threads_(max_spare_threads),
         spare_threads_(),
         current_threads_(),
         current_tasks_() {}
 
-    ~impl() {
+    ~async_service_impl() {
       if (valid()) {
         close();
       }
@@ -265,8 +265,8 @@ namespace dromozoa {
       if (compat_pipe2(fd, O_CLOEXEC | O_NONBLOCK) == -1) {
         return -1;
       }
-      file_descriptor fd0(fd[0]);
-      file_descriptor fd1(fd[1]);
+      file_descriptor reader(fd[0]);
+      file_descriptor writer(fd[1]);
 
       {
         scoped_lock<mutex> counter_lock(counter_mutex_);
@@ -279,20 +279,20 @@ namespace dromozoa {
 
       {
         scoped_lock<mutex> ready_lock(ready_mutex_);
-        reader_.swap(fd0);
-        writer_.swap(fd1);
+        ready_reader_.swap(reader);
+        ready_writer_.swap(writer);
       }
 
       return 0;
     }
 
     int close() {
-      file_descriptor fd0;
-      file_descriptor fd1;
+      file_descriptor reader;
+      file_descriptor writer;
       {
         scoped_lock<mutex> ready_lock(ready_mutex_);
-        fd0.swap(reader_);
-        fd1.swap(writer_);
+        reader.swap(ready_reader_);
+        writer.swap(ready_writer_);
       }
 
       queue_type queue;
@@ -328,27 +328,27 @@ namespace dromozoa {
         }
       }
 
-      if (fd0.close() == -1) {
+      if (reader.close() == -1) {
         return -1;
       }
-      if (fd1.close() == -1) {
+      if (writer.close() == -1) {
         return -1;
       }
       return 0;
     }
 
     bool valid() const {
-      return reader_.valid();
+      return ready_reader_.valid();
     }
 
     int get() const {
-      return reader_.get();
+      return ready_reader_.get();
     }
 
     int read() const {
       int count = 0;
       char c;
-      while (::read(reader_.get(), &c, 1) == 1) {
+      while (::read(ready_reader_.get(), &c, 1) == 1) {
         ++count;
       }
       return count;
@@ -423,24 +423,22 @@ namespace dromozoa {
     unsigned int current_threads_;
     unsigned int current_tasks_;
 
-    mutex counter_mutex_;
-    conditional_variable counter_condition_;
+    mutex              counter_mutex_;
+    condition_variable counter_condition_;
+    mutex              queue_mutex_;
+    queue_type         queue_;
+    queue_index_type   queue_index_;
+    condition_variable queue_condition_;
+    mutex              ready_mutex_;
+    queue_type         ready_;
+    file_descriptor    ready_reader_;
+    file_descriptor    ready_writer_;
 
-    mutex queue_mutex_;
-    queue_type queue_;
-    queue_index_type queue_index_;
-    conditional_variable queue_condition_;
-
-    mutex ready_mutex_;
-    queue_type ready_;
-    file_descriptor reader_;
-    file_descriptor writer_;
-
-    impl(const impl&);
-    impl& operator=(const impl&);
+    async_service_impl(const async_service_impl&);
+    async_service_impl& operator=(const async_service_impl&);
 
     static void* start_routine(void* self) {
-      static_cast<impl*>(self)->start();
+      static_cast<async_service_impl*>(self)->start();
       return 0;
     }
 
@@ -481,8 +479,8 @@ namespace dromozoa {
         {
           scoped_lock<mutex> ready_lock(ready_mutex_);
           ready_.push_back(task);
-          if (writer_.valid()) {
-            write(writer_.get(), "", 1);
+          if (ready_writer_.valid()) {
+            write(ready_writer_.get(), "", 1);
           }
         }
 
@@ -501,8 +499,8 @@ namespace dromozoa {
     }
   };
 
-  async_service::impl* async_service::open(unsigned int start_threads) {
-    scoped_ptr<async_service::impl> impl(new async_service::impl(start_threads, start_threads));
+  async_service_impl* async_service::open(unsigned int start_threads) {
+    scoped_ptr<async_service_impl> impl(new async_service_impl(start_threads, start_threads));
     if (impl->open(start_threads) == -1) {
       return 0;
     } else {
@@ -510,8 +508,8 @@ namespace dromozoa {
     }
   }
 
-  async_service::impl* async_service::open(unsigned int start_threads, unsigned int max_threads) {
-    scoped_ptr<async_service::impl> impl(new async_service::impl(max_threads, max_threads));
+  async_service_impl* async_service::open(unsigned int start_threads, unsigned int max_threads) {
+    scoped_ptr<async_service_impl> impl(new async_service_impl(max_threads, max_threads));
     if (impl->open(start_threads) == -1) {
       return 0;
     } else {
@@ -519,8 +517,8 @@ namespace dromozoa {
     }
   }
 
-  async_service::impl* async_service::open(unsigned int start_threads, unsigned int max_threads, unsigned int max_spare_threads) {
-    scoped_ptr<async_service::impl> impl(new async_service::impl(max_threads, max_spare_threads));
+  async_service_impl* async_service::open(unsigned int start_threads, unsigned int max_threads, unsigned int max_spare_threads) {
+    scoped_ptr<async_service_impl> impl(new async_service_impl(max_threads, max_spare_threads));
     if (impl->open(start_threads) == -1) {
       return 0;
     } else {
@@ -528,7 +526,7 @@ namespace dromozoa {
     }
   }
 
-  async_service::async_service(impl* impl) : impl_(impl) {}
+  async_service::async_service(async_service_impl* impl) : impl_(impl) {}
 
   async_service::~async_service() {
     delete impl_;

@@ -1,4 +1,4 @@
-// Copyright (C) 2016,2017 Tomoyuki Fujimori <moyu@dromozoa.com>
+// Copyright (C) 2016-2018 Tomoyuki Fujimori <moyu@dromozoa.com>
 //
 // This file is part of dromozoa-unix.
 //
@@ -21,13 +21,14 @@
 #include <dromozoa/async_task.hpp>
 
 namespace dromozoa {
+  class async_service_impl;
+
   class async_service {
   public:
-    class impl;
-    static impl* open(unsigned int start_threads);
-    static impl* open(unsigned int start_threads, unsigned int max_threads);
-    static impl* open(unsigned int start_threads, unsigned int max_threads, unsigned int max_spare_threads);
-    async_service(impl* impl);
+    static async_service_impl* open(unsigned int start_threads);
+    static async_service_impl* open(unsigned int start_threads, unsigned int max_threads);
+    static async_service_impl* open(unsigned int start_threads, unsigned int max_threads, unsigned int max_spare_threads);
+    async_service(async_service_impl* impl);
     ~async_service();
     int close();
     bool valid() const;
@@ -38,7 +39,7 @@ namespace dromozoa {
     async_task* pop();
     void info(unsigned int& spare_threads, unsigned int& current_threads, unsigned int& current_tasks);
   private:
-    impl* impl_;
+    async_service_impl* impl_;
     async_service(const async_service&);
     async_service& operator=(const async_service&);
   };
