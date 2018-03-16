@@ -15,6 +15,8 @@
 // You should have received a copy of the GNU General Public License
 // along with dromozoa-unix.  If not, see <http://www.gnu.org/licenses/>.
 
+#include <assert.h>
+
 #include <iomanip>
 #include <iostream>
 
@@ -22,8 +24,8 @@
 
 int main(int, char*[]) {
   dromozoa::timer timer;
-  timer.start();
-  timer.stop();
+  assert(timer.start() == 0);
+  assert(timer.stop() == 0);
   std::cout << std::scientific << std::setprecision(17)
       << "elapsed " << timer.elapsed() << "\n";
   return 0;

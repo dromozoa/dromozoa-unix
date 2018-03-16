@@ -1,4 +1,4 @@
-// Copyright (C) 2016 Tomoyuki Fujimori <moyu@dromozoa.com>
+// Copyright (C) 2016,2018 Tomoyuki Fujimori <moyu@dromozoa.com>
 //
 // This file is part of dromozoa-unix.
 //
@@ -15,15 +15,21 @@
 // You should have received a copy of the GNU General Public License
 // along with dromozoa-unix.  If not, see <http://www.gnu.org/licenses/>.
 
+#include <errno.h>
 #include <string.h>
 
 #include <dromozoa/socket_address.hpp>
+#include <dromozoa/system_error.hpp>
 
 namespace dromozoa {
   socket_address::socket_address() : address_(), size_(sizeof(address_)) {}
 
-  socket_address::socket_address(const struct sockaddr* address, socklen_t size) : address_(), size_(size) {
+  socket_address::socket_address(const struct sockaddr* address, socklen_t size) : address_(), size_() {
+    if (size > sizeof(address_)) {
+      throw system_error(EINVAL);
+    }
     memmove(&address_, address, size);
+    size_ = size;
   }
 
   struct sockaddr* socket_address::get() {

@@ -1,4 +1,4 @@
-// Copyright (C) 2016 Tomoyuki Fujimori <moyu@dromozoa.com>
+// Copyright (C) 2016,2018 Tomoyuki Fujimori <moyu@dromozoa.com>
 //
 // This file is part of dromozoa-unix.
 //
@@ -52,7 +52,7 @@ int main(int, char*[]) {
   assert(selector.add(dromozoa::selfpipe_get(), dromozoa::SELECTOR_READ) == 0);
 
   const char* path = getenv("PATH");
-  const char* argv[] = { "env", 0 };
+  const char* argv[] = { "ls", "-l", "/", 0 };
   pid_t pid = -1;
   assert(dromozoa::forkexec(path, argv, 0, 0, 0, pid) == 0);
   std::cout << pid << "\n";
