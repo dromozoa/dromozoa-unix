@@ -1,4 +1,4 @@
-// Copyright (C) 2016 Tomoyuki Fujimori <moyu@dromozoa.com>
+// Copyright (C) 2016,2018 Tomoyuki Fujimori <moyu@dromozoa.com>
 //
 // This file is part of dromozoa-unix.
 //
@@ -21,20 +21,8 @@
 #include <sys/types.h>
 
 namespace dromozoa {
-  int forkexec(
-      const char* path,
-      const char* const* argv,
-      const char* const* envp,
-      const char* chdir,
-      const int* dup2_stdio,
-      pid_t& pid);
-  int forkexec_daemon(
-      const char* path,
-      const char* const* argv,
-      const char* const* envp,
-      const char* chdir,
-      pid_t& pid1,
-      pid_t& pid2);
+  int forkexec(const char* path, const char* const* argv, const char* const* envp, const char* chdir, const int* dup2_stdio, pid_t& pid);
+  int forkexec_daemon(const char* path, const char* const* argv, const char* const* envp, const char* chdir, pid_t& pid1, pid_t& pid2);
 }
 
 #endif
