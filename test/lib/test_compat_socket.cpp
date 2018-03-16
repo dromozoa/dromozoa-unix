@@ -73,7 +73,7 @@ void test_compat_socketpair2() {
 }
 
 void dump() {
-  static const size_t width = sizeof(int) * 4;
+  static const size_t width = sizeof(int) * 2;
   std::cout << std::hex << std::setfill('0')
       << "O_CLOEXEC            0x" << std::setw(width) << O_CLOEXEC << "\n"
       << "O_NONBLOCK           0x" << std::setw(width) << O_NONBLOCK << "\n"
