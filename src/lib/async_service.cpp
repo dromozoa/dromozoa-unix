@@ -174,15 +174,15 @@ namespace dromozoa {
       scoped_lock& operator=(const scoped_lock&);
     };
 
-    class conditional_variable {
+    class condition_variable {
     public:
-      conditional_variable() : cond_() {
+      condition_variable() : cond_() {
         if (int result = pthread_cond_init(&cond_, 0)) {
           throw system_error(result);
         }
       }
 
-      ~conditional_variable() {
+      ~condition_variable() {
         if (int result = pthread_cond_destroy(&cond_)) {
           throw system_error(result);
         }
@@ -424,12 +424,12 @@ namespace dromozoa {
     unsigned int current_tasks_;
 
     mutex counter_mutex_;
-    conditional_variable counter_condition_;
+    condition_variable counter_condition_;
 
     mutex queue_mutex_;
     queue_type queue_;
     queue_index_type queue_index_;
-    conditional_variable queue_condition_;
+    condition_variable queue_condition_;
 
     mutex ready_mutex_;
     queue_type ready_;
