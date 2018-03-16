@@ -35,7 +35,8 @@ check_PROGRAMS = \
 	test_selector.exe \
 	test_selfpipe.exe \
 	test_sigmask.exe \
-	test_socket_address.exe
+	test_socket_address.exe \
+	test_timer.exe
 
 test_argument_vector_exe_CPPFLAGS = -I$(top_srcdir)/include
 test_argument_vector_exe_LDADD = $(top_builddir)/src/lib/libdromozoa-unix.la
@@ -100,3 +101,7 @@ test_sigmask_exe_SOURCES = test_sigmask.cpp
 test_socket_address_exe_CPPFLAGS = -I$(top_srcdir)/include
 test_socket_address_exe_LDADD = $(top_builddir)/src/lib/libdromozoa-unix.la
 test_socket_address_exe_SOURCES = test_socket_address.cpp
+
+test_timer_exe_CPPFLAGS = -I$(top_srcdir)/include
+test_timer_exe_LDADD = $(top_builddir)/src/lib/libdromozoa-unix.la
+test_timer_exe_SOURCES = test_timer.cpp
