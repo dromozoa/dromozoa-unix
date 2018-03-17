@@ -1,4 +1,4 @@
--- Copyright (C) 2016,2017 Tomoyuki Fujimori <moyu@dromozoa.com>
+-- Copyright (C) 2016-2018 Tomoyuki Fujimori <moyu@dromozoa.com>
 --
 -- This file is part of dromozoa-unix.
 --
@@ -21,10 +21,7 @@ local uint32 = require "dromozoa.commons.uint32"
 local dyld = require "dromozoa.dyld"
 local unix = require "dromozoa.unix"
 
-local symbol = dyld.RTLD_DEFAULT:dlsym("pthread_create")
-if not symbol or symbol:is_null() then
-  dyld.dlopen("libpthread.so.0", uint32.bor(dyld.RTLD_LAZY, dyld.RTLD_GLOBAL))
-end
+assert(dyld.dlopen_pthread())
 
 local service = unix.async_service(1)
 local selector = unix.selector()
@@ -48,21 +45,22 @@ local count = 5
 
 while true do
   local result = selector:select()
-  -- print("select", result)
+  print("select", result)
   for i = 1, result do
     local fd, event = selector:event(i)
-    -- print("event", fd, event)
+    print("event", fd, event)
     if fd == service:get() then
       local result = service:read()
-      -- print("read", result)
+      print("read", result)
       while true do
         local task = service:pop()
-        -- print(task)
+        print(task)
         if task then
           local a, b = task:result()
           if type(a) == "table" then
             print(dumper.encode(a))
-            for i, ai in ipairs(a) do
+            for i = 1, #a do
+              local ai = a[i]
               assert(service:push(ai.ai_addr:async_getnameinfo()))
               count = count + 1
             end

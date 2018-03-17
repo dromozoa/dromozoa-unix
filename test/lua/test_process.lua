@@ -1,4 +1,4 @@
--- Copyright (C) 2016 Tomoyuki Fujimori <moyu@dromozoa.com>
+-- Copyright (C) 2016,2018 Tomoyuki Fujimori <moyu@dromozoa.com>
 --
 -- This file is part of dromozoa-unix.
 --
@@ -15,30 +15,28 @@
 -- You should have received a copy of the GNU General Public License
 -- along with dromozoa-unix.  If not, see <http://www.gnu.org/licenses/>.
 
-local sequence = require "dromozoa.commons.sequence"
-local sequence_writer = require "dromozoa.commons.sequence_writer"
 local unix = require "dromozoa.unix"
 
 local PATH = os.getenv("PATH")
 local envp = unix.get_environ()
-sequence.push(envp, "foo=bar")
+envp[#envp + 1] = "foo=bar"
 
 local reader, writer = assert(unix.pipe())
 local process = assert(unix.process())
 assert(process:forkexec(PATH, { "sh", "-c", "pwd; echo \"$foo\"" }, envp, "/", { [1] = writer }))
 assert(writer:close())
 
-local out = sequence_writer()
+local buffer = {}
 while true do
   local data = assert(reader:read(4096))
   if data == "" then
     break
   else
-    out:write(data)
+    buffer[#buffer + 1] = data
   end
 end
 assert(reader:close())
-assert(out:concat() == "/\nbar\n")
+assert(table.concat(buffer) == "/\nbar\n")
 
 local a, b, c = assert(unix.wait())
 assert(a == process[1])

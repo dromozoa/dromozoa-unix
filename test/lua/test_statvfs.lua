@@ -1,4 +1,4 @@
--- Copyright (C) 2016 Tomoyuki Fujimori <moyu@dromozoa.com>
+-- Copyright (C) 2016,2018 Tomoyuki Fujimori <moyu@dromozoa.com>
 --
 -- This file is part of dromozoa-unix.
 --
@@ -18,7 +18,21 @@
 local json = require "dromozoa.commons.json"
 local unix = require "dromozoa.unix"
 
+local function dump(t)
+  local keys = {}
+  for k in pairs(t) do
+    keys[#keys + 1] = k
+  end
+  table.sort(keys)
+  for i = 1, #keys do
+    local k = keys[i]
+    print(("%-9s | %10d"):format(k, t[k]))
+  end
+end
+
 local fd = assert(unix.open("."))
-print(json.encode(assert(fd:fstatvfs())))
-print(json.encode(assert(unix.statvfs("."))))
+print "--"
+dump(assert(fd:fstatvfs()))
+print "--"
+dump(assert(unix.statvfs(".")))
 fd:close()
