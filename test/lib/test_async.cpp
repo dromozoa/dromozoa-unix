@@ -57,10 +57,10 @@ private:
   nanosleep_task& operator=(const nanosleep_task&);
 };
 
-struct timespec make_timespec(time_t sec, long nsec) {
+struct timespec make_timespec(time_t s, long n) {
   struct timespec tv = {};
-  tv.tv_sec = sec;
-  tv.tv_nsec = nsec;
+  tv.tv_sec = s;
+  tv.tv_nsec = n;
   return tv;
 }
 

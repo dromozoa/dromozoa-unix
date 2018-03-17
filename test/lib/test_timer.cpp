@@ -1,4 +1,4 @@
-// Copyright (C) 2016,2018 Tomoyuki Fujimori <moyu@dromozoa.com>
+// Copyright (C) 2018 Tomoyuki Fujimori <moyu@dromozoa.com>
 //
 // This file is part of dromozoa-unix.
 //
@@ -16,19 +16,17 @@
 // along with dromozoa-unix.  If not, see <http://www.gnu.org/licenses/>.
 
 #include <assert.h>
-#include <errno.h>
 
-#include <dromozoa/errno_saver.hpp>
+#include <iomanip>
+#include <iostream>
+
+#include <dromozoa/timer.hpp>
 
 int main(int, char*[]) {
-  errno = ENOENT;
-  assert(errno == ENOENT);
-  {
-    dromozoa::errno_saver save;
-    assert(errno == ENOENT);
-    errno = EINTR;
-    assert(errno == EINTR);
-  }
-  assert(errno == ENOENT);
+  dromozoa::timer timer;
+  assert(timer.start() == 0);
+  assert(timer.stop() == 0);
+  std::cout << std::scientific << std::setprecision(17)
+      << "elapsed " << timer.elapsed() << "\n";
   return 0;
 }

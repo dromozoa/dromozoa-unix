@@ -1,4 +1,4 @@
-// Copyright (C) 2016 Tomoyuki Fujimori <moyu@dromozoa.com>
+// Copyright (C) 2016,2018 Tomoyuki Fujimori <moyu@dromozoa.com>
 //
 // This file is part of dromozoa-unix.
 //
@@ -15,14 +15,13 @@
 // You should have received a copy of the GNU General Public License
 // along with dromozoa-unix.  If not, see <http://www.gnu.org/licenses/>.
 
+#include <assert.h>
 #include <errno.h>
 #include <stdlib.h>
 
 #include <vector>
 
 #include <dromozoa/pathexec.hpp>
-
-#include "assert.h"
 
 #define assert_pathexec_buffer_size(path, command, size) \
   do { \

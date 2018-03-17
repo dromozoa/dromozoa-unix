@@ -1,4 +1,4 @@
-// Copyright (C) 2016 Tomoyuki Fujimori <moyu@dromozoa.com>
+// Copyright (C) 2016,2018 Tomoyuki Fujimori <moyu@dromozoa.com>
 //
 // This file is part of dromozoa-unix.
 //
@@ -25,14 +25,14 @@
 
 namespace dromozoa {
   namespace {
-    int reader = -1;
-    int writer = -1;
-    struct sigaction save_sa;
+    int selfpipe_reader = -1;
+    int selfpipe_writer = -1;
+    struct sigaction selfpipe_save_sa;
   }
 }
 
 extern "C" void dromozoa_selfpipe_trigger(int) {
-  write(dromozoa::writer, "", 1);
+  write(dromozoa::selfpipe_writer, "", 1);
 }
 
 namespace dromozoa {
@@ -45,17 +45,17 @@ namespace dromozoa {
     if (compat_pipe2(fd, O_CLOEXEC | O_NONBLOCK) == -1) {
       return -1;
     }
-    file_descriptor fd0(fd[0]);
-    file_descriptor fd1(fd[1]);
+    file_descriptor reader(fd[0]);
+    file_descriptor writer(fd[1]);
 
     struct sigaction sa = {};
     sa.sa_handler = dromozoa_selfpipe_trigger;
-    if (sigaction(SIGCHLD, &sa, &save_sa) == -1) {
+    if (sigaction(SIGCHLD, &sa, &selfpipe_save_sa) == -1) {
       return -1;
     }
 
-    reader = fd0.release();
-    writer = fd1.release();
+    selfpipe_reader = reader.release();
+    selfpipe_writer = writer.release();
     return 0;
   }
 
@@ -64,35 +64,35 @@ namespace dromozoa {
       return 0;
     }
 
-    file_descriptor fd0(reader);
-    file_descriptor fd1(writer);
-    reader = -1;
-    writer = -1;
+    file_descriptor reader(selfpipe_reader);
+    file_descriptor writer(selfpipe_writer);
+    selfpipe_reader = -1;
+    selfpipe_writer = -1;
 
-    if (sigaction(SIGCHLD, &save_sa, 0) == -1) {
+    if (sigaction(SIGCHLD, &selfpipe_save_sa, 0) == -1) {
       return -1;
     }
-    if (fd0.close() == -1) {
+    if (reader.close() == -1) {
       return -1;
     }
-    if (fd1.close() == -1) {
+    if (writer.close() == -1) {
       return -1;
     }
     return 0;
   }
 
   bool selfpipe_valid() {
-    return reader != -1;
+    return selfpipe_reader != -1;
   }
 
   int selfpipe_get() {
-    return reader;
+    return selfpipe_reader;
   }
 
   int selfpipe_read() {
     int count = 0;
     char c;
-    while (read(reader, &c, 1) == 1) {
+    while (read(selfpipe_reader, &c, 1) == 1) {
       ++count;
     }
     return count;

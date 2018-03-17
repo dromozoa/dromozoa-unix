@@ -1,4 +1,4 @@
-// Copyright (C) 2016,2017 Tomoyuki Fujimori <moyu@dromozoa.com>
+// Copyright (C) 2016-2018 Tomoyuki Fujimori <moyu@dromozoa.com>
 //
 // This file is part of dromozoa-unix.
 //
@@ -21,8 +21,8 @@
 #include <time.h>
 
 namespace dromozoa {
-  static const int SELECTOR_READ = 1;
-  static const int SELECTOR_WRITE = 2;
+  extern const int SELECTOR_READ;
+  extern const int SELECTOR_WRITE;
 
   class selector {
   public:

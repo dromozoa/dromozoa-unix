@@ -1,4 +1,4 @@
-// Copyright (C) 2016 Tomoyuki Fujimori <moyu@dromozoa.com>
+// Copyright (C) 2016,2018 Tomoyuki Fujimori <moyu@dromozoa.com>
 //
 // This file is part of dromozoa-unix.
 //
@@ -32,77 +32,69 @@ namespace dromozoa {
     class forkexec_impl {
     public:
       int open_die() {
-        int die_fd[] = { -1, -1 };
-        if (compat_pipe2(die_fd, O_CLOEXEC) == -1) {
+        int fd[] = { -1, -1 };
+        if (compat_pipe2(fd, O_CLOEXEC) == -1) {
           return -1;
         }
-        file_descriptor(die_fd[0]).swap(die_fd0_);
-        file_descriptor(die_fd[1]).swap(die_fd1_);
+        file_descriptor(fd[0]).swap(die_reader_);
+        file_descriptor(fd[1]).swap(die_writer_);
         return 0;
       }
 
       void close_die_reader() {
-        die_fd0_.close();
+        die_reader_.close();
       }
 
       void close_die_writer() {
-        die_fd1_.close();
+        die_writer_.close();
       }
 
       void die() {
         int code = errno;
-        write(die_fd1_.get(), &code, sizeof(code));
+        write(die_writer_.get(), &code, sizeof(code));
         this->~forkexec_impl();
         _exit(1);
       }
 
       int read_die() {
         int code = 0;
-        read(die_fd0_.get(), &code, sizeof(code));
-        die_fd0_.close();
+        read(die_reader_.get(), &code, sizeof(code));
+        die_reader_.close();
         return code;
       }
 
       int open_pid() {
-        int pid_fd[] = { -1, -1 };
-        if (compat_pipe2(pid_fd, O_CLOEXEC) == -1) {
+        int fd[] = { -1, -1 };
+        if (compat_pipe2(fd, O_CLOEXEC) == -1) {
           return -1;
         }
-        file_descriptor(pid_fd[0]).swap(pid_fd0_);
-        file_descriptor(pid_fd[1]).swap(pid_fd1_);
+        file_descriptor(fd[0]).swap(pid_reader_);
+        file_descriptor(fd[1]).swap(pid_writer_);
         return 0;
       }
 
       int close_pid_reader() {
-        return pid_fd0_.close();
+        return pid_reader_.close();
       }
 
       int close_pid_writer() {
-        return pid_fd1_.close();
+        return pid_writer_.close();
       }
 
       void quit(pid_t pid) {
-        write(pid_fd1_.get(), &pid, sizeof(pid));
+        write(pid_writer_.get(), &pid, sizeof(pid));
         this->~forkexec_impl();
         _exit(0);
       }
 
       pid_t read_pid() {
         pid_t pid = -1;
-        read(pid_fd0_.get(), &pid, sizeof(pid));
-        pid_fd0_.close();
+        read(pid_reader_.get(), &pid, sizeof(pid));
+        pid_reader_.close();
         return pid;
       }
 
-      void forkexec(
-          const char* path,
-          const char* const* argv,
-          const char* const* envp,
-          const char* chdir,
-          const int* dup2_stdio,
-          bool dup2_null,
-          char* buffer,
-          size_t size) {
+      void forkexec(const char* path, const char* const* argv, const char* const* envp, const char* chdir, const int* dup2_stdio, bool dup2_null, char* buffer, size_t size) {
         if (chdir) {
           if (::chdir(chdir) == -1) {
             die();
@@ -128,20 +120,20 @@ namespace dromozoa {
         }
 
         if (dup2_null) {
-          file_descriptor(open("/dev/null", O_RDWR | O_CLOEXEC, 0)).swap(null_fd_);
-          if (!null_fd_.valid()) {
+          file_descriptor(open("/dev/null", O_RDWR | O_CLOEXEC, 0)).swap(null_);
+          if (!null_.valid()) {
             die();
           }
-          if (dup2(null_fd_.get(), 0) == -1) {
+          if (dup2(null_.get(), 0) == -1) {
             die();
           }
-          if (dup2(null_fd_.get(), 1) == -1) {
+          if (dup2(null_.get(), 1) == -1) {
             die();
           }
-          if (dup2(null_fd_.get(), 2) == -1) {
+          if (dup2(null_.get(), 2) == -1) {
             die();
           }
-          null_fd_.close();
+          null_.close();
         }
 
         if (sigmask_unblock_all_signals(0) == -1) {
@@ -153,21 +145,15 @@ namespace dromozoa {
       }
 
     private:
-      file_descriptor die_fd0_;
-      file_descriptor die_fd1_;
-      file_descriptor pid_fd0_;
-      file_descriptor pid_fd1_;
-      file_descriptor null_fd_;
+      file_descriptor die_reader_;
+      file_descriptor die_writer_;
+      file_descriptor pid_reader_;
+      file_descriptor pid_writer_;
+      file_descriptor null_;
     };
   }
 
-  int forkexec(
-      const char* path,
-      const char* const* argv,
-      const char* const* envp,
-      const char* chdir,
-      const int* dup2_stdio,
-      pid_t& pid) {
+  int forkexec(const char* path, const char* const* argv, const char* const* envp, const char* chdir, const int* dup2_stdio, pid_t& pid) {
     pid = -1;
     std::vector<char> buffer(pathexec_buffer_size(path, argv));
     forkexec_impl forkexec_impl;
