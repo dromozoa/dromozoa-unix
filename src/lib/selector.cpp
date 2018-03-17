@@ -1,4 +1,4 @@
-// Copyright (C) 2016 Tomoyuki Fujimori <moyu@dromozoa.com>
+// Copyright (C) 2016,2018 Tomoyuki Fujimori <moyu@dromozoa.com>
 //
 // This file is part of dromozoa-unix.
 //
@@ -18,5 +18,8 @@
 #include <dromozoa/selector.hpp>
 
 namespace dromozoa {
+  const int SELECTOR_READ = 1;
+  const int SELECTOR_WRITE = 2;
+
   selector::~selector() {}
 }

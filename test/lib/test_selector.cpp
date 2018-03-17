@@ -19,6 +19,7 @@
 #include "config.h"
 #endif
 
+#include <assert.h>
 #include <errno.h>
 #include <fcntl.h>
 #include <unistd.h>
@@ -35,8 +36,6 @@ typedef dromozoa::selector_epoll selector_impl;
 #include <dromozoa/selector_kqueue.hpp>
 typedef dromozoa::selector_kqueue selector_impl;
 #endif
-
-#include "assert.hpp"
 
 void test() {
   int selector_fd = selector_impl::open(dromozoa::SELECTOR_CLOEXEC);
