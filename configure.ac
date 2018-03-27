@@ -46,7 +46,7 @@ AC_CHECK_MEMBERS([struct stat.st_ctimespec])
 AC_CHECK_MEMBERS([struct stat.st_mtim])
 AC_CHECK_MEMBERS([struct stat.st_mtimespec])
 
-AC_SEARCH_LIBS([clock_gettime], [rt], [AC_DEFINE(HAVE_CLOCK_GETTIME, 1, [Define to 1 if you have the 'clock_gettime' function.]) ])
+AC_SEARCH_LIBS([clock_gettime], [rt], [AC_DEFINE(HAVE_CLOCK_GETTIME, 1, [Define to 1 if you have the 'clock_gettime' function.])])
 
 AX_PTHREAD()
 CXXFLAGS="$CXXFLAGS $PTHREAD_CFLAGS"
