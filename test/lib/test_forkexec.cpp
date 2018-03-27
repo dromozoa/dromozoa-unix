@@ -1,4 +1,4 @@
-// Copyright (C) 2016 Tomoyuki Fujimori <moyu@dromozoa.com>
+// Copyright (C) 2016,2018 Tomoyuki Fujimori <moyu@dromozoa.com>
 //
 // This file is part of dromozoa-unix.
 //
@@ -72,6 +72,7 @@ void test_forkexec_daemon1() {
   std::cout << pid1 << " " << pid2 << "\n";
   int status;
   assert(waitpid(-1, &status, 0) == pid1);
+  std::cout << status << "\n";
   assert(WIFEXITED(status) && WEXITSTATUS(status) == 0);
   assert(kill(pid2, SIGTERM) == 0);
 }
@@ -88,6 +89,7 @@ void test_forkexec_daemon2() {
   std::cout << pid1 << " " << pid2 << "\n";
   int status;
   assert(waitpid(-1, &status, 0) == pid1);
+  std::cout << status << "\n";
   assert(WIFEXITED(status) && WEXITSTATUS(status) == 0);
 }
 
