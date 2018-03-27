@@ -29,6 +29,8 @@
 
 namespace dromozoa {
   namespace {
+    static const size_t STATIC_BUFFER_SIZE = 256;
+
     class forkexec_impl {
     public:
       int open_die() {
@@ -155,7 +157,18 @@ namespace dromozoa {
 
   int forkexec(const char* path, const char* const* argv, const char* const* envp, const char* chdir, const int* dup2_stdio, pid_t& pid) {
     pid = -1;
-    std::vector<char> buffer(pathexec_buffer_size(path, argv));
+
+    char static_buffer[STATIC_BUFFER_SIZE] = { 0 };
+    std::vector<char> dynamic_buffer;
+    char* buffer = 0;
+    size_t buffer_size = pathexec_buffer_size(path, argv);
+    if (buffer_size <= STATIC_BUFFER_SIZE) {
+      buffer = static_buffer;
+    } else {
+      dynamic_buffer.resize(buffer_size);
+      buffer = dynamic_buffer.data();
+    }
+
     forkexec_impl forkexec_impl;
 
     sigset_t mask;
@@ -173,7 +186,7 @@ namespace dromozoa {
       return -1;
     } else if (pid == 0) {
       forkexec_impl.close_die_reader();
-      forkexec_impl.forkexec(path, argv, envp, chdir, dup2_stdio, false, &buffer[0], buffer.size());
+      forkexec_impl.forkexec(path, argv, envp, chdir, dup2_stdio, false, buffer, buffer_size);
     }
     forkexec_impl.close_die_writer();
 
@@ -195,7 +208,18 @@ namespace dromozoa {
       pid_t& pid2) {
     pid1 = -1;
     pid2 = -1;
-    std::vector<char> buffer(pathexec_buffer_size(path, argv));
+
+    char static_buffer[STATIC_BUFFER_SIZE] = { 0 };
+    std::vector<char> dynamic_buffer;
+    char* buffer = 0;
+    size_t buffer_size = pathexec_buffer_size(path, argv);
+    if (buffer_size <= STATIC_BUFFER_SIZE) {
+      buffer = static_buffer;
+    } else {
+      dynamic_buffer.resize(buffer_size);
+      buffer = dynamic_buffer.data();
+    }
+
     forkexec_impl forkexec_impl;
 
     sigset_t mask;
@@ -225,7 +249,7 @@ namespace dromozoa {
         forkexec_impl.die();
       } else if (pid == 0) {
         forkexec_impl.close_pid_writer();
-        forkexec_impl.forkexec(path, argv, envp, chdir, 0, true, &buffer[0], buffer.size());
+        forkexec_impl.forkexec(path, argv, envp, chdir, 0, true, buffer, buffer_size);
       }
       forkexec_impl.quit(pid);
     }
