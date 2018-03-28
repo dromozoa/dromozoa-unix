@@ -16,6 +16,7 @@
 // along with dromozoa-unix.  If not, see <http://www.gnu.org/licenses/>.
 
 #include <fcntl.h>
+#include <pthread.h>
 #include <unistd.h>
 
 #include <exception>
@@ -268,7 +269,7 @@ namespace dromozoa {
       file_descriptor reader(fd[0]);
       file_descriptor writer(fd[1]);
 
-      {
+      if (start_threads > 0) {
         scoped_lock<mutex> counter_lock(counter_mutex_);
         spare_threads_ += start_threads;
         current_threads_ += start_threads;
