@@ -18,6 +18,8 @@
 #ifndef DROMOZOA_ASYNC_SERVICE_HPP
 #define DROMOZOA_ASYNC_SERVICE_HPP
 
+#include <dromozoa/scoped_ptr.hpp>
+
 namespace dromozoa {
   class async_service_task {
   public:
@@ -44,7 +46,7 @@ namespace dromozoa {
     async_service_task* pop();
     void info(unsigned int& spare_threads, unsigned int& current_threads, unsigned int& current_tasks);
   private:
-    async_service_impl* impl_;
+    scoped_ptr<async_service_impl> impl_;
     async_service(const async_service&);
     async_service& operator=(const async_service&);
   };

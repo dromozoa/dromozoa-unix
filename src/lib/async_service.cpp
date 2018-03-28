@@ -214,30 +214,6 @@ namespace dromozoa {
       pthread_cond_t cond_;
     };
 
-    template <class T>
-    class scoped_ptr {
-    public:
-      explicit scoped_ptr(T* ptr) : ptr_(ptr) {}
-
-      ~scoped_ptr() {
-        delete ptr_;
-      }
-
-      T* operator->() const {
-        return ptr_;
-      }
-
-      T* release() {
-        T* ptr = ptr_;
-        ptr_ = 0;
-        return ptr;
-      }
-
-    private:
-      T* ptr_;
-      scoped_ptr(const scoped_ptr&);
-      scoped_ptr& operator=(const scoped_ptr&);
-    };
   }
 
   async_service_task::~async_service_task() {}
@@ -530,9 +506,7 @@ namespace dromozoa {
 
   async_service::async_service(async_service_impl* impl) : impl_(impl) {}
 
-  async_service::~async_service() {
-    delete impl_;
-  }
+  async_service::~async_service() {}
 
   int async_service::close() {
     return impl_->close();
