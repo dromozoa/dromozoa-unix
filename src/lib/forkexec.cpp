@@ -55,6 +55,9 @@ namespace dromozoa {
         int code = errno;
         write(die_writer_.get(), &code, sizeof(code));
         this->~forkexec_impl();
+        close(0);
+        close(1);
+        close(2);
         _exit(1);
       }
 
@@ -86,6 +89,9 @@ namespace dromozoa {
       void quit(pid_t pid) {
         write(pid_writer_.get(), &pid, sizeof(pid));
         this->~forkexec_impl();
+        close(0);
+        close(1);
+        close(2);
         _exit(0);
       }
 
