@@ -24,7 +24,6 @@
 #include <sys/wait.h>
 
 #include <iostream>
-#include <sstream>
 #include <string>
 
 #include <dromozoa/compat_pipe2.hpp>
