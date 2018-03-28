@@ -32,19 +32,28 @@ void check_pathexec_buffer_size(const char* path, const char* command, size_t ex
 }
 
 void test1() {
+  check_pathexec_buffer_size(0, "/foo", 0);
+  check_pathexec_buffer_size(0, "./foo", 0);
+  check_pathexec_buffer_size(0, "foo/bar", 0);
+  check_pathexec_buffer_size("", "foo", 6);
+  check_pathexec_buffer_size(".", "foo", 6);
+  check_pathexec_buffer_size(":", "foo", 6);
+  check_pathexec_buffer_size("/usr/bin:/bin:/usr/sbin:/sbin", "foo", 14);
+}
+
+void test2() {
   const char* argv[] = { "./no such command", 0 };
   assert(dromozoa::pathexec(0, argv, 0, 0, 0) == -1);
   assert(errno == ENOENT);
 }
 
-void test2() {
+void test3() {
   const char* argv[] = { "./.", 0 };
   assert(dromozoa::pathexec(0, argv, 0, 0, 0) == -1);
-  assert(errno != ENOENT); // EACCES (darwin)
-  std::cerr << errno << "\n";
+  assert(errno == EACCES);
 }
 
-void test3() {
+void test4() {
   const char* path = getenv("PATH");
   const char* argv[] = { "no such command", 0 };
   std::vector<char> buffer(dromozoa::pathexec_buffer_size(path, argv));
@@ -53,17 +62,9 @@ void test3() {
 }
 
 int main(int, char*[]) {
-  check_pathexec_buffer_size(0, "/foo", 0);
-  check_pathexec_buffer_size(0, "./foo", 0);
-  check_pathexec_buffer_size(0, "foo/bar", 0);
-  check_pathexec_buffer_size("", "foo", 6);
-  check_pathexec_buffer_size(".", "foo", 6);
-  check_pathexec_buffer_size(":", "foo", 6);
-  check_pathexec_buffer_size("/usr/bin:/bin:/usr/sbin:/sbin", "foo", 14);
-
   test1();
   test2();
   test3();
-
+  test4();
   return 0;
 }
