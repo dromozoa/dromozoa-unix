@@ -29,8 +29,6 @@ namespace dromozoa {
     static const int MAX_BUFFER_SIZE = 8192;
   }
 
-  const int SELECTOR_CLOEXEC = O_CLOEXEC;
-
   int selector_kqueue::open(int flags) {
     sigset_t mask;
     if (sigmask_block_all_signals(&mask) == -1) {

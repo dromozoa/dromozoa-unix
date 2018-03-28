@@ -1,4 +1,4 @@
-// Copyright (C) 2016,2017 Tomoyuki Fujimori <moyu@dromozoa.com>
+// Copyright (C) 2016-2018 Tomoyuki Fujimori <moyu@dromozoa.com>
 //
 // This file is part of dromozoa-unix.
 //
@@ -27,8 +27,6 @@
 #include <dromozoa/selector.hpp>
 
 namespace dromozoa {
-  extern const int SELECTOR_CLOEXEC;
-
   class selector_epoll : public selector {
   public:
     static int open(int flags);

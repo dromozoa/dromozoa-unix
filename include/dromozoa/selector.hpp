@@ -23,6 +23,7 @@
 namespace dromozoa {
   extern const int SELECTOR_READ;
   extern const int SELECTOR_WRITE;
+  extern const int SELECTOR_CLOEXEC;
 
   class selector {
   public:
