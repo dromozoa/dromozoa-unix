@@ -26,7 +26,6 @@ int main(int, char*[]) {
   dromozoa::timer timer;
   assert(timer.start() == 0);
   assert(timer.stop() == 0);
-  std::cout << std::scientific << std::setprecision(17)
-      << "elapsed " << timer.elapsed() << "\n";
+  std::cout << std::scientific << std::setprecision(17) << "elapsed " << timer.elapsed() << "\n";
   return 0;
 }
