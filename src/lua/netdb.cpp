@@ -133,7 +133,7 @@ namespace dromozoa {
       }
     }
 
-    class async_getaddrinfo : public async_task_impl {
+    class async_getaddrinfo : public async_task {
     public:
       async_getaddrinfo(const char* nodename, const char* servname, const optional<struct addrinfo>& hints) : hints_(hints), result_(), code_() {
         if (nodename) {
@@ -182,7 +182,7 @@ namespace dromozoa {
       luaX_set_metatable(L, "dromozoa.unix.async_task");
     }
 
-    class async_getnameinfo : public async_task_impl {
+    class async_getnameinfo : public async_task {
     public:
       async_getnameinfo(const socket_address& address, int flags) : address_(address), nodename_(NI_MAXHOST), servname_(NI_MAXSERV), flags_(flags) {}
 

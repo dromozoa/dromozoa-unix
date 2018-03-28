@@ -21,9 +21,8 @@
 #include <iostream>
 
 #include <dromozoa/async_service.hpp>
-#include <dromozoa/async_task.hpp>
 
-class nanosleep_task : public dromozoa::async_task {
+class nanosleep_task : public dromozoa::async_service_task {
 public:
   explicit nanosleep_task(const struct timespec& tv) : tv_(tv), thread_(), finished_() {}
 
@@ -37,7 +36,7 @@ public:
     std::cout << "[cancel] " << this << ", " << thread_ << ", " << pthread_self() << "\n";
   }
 
-  virtual void result(void*) {
+  void result() {
     std::cout << "[result] " << this << ", "<< thread_ << ", " << pthread_self() << "\n";
   }
 
@@ -91,10 +90,10 @@ void test1() {
   assert(!task3.finished());
   assert(!task4.finished());
 
-  task1.result(0);
-  task2.result(0);
-  task3.result(0);
-  task4.result(0);
+  task1.result();
+  task2.result();
+  task3.result();
+  task4.result();
 
   assert(pthread_equal(task1.thread(), task2.thread()) != 0);
   assert(pthread_equal(task1.thread(), task3.thread()) == 0);
@@ -124,10 +123,10 @@ void test2() {
   assert(task3.finished());
   assert(task4.finished());
 
-  task1.result(0);
-  task2.result(0);
-  task3.result(0);
-  task4.result(0);
+  task1.result();
+  task2.result();
+  task3.result();
+  task4.result();
 
   assert(pthread_equal(task1.thread(), task2.thread()) == 0);
   assert(pthread_equal(task1.thread(), task3.thread()) == 0);
@@ -165,10 +164,10 @@ void test3() {
   assert(!task3.finished());
   assert(task4.finished());
 
-  task1.result(0);
-  task2.result(0);
-  task3.result(0);
-  task4.result(0);
+  task1.result();
+  task2.result();
+  task3.result();
+  task4.result();
 
   assert(pthread_equal(task1.thread(), task2.thread()) != 0);
   assert(pthread_equal(task1.thread(), task3.thread()) == 0);

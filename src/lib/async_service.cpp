@@ -27,7 +27,6 @@
 #include <dromozoa/bind/unexpected.hpp>
 
 #include <dromozoa/async_service.hpp>
-#include <dromozoa/async_task.hpp>
 #include <dromozoa/compat_pipe2.hpp>
 #include <dromozoa/file_descriptor.hpp>
 #include <dromozoa/system_error.hpp>
@@ -241,11 +240,13 @@ namespace dromozoa {
     };
   }
 
+  async_service_task::~async_service_task() {}
+
   class async_service_impl {
   public:
-    typedef std::list<async_task*> queue_type;
+    typedef std::list<async_service_task*> queue_type;
     typedef queue_type::iterator queue_iterator;
-    typedef std::map<async_task*, queue_iterator> queue_index_type;
+    typedef std::map<async_service_task*, queue_iterator> queue_index_type;
     typedef queue_index_type::iterator queue_index_iterator;
 
     explicit async_service_impl(unsigned int max_threads, unsigned int max_spare_threads)
@@ -310,7 +311,7 @@ namespace dromozoa {
         queue_iterator i = queue.begin();
         queue_iterator end = queue.end();
         for (; i != end; ++i) {
-          async_task* task = *i;
+          async_service_task* task = *i;
           try {
             task->cancel();
           } catch (const std::exception& e) {
@@ -355,7 +356,7 @@ namespace dromozoa {
       return count;
     }
 
-    void push(async_task* task) {
+    void push(async_service_task* task) {
       {
         scoped_lock<mutex> counter_lock(counter_mutex_);
         ++current_tasks_;
@@ -374,7 +375,7 @@ namespace dromozoa {
       }
     }
 
-    bool cancel(async_task* task) {
+    bool cancel(async_service_task* task) {
       {
         scoped_lock<mutex> queue_lock(queue_mutex_);
         queue_index_iterator i = queue_index_.find(task);
@@ -399,12 +400,12 @@ namespace dromozoa {
       return true;
     }
 
-    async_task* pop() {
+    async_service_task* pop() {
       scoped_lock<mutex> ready_lock(ready_mutex_);
       if (ready_.empty()) {
         return 0;
       } else {
-        async_task* task = ready_.front();
+        async_service_task* task = ready_.front();
         ready_.pop_front();
         return task;
       }
@@ -445,7 +446,7 @@ namespace dromozoa {
 
     void start() {
       while (true) {
-        async_task* task = 0;
+        async_service_task* task = 0;
 
         {
           scoped_lock<mutex> queue_lock(queue_mutex_);
@@ -549,15 +550,15 @@ namespace dromozoa {
     return impl_->read();
   }
 
-  void async_service::push(async_task* task) {
+  void async_service::push(async_service_task* task) {
     impl_->push(task);
   }
 
-  bool async_service::cancel(async_task* task) {
+  bool async_service::cancel(async_service_task* task) {
     return impl_->cancel(task);
   }
 
-  async_task* async_service::pop() {
+  async_service_task* async_service::pop() {
     return impl_->pop();
   }
 
