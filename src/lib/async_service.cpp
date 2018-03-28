@@ -92,7 +92,7 @@ namespace dromozoa {
 
       ~mutex_attr() {
         if (int result = pthread_mutexattr_destroy(&attr_)) {
-          throw system_error(result);
+          std::terminate();
         }
       }
 
@@ -127,7 +127,7 @@ namespace dromozoa {
 
       ~mutex() {
         if (int result = pthread_mutex_destroy(&mutex_)) {
-          throw system_error(result);
+          std::terminate();
         }
       }
 
@@ -184,7 +184,7 @@ namespace dromozoa {
 
       ~condition_variable() {
         if (int result = pthread_cond_destroy(&cond_)) {
-          throw system_error(result);
+          std::terminate();
         }
       }
 
