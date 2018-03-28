@@ -15,11 +15,27 @@
 // You should have received a copy of the GNU General Public License
 // along with dromozoa-unix.  If not, see <http://www.gnu.org/licenses/>.
 
+#ifdef HAVE_CONFIG_H
+#include "config.h"
+#endif
+
 #include <dromozoa/selector.hpp>
+
+#ifdef HAVE_EPOLL_CREATE1
+#include <sys/epoll.h>
+#else
+#include <fcntl.h>
+#endif
 
 namespace dromozoa {
   const int SELECTOR_READ = 1;
   const int SELECTOR_WRITE = 2;
+
+#ifdef HAVE_EPOLL_CREATE1
+  const int SELECTOR_CLOEXEC = EPOLL_CLOEXEC;
+#else
+  const int SELECTOR_CLOEXEC = O_CLOEXEC;
+#endif
 
   selector::~selector() {}
 }

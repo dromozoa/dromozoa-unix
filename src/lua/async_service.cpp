@@ -82,7 +82,7 @@ namespace dromozoa {
     }
 
     void impl_push(lua_State* L) {
-      async_task_impl* task = static_cast<async_task_impl*>(check_async_task(L, 2));
+      async_task* task = check_async_task(L, 2);
       task->ref(L, 2);
       check_async_service(L, 1)->push(task);
       luaX_push_success(L);
@@ -94,7 +94,7 @@ namespace dromozoa {
     }
 
     void impl_pop(lua_State* L) {
-      async_task_impl* task = static_cast<async_task_impl*>(check_async_service(L, 1)->pop());
+      async_task* task = static_cast<async_task*>(check_async_service(L, 1)->pop());
       if (task) {
         task->get_field(L);
         task->unref();

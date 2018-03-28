@@ -18,9 +18,16 @@
 #ifndef DROMOZOA_ASYNC_SERVICE_HPP
 #define DROMOZOA_ASYNC_SERVICE_HPP
 
-#include <dromozoa/async_task.hpp>
+#include <dromozoa/scoped_ptr.hpp>
 
 namespace dromozoa {
+  class async_service_task {
+  public:
+    virtual ~async_service_task() = 0;
+    virtual void dispatch() = 0;
+    virtual void cancel() = 0;
+  };
+
   class async_service_impl;
 
   class async_service {
@@ -34,12 +41,12 @@ namespace dromozoa {
     bool valid() const;
     int get() const;
     int read() const;
-    void push(async_task* task);
-    bool cancel(async_task* task);
-    async_task* pop();
+    void push(async_service_task* task);
+    bool cancel(async_service_task* task);
+    async_service_task* pop();
     void info(unsigned int& spare_threads, unsigned int& current_threads, unsigned int& current_tasks);
   private:
-    async_service_impl* impl_;
+    scoped_ptr<async_service_impl> impl_;
     async_service(const async_service&);
     async_service& operator=(const async_service&);
   };

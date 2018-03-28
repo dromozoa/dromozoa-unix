@@ -1,4 +1,4 @@
-// Copyright (C) 2016 Tomoyuki Fujimori <moyu@dromozoa.com>
+// Copyright (C) 2018 Tomoyuki Fujimori <moyu@dromozoa.com>
 //
 // This file is part of dromozoa-unix.
 //
@@ -15,8 +15,36 @@
 // You should have received a copy of the GNU General Public License
 // along with dromozoa-unix.  If not, see <http://www.gnu.org/licenses/>.
 
-#include <dromozoa/async_task.hpp>
+#ifndef DROMOZOA_SCOPED_PTR_HPP
+#define DROMOZOA_SCOPED_PTR_HPP
 
 namespace dromozoa {
-  async_task::~async_task() {}
+  template <class T>
+  class scoped_ptr {
+  public:
+    explicit scoped_ptr(T* ptr) : ptr_(ptr) {}
+
+    ~scoped_ptr() {
+      typedef char type_must_be_complete[sizeof(T) ? 1 : -1];
+      (void) sizeof(type_must_be_complete);
+      delete ptr_;
+    }
+
+    T* operator->() const {
+      return ptr_;
+    }
+
+    T* release() {
+      T* ptr = ptr_;
+      ptr_ = 0;
+      return ptr;
+    }
+
+  private:
+    T* ptr_;
+    scoped_ptr(const scoped_ptr&);
+    scoped_ptr& operator=(const scoped_ptr&);
+  };
 }
+
+#endif

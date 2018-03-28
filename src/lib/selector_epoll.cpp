@@ -1,4 +1,4 @@
-// Copyright (C) 2016,2017 Tomoyuki Fujimori <moyu@dromozoa.com>
+// Copyright (C) 2016-2018 Tomoyuki Fujimori <moyu@dromozoa.com>
 //
 // This file is part of dromozoa-unix.
 //
@@ -29,12 +29,6 @@ namespace dromozoa {
     static const size_t INITIAL_BUFFER_SIZE = 32;
     static const int MAX_BUFFER_SIZE = 4096;
   }
-
-#ifdef EPOLL_CLOEXEC
-  const int SELECTOR_CLOEXEC = EPOLL_CLOEXEC;
-#else
-  const int SELECTOR_CLOEXEC = O_CLOEXEC;
-#endif
 
 #ifdef HAVE_EPOLL_CREATE1
   int selector_epoll::open(int flags) {

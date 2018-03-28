@@ -49,7 +49,7 @@ namespace dromozoa {
       }
     }
 
-    class async_nanosleep : public async_task_impl {
+    class async_nanosleep : public async_task {
     public:
       explicit async_nanosleep(const struct timespec& tv1) : tv1_(tv1), tv2_(), result_(), code_() {}
 

@@ -18,25 +18,25 @@
 #include "common.hpp"
 
 namespace dromozoa {
-  async_task_impl::async_task_impl() {}
+  async_task::async_task() {}
 
-  void async_task_impl::cancel() {
+  void async_task::cancel() {
     unref();
   }
 
-  void async_task_impl::result(void* state) {
-    impl_result(static_cast<lua_State*>(state));
+  void async_task::result(lua_State* state) {
+    impl_result(state);
   }
 
-  void async_task_impl::ref(lua_State* L, int index) {
+  void async_task::ref(lua_State* L, int index) {
     luaX_reference<>(L, index).swap(ref_);
   }
 
-  void async_task_impl::unref() {
+  void async_task::unref() {
     luaX_reference<>().swap(ref_);
   }
 
-  void async_task_impl::get_field(lua_State* L) {
+  void async_task::get_field(lua_State* L) {
     ref_.get_field(L);
   }
 
