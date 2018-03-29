@@ -21,21 +21,72 @@
 
 #include <dromozoa/selector.hpp>
 
-#ifdef HAVE_EPOLL_CREATE1
-#include <sys/epoll.h>
-#else
+#if defined(HAVE_EPOLL_CREATE) || defined(HAVE_EPOLL_CREATE1)
+#include <dromozoa/selector_epoll.hpp>
+#elif defined(HAVE_KQUEUE)
 #include <fcntl.h>
+#include <dromozoa/selector_kqueue.hpp>
 #endif
 
 namespace dromozoa {
   const int SELECTOR_READ = 1;
   const int SELECTOR_WRITE = 2;
 
-#ifdef HAVE_EPOLL_CREATE1
+#ifdef EPOLL_CLOEXEC
   const int SELECTOR_CLOEXEC = EPOLL_CLOEXEC;
 #else
   const int SELECTOR_CLOEXEC = O_CLOEXEC;
 #endif
 
+  selector_impl::~selector_impl() {}
+
+  selector_impl* selector::open(int flags) {
+#if defined(HAVE_EPOLL_CREATE) || defined(HAVE_EPOLL_CREATE1)
+    typedef selector_epoll selector_impl_type;
+#elif defined(HAVE_KQUEUE)
+    typedef selector_kqueue selector_impl_type;
+#endif
+    scoped_ptr<selector_impl> impl(new selector_impl_type());
+    if (impl->open(flags) == -1) {
+      return 0;
+    } else {
+      return impl.release();
+    }
+  }
+
+  selector::selector(selector_impl* impl) : impl_(impl) {}
+
   selector::~selector() {}
+
+  int selector::close() {
+    return impl_->close();
+  }
+
+  bool selector::valid() const {
+    return impl_->valid();
+  }
+
+  int selector::get() const {
+    return impl_->get();
+  }
+
+  int selector::add(int fd, int event) {
+    return impl_->add(fd, event);
+  }
+
+  int selector::mod(int fd, int event) {
+    return impl_->mod(fd, event);
+  }
+
+  int selector::del(int fd) {
+    return impl_->del(fd);
+  }
+
+  int selector::select(const struct timespec* timeout) {
+    return impl_->select(timeout);
+  }
+
+  int selector::event(int i, int& fd, int& event) const {
+    return impl_->event(i, fd, event);
+  }
 }

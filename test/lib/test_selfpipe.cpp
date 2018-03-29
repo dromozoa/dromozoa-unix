@@ -15,10 +15,6 @@
 // You should have received a copy of the GNU General Public License
 // along with dromozoa-unix.  If not, see <http://www.gnu.org/licenses/>.
 
-#ifdef HAVE_CONFIG_H
-#include "config.h"
-#endif
-
 #include <errno.h>
 #include <stdlib.h>
 #include <sys/wait.h>
@@ -29,26 +25,20 @@
 #include <dromozoa/forkexec.hpp>
 #include <dromozoa/selector.hpp>
 
-#if defined(HAVE_EPOLL_CREATE) || defined(HAVE_EPOLL_CREATE1)
-#include <dromozoa/selector_epoll.hpp>
-typedef dromozoa::selector_epoll selector_impl;
-#elif defined(HAVE_KQUEUE)
-#include <dromozoa/selector_kqueue.hpp>
-typedef dromozoa::selector_kqueue selector_impl;
-#endif
-
 #include "assert.hpp"
 
 int main(int, char*[]) {
   assert(dromozoa::selfpipe_open() == 0);
 
-  int fd = selector_impl::open(dromozoa::SELECTOR_CLOEXEC);
+  dromozoa::selector_impl* impl = dromozoa::selector::open(dromozoa::SELECTOR_CLOEXEC);
+  assert(impl);
+  int fd = impl->get();
   std::cout << fd << "\n";
   assert(fd != -1);
   assert_coe(fd);
   assert_ndelay_off(fd);
 
-  selector_impl selector(fd);
+  dromozoa::selector selector(impl);
   assert(selector.add(dromozoa::selfpipe_get(), dromozoa::SELECTOR_READ) == 0);
 
   const char* path = getenv("PATH");

@@ -29,11 +29,11 @@
 #include <dromozoa/selector.hpp>
 
 namespace dromozoa {
-  class selector_kqueue : public selector {
+  class selector_kqueue : public selector_impl {
   public:
-    static int open(int flags);
-    selector_kqueue(int fd);
+    selector_kqueue();
     virtual ~selector_kqueue();
+    virtual int open(int flags);
     virtual int close();
     virtual bool valid() const;
     virtual int get() const;
