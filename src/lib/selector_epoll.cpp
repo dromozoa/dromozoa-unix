@@ -30,9 +30,19 @@ namespace dromozoa {
     static const int MAX_BUFFER_SIZE = 4096;
   }
 
+  selector_epoll::selector_epoll() : result_(-1), buffer_(INITIAL_BUFFER_SIZE) {}
+
+  selector_epoll::~selector_epoll() {}
+
 #ifdef HAVE_EPOLL_CREATE1
   int selector_epoll::open(int flags) {
-    return epoll_create1(flags);
+    file_descriptor fd(epoll_create1(flags));
+    if (!fd.valid()) {
+      return -1;
+    }
+
+    fd_.swap(fd);
+    return 0;
   }
 #else
   int selector_epoll::open(int flags) {
@@ -53,13 +63,10 @@ namespace dromozoa {
       }
     }
 
-    return fd.release();
+    fd_.swap(fd);
+    return 0;
   }
 #endif
-
-  selector_epoll::selector_epoll(int fd) : fd_(fd), result_(-1), buffer_(INITIAL_BUFFER_SIZE) {}
-
-  selector_epoll::~selector_epoll() {}
 
   int selector_epoll::close() {
     return fd_.close();

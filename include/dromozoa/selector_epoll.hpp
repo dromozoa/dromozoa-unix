@@ -27,11 +27,11 @@
 #include <dromozoa/selector.hpp>
 
 namespace dromozoa {
-  class selector_epoll : public selector {
+  class selector_epoll : public selector_impl {
   public:
-    static int open(int flags);
     selector_epoll(int fd);
     virtual ~selector_epoll();
+    virtual int open(int flags);
     virtual int close();
     virtual bool valid() const;
     virtual int get() const;
