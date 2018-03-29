@@ -19,12 +19,13 @@
 #include "config.h"
 #endif
 
+#include <fcntl.h>
+
 #include <dromozoa/selector.hpp>
 
 #if defined(HAVE_EPOLL_CREATE) || defined(HAVE_EPOLL_CREATE1)
 #include <dromozoa/selector_epoll.hpp>
 #elif defined(HAVE_KQUEUE)
-#include <fcntl.h>
 #include <dromozoa/selector_kqueue.hpp>
 #endif
 

@@ -16,9 +16,7 @@
 // along with dromozoa-unix.  If not, see <http://www.gnu.org/licenses/>.
 
 #include <errno.h>
-#include <fcntl.h>
 #include <stddef.h>
-#include <sys/epoll.h>
 
 #include <dromozoa/coe.hpp>
 #include <dromozoa/selector_epoll.hpp>
@@ -41,7 +39,7 @@ namespace dromozoa {
       return -1;
     }
 
-    fd_.swap(fd);
+    fd.swap(fd_);
     return 0;
   }
 #else
@@ -63,7 +61,7 @@ namespace dromozoa {
       }
     }
 
-    fd_.swap(fd);
+    fd.swap(fd_);
     return 0;
   }
 #endif

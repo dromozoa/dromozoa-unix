@@ -16,7 +16,6 @@
 // along with dromozoa-unix.  If not, see <http://www.gnu.org/licenses/>.
 
 #include <errno.h>
-#include <fcntl.h>
 #include <stddef.h>
 
 #include <dromozoa/coe.hpp>
@@ -30,12 +29,6 @@ namespace dromozoa {
   }
 
   selector_kqueue::selector_kqueue() : result_(-1), buffer_(INITIAL_BUFFER_SIZE) {}
-
-  selector_kqueue::~selector_kqueue() {
-    if (valid()) {
-      close();
-    }
-  }
 
   int selector_kqueue::open(int flags) {
     sigset_t mask;
@@ -55,7 +48,7 @@ namespace dromozoa {
       }
     }
 
-    fd_.swap(fd);
+    fd.swap(fd_);
     return 0;
   }
 
