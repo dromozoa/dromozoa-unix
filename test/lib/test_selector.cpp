@@ -15,7 +15,6 @@
 // You should have received a copy of the GNU General Public License
 // along with dromozoa-unix.  If not, see <http://www.gnu.org/licenses/>.
 
-#include <assert.h>
 #include <errno.h>
 #include <fcntl.h>
 #include <unistd.h>
@@ -23,12 +22,20 @@
 #include <iostream>
 
 #include <dromozoa/compat_pipe2.hpp>
+#include <dromozoa/scoped_ptr.hpp>
 #include <dromozoa/selector.hpp>
 
+#include "assert.hpp"
+
 void test() {
-  dromozoa::selector_impl* impl = dromozoa::selector::open(dromozoa::SELECTOR_CLOEXEC);
-  assert(impl);
-  dromozoa::selector selector(impl);
+  dromozoa::scoped_ptr<dromozoa::selector_impl> impl(dromozoa::selector::open(dromozoa::SELECTOR_CLOEXEC));
+  assert(impl.valid());
+  dromozoa::selector selector(impl.release());
+
+  int selector_fd = selector.get();
+  if (selector_fd != -1) {
+    assert_coe(selector_fd);
+  }
 
   int pipe_fd[2] = { -1, -1 };
   assert(dromozoa::compat_pipe2(pipe_fd, O_CLOEXEC) != -1);
@@ -43,8 +50,7 @@ void test() {
   assert(write(pipe_fd[1], "", 1) == 1);
   assert(close(pipe_fd[1]) != -1);
 
-  int result = -1;
-  result = selector.add(pipe_fd[0], dromozoa::SELECTOR_READ);
+  int result = selector.add(pipe_fd[0], dromozoa::SELECTOR_READ);
   assert(result == 0 || errno == EPIPE);
 
   assert(selector.select(&timeout) == 1);
