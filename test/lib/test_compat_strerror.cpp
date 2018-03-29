@@ -1,4 +1,4 @@
-// Copyright (C) 2016 Tomoyuki Fujimori <moyu@dromozoa.com>
+// Copyright (C) 2016,2018 Tomoyuki Fujimori <moyu@dromozoa.com>
 //
 // This file is part of dromozoa-unix.
 //
@@ -23,9 +23,10 @@
 
 int main(int, char*[]) {
   std::cout
-      << "strerror(ENOENT)=\"" << dromozoa::compat_strerror(ENOENT) << "\"\n"
-      << "strerror(-1)=\"" << dromozoa::compat_strerror(-1) << "\"\n"
-      << "strerror(0)=\"" << dromozoa::compat_strerror(0) << "\"\n"
-      << "strerror(65535)=\"" << dromozoa::compat_strerror(65535) << "\"\n";
+      << "strerror(ENOENT) " << dromozoa::compat_strerror(ENOENT) << "\n"
+      << "strerror(-1)     " << dromozoa::compat_strerror(-1)     << "\n"
+      << "strerror(0)      " << dromozoa::compat_strerror(0)      << "\n"
+      << "strerror(65535)  " << dromozoa::compat_strerror(65535)  << "\n"
+      ;
   return 0;
 }

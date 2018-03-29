@@ -36,6 +36,7 @@ void test() {
   int selector_fd = selector.get();
   if (selector_fd != -1) {
     check_coe(selector_fd);
+    check_ndelay_off(selector_fd);
   }
 
   int pipe_fd[2] = { -1, -1 };

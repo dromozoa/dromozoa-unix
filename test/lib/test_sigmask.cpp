@@ -32,7 +32,7 @@ void test_sigmask1() {
   assert(!sigismember(&mask2, SIGCHLD));
 
   {
-    dromozoa::sigmask_saver save(mask2);
+    dromozoa::sigmask_saver save_sigmask(mask2);
     assert(dromozoa::compat_sigmask(SIG_BLOCK, 0, &mask1) != -1);
   }
   assert(dromozoa::compat_sigmask(SIG_BLOCK, 0, &mask2) != -1);

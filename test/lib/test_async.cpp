@@ -36,10 +36,6 @@ public:
     std::cout << "[cancel] " << this << ", " << thread_ << ", " << pthread_self() << "\n";
   }
 
-  void result() {
-    std::cout << "[result] " << this << ", "<< thread_ << ", " << pthread_self() << "\n";
-  }
-
   pthread_t thread() const {
     return thread_;
   }
@@ -90,11 +86,6 @@ void test1() {
   assert(!task3.finished());
   assert(!task4.finished());
 
-  task1.result();
-  task2.result();
-  task3.result();
-  task4.result();
-
   assert(pthread_equal(task1.thread(), task2.thread()) != 0);
   assert(pthread_equal(task1.thread(), task3.thread()) == 0);
   assert(pthread_equal(task1.thread(), task4.thread()) == 0);
@@ -122,11 +113,6 @@ void test2() {
   assert(task2.finished());
   assert(task3.finished());
   assert(task4.finished());
-
-  task1.result();
-  task2.result();
-  task3.result();
-  task4.result();
 
   assert(pthread_equal(task1.thread(), task2.thread()) == 0);
   assert(pthread_equal(task1.thread(), task3.thread()) == 0);
@@ -163,11 +149,6 @@ void test3() {
   assert(task2.finished());
   assert(!task3.finished());
   assert(task4.finished());
-
-  task1.result();
-  task2.result();
-  task3.result();
-  task4.result();
 
   assert(pthread_equal(task1.thread(), task2.thread()) != 0);
   assert(pthread_equal(task1.thread(), task3.thread()) == 0);

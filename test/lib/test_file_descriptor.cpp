@@ -44,7 +44,6 @@ int main(int, char*[]) {
   assert(close(fd[0]) != -1);
   assert(close(fd[1]) != -1);
 
-  // unexpected
-
+  // unexpected: fd1 already closed
   return 0;
 }

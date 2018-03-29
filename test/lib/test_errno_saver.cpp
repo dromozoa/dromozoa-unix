@@ -24,7 +24,7 @@ int main(int, char*[]) {
   errno = ENOENT;
   assert(errno == ENOENT);
   {
-    dromozoa::errno_saver save;
+    dromozoa::errno_saver save_errno;
     assert(errno == ENOENT);
     errno = EINTR;
     assert(errno == EINTR);

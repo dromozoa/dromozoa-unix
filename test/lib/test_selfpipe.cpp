@@ -18,6 +18,7 @@
 #include <assert.h>
 #include <errno.h>
 #include <stdlib.h>
+#include <unistd.h>
 #include <sys/wait.h>
 
 #include <iostream>
@@ -26,32 +27,24 @@
 #include <dromozoa/forkexec.hpp>
 #include <dromozoa/selector.hpp>
 
-#include "check.hpp"
-
 int main(int, char*[]) {
   assert(dromozoa::selfpipe_open() == 0);
 
-  dromozoa::selector_impl* impl = dromozoa::selector::open(dromozoa::SELECTOR_CLOEXEC);
-  assert(impl);
-  int fd = impl->get();
-  std::cout << fd << "\n";
-  assert(fd != -1);
-  check_coe(fd);
-  check_ndelay_off(fd);
+  std::cout << "pid " << getpid() << "\n";
 
-  dromozoa::selector selector(impl);
+  dromozoa::selector selector(dromozoa::selector::open(dromozoa::SELECTOR_CLOEXEC));
   assert(selector.add(dromozoa::selfpipe_get(), dromozoa::SELECTOR_READ) == 0);
 
   const char* path = getenv("PATH");
-  const char* argv[] = { "ls", "-l", "/", 0 };
+  const char* argv[] = { "echo", "foo", 0 };
   pid_t pid = -1;
   assert(dromozoa::forkexec(path, argv, 0, 0, 0, pid) == 0);
-  std::cout << pid << "\n";
+  std::cout << "child pid " << pid << "\n";
   assert(pid != -1);
 
   while (true) {
     int result = selector.select(0);
-    std::cout << result << "\n";
+    std::cout << "result " << result << "\n";
     if (result == -1) {
       assert(errno == EINTR);
     } else {
@@ -63,6 +56,7 @@ int main(int, char*[]) {
 
   int status = 0;
   assert(waitpid(-1, &status, 0) == pid);
+  std::cout << "status " << status << "\n";
   assert(WIFEXITED(status) && WEXITSTATUS(status) == 0);
 
   assert(dromozoa::selfpipe_close() == 0);
