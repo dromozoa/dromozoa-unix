@@ -30,8 +30,6 @@ namespace dromozoa {
 
   selector_epoll::selector_epoll() : result_(-1), buffer_(INITIAL_BUFFER_SIZE) {}
 
-  selector_epoll::~selector_epoll() {}
-
 #ifdef HAVE_EPOLL_CREATE1
   int selector_epoll::open(int flags) {
     file_descriptor fd(epoll_create1(flags));
