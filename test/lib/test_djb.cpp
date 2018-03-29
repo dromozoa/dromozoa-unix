@@ -15,6 +15,7 @@
 // You should have received a copy of the GNU General Public License
 // along with dromozoa-unix.  If not, see <http://www.gnu.org/licenses/>.
 
+#include <assert.h>
 #include <unistd.h>
 
 #include <iostream>
@@ -22,7 +23,7 @@
 #include <dromozoa/coe.hpp>
 #include <dromozoa/ndelay.hpp>
 
-#include "assert.hpp"
+#include "check.hpp"
 
 int main(int, char*[]) {
   int fd[2] = { -1, -1 };
@@ -35,19 +36,19 @@ int main(int, char*[]) {
   assert(!(fcntl(fd[1], F_GETFD) & FD_CLOEXEC));
   assert(dromozoa::coe(fd[0]) != -1);
   assert(dromozoa::coe(fd[1]) != -1);
-  assert_coe(fd[0]);
-  assert_coe(fd[1]);
+  check_coe(fd[0]);
+  check_coe(fd[1]);
 
-  assert_ndelay_off(fd[0]);
-  assert_ndelay_off(fd[1]);
+  check_ndelay_off(fd[0]);
+  check_ndelay_off(fd[1]);
   assert(dromozoa::ndelay_on(fd[0]) != -1);
   assert(dromozoa::ndelay_off(fd[1]) != -1);
-  assert_ndelay_on(fd[0]);
-  assert_ndelay_off(fd[1]);
+  check_ndelay_on(fd[0]);
+  check_ndelay_off(fd[1]);
   assert(dromozoa::ndelay_off(fd[0]) != -1);
   assert(dromozoa::ndelay_on(fd[1]) != -1);
-  assert_ndelay_off(fd[0]);
-  assert_ndelay_on(fd[1]);
+  check_ndelay_off(fd[0]);
+  check_ndelay_on(fd[1]);
 
   assert(close(fd[0]) != -1);
   assert(close(fd[1]) != -1);

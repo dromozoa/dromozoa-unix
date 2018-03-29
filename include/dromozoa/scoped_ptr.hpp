@@ -44,6 +44,10 @@ namespace dromozoa {
       return ptr_;
     }
 
+    T* get() const {
+      return ptr_;
+    }
+
   private:
     T* ptr_;
     scoped_ptr(const scoped_ptr&);

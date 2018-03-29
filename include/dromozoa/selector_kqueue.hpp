@@ -32,7 +32,6 @@ namespace dromozoa {
   class selector_kqueue : public selector_impl {
   public:
     selector_kqueue();
-    virtual ~selector_kqueue();
     virtual int open(int flags);
     virtual int close();
     virtual bool valid() const;
