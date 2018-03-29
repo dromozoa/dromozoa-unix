@@ -29,7 +29,7 @@
 namespace dromozoa {
   class selector_epoll : public selector_impl {
   public:
-    selector_epoll(int fd);
+    selector_epoll();
     virtual ~selector_epoll();
     virtual int open(int flags);
     virtual int close();
