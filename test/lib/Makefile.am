@@ -17,7 +17,7 @@
 
 TESTS = $(check_PROGRAMS)
 
-noinst_HEADERS = assert.hpp
+noinst_HEADERS = check.hpp
 
 check_PROGRAMS = \
 	test_argument_vector.exe \

@@ -15,6 +15,7 @@
 // You should have received a copy of the GNU General Public License
 // along with dromozoa-unix.  If not, see <http://www.gnu.org/licenses/>.
 
+#include <assert.h>
 #include <errno.h>
 #include <fcntl.h>
 #include <unistd.h>
@@ -25,7 +26,7 @@
 #include <dromozoa/scoped_ptr.hpp>
 #include <dromozoa/selector.hpp>
 
-#include "assert.hpp"
+#include "check.hpp"
 
 void test() {
   dromozoa::scoped_ptr<dromozoa::selector_impl> impl(dromozoa::selector::open(dromozoa::SELECTOR_CLOEXEC));
@@ -34,7 +35,7 @@ void test() {
 
   int selector_fd = selector.get();
   if (selector_fd != -1) {
-    assert_coe(selector_fd);
+    check_coe(selector_fd);
   }
 
   int pipe_fd[2] = { -1, -1 };

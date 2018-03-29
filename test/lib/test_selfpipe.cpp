@@ -15,6 +15,7 @@
 // You should have received a copy of the GNU General Public License
 // along with dromozoa-unix.  If not, see <http://www.gnu.org/licenses/>.
 
+#include <assert.h>
 #include <errno.h>
 #include <stdlib.h>
 #include <sys/wait.h>
@@ -25,7 +26,7 @@
 #include <dromozoa/forkexec.hpp>
 #include <dromozoa/selector.hpp>
 
-#include "assert.hpp"
+#include "check.hpp"
 
 int main(int, char*[]) {
   assert(dromozoa::selfpipe_open() == 0);
@@ -35,8 +36,8 @@ int main(int, char*[]) {
   int fd = impl->get();
   std::cout << fd << "\n";
   assert(fd != -1);
-  assert_coe(fd);
-  assert_ndelay_off(fd);
+  check_coe(fd);
+  check_ndelay_off(fd);
 
   dromozoa::selector selector(impl);
   assert(selector.add(dromozoa::selfpipe_get(), dromozoa::SELECTOR_READ) == 0);

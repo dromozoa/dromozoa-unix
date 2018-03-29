@@ -15,6 +15,7 @@
 // You should have received a copy of the GNU General Public License
 // along with dromozoa-unix.  If not, see <http://www.gnu.org/licenses/>.
 
+#include <assert.h>
 #include <stddef.h>
 #include <unistd.h>
 #include <sys/socket.h>
@@ -24,14 +25,14 @@
 
 #include <dromozoa/compat_socket.hpp>
 
-#include "assert.hpp"
+#include "check.hpp"
 
 void test_compat_socket1() {
   int fd = dromozoa::compat_socket(AF_UNIX, SOCK_STREAM | dromozoa::COMPAT_SOCK_CLOEXEC | dromozoa::COMPAT_SOCK_NONBLOCK, 0);
   std::cout << fd << "\n";
   assert(fd != -1);
-  assert_coe(fd);
-  assert_ndelay_on(fd);
+  check_coe(fd);
+  check_ndelay_on(fd);
   assert(close(fd) != -1);
 }
 
@@ -39,8 +40,8 @@ void test_compat_socket2() {
   int fd = dromozoa::compat_socket(AF_UNIX, SOCK_STREAM | dromozoa::COMPAT_SOCK_CLOEXEC, 0);
   std::cout << fd << "\n";
   assert(fd != -1);
-  assert_coe(fd);
-  assert_ndelay_off(fd);
+  check_coe(fd);
+  check_ndelay_off(fd);
   assert(close(fd) != -1);
 }
 
@@ -50,10 +51,10 @@ void test_compat_socketpair1() {
   std::cout << fd[0] << ", " << fd[1] << "\n";
   assert(fd[0] != -1);
   assert(fd[1] != -1);
-  assert_coe(fd[0]);
-  assert_coe(fd[1]);
-  assert_ndelay_on(fd[0]);
-  assert_ndelay_on(fd[1]);
+  check_coe(fd[0]);
+  check_coe(fd[1]);
+  check_ndelay_on(fd[0]);
+  check_ndelay_on(fd[1]);
   assert(close(fd[0]) != -1);
   assert(close(fd[1]) != -1);
 }
@@ -64,10 +65,10 @@ void test_compat_socketpair2() {
   std::cout << fd[0] << ", " << fd[1] << "\n";
   assert(fd[0] != -1);
   assert(fd[1] != -1);
-  assert_coe(fd[0]);
-  assert_coe(fd[1]);
-  assert_ndelay_off(fd[0]);
-  assert_ndelay_off(fd[1]);
+  check_coe(fd[0]);
+  check_coe(fd[1]);
+  check_ndelay_off(fd[0]);
+  check_ndelay_off(fd[1]);
   assert(close(fd[0]) != -1);
   assert(close(fd[1]) != -1);
 }
