@@ -40,6 +40,10 @@ namespace dromozoa {
       return ptr;
     }
 
+    bool valid() const {
+      return ptr_;
+    }
+
   private:
     T* ptr_;
     scoped_ptr(const scoped_ptr&);

@@ -35,7 +35,7 @@ namespace dromozoa {
     static async_service_impl* open(unsigned int start_threads);
     static async_service_impl* open(unsigned int start_threads, unsigned int max_threads);
     static async_service_impl* open(unsigned int start_threads, unsigned int max_threads, unsigned int max_spare_threads);
-    async_service(async_service_impl* impl);
+    explicit async_service(async_service_impl* impl);
     ~async_service();
     int close();
     bool valid() const;

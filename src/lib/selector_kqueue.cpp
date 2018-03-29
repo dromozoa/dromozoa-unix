@@ -29,6 +29,14 @@ namespace dromozoa {
     static const int MAX_BUFFER_SIZE = 8192;
   }
 
+  selector_kqueue::selector_kqueue() : result_(-1), buffer_(INITIAL_BUFFER_SIZE) {}
+
+  selector_kqueue::~selector_kqueue() {
+    if (valid()) {
+      close();
+    }
+  }
+
   int selector_kqueue::open(int flags) {
     sigset_t mask;
     if (sigmask_block_all_signals(&mask) == -1) {
@@ -47,12 +55,9 @@ namespace dromozoa {
       }
     }
 
-    return fd.release();
+    fd_.swap(fd);
+    return 0;
   }
-
-  selector_kqueue::selector_kqueue(int fd) : fd_(fd), result_(-1), buffer_(INITIAL_BUFFER_SIZE) {}
-
-  selector_kqueue::~selector_kqueue() {}
 
   int selector_kqueue::close() {
     return fd_.close();

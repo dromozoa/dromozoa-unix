@@ -1,4 +1,4 @@
-// Copyright (C) 2016 Tomoyuki Fujimori <moyu@dromozoa.com>
+// Copyright (C) 2016,2018 Tomoyuki Fujimori <moyu@dromozoa.com>
 //
 // This file is part of dromozoa-unix.
 //
@@ -19,12 +19,12 @@
 #include "config.h"
 #endif
 
-#include <errno.h>
-#include <unistd.h>
-
 #ifdef HAVE_SYSCTLBYNAME
 #include <sys/types.h>
 #include <sys/sysctl.h>
+#else
+#include <errno.h>
+#include <unistd.h>
 #endif
 
 #include <dromozoa/hardware_concurrency.hpp>

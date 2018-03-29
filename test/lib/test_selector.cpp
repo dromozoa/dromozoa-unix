@@ -15,10 +15,6 @@
 // You should have received a copy of the GNU General Public License
 // along with dromozoa-unix.  If not, see <http://www.gnu.org/licenses/>.
 
-#ifdef HAVE_CONFIG_H
-#include "config.h"
-#endif
-
 #include <assert.h>
 #include <errno.h>
 #include <fcntl.h>
@@ -29,20 +25,12 @@
 #include <dromozoa/compat_pipe2.hpp>
 #include <dromozoa/selector.hpp>
 
-#if defined(HAVE_EPOLL_CREATE) || defined(HAVE_EPOLL_CREATE1)
-#include <dromozoa/selector_epoll.hpp>
-typedef dromozoa::selector_epoll selector_impl;
-#elif defined(HAVE_KQUEUE)
-#include <dromozoa/selector_kqueue.hpp>
-typedef dromozoa::selector_kqueue selector_impl;
-#endif
-
 void test() {
-  int selector_fd = selector_impl::open(dromozoa::SELECTOR_CLOEXEC);
-  assert(selector_fd != -1);
-  selector_impl selector(selector_fd);
+  dromozoa::selector_impl* impl = dromozoa::selector::open(dromozoa::SELECTOR_CLOEXEC);
+  assert(impl);
+  dromozoa::selector selector(impl);
 
-  int pipe_fd[2] = { -1,-1 };
+  int pipe_fd[2] = { -1, -1 };
   assert(dromozoa::compat_pipe2(pipe_fd, O_CLOEXEC) != -1);
 
   struct timespec timeout = {};

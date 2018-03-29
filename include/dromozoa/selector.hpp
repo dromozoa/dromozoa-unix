@@ -20,14 +20,17 @@
 
 #include <time.h>
 
+#include <dromozoa/scoped_ptr.hpp>
+
 namespace dromozoa {
   extern const int SELECTOR_READ;
   extern const int SELECTOR_WRITE;
   extern const int SELECTOR_CLOEXEC;
 
-  class selector {
+  class selector_impl {
   public:
-    virtual ~selector();
+    virtual ~selector_impl() = 0;
+    virtual int open(int flags) = 0;
     virtual int close() = 0;
     virtual bool valid() const = 0;
     virtual int get() const = 0;
@@ -36,6 +39,25 @@ namespace dromozoa {
     virtual int del(int fd) = 0;
     virtual int select(const struct timespec* timeout) = 0;
     virtual int event(int i, int& fd, int& event) const = 0;
+  };
+
+  class selector {
+  public:
+    static selector_impl* open(int flags);
+    explicit selector(selector_impl* impl);
+    ~selector();
+    int close();
+    bool valid() const;
+    int get() const;
+    int add(int fd, int event);
+    int mod(int fd, int event);
+    int del(int fd);
+    int select(const struct timespec* timeout);
+    int event(int i, int& fd, int& event) const;
+  private:
+    scoped_ptr<selector_impl> impl_;
+    selector(const selector&);
+    selector& operator=(const selector&);
   };
 }
 
