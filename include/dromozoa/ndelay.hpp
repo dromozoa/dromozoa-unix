@@ -1,4 +1,4 @@
-// Copyright (C) 2016 Tomoyuki Fujimori <moyu@dromozoa.com>
+// Copyright (C) 2016,2018 Tomoyuki Fujimori <moyu@dromozoa.com>
 //
 // This file is part of dromozoa-unix.
 //
@@ -21,6 +21,8 @@
 namespace dromozoa {
   int ndelay_on(int fd);
   int ndelay_off(int fd);
+  int is_ndelay_on(int fd);
+  int is_ndelay_off(int fd);
 }
 
 #endif

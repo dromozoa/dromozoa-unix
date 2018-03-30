@@ -21,6 +21,7 @@
 
 #include <iostream>
 
+#include <dromozoa/coe.hpp>
 #include <dromozoa/compat_pipe2.hpp>
 
 #include "common.hpp"
@@ -31,8 +32,8 @@ void test1() {
   std::cout << fd[0] << ", " << fd[1] << "\n";
   assert(fd[0] != -1);
   assert(fd[1] != -1);
-  check_coe(fd[0]);
-  check_coe(fd[1]);
+  assert(dromozoa::is_coe(fd[0]) == 1);
+  assert(dromozoa::is_coe(fd[1]) == 1);
   check_ndelay_on(fd[0]);
   check_ndelay_on(fd[1]);
   assert(close(fd[0]) != -1);
@@ -45,8 +46,8 @@ void test2() {
   std::cout << fd[0] << ", " << fd[1] << "\n";
   assert(fd[0] != -1);
   assert(fd[1] != -1);
-  check_coe(fd[0]);
-  check_coe(fd[1]);
+  assert(dromozoa::is_coe(fd[0]) == 1);
+  assert(dromozoa::is_coe(fd[1]) == 1);
   check_ndelay_off(fd[0]);
   check_ndelay_off(fd[1]);
   assert(close(fd[0]) != -1);
