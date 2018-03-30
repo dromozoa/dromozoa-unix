@@ -17,17 +17,15 @@
 # You should have received a copy of the GNU General Public License
 # along with dromozoa-unix.  If not, see <http://www.gnu.org/licenses/>.
 
-case x$1 in
-  x) lua=lua;;
-  *) lua=$1;;
-esac
-
-LUA_PATH="?.lua;;"
+LUA_PATH="test/lua/?.lua;;"
 export LUA_PATH
 
 for i in test/lua/test*.lua
 do
-  "$lua" "$i"
+  case X$# in
+    X0) lua "$i";;
+    *) "$@" "$i";;
+  esac
 done
 
 rm -fr test.lock test.sock test.txt test.dir test.fifo
