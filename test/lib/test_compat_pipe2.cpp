@@ -23,7 +23,7 @@
 
 #include <dromozoa/compat_pipe2.hpp>
 
-#include "check.hpp"
+#include "common.hpp"
 
 void test1() {
   int fd[2] = { -1, -1 };

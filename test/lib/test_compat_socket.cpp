@@ -25,7 +25,7 @@
 
 #include <dromozoa/compat_socket.hpp>
 
-#include "check.hpp"
+#include "common.hpp"
 
 void test_compat_socket1() {
   int fd = dromozoa::compat_socket(AF_UNIX, SOCK_STREAM | dromozoa::COMPAT_SOCK_CLOEXEC | dromozoa::COMPAT_SOCK_NONBLOCK, 0);

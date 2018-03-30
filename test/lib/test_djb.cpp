@@ -23,7 +23,7 @@
 #include <dromozoa/coe.hpp>
 #include <dromozoa/ndelay.hpp>
 
-#include "check.hpp"
+#include "common.hpp"
 
 int main(int, char*[]) {
   int fd[2] = { -1, -1 };

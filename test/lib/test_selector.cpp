@@ -26,7 +26,7 @@
 #include <dromozoa/scoped_ptr.hpp>
 #include <dromozoa/selector.hpp>
 
-#include "check.hpp"
+#include "common.hpp"
 
 void test() {
   dromozoa::scoped_ptr<dromozoa::selector_impl> impl(dromozoa::selector::open(dromozoa::SELECTOR_CLOEXEC));
