@@ -24,6 +24,7 @@ check_PROGRAMS = \
 	test_async.exe \
 	test_compat_clock_gettime.exe \
 	test_compat_pipe2.exe \
+	test_compat_mkostemp.exe \
 	test_compat_socket.exe \
 	test_compat_strerror.exe \
 	test_djb.exe \
@@ -57,6 +58,10 @@ test_compat_pipe2_exe_SOURCES = test_compat_pipe2.cpp
 test_compat_socket_exe_CPPFLAGS = -I$(top_srcdir)/include
 test_compat_socket_exe_LDADD = $(top_builddir)/src/lib/libdromozoa-unix.la
 test_compat_socket_exe_SOURCES = test_compat_socket.cpp
+
+test_compat_mkostemp_exe_CPPFLAGS = -I$(top_srcdir)/include
+test_compat_mkostemp_exe_LDADD = $(top_builddir)/src/lib/libdromozoa-unix.la
+test_compat_mkostemp_exe_SOURCES = test_compat_mkostemp.cpp
 
 test_compat_strerror_exe_CPPFLAGS = -I$(top_srcdir)/include
 test_compat_strerror_exe_LDADD = $(top_builddir)/src/lib/libdromozoa-unix.la
