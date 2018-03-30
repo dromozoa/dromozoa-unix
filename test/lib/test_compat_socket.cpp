@@ -16,6 +16,7 @@
 // along with dromozoa-unix.  If not, see <http://www.gnu.org/licenses/>.
 
 #include <assert.h>
+#include <fcntl.h>
 #include <stddef.h>
 #include <unistd.h>
 #include <sys/socket.h>
@@ -23,16 +24,16 @@
 #include <iomanip>
 #include <iostream>
 
+#include <dromozoa/coe.hpp>
 #include <dromozoa/compat_socket.hpp>
-
-#include "check.hpp"
+#include <dromozoa/ndelay.hpp>
 
 void test_compat_socket1() {
   int fd = dromozoa::compat_socket(AF_UNIX, SOCK_STREAM | dromozoa::COMPAT_SOCK_CLOEXEC | dromozoa::COMPAT_SOCK_NONBLOCK, 0);
   std::cout << fd << "\n";
   assert(fd != -1);
-  check_coe(fd);
-  check_ndelay_on(fd);
+  assert(dromozoa::is_coe(fd) == 1);
+  assert(dromozoa::is_ndelay_on(fd) == 1);
   assert(close(fd) != -1);
 }
 
@@ -40,8 +41,8 @@ void test_compat_socket2() {
   int fd = dromozoa::compat_socket(AF_UNIX, SOCK_STREAM | dromozoa::COMPAT_SOCK_CLOEXEC, 0);
   std::cout << fd << "\n";
   assert(fd != -1);
-  check_coe(fd);
-  check_ndelay_off(fd);
+  assert(dromozoa::is_coe(fd) == 1);
+  assert(dromozoa::is_ndelay_off(fd) == 1);
   assert(close(fd) != -1);
 }
 
@@ -51,10 +52,10 @@ void test_compat_socketpair1() {
   std::cout << fd[0] << ", " << fd[1] << "\n";
   assert(fd[0] != -1);
   assert(fd[1] != -1);
-  check_coe(fd[0]);
-  check_coe(fd[1]);
-  check_ndelay_on(fd[0]);
-  check_ndelay_on(fd[1]);
+  assert(dromozoa::is_coe(fd[0]) == 1);
+  assert(dromozoa::is_coe(fd[1]) == 1);
+  assert(dromozoa::is_ndelay_on(fd[0]) == 1);
+  assert(dromozoa::is_ndelay_on(fd[1]) == 1);
   assert(close(fd[0]) != -1);
   assert(close(fd[1]) != -1);
 }
@@ -65,10 +66,10 @@ void test_compat_socketpair2() {
   std::cout << fd[0] << ", " << fd[1] << "\n";
   assert(fd[0] != -1);
   assert(fd[1] != -1);
-  check_coe(fd[0]);
-  check_coe(fd[1]);
-  check_ndelay_off(fd[0]);
-  check_ndelay_off(fd[1]);
+  assert(dromozoa::is_coe(fd[0]) == 1);
+  assert(dromozoa::is_coe(fd[1]) == 1);
+  assert(dromozoa::is_ndelay_off(fd[0]) == 1);
+  assert(dromozoa::is_ndelay_off(fd[1]) == 1);
   assert(close(fd[0]) != -1);
   assert(close(fd[1]) != -1);
 }

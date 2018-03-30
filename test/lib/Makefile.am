@@ -17,8 +17,6 @@
 
 TESTS = $(check_PROGRAMS)
 
-noinst_HEADERS = check.hpp
-
 check_PROGRAMS = \
 	test_argument_vector.exe \
 	test_async.exe \

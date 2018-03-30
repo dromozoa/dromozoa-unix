@@ -23,8 +23,6 @@
 #include <dromozoa/coe.hpp>
 #include <dromozoa/ndelay.hpp>
 
-#include "check.hpp"
-
 int main(int, char*[]) {
   int fd[2] = { -1, -1 };
   assert(pipe(fd) != -1);
@@ -32,23 +30,42 @@ int main(int, char*[]) {
   assert(fd[0] != -1);
   assert(fd[1] != -1);
 
-  assert(!(fcntl(fd[0], F_GETFD) & FD_CLOEXEC));
-  assert(!(fcntl(fd[1], F_GETFD) & FD_CLOEXEC));
+  assert(dromozoa::is_coe(fd[0]) == 0);
+  assert(dromozoa::is_coe(fd[1]) == 0);
+  assert(dromozoa::is_ndelay_on(fd[0]) == 0);
+  assert(dromozoa::is_ndelay_on(fd[1]) == 0);
+  assert(dromozoa::is_ndelay_off(fd[0]) == 1);
+  assert(dromozoa::is_ndelay_off(fd[1]) == 1);
+
   assert(dromozoa::coe(fd[0]) != -1);
   assert(dromozoa::coe(fd[1]) != -1);
-  check_coe(fd[0]);
-  check_coe(fd[1]);
 
-  check_ndelay_off(fd[0]);
-  check_ndelay_off(fd[1]);
+  assert(dromozoa::is_coe(fd[0]) == 1);
+  assert(dromozoa::is_coe(fd[1]) == 1);
+  assert(dromozoa::is_ndelay_on(fd[0]) == 0);
+  assert(dromozoa::is_ndelay_on(fd[1]) == 0);
+  assert(dromozoa::is_ndelay_off(fd[0]) == 1);
+  assert(dromozoa::is_ndelay_off(fd[1]) == 1);
+
   assert(dromozoa::ndelay_on(fd[0]) != -1);
   assert(dromozoa::ndelay_off(fd[1]) != -1);
-  check_ndelay_on(fd[0]);
-  check_ndelay_off(fd[1]);
+
+  assert(dromozoa::is_coe(fd[0]) == 1);
+  assert(dromozoa::is_coe(fd[1]) == 1);
+  assert(dromozoa::is_ndelay_on(fd[0]) == 1);
+  assert(dromozoa::is_ndelay_on(fd[1]) == 0);
+  assert(dromozoa::is_ndelay_off(fd[0]) == 0);
+  assert(dromozoa::is_ndelay_off(fd[1]) == 1);
+
   assert(dromozoa::ndelay_off(fd[0]) != -1);
   assert(dromozoa::ndelay_on(fd[1]) != -1);
-  check_ndelay_off(fd[0]);
-  check_ndelay_on(fd[1]);
+
+  assert(dromozoa::is_coe(fd[0]) == 1);
+  assert(dromozoa::is_coe(fd[1]) == 1);
+  assert(dromozoa::is_ndelay_on(fd[0]) == 0);
+  assert(dromozoa::is_ndelay_on(fd[1]) == 1);
+  assert(dromozoa::is_ndelay_off(fd[0]) == 1);
+  assert(dromozoa::is_ndelay_off(fd[1]) == 0);
 
   assert(close(fd[0]) != -1);
   assert(close(fd[1]) != -1);

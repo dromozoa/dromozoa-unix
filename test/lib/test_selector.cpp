@@ -22,11 +22,11 @@
 
 #include <iostream>
 
+#include <dromozoa/coe.hpp>
 #include <dromozoa/compat_pipe2.hpp>
+#include <dromozoa/ndelay.hpp>
 #include <dromozoa/scoped_ptr.hpp>
 #include <dromozoa/selector.hpp>
-
-#include "check.hpp"
 
 void test() {
   dromozoa::scoped_ptr<dromozoa::selector_impl> impl(dromozoa::selector::open(dromozoa::SELECTOR_CLOEXEC));
@@ -35,8 +35,8 @@ void test() {
 
   int selector_fd = selector.get();
   if (selector_fd != -1) {
-    check_coe(selector_fd);
-    check_ndelay_off(selector_fd);
+    assert(dromozoa::is_coe(selector_fd) == 1);
+    assert(dromozoa::is_ndelay_off(selector_fd) == 1);
   }
 
   int pipe_fd[2] = { -1, -1 };

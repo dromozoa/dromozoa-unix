@@ -1,4 +1,4 @@
-// Copyright (C) 2016 Tomoyuki Fujimori <moyu@dromozoa.com>
+// Copyright (C) 2016,2018 Tomoyuki Fujimori <moyu@dromozoa.com>
 //
 // This file is part of dromozoa-unix.
 //
@@ -24,7 +24,21 @@ namespace dromozoa {
     int result = fcntl(fd, F_GETFD);
     if (result == -1) {
       return -1;
+    } else {
+      return fcntl(fd, F_SETFD, result | FD_CLOEXEC);
     }
-    return fcntl(fd, F_SETFD, result | FD_CLOEXEC);
+  }
+
+  int is_coe(int fd) {
+    int result = fcntl(fd, F_GETFD);
+    if (result == -1) {
+      return -1;
+    } else {
+      if (result & FD_CLOEXEC) {
+        return 1;
+      } else {
+        return 0;
+      }
+    }
   }
 }
