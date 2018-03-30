@@ -23,8 +23,7 @@
 
 #include <dromozoa/coe.hpp>
 #include <dromozoa/compat_pipe2.hpp>
-
-#include "common.hpp"
+#include <dromozoa/ndelay.hpp>
 
 void test1() {
   int fd[2] = { -1, -1 };
@@ -34,8 +33,8 @@ void test1() {
   assert(fd[1] != -1);
   assert(dromozoa::is_coe(fd[0]) == 1);
   assert(dromozoa::is_coe(fd[1]) == 1);
-  check_ndelay_on(fd[0]);
-  check_ndelay_on(fd[1]);
+  assert(dromozoa::is_ndelay_on(fd[0]) == 1);
+  assert(dromozoa::is_ndelay_on(fd[1]) == 1);
   assert(close(fd[0]) != -1);
   assert(close(fd[1]) != -1);
 }
@@ -48,8 +47,8 @@ void test2() {
   assert(fd[1] != -1);
   assert(dromozoa::is_coe(fd[0]) == 1);
   assert(dromozoa::is_coe(fd[1]) == 1);
-  check_ndelay_off(fd[0]);
-  check_ndelay_off(fd[1]);
+  assert(dromozoa::is_ndelay_off(fd[0]) == 1);
+  assert(dromozoa::is_ndelay_off(fd[1]) == 1);
   assert(close(fd[0]) != -1);
   assert(close(fd[1]) != -1);
 }

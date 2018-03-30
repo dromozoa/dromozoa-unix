@@ -43,7 +43,7 @@ namespace dromozoa {
     if (result == -1) {
       return -1;
     } else {
-      if (result | O_NONBLOCK) {
+      if (result & O_NONBLOCK) {
         return 1;
       } else {
         return 0;
@@ -56,7 +56,7 @@ namespace dromozoa {
     if (result == -1) {
       return -1;
     } else {
-      if (result & ~O_NONBLOCK) {
+      if (!(result & O_NONBLOCK)) {
         return 1;
       } else {
         return 0;
