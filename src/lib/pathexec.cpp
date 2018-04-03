@@ -104,7 +104,7 @@ namespace dromozoa {
           }
           p = copy(p, '/');
           p = copy(p, command, command_size);
-          p = copy(p, '\0');
+          copy(p, '\0');
           execve(buffer, const_cast<char**>(argv), const_cast<char**>(envp));
           switch (errno) {
             case ENOENT:
