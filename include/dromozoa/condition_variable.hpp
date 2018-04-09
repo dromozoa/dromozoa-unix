@@ -20,6 +20,7 @@
 
 #include <pthread.h>
 
+#include <dromozoa/mutex.hpp>
 #include <dromozoa/scoped_lock.hpp>
 
 namespace dromozoa {
@@ -29,7 +30,7 @@ namespace dromozoa {
     ~condition_variable();
     void notify_one();
     void notify_all();
-    void wait(scoped_lock<>& lock);
+    void wait(scoped_lock<mutex>& lock);
     pthread_cond_t* native_handle();
   private:
     pthread_cond_t cond_;

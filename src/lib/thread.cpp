@@ -20,8 +20,6 @@
 #include <exception>
 #include <utility>
 
-#include <dromozoa/bind/unexpected.hpp>
-
 #include <dromozoa/system_error.hpp>
 #include <dromozoa/thread.hpp>
 
