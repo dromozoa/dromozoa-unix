@@ -15,23 +15,31 @@
 // You should have received a copy of the GNU General Public License
 // along with dromozoa-unix.  If not, see <http://www.gnu.org/licenses/>.
 
-#ifndef DROMOZOA_MUTEX_HPP
-#define DROMOZOA_MUTEX_HPP
+#ifndef DROMOZOA_SCOPED_LOCK_HPP
+#define DROMOZOA_SCOPED_LOCK_HPP
 
-#include <pthread.h>
+#include <dromozoa/mutex.hpp>
 
 namespace dromozoa {
-  class mutex {
+  template <class T = mutex>
+  class scoped_lock {
   public:
-    mutex();
-    ~mutex();
-    void lock();
-    void unlock();
-    pthread_mutex_t* native_handle();
+    explicit scoped_lock(T& mutex) : mutex_(&mutex) {
+      mutex_->lock();
+    }
+
+    ~scoped_lock() {
+      mutex_->unlock();
+    }
+
+    T* mutex() const {
+      return mutex_;
+    }
+
   private:
-    pthread_mutex_t mutex_;
-    mutex(const mutex&);
-    mutex& operator=(const mutex&);
+    T* mutex_;
+    scoped_lock(const scoped_lock&);
+    scoped_lock& operator=(const scoped_lock&);
   };
 }
 

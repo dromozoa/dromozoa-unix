@@ -87,16 +87,4 @@ namespace dromozoa {
   pthread_mutex_t* mutex::native_handle() {
     return &mutex_;
   }
-
-  scoped_lock::scoped_lock(dromozoa::mutex& mutex) : mutex_(&mutex) {
-    mutex_->lock();
-  }
-
-  scoped_lock::~scoped_lock() {
-    mutex_->unlock();
-  }
-
-  dromozoa::mutex* scoped_lock::mutex() const {
-    return mutex_;
-  }
 }
