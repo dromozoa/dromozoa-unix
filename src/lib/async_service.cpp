@@ -16,7 +16,6 @@
 // along with dromozoa-unix.  If not, see <http://www.gnu.org/licenses/>.
 
 #include <fcntl.h>
-#include <pthread.h>
 #include <unistd.h>
 
 #include <exception>
@@ -32,7 +31,6 @@
 #include <dromozoa/file_descriptor.hpp>
 #include <dromozoa/mutex.hpp>
 #include <dromozoa/scoped_lock.hpp>
-#include <dromozoa/system_error.hpp>
 #include <dromozoa/thread.hpp>
 
 namespace dromozoa {
