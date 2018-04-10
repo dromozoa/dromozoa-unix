@@ -28,194 +28,14 @@
 
 #include <dromozoa/async_service.hpp>
 #include <dromozoa/compat_pipe2.hpp>
+#include <dromozoa/condition_variable.hpp>
 #include <dromozoa/file_descriptor.hpp>
+#include <dromozoa/mutex.hpp>
+#include <dromozoa/scoped_lock.hpp>
 #include <dromozoa/system_error.hpp>
+#include <dromozoa/thread.hpp>
 
 namespace dromozoa {
-  namespace {
-    class thread {
-    public:
-      thread(void* (*start_routine)(void*), void* arg) : thread_(), joinable_() {
-        if (int result = pthread_create(&thread_, 0, start_routine, arg)) {
-          throw system_error(result);
-        }
-        joinable_ = true;
-      }
-
-      ~thread() {
-        if (joinable_) {
-          std::terminate();
-        }
-      }
-
-      bool joinable() const {
-        return joinable_;
-      }
-
-      void join() {
-        if (int result = pthread_join(thread_, 0)) {
-          throw system_error(result);
-        }
-        joinable_ = false;
-      }
-
-      void detach() {
-        if (int result = pthread_detach(thread_)) {
-          throw system_error(result);
-        }
-        joinable_ = false;
-      }
-
-      pthread_t native_handle() {
-        return thread_;
-      }
-
-      void swap(thread& that) {
-        std::swap(thread_, that.thread_);
-        std::swap(joinable_, that.joinable_);
-      }
-
-    private:
-      pthread_t thread_;
-      bool joinable_;
-      thread(const thread&);
-      thread& operator=(const thread&);
-    };
-
-    class mutex_attr {
-    public:
-      mutex_attr() : attr_() {
-        if (int result = pthread_mutexattr_init(&attr_)) {
-          throw system_error(result);
-        }
-      }
-
-      ~mutex_attr() {
-        if (pthread_mutexattr_destroy(&attr_)) {
-          std::terminate();
-        }
-      }
-
-      mutex_attr& set_error_check() {
-        return set_type(PTHREAD_MUTEX_ERRORCHECK);
-      }
-
-      pthread_mutexattr_t* get() {
-        return &attr_;
-      }
-
-    private:
-      pthread_mutexattr_t attr_;
-      mutex_attr(const mutex_attr&);
-      mutex_attr& operator=(const mutex_attr&);
-
-      mutex_attr& set_type(int kind) {
-        if (int result = pthread_mutexattr_settype(&attr_, kind)) {
-          throw system_error(result);
-        }
-        return *this;
-      }
-    };
-
-    class mutex {
-    public:
-      mutex() : mutex_() {
-        if (int result = pthread_mutex_init(&mutex_, mutex_attr().set_error_check().get())) {
-          throw system_error(result);
-        }
-      }
-
-      ~mutex() {
-        if (pthread_mutex_destroy(&mutex_)) {
-          std::terminate();
-        }
-      }
-
-      void lock() {
-        if (int result = pthread_mutex_lock(&mutex_)) {
-          throw system_error(result);
-        }
-      }
-
-      void unlock() {
-        if (int result = pthread_mutex_unlock(&mutex_)) {
-          throw system_error(result);
-        }
-      }
-
-      pthread_mutex_t* native_handle() {
-        return &mutex_;
-      }
-
-    private:
-      pthread_mutex_t mutex_;
-      mutex(const mutex&);
-      mutex& operator=(const mutex&);
-    };
-
-    template <class T>
-    class scoped_lock {
-    public:
-      scoped_lock(T& mutex) : mutex_(&mutex) {
-        mutex_->lock();
-      }
-
-      ~scoped_lock() {
-        mutex_->unlock();
-      }
-
-      T* mutex() const {
-        return mutex_;
-      }
-
-    private:
-      T* mutex_;
-      scoped_lock(const scoped_lock&);
-      scoped_lock& operator=(const scoped_lock&);
-    };
-
-    class condition_variable {
-    public:
-      condition_variable() : cond_() {
-        if (int result = pthread_cond_init(&cond_, 0)) {
-          throw system_error(result);
-        }
-      }
-
-      ~condition_variable() {
-        if (pthread_cond_destroy(&cond_)) {
-          std::terminate();
-        }
-      }
-
-      void notify_one() {
-        if (int result = pthread_cond_signal(&cond_)) {
-          throw system_error(result);
-        }
-      }
-
-      void notify_all() {
-        if (int result = pthread_cond_broadcast(&cond_)) {
-          throw system_error(result);
-        }
-      }
-
-      void wait(scoped_lock<mutex>& lock) {
-        if (int result = pthread_cond_wait(&cond_, lock.mutex()->native_handle())) {
-          throw system_error(result);
-        }
-      }
-
-      pthread_cond_t* native_handle() {
-        return &cond_;
-      }
-
-    private:
-      pthread_cond_t cond_;
-    };
-
-  }
-
   async_service_task::~async_service_task() {}
 
   class async_service_impl {
@@ -247,7 +67,7 @@ namespace dromozoa {
       file_descriptor writer(fd[1]);
 
       if (start_threads > 0) {
-        scoped_lock<mutex> counter_lock(counter_mutex_);
+        scoped_lock<> counter_lock(counter_mutex_);
         spare_threads_ += start_threads;
         current_threads_ += start_threads;
         for (unsigned int i = 0; i < start_threads; ++i) {
@@ -256,7 +76,7 @@ namespace dromozoa {
       }
 
       {
-        scoped_lock<mutex> ready_lock(ready_mutex_);
+        scoped_lock<> ready_lock(ready_mutex_);
         ready_reader_.swap(reader);
         ready_writer_.swap(writer);
       }
@@ -268,7 +88,7 @@ namespace dromozoa {
       file_descriptor reader;
       file_descriptor writer;
       {
-        scoped_lock<mutex> ready_lock(ready_mutex_);
+        scoped_lock<> ready_lock(ready_mutex_);
         reader.swap(ready_reader_);
         writer.swap(ready_writer_);
       }
@@ -276,7 +96,7 @@ namespace dromozoa {
       queue_type queue;
       queue.push_back(0);
       {
-        scoped_lock<mutex> queue_lock(queue_mutex_);
+        scoped_lock<> queue_lock(queue_mutex_);
         queue.swap(queue_);
         queue_index_.clear();
         queue_condition_.notify_all();
@@ -299,7 +119,7 @@ namespace dromozoa {
       }
 
       {
-        scoped_lock<mutex> counter_lock(counter_mutex_);
+        scoped_lock<> counter_lock(counter_mutex_);
         current_tasks_ -= canceled_tasks;
         while (current_threads_ > 0) {
           counter_condition_.wait(counter_lock);
@@ -334,7 +154,7 @@ namespace dromozoa {
 
     void push(async_service_task* task) {
       {
-        scoped_lock<mutex> counter_lock(counter_mutex_);
+        scoped_lock<> counter_lock(counter_mutex_);
         ++current_tasks_;
         if (current_threads_ < current_tasks_ && current_threads_ < max_threads_) {
           ++spare_threads_;
@@ -344,7 +164,7 @@ namespace dromozoa {
       }
 
       {
-        scoped_lock<mutex> queue_lock(queue_mutex_);
+        scoped_lock<> queue_lock(queue_mutex_);
         queue_iterator i = queue_.insert(queue_.end(), task);
         queue_index_.insert(std::make_pair(task, i));
         queue_condition_.notify_one();
@@ -353,7 +173,7 @@ namespace dromozoa {
 
     bool cancel(async_service_task* task) {
       {
-        scoped_lock<mutex> queue_lock(queue_mutex_);
+        scoped_lock<> queue_lock(queue_mutex_);
         queue_index_iterator i = queue_index_.find(task);
         if (i == queue_index_.end()) {
           return false;
@@ -369,7 +189,7 @@ namespace dromozoa {
       }
 
       {
-        scoped_lock<mutex> counter_lock(counter_mutex_);
+        scoped_lock<> counter_lock(counter_mutex_);
         --current_tasks_;
       }
 
@@ -377,7 +197,7 @@ namespace dromozoa {
     }
 
     async_service_task* pop() {
-      scoped_lock<mutex> ready_lock(ready_mutex_);
+      scoped_lock<> ready_lock(ready_mutex_);
       if (ready_.empty()) {
         return 0;
       } else {
@@ -388,7 +208,7 @@ namespace dromozoa {
     }
 
     void info(unsigned int& spare_threads, unsigned int& current_threads, unsigned int& current_tasks) {
-      scoped_lock<mutex> counter_lock(counter_mutex_);
+      scoped_lock<> counter_lock(counter_mutex_);
       spare_threads = spare_threads_;
       current_threads = current_threads_;
       current_tasks = current_tasks_;
@@ -425,7 +245,7 @@ namespace dromozoa {
         async_service_task* task = 0;
 
         {
-          scoped_lock<mutex> queue_lock(queue_mutex_);
+          scoped_lock<> queue_lock(queue_mutex_);
           while (queue_.empty()) {
             queue_condition_.wait(queue_lock);
           }
@@ -437,7 +257,7 @@ namespace dromozoa {
         }
 
         {
-          scoped_lock<mutex> counter_lock(counter_mutex_);
+          scoped_lock<> counter_lock(counter_mutex_);
           if (task) {
             --spare_threads_;
           } else {
@@ -455,7 +275,7 @@ namespace dromozoa {
         }
 
         {
-          scoped_lock<mutex> ready_lock(ready_mutex_);
+          scoped_lock<> ready_lock(ready_mutex_);
           ready_.push_back(task);
           if (ready_writer_.valid()) {
             write(ready_writer_.get(), "", 1);
@@ -463,7 +283,7 @@ namespace dromozoa {
         }
 
         {
-          scoped_lock<mutex> counter_lock(counter_mutex_);
+          scoped_lock<> counter_lock(counter_mutex_);
           --current_tasks_;
           if (current_threads_ <= current_tasks_ || spare_threads_ < max_spare_threads_) {
             ++spare_threads_;

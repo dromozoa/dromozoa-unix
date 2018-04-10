@@ -22,6 +22,7 @@ LDLIBS += -ldl
 
 OBJS = \
 	callback.o \
+	common.o \
 	core.o \
 	module.o \
 	handle.o \
@@ -32,6 +33,9 @@ all: $(TARGET)
 
 clean:
 	rm -f *.o $(TARGET)
+
+check:
+	./test.sh
 
 bind.so: $(OBJS)
 	$(CXX) $(LDFLAGS) $^ $(LDLIBS) -o $@

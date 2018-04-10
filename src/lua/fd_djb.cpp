@@ -1,4 +1,4 @@
-// Copyright (C) 2016 Tomoyuki Fujimori <moyu@dromozoa.com>
+// Copyright (C) 2016,2018 Tomoyuki Fujimori <moyu@dromozoa.com>
 //
 // This file is part of dromozoa-unix.
 //
@@ -74,29 +74,29 @@ namespace dromozoa {
     }
 
     void impl_is_coe(lua_State* L) {
-      int result = fcntl(check_fd(L, 1), F_GETFD);
+      int result = is_coe(check_fd(L, 1));
       if (result == -1) {
         push_error(L);
       } else {
-        luaX_push(L, (result & FD_CLOEXEC) != 0);
+        luaX_push(L, result != 0);
       }
     }
 
     void impl_is_ndelay_on(lua_State* L) {
-      int result = fcntl(check_fd(L, 1), F_GETFL);
+      int result = is_ndelay_on(check_fd(L, 1));
       if (result == -1) {
         push_error(L);
       } else {
-        luaX_push(L, (result & O_NONBLOCK) != 0);
+        luaX_push(L, result != 0);
       }
     }
 
     void impl_is_ndelay_off(lua_State* L) {
-      int result = fcntl(check_fd(L, 1), F_GETFL);
+      int result = is_ndelay_off(check_fd(L, 1));
       if (result == -1) {
         push_error(L);
       } else {
-        luaX_push(L, (result & O_NONBLOCK) == 0);
+        luaX_push(L, result != 0);
       }
     }
   }
