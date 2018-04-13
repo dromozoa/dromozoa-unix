@@ -21,38 +21,38 @@
 
 namespace dromozoa {
   namespace {
-    void impl_open(lua_State* L) {
-      if (selfpipe_open() == -1) {
-        push_error(L);
-      } else {
-        luaX_push_success(L);
-      }
-    }
+    // void impl_open(lua_State* L) {
+    //   if (selfpipe_open() == -1) {
+    //     push_error(L);
+    //   } else {
+    //     luaX_push_success(L);
+    //   }
+    // }
 
-    void impl_close(lua_State* L) {
-      if (selfpipe_close() == -1) {
-        push_error(L);
-      } else {
-        luaX_push_success(L);
-      }
-    }
+    // void impl_close(lua_State* L) {
+    //   if (selfpipe_close() == -1) {
+    //     push_error(L);
+    //   } else {
+    //     luaX_push_success(L);
+    //   }
+    // }
 
-    void impl_get(lua_State* L) {
-      luaX_push(L, selfpipe_get());
-    }
+    // void impl_get(lua_State* L) {
+    //   luaX_push(L, selfpipe_get());
+    // }
 
-    void impl_read(lua_State* L) {
-      luaX_push(L, selfpipe_read());
-    }
+    // void impl_read(lua_State* L) {
+    //   luaX_push(L, selfpipe_read());
+    // }
   }
 
   void initialize_selfpipe(lua_State* L) {
     lua_newtable(L);
     {
-      luaX_set_field(L, -1, "open", impl_open);
-      luaX_set_field(L, -1, "close", impl_close);
-      luaX_set_field(L, -1, "get", impl_get);
-      luaX_set_field(L, -1, "read", impl_read);
+      // luaX_set_field(L, -1, "open", impl_open);
+      // luaX_set_field(L, -1, "close", impl_close);
+      // luaX_set_field(L, -1, "get", impl_get);
+      // luaX_set_field(L, -1, "read", impl_read);
     }
     luaX_set_field(L, -2, "selfpipe");
   }

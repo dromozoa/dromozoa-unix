@@ -18,11 +18,13 @@
 #ifndef DROMOZOA_SCOPED_PTR_HPP
 #define DROMOZOA_SCOPED_PTR_HPP
 
+#include <utility>
+
 namespace dromozoa {
   template <class T>
   class scoped_ptr {
   public:
-    explicit scoped_ptr(T* ptr) : ptr_(ptr) {}
+    explicit scoped_ptr(T* ptr = 0) : ptr_(ptr) {}
 
     ~scoped_ptr() {
       typedef char type_must_be_complete[sizeof(T) ? 1 : -1];
@@ -30,8 +32,8 @@ namespace dromozoa {
       delete ptr_;
     }
 
-    T* operator->() const {
-      return ptr_;
+    void reset(T* ptr = 0) {
+      scoped_ptr(ptr).swap(*this);
     }
 
     T* release() {
@@ -46,6 +48,18 @@ namespace dromozoa {
 
     T* get() const {
       return ptr_;
+    }
+
+    T& operator*() const {
+      return *ptr_;
+    }
+
+    T* operator->() const {
+      return ptr_;
+    }
+
+    void swap(scoped_ptr& that) {
+      std::swap(ptr_, that.ptr_);
     }
 
   private:

@@ -28,12 +28,16 @@
 #include <dromozoa/selector.hpp>
 
 int main(int, char*[]) {
-  assert(dromozoa::selfpipe_open() == 0);
+  dromozoa::selfpipe_impl* impl = dromozoa::selfpipe::open();
+  assert(impl);
+  dromozoa::selfpipe sp1(impl);
+
+  dromozoa::selfpipe sp2(dromozoa::selfpipe::open());
 
   std::cout << "pid " << getpid() << "\n";
 
   dromozoa::selector selector(dromozoa::selector::open(dromozoa::SELECTOR_CLOEXEC));
-  assert(selector.add(dromozoa::selfpipe_get(), dromozoa::SELECTOR_READ) == 0);
+  assert(selector.add(sp1.get(), dromozoa::SELECTOR_READ) == 0);
 
   const char* path = getenv("PATH");
   const char* argv[] = { "echo", "foo", 0 };
@@ -52,13 +56,17 @@ int main(int, char*[]) {
       break;
     }
   }
-  assert(dromozoa::selfpipe_read() == 1);
+  assert(sp1.read() == 1);
 
   int status = 0;
-  assert(waitpid(-1, &status, 0) == pid);
+  assert(waitpid(pid, &status, 0) == pid);
   std::cout << "status " << status << "\n";
   assert(WIFEXITED(status) && WEXITSTATUS(status) == 0);
 
-  assert(dromozoa::selfpipe_close() == 0);
+  assert(sp1.close() == 0);
+
+  assert(sp2.read() == 1);
+  assert(sp2.read() == 0);
+
   return 0;
 }
