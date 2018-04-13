@@ -18,28 +18,25 @@
 #ifndef DROMOZOA_SELFPIPE_HPP
 #define DROMOZOA_SELFPIPE_HPP
 
-#include <dromozoa/file_descriptor.hpp>
+#include <dromozoa/scoped_ptr.hpp>
 
 namespace dromozoa {
+  class selfpipe_impl;
+
   class selfpipe {
   public:
-    selfpipe();
+    static selfpipe_impl* open();
+    explicit selfpipe(selfpipe_impl* impl);
     ~selfpipe();
     int close();
     bool valiid();
     int get() const;
     int read() const;
   private:
-    file_descriptor fd_;
+    scoped_ptr<selfpipe_impl> impl_;
     selfpipe(const selfpipe&);
     selfpipe& operator=(const selfpipe&);
   };
-
-  int selfpipe_open();
-  int selfpipe_close();
-  bool selfpipe_valid();
-  int selfpipe_get();
-  int selfpipe_read();
 }
 
 #endif
