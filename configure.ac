@@ -48,10 +48,10 @@ AC_CHECK_MEMBERS([struct stat.st_mtimespec])
 
 AC_SEARCH_LIBS([clock_gettime], [rt], [AC_DEFINE(HAVE_CLOCK_GETTIME, 1, [Define to 1 if you have the 'clock_gettime' function.])])
 
-AX_PTHREAD()
+AX_PTHREAD([], [AC_MSG_ERROR([could not find pthread])])
 CXXFLAGS="$CXXFLAGS $PTHREAD_CFLAGS"
 LIBS="$LIBS $PTHREAD_LIBS"
-AC_SEARCH_LIBS([pthread_sigmask], [pthread])
+# AC_SEARCH_LIBS([pthread_sigmask], [pthread])
 
 AX_PROG_LUA([5.1], [], [], [AC_MSG_ERROR([could not find lua])])
 AX_LUA_HEADERS([], [AC_MSG_ERROR([could not find lua])])
