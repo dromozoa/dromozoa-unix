@@ -188,77 +188,79 @@ namespace dromozoa {
 
       return 0;
     }
+
+    class selfpipe_subscriber : public selfpipe_impl {
+    public:
+      ~selfpipe_subscriber() {
+        if (valid()) {
+          close();
+        }
+      }
+
+      int open() {
+        int fd[2] = { -1, -1 };
+        if (compat_pipe2(fd, O_CLOEXEC | O_NONBLOCK) == -1) {
+          return -1;
+        }
+        file_descriptor reader(fd[0]);
+        file_descriptor writer(fd[1]);
+
+        if (selfpipe_open(writer.get()) == -1) {
+          return -1;
+        }
+
+        reader_.swap(reader);
+        writer_.swap(writer);
+        return 0;
+      }
+
+      int close() {
+        file_descriptor reader;
+        file_descriptor writer;
+
+        reader.swap(reader_);
+        writer.swap(writer_);
+
+        if (selfpipe_close(writer.get()) == -1) {
+          return -1;
+        }
+
+        if (reader.close() == -1) {
+          return -1;
+        }
+        if (writer.close() == -1) {
+          return -1;
+        }
+        return 0;
+      }
+
+      bool valid() const {
+        return reader_.valid();
+      }
+
+      int get() const {
+        return reader_.get();
+      }
+
+      int read() const {
+        int count = 0;
+        char c;
+        while (::read(reader_.get(), &c, 1) == 1) {
+          ++count;
+        }
+        return count;
+      }
+
+    private:
+      file_descriptor reader_;
+      file_descriptor writer_;
+    };
   }
 
-  class selfpipe_impl {
-  public:
-    ~selfpipe_impl() {
-      if (valid()) {
-        close();
-      }
-    }
-
-    int open() {
-      int fd[2] = { -1, -1 };
-      if (compat_pipe2(fd, O_CLOEXEC | O_NONBLOCK) == -1) {
-        return -1;
-      }
-      file_descriptor reader(fd[0]);
-      file_descriptor writer(fd[1]);
-
-      if (selfpipe_open(writer.get()) == -1) {
-        return -1;
-      }
-
-      reader_.swap(reader);
-      writer_.swap(writer);
-      return 0;
-    }
-
-    int close() {
-      file_descriptor reader;
-      file_descriptor writer;
-
-      reader.swap(reader_);
-      writer.swap(writer_);
-
-      if (selfpipe_close(writer.get()) == -1) {
-        return -1;
-      }
-
-      if (reader.close() == -1) {
-        return -1;
-      }
-      if (writer.close() == -1) {
-        return -1;
-      }
-      return 0;
-    }
-
-    bool valid() {
-      return reader_.valid();
-    }
-
-    int get() const {
-      return reader_.get();
-    }
-
-    int read() const {
-      int count = 0;
-      char c;
-      while (::read(reader_.get(), &c, 1) == 1) {
-        ++count;
-      }
-      return count;
-    }
-
-  private:
-    file_descriptor reader_;
-    file_descriptor writer_;
-  };
+  selfpipe_impl::~selfpipe_impl() {}
 
   selfpipe_impl* selfpipe::open() {
-    scoped_ptr<selfpipe_impl> impl(new selfpipe_impl());
+    scoped_ptr<selfpipe_subscriber> impl(new selfpipe_subscriber());
     if (impl->open() == -1) {
       return 0;
     } else {
@@ -274,7 +276,7 @@ namespace dromozoa {
     return impl_->close();
   }
 
-  bool selfpipe::valiid() {
+  bool selfpipe::valiid() const {
     return impl_->valid();
   }
 
