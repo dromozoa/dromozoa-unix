@@ -1,4 +1,4 @@
--- Copyright (C) 2016 Tomoyuki Fujimori <moyu@dromozoa.com>
+-- Copyright (C) 2016,2018 Tomoyuki Fujimori <moyu@dromozoa.com>
 --
 -- This file is part of dromozoa-unix.
 --
@@ -18,14 +18,13 @@
 local unix = require "dromozoa.unix"
 
 assert(unix.block_signal(unix.SIGCHLD))
-assert(unix.selfpipe.get() == -1)
-assert(unix.selfpipe.open())
-assert(unix.selfpipe.get() ~= -1)
+
+local selfpipe = assert(unix.selfpipe())
 
 local PATH = os.getenv("PATH")
 
 local selector = assert(unix.selector())
-assert(selector:add(unix.selfpipe.get(), unix.SELECTOR_READ))
+assert(selector:add(selfpipe:get(), unix.SELECTOR_READ))
 
 local process1 = assert(unix.process())
 local process2 = assert(unix.process())
@@ -46,7 +45,7 @@ repeat
     print(b)
   else
     assert(a == 1)
-    assert(unix.selfpipe.read() > 0)
+    assert(selfpipe:read() > 0)
     while true do
       local a, b, c = unix.wait(-1, unix.WNOHANG)
       if a == nil then
