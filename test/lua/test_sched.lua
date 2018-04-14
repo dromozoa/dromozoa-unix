@@ -1,4 +1,4 @@
--- Copyright (C) 2016 Tomoyuki Fujimori <moyu@dromozoa.com>
+-- Copyright (C) 2016,2018 Tomoyuki Fujimori <moyu@dromozoa.com>
 --
 -- This file is part of dromozoa-unix.
 --
@@ -15,8 +15,6 @@
 -- You should have received a copy of the GNU General Public License
 -- along with dromozoa-unix.  If not, see <http://www.gnu.org/licenses/>.
 
-local equal = require "dromozoa.commons.equal"
-local json = require "dromozoa.commons.json"
 local unix = require "dromozoa.unix"
 
 assert(unix.sched_yield())
@@ -46,7 +44,5 @@ if unix.sched_getscheduler and unix.sched_getparam and unix.sched_setscheduler t
 end
 
 if unix.sched_getaffinity and unix.sched_setaffinity then
-  print("affinity", json.encode(unix.sched_getaffinity(0)))
   assert(unix.sched_setaffinity(0, { 0 }))
-  assert(equal(unix.sched_getaffinity(0), { 0 }))
 end
