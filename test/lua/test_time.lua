@@ -1,4 +1,4 @@
--- Copyright (C) 2016 Tomoyuki Fujimori <moyu@dromozoa.com>
+-- Copyright (C) 2016,2018 Tomoyuki Fujimori <moyu@dromozoa.com>
 --
 -- This file is part of dromozoa-unix.
 --
@@ -18,7 +18,8 @@
 local unix = require "dromozoa.unix"
 
 assert(unix.block_signal(unix.SIGCHLD))
-assert(unix.selfpipe.open())
+
+local selfpipe = assert(unix.selfpipe())
 
 local PATH = os.getenv("PATH")
 
@@ -41,6 +42,7 @@ assert(unix.unblock_signal(unix.SIGCHLD))
 local a, b, c, d = unix.nanosleep(10)
 assert(unix.block_signal(unix.SIGCHLD))
 
+print(a, b, c, d)
 assert(a == nil)
 assert(c == unix.EINTR)
 assert(getmetatable(d))
@@ -56,5 +58,3 @@ assert(c == 0)
 local t1 = assert(unix.clock_gettime(unix.CLOCK_MONOTONIC))
 local t2 = assert(unix.clock_gettime(unix.CLOCK_MONOTONIC))
 assert(t1 < t2)
-
-assert(unix.selfpipe.close())

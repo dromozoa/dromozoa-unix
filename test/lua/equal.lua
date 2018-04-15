@@ -1,4 +1,4 @@
--- Copyright (C) 2016,2018 Tomoyuki Fujimori <moyu@dromozoa.com>
+-- Copyright (C) 2018 Tomoyuki Fujimori <moyu@dromozoa.com>
 --
 -- This file is part of dromozoa-unix.
 --
@@ -15,23 +15,27 @@
 -- You should have received a copy of the GNU General Public License
 -- along with dromozoa-unix.  If not, see <http://www.gnu.org/licenses/>.
 
-local unix = require "dromozoa.unix"
-
-local function dump(t)
-  local keys = {}
-  for k in pairs(t) do
-    keys[#keys + 1] = k
-  end
-  table.sort(keys)
-  for i = 1, #keys do
-    local k = keys[i]
-    print(("%-9s | %10d"):format(k, t[k]))
+local function equal(a, b)
+  if a == b then
+    return true
+  else
+    if type(a) == "table" and type(b) == "table" then
+      for k, u in pairs(a) do
+        local v = b[k]
+        if v == nil or not equal(u, v) then
+          return false
+        end
+      end
+      for k in pairs(b) do
+        if a[k] == nil then
+          return false
+        end
+      end
+      return true
+    else
+      return false
+    end
   end
 end
 
-local fd = assert(unix.open("."))
-print "--"
-dump(assert(fd:fstatvfs()))
-print "--"
-dump(assert(unix.statvfs(".")))
-fd:close()
+return equal

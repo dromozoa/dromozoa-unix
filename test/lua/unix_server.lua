@@ -1,4 +1,4 @@
--- Copyright (C) 2016 Tomoyuki Fujimori <moyu@dromozoa.com>
+-- Copyright (C) 2016,2018 Tomoyuki Fujimori <moyu@dromozoa.com>
 --
 -- This file is part of dromozoa-unix.
 --
@@ -15,10 +15,9 @@
 -- You should have received a copy of the GNU General Public License
 -- along with dromozoa-unix.  If not, see <http://www.gnu.org/licenses/>.
 
-local uint32 = require "dromozoa.commons.uint32"
 local unix = require "dromozoa.unix"
 
-local server = assert(unix.socket(unix.AF_UNIX, uint32.bor(unix.SOCK_STREAM, unix.SOCK_CLOEXEC)))
+local server = assert(unix.socket(unix.AF_UNIX, unix.SOCK_STREAM + unix.SOCK_CLOEXEC))
 os.remove("test.sock")
 assert(server:bind(unix.sockaddr_un("test.sock")))
 assert(server:listen())

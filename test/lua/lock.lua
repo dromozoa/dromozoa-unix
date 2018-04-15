@@ -1,4 +1,4 @@
--- Copyright (C) 2016 Tomoyuki Fujimori <moyu@dromozoa.com>
+-- Copyright (C) 2016,2018 Tomoyuki Fujimori <moyu@dromozoa.com>
 --
 -- This file is part of dromozoa-unix.
 --
@@ -15,12 +15,11 @@
 -- You should have received a copy of the GNU General Public License
 -- along with dromozoa-unix.  If not, see <http://www.gnu.org/licenses/>.
 
-local uint32 = require "dromozoa.commons.uint32"
 local unix = require "dromozoa.unix"
 
 local mode = ...
 
-local fd = assert(unix.open("test.lock", uint32.bor(unix.O_WRONLY, unix.O_CREAT, unix.O_CLOEXEC)))
+local fd = assert(unix.open("test.lock", unix.O_WRONLY + unix.O_CREAT + unix.O_CLOEXEC))
 
 if mode == "1" then
   assert(io.stdin:read(1) == "x")

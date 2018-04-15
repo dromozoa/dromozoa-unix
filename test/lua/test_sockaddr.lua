@@ -1,4 +1,4 @@
--- Copyright (C) 2016 Tomoyuki Fujimori <moyu@dromozoa.com>
+-- Copyright (C) 2016,2018 Tomoyuki Fujimori <moyu@dromozoa.com>
 --
 -- This file is part of dromozoa-unix.
 --
@@ -15,7 +15,6 @@
 -- You should have received a copy of the GNU General Public License
 -- along with dromozoa-unix.  If not, see <http://www.gnu.org/licenses/>.
 
-local uint32 = require "dromozoa.commons.uint32"
 local unix = require "dromozoa.unix"
 
 assert(not pcall(unix.sockaddr_un, ("0123456789abcdef"):rep(4096)))
@@ -48,12 +47,12 @@ assert(ai.ai_addr:port() == "\0\80")
 
 local sa = assert(unix.sockaddr_in("\127\0\0\1", "\0\80"))
 assert(sa:family() == unix.AF_INET)
-local host, serv = assert(sa:getnameinfo(uint32.bor(unix.NI_NUMERICHOST, unix.NI_NUMERICSERV)))
+local host, serv = assert(sa:getnameinfo(unix.NI_NUMERICHOST + unix.NI_NUMERICSERV))
 assert(host == "127.0.0.1")
 assert(serv == "80")
 
 local sa = assert(unix.sockaddr_in6(("\0"):rep(15) .. "\1", "\0\80"))
 assert(sa:family() == unix.AF_INET6)
-local host, serv = assert(sa:getnameinfo(uint32.bor(unix.NI_NUMERICHOST, unix.NI_NUMERICSERV)))
+local host, serv = assert(sa:getnameinfo(unix.NI_NUMERICHOST + unix.NI_NUMERICSERV))
 assert(host == "::1")
 assert(serv == "80")

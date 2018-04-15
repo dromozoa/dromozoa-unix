@@ -1,4 +1,4 @@
--- Copyright (C) 2016,2017 Tomoyuki Fujimori <moyu@dromozoa.com>
+-- Copyright (C) 2016-2018 Tomoyuki Fujimori <moyu@dromozoa.com>
 --
 -- This file is part of dromozoa-unix.
 --
@@ -15,11 +15,10 @@
 -- You should have received a copy of the GNU General Public License
 -- along with dromozoa-unix.  If not, see <http://www.gnu.org/licenses/>.
 
-local sequence = require "dromozoa.commons.sequence"
 local unix = require "dromozoa.unix"
 
-for i in sequence.each(assert(unix.get_environ())) do
-  local k, v = i:match("([^=]+)=(.*)")
+for _, item in ipairs(assert(unix.get_environ())) do
+  local k, v = item:match("([^=]+)=(.*)")
   assert(os.getenv(k) == v)
 end
 

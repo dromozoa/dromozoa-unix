@@ -1,4 +1,4 @@
--- Copyright (C) 2016 Tomoyuki Fujimori <moyu@dromozoa.com>
+-- Copyright (C) 2016,2018 Tomoyuki Fujimori <moyu@dromozoa.com>
 --
 -- This file is part of dromozoa-unix.
 --
@@ -15,14 +15,13 @@
 -- You should have received a copy of the GNU General Public License
 -- along with dromozoa-unix.  If not, see <http://www.gnu.org/licenses/>.
 
-local uint32 = require "dromozoa.commons.uint32"
 local unix = require "dromozoa.unix"
 
 local addrinfo = assert(unix.getaddrinfo(nil, "0", { ai_socktype = unix.SOCK_STREAM, ai_flags = unix.AI_PASSIVE }))
 local ai = addrinfo[1]
 assert(ai.ai_socktype == unix.SOCK_STREAM)
 
-local server = assert(unix.socket(ai.ai_family, uint32.bor(ai.ai_socktype, unix.SOCK_CLOEXEC), ai.ai_protocol))
+local server = assert(unix.socket(ai.ai_family, ai.ai_socktype +  unix.SOCK_CLOEXEC, ai.ai_protocol))
 assert(server:is_coe())
 assert(server:getsockopt(unix.SOL_SOCKET, unix.SO_REUSEADDR) == 0)
 assert(server:setsockopt(unix.SOL_SOCKET, unix.SO_REUSEADDR, 1))
@@ -31,12 +30,12 @@ assert(server:bind(ai.ai_addr))
 assert(server:listen())
 
 local sa = assert(server:getsockname())
-local host, serv = assert(sa:getnameinfo(uint32.bor(unix.NI_NUMERICHOST, unix.NI_NUMERICSERV)))
+local host, serv = assert(sa:getnameinfo(unix.NI_NUMERICHOST + unix.NI_NUMERICSERV))
 assert(host == "0.0.0.0" or host == "::")
 assert(tonumber(serv) > 0)
 assert(server:close())
 
-local fd1, fd2 = assert(unix.socketpair(unix.AF_UNIX, uint32.bor(unix.SOCK_STREAM, unix.SOCK_CLOEXEC)))
+local fd1, fd2 = assert(unix.socketpair(unix.AF_UNIX, unix.SOCK_STREAM + unix.SOCK_CLOEXEC))
 assert(fd1:is_coe())
 assert(fd2:is_coe())
 
