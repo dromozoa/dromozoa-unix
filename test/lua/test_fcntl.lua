@@ -19,6 +19,7 @@ local unix = require "dromozoa.unix"
 
 assert(unix.O_CLOEXEC)
 assert(unix.O_NONBLOCK)
+assert(unix.umask(tonumber("022", 8)))
 
 os.remove("test.txt")
 
