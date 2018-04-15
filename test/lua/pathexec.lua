@@ -19,4 +19,4 @@ local unix = require "dromozoa.unix"
 
 local PATH = os.getenv("PATH")
 
-unix.pathexec(PATH, { "env" }, {})
+unix.pathexec(PATH, { "sh", "-c", [[echo "$foo"]] }, { "foo=baz" })
