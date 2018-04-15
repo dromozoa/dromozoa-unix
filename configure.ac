@@ -50,8 +50,8 @@ AC_SEARCH_LIBS([clock_gettime], [rt], [AC_DEFINE(HAVE_CLOCK_GETTIME, 1, [Define 
 
 AX_PTHREAD([], [AC_MSG_ERROR([could not find pthread])])
 CXXFLAGS="$CXXFLAGS $PTHREAD_CFLAGS"
-LDFLAGS="$LDFLAGS $PTHREAD_CFLAGS"
 LIBS="$LIBS $PTHREAD_LIBS"
+AC_SEARCH_LIBS([pthread_sigmask], [pthread])
 
 AX_PROG_LUA([5.1], [], [], [AC_MSG_ERROR([could not find lua])])
 AX_LUA_HEADERS([], [AC_MSG_ERROR([could not find lua])])
