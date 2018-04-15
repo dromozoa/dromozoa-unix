@@ -31,6 +31,6 @@ assert(unix.bor(0x1F, 0xF1) == 0xFF)
 
 local result, message = pcall(unix.band, 1, "foo")
 if verbose then
-  print(message)
+  io.stderr:write(message, "\n")
 end
 assert(not result)

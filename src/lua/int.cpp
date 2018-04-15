@@ -20,21 +20,21 @@
 namespace dromozoa {
   namespace {
     void impl_band(lua_State* L) {
-      int value = luaX_check_integer<int>(L, 1);
+      int result = luaX_check_integer<int>(L, 1);
       int top = lua_gettop(L);
       for (int i = 2; i <= top; ++i) {
-        value &= luaX_check_integer<int>(L, i);
+        result &= luaX_check_integer<int>(L, i);
       }
-      luaX_push(L, value);
+      luaX_push(L, result);
     }
 
     void impl_bor(lua_State* L) {
-      int value = luaX_check_integer<int>(L, 1);
+      int result = luaX_check_integer<int>(L, 1);
       int top = lua_gettop(L);
       for (int i = 2; i <= top; ++i) {
-        value |= luaX_check_integer<int>(L, i);
+        result |= luaX_check_integer<int>(L, i);
       }
-      luaX_push(L, value);
+      luaX_push(L, result);
     }
   }
 
