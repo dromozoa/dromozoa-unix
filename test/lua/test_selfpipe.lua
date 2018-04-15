@@ -19,10 +19,9 @@ local unix = require "dromozoa.unix"
 
 assert(unix.block_signal(unix.SIGCHLD))
 
-local selfpipe = assert(unix.selfpipe())
-
 local PATH = os.getenv("PATH")
 
+local selfpipe = assert(unix.selfpipe())
 local selector = assert(unix.selector())
 assert(selector:add(selfpipe:get(), unix.SELECTOR_READ))
 

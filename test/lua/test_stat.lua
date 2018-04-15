@@ -1,4 +1,4 @@
--- Copyright (C) 2016 Tomoyuki Fujimori <moyu@dromozoa.com>
+-- Copyright (C) 2016,2018 Tomoyuki Fujimori <moyu@dromozoa.com>
 --
 -- This file is part of dromozoa-unix.
 --
@@ -15,9 +15,8 @@
 -- You should have received a copy of the GNU General Public License
 -- along with dromozoa-unix.  If not, see <http://www.gnu.org/licenses/>.
 
-local equal = require "dromozoa.commons.equal"
-local json = require "dromozoa.commons.json"
 local unix = require "dromozoa.unix"
+local equal = require "equal"
 
 local fd, tmpname = assert(unix.mkstemp("tmp-XXXXXX"))
 

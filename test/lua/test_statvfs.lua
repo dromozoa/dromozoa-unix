@@ -15,7 +15,6 @@
 -- You should have received a copy of the GNU General Public License
 -- along with dromozoa-unix.  If not, see <http://www.gnu.org/licenses/>.
 
-local json = require "dromozoa.commons.json"
 local unix = require "dromozoa.unix"
 
 local function dump(t)

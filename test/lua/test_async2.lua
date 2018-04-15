@@ -15,8 +15,6 @@
 -- You should have received a copy of the GNU General Public License
 -- along with dromozoa-unix.  If not, see <http://www.gnu.org/licenses/>.
 
-local dumper = require "dromozoa.commons.dumper"
-local uint32 = require "dromozoa.commons.uint32"
 local dyld = require "dromozoa.dyld"
 local unix = require "dromozoa.unix"
 
@@ -44,7 +42,6 @@ local count = 5
 while true do
   local task = service:pop()
   if task then
-    print(dumper.encode(task:result()))
     count = count - 1
     if count == 0 then
       break

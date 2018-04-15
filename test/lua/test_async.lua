@@ -15,9 +15,6 @@
 -- You should have received a copy of the GNU General Public License
 -- along with dromozoa-unix.  If not, see <http://www.gnu.org/licenses/>.
 
-local dumper = require "dromozoa.commons.dumper"
-local ipairs = require "dromozoa.commons.ipairs"
-local uint32 = require "dromozoa.commons.uint32"
 local dyld = require "dromozoa.dyld"
 local unix = require "dromozoa.unix"
 
@@ -58,7 +55,6 @@ while true do
         if task then
           local a, b = task:result()
           if type(a) == "table" then
-            print(dumper.encode(a))
             for i = 1, #a do
               local ai = a[i]
               assert(service:push(ai.ai_addr:async_getnameinfo()))

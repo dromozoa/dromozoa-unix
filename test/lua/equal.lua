@@ -1,4 +1,4 @@
--- Copyright (C) 2016,2018 Tomoyuki Fujimori <moyu@dromozoa.com>
+-- Copyright (C) 2018 Tomoyuki Fujimori <moyu@dromozoa.com>
 --
 -- This file is part of dromozoa-unix.
 --
@@ -15,16 +15,27 @@
 -- You should have received a copy of the GNU General Public License
 -- along with dromozoa-unix.  If not, see <http://www.gnu.org/licenses/>.
 
-local unix = require "dromozoa.unix"
+local function equal(a, b)
+  if a == b then
+    return true
+  else
+    if type(a) == "table" and type(b) == "table" then
+      for k, u in pairs(a) do
+        local v = b[k]
+        if v == nil or not equal(u, v) then
+          return false
+        end
+      end
+      for k in pairs(b) do
+        if a[k] == nil then
+          return false
+        end
+      end
+      return true
+    else
+      return false
+    end
+  end
+end
 
-local addrinfo = assert(unix.getaddrinfo("127.0.0.1", "http", { ai_family = unix.AF_INET, ai_socktype = unix.SOCK_STREAM }))
-assert(#addrinfo == 1)
-
-local ai = addrinfo[1]
-local host, serv = assert(ai.ai_addr:getnameinfo(unix.NI_NUMERICHOST + unix.NI_NUMERICSERV))
-assert(ai.ai_socktype == unix.SOCK_STREAM)
-assert(ai.ai_addr:family() == unix.AF_INET)
-assert(host == "127.0.0.1")
-assert(tonumber(serv) == 80)
-
-assert(not unix.getaddrinfo())
+return equal
