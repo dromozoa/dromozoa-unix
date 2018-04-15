@@ -33,6 +33,7 @@ unix_la_SOURCES = \
 	fd_djb.cpp \
 	fd_socket.cpp \
 	fd_unistd.cpp \
+	int.cpp \
 	module.cpp \
 	netdb.cpp \
 	netinet.cpp \
