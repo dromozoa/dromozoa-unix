@@ -17,13 +17,15 @@
 
 local unix = require "dromozoa.unix"
 
+local verbose = os.getenv "VERBOSE" == "1"
+
 local PATH = os.getenv("PATH")
 local envp = unix.get_environ()
 envp[#envp + 1] = "foo=bar"
 
 local reader, writer = assert(unix.pipe())
 local process = assert(unix.process())
-assert(process:forkexec(PATH, { "sh", "-c", "pwd; echo \"$foo\"" }, envp, "/", { [1] = writer }))
+assert(process:forkexec(PATH, { "sh", "-c", [[pwd; echo "$foo"]] }, envp, "/", { [1] = writer }))
 assert(writer:close())
 
 local buffer = {}
@@ -36,22 +38,28 @@ while true do
   end
 end
 assert(reader:close())
+if verbose then
+  print(("%q"):format(table.concat(buffer)))
+end
 assert(table.concat(buffer) == "/\nbar\n")
 
-local a, b, c = assert(unix.wait())
-assert(a == process[1])
-assert(b == "exit")
-assert(c == 0)
+local pid, reason, status = assert(unix.wait())
+assert(pid == process[1])
+assert(reason == "exit")
+assert(status == 0)
 
 local process = unix.process()
-local a, b, c = process:forkexec(PATH, { "no such command" })
-assert(a == nil)
-assert(c == unix.ENOENT)
+local result, message, code = process:forkexec(PATH, { "no such command" })
+if verbose then
+  print(message)
+end
+assert(not result)
+assert(code == unix.ENOENT)
 
-local a, b, c = assert(unix.wait())
-assert(a == process[1])
-assert(b == "exit")
-assert(c == 1)
+local pid, reason, status = assert(unix.wait())
+assert(pid == process[1])
+assert(reason == "exit")
+assert(status == 1)
 
 local reader, writer = assert(unix.pipe(0))
 assert(reader:coe())
@@ -59,25 +67,32 @@ local process = assert(unix.process())
 assert(process:forkexec_daemon(PATH, { "sh", "-c", "echo foo >&" .. writer:get() .. "; exec sleep 10" }))
 assert(writer:close())
 
-local a, b, c = assert(unix.wait())
-assert(a == process[1])
-assert(b == "exit")
-assert(c == 0)
+local pid, reason, status = assert(unix.wait())
+assert(pid == process[1])
+assert(reason == "exit")
+assert(status == 0)
 
-local t1 = unix.clock_gettime(unix.CLOCK_MONOTONIC_RAW)
+local timer = unix.timer()
+timer:start()
 assert(reader:read(4) == "foo\n")
 assert(unix.kill(process[2], 0))
 assert(unix.kill(process[2]))
 assert(reader:read(4) == "")
-local t2 = unix.clock_gettime(unix.CLOCK_MONOTONIC_RAW)
-assert(t2 - t1 < unix.timespec(5))
+timer:stop()
+if verbose then
+  print(timer:elapsed())
+end
+assert(timer:elapsed() < 5)
 
 local process = unix.process()
-local a, b, c = process:forkexec_daemon(PATH, { "no such command" })
-assert(a == nil)
-assert(c == unix.ENOENT)
+local result, message, code = process:forkexec_daemon(PATH, { "no such command" })
+if verbose then
+  print(message)
+end
+assert(not result)
+assert(code == unix.ENOENT)
 
-local a, b, c = assert(unix.wait())
-assert(a == process[1])
-assert(b == "exit")
-assert(c == 0)
+local pid, reason, status = assert(unix.wait())
+assert(pid == process[1])
+assert(reason == "exit")
+assert(status == 0)

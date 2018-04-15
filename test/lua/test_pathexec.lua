@@ -17,6 +17,8 @@
 
 local unix = require "dromozoa.unix"
 
+local verbose = os.getenv "VERBOSE" == "1"
+
 local PATH = os.getenv("PATH")
 local envp = unix.get_environ()
 envp[#envp + 1] = "foo=bar"
@@ -36,13 +38,12 @@ while true do
   end
 end
 assert(reader:close())
-
-for line in table.concat(buffer):gmatch "(.-)\n" do
-  assert(line ~= "foo=bar")
-  print(line)
+if verbose then
+  print(("%q"):format(table.concat(buffer)))
 end
+assert(table.concat(buffer) == "baz\n")
 
-local a, b, c = assert(unix.wait())
-assert(a == process[1])
-assert(b == "exit")
-assert(c == 0)
+local pid, reason, status = assert(unix.wait())
+assert(pid == process[1])
+assert(reason == "exit")
+assert(status == 0)

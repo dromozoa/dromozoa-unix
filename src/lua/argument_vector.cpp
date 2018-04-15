@@ -1,4 +1,4 @@
-// Copyright (C) 2016,2017 Tomoyuki Fujimori <moyu@dromozoa.com>
+// Copyright (C) 2016-2018 Tomoyuki Fujimori <moyu@dromozoa.com>
 //
 // This file is part of dromozoa-unix.
 //
@@ -21,7 +21,7 @@ namespace dromozoa {
   argument_vector to_argument_vector(lua_State* L, int index) {
     argument_vector result;
     if (lua_istable(L, index)) {
-      result.clear(); // make empty (not null)
+      result.clear(); // make empty
       for (int i = 1; ; ++i) {
         luaX_get_field(L, index, i);
         if (const char* p = lua_tostring(L, -1)) {
