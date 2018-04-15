@@ -27,4 +27,5 @@ EXTRA_DIST = \
 	include \
 	m4/update \
 	test/lua \
-	test.sh
+	$(TESTS)
+TESTS = test.sh
