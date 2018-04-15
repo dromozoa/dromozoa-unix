@@ -17,6 +17,8 @@
 
 local unix = require "dromozoa.unix"
 
+assert(unix.umask(tonumber("022", 8)))
+
 local mask = unix.umask(tonumber("022", 8))
 assert(mask == tonumber("022", 8))
 assert(unix.umask(mask) == tonumber("022", 8))
