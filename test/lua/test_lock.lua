@@ -48,3 +48,5 @@ local pid, reason, status = assert(unix.wait())
 assert(pid == process1[1] or process2[1])
 assert(reason == "exit")
 assert(status == 0)
+
+assert(os.remove "test.lock")
