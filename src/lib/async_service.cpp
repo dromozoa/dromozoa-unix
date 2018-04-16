@@ -15,6 +15,7 @@
 // You should have received a copy of the GNU General Public License
 // along with dromozoa-unix.  If not, see <http://www.gnu.org/licenses/>.
 
+#include <errno.h>
 #include <fcntl.h>
 #include <unistd.h>
 
@@ -31,6 +32,7 @@
 #include <dromozoa/file_descriptor.hpp>
 #include <dromozoa/mutex.hpp>
 #include <dromozoa/scoped_lock.hpp>
+#include <dromozoa/sigmask.hpp>
 #include <dromozoa/thread.hpp>
 
 namespace dromozoa {
@@ -66,6 +68,13 @@ namespace dromozoa {
 
       if (start_threads > 0) {
         scoped_lock<> counter_lock(counter_mutex_);
+
+        sigset_t mask;
+        if (sigmask_block_all_signals(&mask)) {
+          return -1;
+        }
+        sigmask_saver save_mask(mask);
+
         spare_threads_ += start_threads;
         current_threads_ += start_threads;
         for (unsigned int i = 0; i < start_threads; ++i) {
@@ -150,11 +159,17 @@ namespace dromozoa {
       return count;
     }
 
-    void push(async_service_task* task) {
+    int push(async_service_task* task) {
       {
         scoped_lock<> counter_lock(counter_mutex_);
         ++current_tasks_;
         if (current_threads_ < current_tasks_ && current_threads_ < max_threads_) {
+          sigset_t mask;
+          if (sigmask_block_all_signals(&mask)) {
+            return -1;
+          }
+          sigmask_saver save_mask(mask);
+
           ++spare_threads_;
           ++current_threads_;
           thread(&start_routine, this).detach();
@@ -167,6 +182,7 @@ namespace dromozoa {
         queue_index_.insert(std::make_pair(task, i));
         queue_condition_.notify_one();
       }
+      return 0;
     }
 
     bool cancel(async_service_task* task) {
@@ -342,8 +358,8 @@ namespace dromozoa {
     return impl_->read();
   }
 
-  void async_service::push(async_service_task* task) {
-    impl_->push(task);
+  int async_service::push(async_service_task* task) {
+    return impl_->push(task);
   }
 
   bool async_service::cancel(async_service_task* task) {

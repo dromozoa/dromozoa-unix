@@ -68,10 +68,10 @@ void test1() {
   nanosleep_task task4(make_timespec(0, 200000000));
 
   dromozoa::async_service service(dromozoa::async_service::open(1));
-  service.push(&task1);
-  service.push(&task2);
-  service.push(&task3);
-  service.push(&task4);
+  assert(service.push(&task1) == 0);
+  assert(service.push(&task2) == 0);
+  assert(service.push(&task3) == 0);
+  assert(service.push(&task4) == 0);
 
   struct timespec tv = make_timespec(0, 300000000);
   nanosleep(&tv, 0);
@@ -100,10 +100,10 @@ void test2() {
   nanosleep_task task4(make_timespec(0, 200000000));
 
   dromozoa::async_service service(dromozoa::async_service::open(4));
-  service.push(&task1);
-  service.push(&task2);
-  service.push(&task3);
-  service.push(&task4);
+  assert(service.push(&task1) == 0);
+  assert(service.push(&task2) == 0);
+  assert(service.push(&task3) == 0);
+  assert(service.push(&task4) == 0);
 
   struct timespec tv = make_timespec(0, 100000000);
   nanosleep(&tv, 0);
@@ -128,10 +128,10 @@ void test3() {
   nanosleep_task task4(make_timespec(0, 200000000));
 
   dromozoa::async_service service(dromozoa::async_service::open(1));
-  service.push(&task1);
-  service.push(&task2);
-  service.push(&task3);
-  service.push(&task4);
+  assert(service.push(&task1) == 0);
+  assert(service.push(&task2) == 0);
+  assert(service.push(&task3) == 0);
+  assert(service.push(&task4) == 0);
 
   struct timespec tv = make_timespec(0, 300000000);
   nanosleep(&tv, 0);
@@ -173,8 +173,8 @@ void test4() {
   assert(current_threads == 0);
   assert(current_tasks == 0);
 
-  service.push(&task1);
-  service.push(&task2);
+  assert(service.push(&task1) == 0);
+  assert(service.push(&task2) == 0);
 
   service.info(spare_threads, current_threads, current_tasks);
   std::cout << spare_threads << ", " << current_threads << ", " << current_tasks << "\n";
@@ -225,7 +225,7 @@ void test5() {
   assert(current_threads == 0);
   assert(current_tasks == 0);
 
-  service.push(&task1);
+  assert(service.push(&task1) == 0);
 
   {
     struct timespec tv = make_timespec(0, 150000000);
@@ -238,7 +238,7 @@ void test5() {
   assert(current_threads == 1);
   assert(current_tasks == 1);
 
-  service.push(&task2);
+  assert(service.push(&task2) == 0);
 
   {
     struct timespec tv = make_timespec(0, 150000000);

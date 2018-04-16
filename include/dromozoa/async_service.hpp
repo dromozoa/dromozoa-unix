@@ -41,7 +41,7 @@ namespace dromozoa {
     bool valid() const;
     int get() const;
     int read() const;
-    void push(async_service_task* task);
+    int push(async_service_task* task);
     bool cancel(async_service_task* task);
     async_service_task* pop();
     void info(unsigned int& spare_threads, unsigned int& current_threads, unsigned int& current_tasks);
