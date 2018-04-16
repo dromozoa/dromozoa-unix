@@ -19,21 +19,26 @@ local unix = require "dromozoa.unix"
 
 local mode = ...
 
-local fd = assert(unix.open("test.lock", unix.O_WRONLY + unix.O_CREAT + unix.O_CLOEXEC))
+local verbose = os.getenv "VERBOSE" == "1"
+
+local fd = assert(unix.open("test.lock", unix.bor(unix.O_WRONLY, unix.O_CREAT, unix.O_CLOEXEC)))
 
 if mode == "1" then
-  assert(io.stdin:read(1) == "x")
-  local a, b, c = fd:lock_exnb()
-  assert(a == nil)
-  assert(c == unix.EWOULDBLOCK)
-  io.stdout:write("x")
+  assert(io.stdin:read(1) == "X")
+  local result, message, code = fd:lock_exnb()
+  if verbose then
+    io.stderr:write(message, "\n")
+  end
+  assert(not result)
+  assert(code == unix.EWOULDBLOCK)
+  io.stdout:write "X"
   io.stdout:flush()
   assert(fd:lock_ex())
 else
   assert(fd:lock_exnb())
-  io.stdout:write("x")
+  io.stdout:write "X"
   io.stdout:flush()
-  assert(io.stdin:read(1) == "x")
+  assert(io.stdin:read(1) == "X")
   assert(unix.nanosleep(0.2))
   assert(fd:lock_un())
 end

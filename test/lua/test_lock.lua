@@ -1,4 +1,4 @@
--- Copyright (C) 2016 Tomoyuki Fujimori <moyu@dromozoa.com>
+-- Copyright (C) 2016,2018 Tomoyuki Fujimori <moyu@dromozoa.com>
 --
 -- This file is part of dromozoa-unix.
 --
@@ -17,9 +17,11 @@
 
 local unix = require "dromozoa.unix"
 
-local PATH = os.getenv("PATH")
+local verbose = os.getenv "VERBOSE" == "1"
 
-os.remove("test.lock")
+local PATH = os.getenv "PATH"
+
+os.remove "test.lock"
 
 local reader1, writer1 = assert(unix.pipe())
 local reader2, writer2 = assert(unix.pipe())
@@ -32,16 +34,19 @@ assert(reader2:close())
 assert(writer1:close())
 assert(writer2:close())
 
-print(process1[1], process2[1])
+if verbose then
+  io.stderr:write(process1[1], "\n")
+  io.stderr:write(process2[1], "\n")
+end
 
-local a, b, c = assert(unix.wait())
-print(a, b, c)
-assert(a == process1[1] or a == process2[1])
-assert(b == "exit")
-assert(c == 0)
+local pid, reason, status = assert(unix.wait())
+assert(pid == process1[1] or process2[1])
+assert(reason == "exit")
+assert(status == 0)
 
-local a, b, c = assert(unix.wait())
-print(a, b, c)
-assert(a == process1[1] or a == process2[1])
-assert(b == "exit")
-assert(c == 0)
+local pid, reason, status = assert(unix.wait())
+assert(pid == process1[1] or process2[1])
+assert(reason == "exit")
+assert(status == 0)
+
+assert(os.remove "test.lock")

@@ -1,4 +1,4 @@
--- Copyright (C) 2016,2018 Tomoyuki Fujimori <moyu@dromozoa.com>
+-- Copyright (C) 2018 Tomoyuki Fujimori <moyu@dromozoa.com>
 --
 -- This file is part of dromozoa-unix.
 --
@@ -17,6 +17,20 @@
 
 local unix = require "dromozoa.unix"
 
-local PATH = os.getenv "PATH"
+local verbose = os.getenv "VERBOSE" == "1"
 
-unix.pathexec(PATH, { "sh", "-c", [[echo "$foo"]] }, { "foo=baz" })
+assert(unix.band(0x01) == 0x01)
+assert(unix.band(0x01, 0x03) == 0x01)
+assert(unix.band(0x01, 0x03, 0x07) == 0x01)
+assert(unix.band(0x1F, 0xF1) == 0x11)
+
+assert(unix.bor(0x01) == 0x01)
+assert(unix.bor(0x01, 0x02) == 0x03)
+assert(unix.bor(0x01, 0x02, 0x04) == 0x07)
+assert(unix.bor(0x1F, 0xF1) == 0xFF)
+
+local result, message = pcall(unix.band, 1, "foo")
+if verbose then
+  io.stderr:write(message, "\n")
+end
+assert(not result)

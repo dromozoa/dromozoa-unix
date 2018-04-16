@@ -17,14 +17,20 @@
 
 local unix = require "dromozoa.unix"
 
+local verbose = os.getenv "VERBOSE" == "1"
+
 local addrinfo = assert(unix.getaddrinfo("127.0.0.1", "http", { ai_family = unix.AF_INET, ai_socktype = unix.SOCK_STREAM }))
 assert(#addrinfo == 1)
 
 local ai = addrinfo[1]
-local host, serv = assert(ai.ai_addr:getnameinfo(unix.NI_NUMERICHOST + unix.NI_NUMERICSERV))
+local host, serv = assert(ai.ai_addr:getnameinfo(unix.bor(unix.NI_NUMERICHOST, unix.NI_NUMERICSERV)))
 assert(ai.ai_socktype == unix.SOCK_STREAM)
 assert(ai.ai_addr:family() == unix.AF_INET)
 assert(host == "127.0.0.1")
 assert(tonumber(serv) == 80)
 
-assert(not unix.getaddrinfo())
+local result, message = unix.getaddrinfo()
+if verbose then
+  io.stderr:write(message, "\n")
+end
+assert(not result)
