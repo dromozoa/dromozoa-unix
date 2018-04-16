@@ -15,7 +15,6 @@
 // You should have received a copy of the GNU General Public License
 // along with dromozoa-unix.  If not, see <http://www.gnu.org/licenses/>.
 
-#include <dromozoa/scoped_ptr.hpp>
 #include <dromozoa/selfpipe.hpp>
 
 #include "common.hpp"
@@ -31,9 +30,8 @@ namespace dromozoa {
     }
 
     void impl_call(lua_State* L) {
-      scoped_ptr<selfpipe_impl> impl(selfpipe::open());
-      if (impl.valid()) {
-        luaX_new<selfpipe>(L, impl.release());
+      if (selfpipe_impl* impl = selfpipe::open()) {
+        luaX_new<selfpipe>(L, impl);
         luaX_set_metatable(L, "dromozoa.unix.selfpipe");
       } else {
         push_error(L);

@@ -15,7 +15,6 @@
 // You should have received a copy of the GNU General Public License
 // along with dromozoa-unix.  If not, see <http://www.gnu.org/licenses/>.
 
-#include <dromozoa/scoped_ptr.hpp>
 #include <dromozoa/selector.hpp>
 
 #include "common.hpp"
@@ -32,9 +31,8 @@ namespace dromozoa {
 
     void impl_call(lua_State* L) {
       int flags = luaX_opt_integer<int>(L, 2, SELECTOR_CLOEXEC);
-      scoped_ptr<selector_impl> impl(selector::open(flags));
-      if (impl.valid()) {
-        luaX_new<selector>(L, impl.release());
+      if (selector_impl* impl = selector::open(flags)) {
+        luaX_new<selector>(L, impl);
         luaX_set_metatable(L, "dromozoa.unix.selector");
       } else {
         push_error(L);

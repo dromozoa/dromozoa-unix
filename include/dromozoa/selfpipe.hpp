@@ -21,15 +21,7 @@
 #include <dromozoa/scoped_ptr.hpp>
 
 namespace dromozoa {
-  class selfpipe_impl {
-  public:
-    virtual ~selfpipe_impl() = 0;
-    virtual int open() = 0;
-    virtual int close() = 0;
-    virtual bool valid() const = 0;
-    virtual int get() const = 0;
-    virtual int read() const = 0;
-  };
+  class selfpipe_impl;
 
   class selfpipe {
   public:
