@@ -84,8 +84,11 @@ namespace dromozoa {
     void impl_push(lua_State* L) {
       async_task* task = check_async_task(L, 2);
       task->ref(L, 2);
-      check_async_service(L, 1)->push(task);
-      luaX_push_success(L);
+      if (check_async_service(L, 1)->push(task) == -1) {
+        push_error(L);
+      } else {
+        luaX_push_success(L);
+      }
     }
 
     void impl_cancel(lua_State* L) {
