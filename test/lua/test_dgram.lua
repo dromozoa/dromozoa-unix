@@ -17,10 +17,7 @@
 
 local unix = require "dromozoa.unix"
 
-local addrinfo = assert(unix.getaddrinfo("127.0.0.1", nil, {
-  ai_socktype = unix.SOCK_DGRAM;
-  ai_flags = unix.AI_PASSIVE;
-}))
+local addrinfo = assert(unix.getaddrinfo("127.0.0.1", nil, { ai_socktype = unix.SOCK_DGRAM, ai_flags = unix.AI_PASSIVE }))
 local ai = addrinfo[1]
 local server_fd = assert(unix.socket(ai.ai_family, ai.ai_socktype + unix.SOCK_CLOEXEC, ai.ai_protocol))
 assert(server_fd:bind(ai.ai_addr))

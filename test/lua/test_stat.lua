@@ -35,7 +35,7 @@ local function dump(t)
   end
 end
 
-local fd, tmpname = assert(unix.mkstemp("tmp-XXXXXX"))
+local fd, tmpname = assert(unix.mkstemp "test.txt-XXXXXX")
 local current_time = assert(unix.clock_gettime(unix.CLOCK_REALTIME))
 if verbose then
   io.stderr:write(tostring(current_time), "\n")
@@ -53,7 +53,7 @@ assert(st1.st_mtim <= current_time)
 assert(st2.st_ctim <= current_time)
 assert(st2.st_mtim <= current_time)
 
-assert(fd:write("foobarbazqux"))
+assert(fd:write "foobarbazqux")
 assert(fd:fsync())
 
 local st1 = assert(fd:fstat())

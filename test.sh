@@ -28,4 +28,4 @@ do
   esac
 done
 
-rm -fr test.lock test.sock test.txt test.dir test.fifo
+rm -fr test.lock test.fifo test.sock test.dir* test.txt*
