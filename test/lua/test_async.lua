@@ -24,7 +24,7 @@ assert(dyld.dlopen_pthread())
 
 local service = assert(unix.async_service(1))
 local selector = assert(unix.selector())
-local timer = assert(unix.timer())
+local timer = unix.timer()
 
 local info = service:info()
 assert(info.spare_threads == 1)

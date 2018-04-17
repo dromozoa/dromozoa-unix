@@ -237,6 +237,17 @@ namespace dromozoa {
     luaX_set_field(L, -1, "NI_NUMERICSCOPE", NI_NUMERICSCOPE);
 #endif
     luaX_set_field(L, -1, "NI_DGRAM", NI_DGRAM);
+
+    luaX_set_field(L, -1, "EAI_AGAIN", EAI_AGAIN);
+    luaX_set_field(L, -1, "EAI_BADFLAGS", EAI_BADFLAGS);
+    luaX_set_field(L, -1, "EAI_FAIL", EAI_FAIL);
+    luaX_set_field(L, -1, "EAI_FAMILY", EAI_FAMILY);
+    luaX_set_field(L, -1, "EAI_MEMORY", EAI_MEMORY);
+    luaX_set_field(L, -1, "EAI_NONAME", EAI_NONAME);
+    luaX_set_field(L, -1, "EAI_SERVICE", EAI_SERVICE);
+    luaX_set_field(L, -1, "EAI_SOCKTYPE", EAI_SOCKTYPE);
+    luaX_set_field(L, -1, "EAI_SYSTEM", EAI_SYSTEM);
+    luaX_set_field(L, -1, "EAI_OVERFLOW", EAI_OVERFLOW);
   }
 
   void initialize_sockaddr_netdb(lua_State* L) {

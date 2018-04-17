@@ -29,8 +29,9 @@ assert(ai.ai_addr:family() == unix.AF_INET)
 assert(host == "127.0.0.1")
 assert(tonumber(serv) == 80)
 
-local result, message = unix.getaddrinfo()
+local result, message, code = unix.getaddrinfo()
 if verbose then
   io.stderr:write(message, "\n")
 end
 assert(not result)
+assert(code == unix.EAI_NONAME)

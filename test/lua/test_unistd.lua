@@ -19,14 +19,19 @@ local unix = require "dromozoa.unix"
 
 local verbose = os.getenv "VERBOSE" == "1"
 
-for _, item in ipairs(assert(unix.get_environ())) do
-  local k, v = item:match("([^=]+)=(.*)")
+local environ = assert(unix.get_environ())
+for i = 1, #environ do
+  local item = environ[i]
+  if verbose then
+    io.stderr:write(item, "\n")
+  end
+  local k, v = assert(item:match "([^=]+)=(.*)")
   assert(os.getenv(k) == v)
 end
 
-assert(unix.getcwd() == unix.realpath("."))
+assert(unix.getcwd() == unix.realpath ".")
 
-local tmpdir = assert(unix.mkdtemp("tmp-XXXXXX"))
+local tmpdir = assert(unix.mkdtemp "test.dir-XXXXXX")
 assert(unix.chdir(tmpdir))
 assert(os.remove(unix.getcwd()))
 

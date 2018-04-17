@@ -24,7 +24,7 @@ os.remove "test.txt"
 local fd = assert(unix.open("test.txt", unix.bor(unix.O_WRONLY, unix.O_CREAT, unix.O_CLOEXEC)))
 assert(fd:is_coe())
 assert(fd:is_ndelay_off())
-assert(fd:write("foo\n") == 4)
+assert(fd:write "foo\n" == 4)
 assert(fd:close())
 
 local fd = assert(unix.open "test.txt")

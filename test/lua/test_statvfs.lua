@@ -34,7 +34,7 @@ local function dump(t)
   end
 end
 
-local fd = assert(unix.open("."))
+local fd = assert(unix.open ".")
 dump(assert(fd:fstatvfs()))
-dump(assert(unix.statvfs(".")))
+dump(assert(unix.statvfs "."))
 fd:close()

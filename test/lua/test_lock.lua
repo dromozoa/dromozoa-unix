@@ -18,15 +18,14 @@
 local unix = require "dromozoa.unix"
 
 local verbose = os.getenv "VERBOSE" == "1"
-
 local PATH = os.getenv "PATH"
 
 os.remove "test.lock"
 
 local reader1, writer1 = assert(unix.pipe())
 local reader2, writer2 = assert(unix.pipe())
-local process1 = assert(unix.process())
-local process2 = assert(unix.process())
+local process1 = unix.process()
+local process2 = unix.process()
 assert(process1:forkexec(PATH, { arg[-1], "test/lua/lock.lua", "1" }, nil, nil, { [0] = reader1, [1] = writer2 }))
 assert(process2:forkexec(PATH, { arg[-1], "test/lua/lock.lua", "2" }, nil, nil, { [0] = reader2, [1] = writer1 }))
 assert(reader1:close())

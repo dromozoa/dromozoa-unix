@@ -18,12 +18,11 @@
 local unix = require "dromozoa.unix"
 
 local verbose = os.getenv "VERBOSE" == "1"
+local PATH = os.getenv "PATH"
 
 assert(unix.block_signal(unix.SIGCHLD))
 
 local selfpipe = assert(unix.selfpipe())
-
-local PATH = os.getenv("PATH")
 
 assert(unix.nanosleep(0.2))
 

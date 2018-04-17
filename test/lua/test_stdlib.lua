@@ -33,7 +33,7 @@ if verbose then
   io.stderr:write(tmpname, "\n")
 end
 assert(fd:is_coe())
-assert(fd:write("foo\n"))
+assert(fd:write "foo\n")
 assert(fd:close())
 
 local fd = assert(unix.open(tmpname))
