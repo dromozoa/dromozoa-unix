@@ -29,7 +29,7 @@ assert(writer:close())
 
 local buffer = {}
 while true do
-  local data = assert(reader:read(4096))
+  local data = assert(reader:read(256))
   if data == "" then
     break
   else

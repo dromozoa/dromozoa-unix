@@ -23,13 +23,13 @@ local envp = unix.get_environ()
 envp[#envp + 1] = "foo=bar"
 
 local reader, writer = assert(unix.pipe())
-local process = assert(unix.process())
+local process = unix.process()
 assert(process:forkexec(PATH, { arg[-1], "test/lua/pathexec.lua" }, envp, nil, { [1] = writer }))
 assert(writer:close())
 
 local buffer = {}
 while true do
-  local data = assert(reader:read(4096))
+  local data = assert(reader:read(256))
   if data == "" then
     break
   else

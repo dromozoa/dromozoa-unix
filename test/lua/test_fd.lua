@@ -25,7 +25,12 @@ assert(unix.STDERR_FILENO == 2)
 
 assert(unix.fd.get(0) == 0)
 assert(unix.stdin:get() == 0)
-assert(not unix.fd.close(-2))
+local result, message, code = unix.fd.close(-2)
+if verbose then
+  io.stderr:write(message, "\n")
+end
+assert(not result)
+assert(code == unix.EBADF)
 
 local fd
 
@@ -42,6 +47,7 @@ do
     io.stderr:write(message, "\n")
   end
   assert(not result)
+  assert(code == unix.EBADF)
 end
 collectgarbage()
 collectgarbage()

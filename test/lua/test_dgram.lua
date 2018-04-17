@@ -36,7 +36,7 @@ assert(client_fd:sendto("foobarbaz", nil, nil, nil, address) == 9)
 
 local result, recv_address = assert(server_fd:recvfrom(16))
 if verbose then
-  local host, serv = assert(recv_address:getnameinfo(unix.NI_NUMERICHOST + unix.NI_NUMERICSERV))
+  local host, serv = assert(recv_address:getnameinfo(unix.bor(unix.NI_NUMERICHOST, unix.NI_NUMERICSERV)))
   io.stderr:write(host, "\n")
   io.stderr:write(serv, "\n")
 end

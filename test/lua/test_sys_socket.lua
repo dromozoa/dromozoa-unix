@@ -64,7 +64,7 @@ assert(so_error == 0)
 assert(so_rcvbuf > 0);
 assert(so_sndbuf > 0);
 
-assert(fd1:write("foo"))
+assert(fd1:write "foo")
 assert(fd1:close())
 
 assert(fd2:read(4) == "foo")

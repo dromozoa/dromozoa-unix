@@ -19,24 +19,24 @@ local unix = require "dromozoa.unix"
 
 assert(unix.umask(tonumber("022", 8)))
 
-local mask = unix.umask(tonumber("022", 8))
+local mask = assert(unix.umask(tonumber("022", 8)))
 assert(mask == tonumber("022", 8))
 assert(unix.umask(mask) == tonumber("022", 8))
 
-assert(unix.mkdir("test.dir"))
-local st = unix.stat("test.dir")
-assert(st.st_mode == unix.S_IFDIR + tonumber("0755", 8))
+assert(unix.mkdir "test.dir")
+local st = assert(unix.stat "test.dir")
+assert(st.st_mode == unix.bor(unix.S_IFDIR, tonumber("0755", 8)))
 
-assert(os.remove("test.dir"))
+assert(os.remove "test.dir")
 
 assert(unix.mkdir("test.dir", tonumber("0707", 8)))
-local st = unix.stat("test.dir")
-assert(st.st_mode == unix.S_IFDIR + tonumber("0705", 8))
+local st = assert(unix.stat "test.dir")
+assert(st.st_mode == unix.bor(unix.S_IFDIR, tonumber("0705", 8)))
 
-assert(os.remove("test.dir"))
+assert(os.remove "test.dir")
 
-assert(unix.mkfifo("test.fifo"))
-local st = unix.stat("test.fifo")
-assert(st.st_mode == unix.S_IFIFO + tonumber("0644", 8))
+assert(unix.mkfifo "test.fifo")
+local st = assert(unix.stat "test.fifo")
+assert(st.st_mode == unix.bor(unix.S_IFIFO, tonumber("0644", 8)))
 
-assert(os.remove("test.fifo"))
+assert(os.remove "test.fifo")
