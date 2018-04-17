@@ -17,21 +17,24 @@
 
 local unix = require "dromozoa.unix"
 
+local verbose = os.getenv "VERBOSE" == "1"
+
 local function dump(t)
-  local keys = {}
-  for k in pairs(t) do
-    keys[#keys + 1] = k
-  end
-  table.sort(keys)
-  for i = 1, #keys do
-    local k = keys[i]
-    print(("%-9s | %10d"):format(k, t[k]))
+  if verbose then
+    local keys = {}
+    for k in pairs(t) do
+      keys[#keys + 1] = k
+    end
+    table.sort(keys)
+    io.stderr:write(("-"):rep(70), "\n")
+    for i = 1, #keys do
+      local k = keys[i]
+      io.stderr:write(("%-9s | %s\n"):format(k, tostring(t[k])))
+    end
   end
 end
 
 local fd = assert(unix.open("."))
-print "--"
 dump(assert(fd:fstatvfs()))
-print "--"
 dump(assert(unix.statvfs(".")))
 fd:close()
