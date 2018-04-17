@@ -24,6 +24,7 @@ assert(dyld.dlopen_pthread())
 
 local service = assert(unix.async_service(1))
 local selector = assert(unix.selector())
+local timer = assert(unix.timer())
 
 local info = service:info()
 assert(info.spare_threads == 1)
@@ -31,6 +32,8 @@ assert(info.current_threads == 1)
 assert(info.current_tasks == 0)
 
 assert(selector:add(service:get(), unix.SELECTOR_READ))
+
+timer:start()
 
 local serv = "https"
 local hints = { ai_socktype = unix.SOCK_STREAM }
@@ -81,14 +84,19 @@ repeat
   end
 until n == 0
 
+timer:stop()
+if verbose then
+  io.stderr:write(timer:elapsed(), "\n")
+end
+
 local tasks = {
   unix.async_nanosleep(0.25);
   unix.async_nanosleep(0.25);
   unix.async_nanosleep(0.25);
   unix.async_nanosleep(0.25);
 }
-for _, task in ipairs(tasks) do
-  assert(service:push(task))
+for i = 1, #tasks do
+  assert(service:push(tasks[i]))
 end
 service:cancel(tasks[2])
 
