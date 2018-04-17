@@ -50,40 +50,43 @@ local n = #tasks
 
 repeat
   local result = assert(selector:select())
+  if verbose then
+    io.stderr:write(result, "\n")
+    io.stderr:flush()
+  end
   assert(result == 1)
   local fd, event = assert(selector:event(1))
   assert(fd == service:get())
   assert(event == unix.SELECTOR_READ)
-  if fd == service:get() then
-    while true do
-      local task = service:pop()
-      if task then
-        local index
-        local a, b = assert(task:result())
-        if type(a) == "table" then
+  assert(service:read() >= 1)
+  while true do
+    local task = service:pop()
+    if task then
+      local index
+      local a, b = assert(task:result())
+      if type(a) == "table" then
+      if verbose then
+        io.stderr:write(tostring(task), "\n")
+        io.stderr:flush()
+      end
+        local addrinfo = a
+        for i = 1, #addrinfo do
+          assert(service:push(addrinfo[i].ai_addr:async_getnameinfo()))
+          n = n + 1
+        end
+      else
+        local host, serv = a, b
         if verbose then
-          io.stderr:write(tostring(task), "\n")
+          io.stderr:write(host, "\n")
+          io.stderr:write(serv, "\n")
           io.stderr:flush()
         end
-          local addrinfo = a
-          for i = 1, #addrinfo do
-            assert(service:push(addrinfo[i].ai_addr:async_getnameinfo()))
-            n = n + 1
-          end
-        else
-          local host, serv = a, b
-          if verbose then
-            io.stderr:write(host, "\n")
-            io.stderr:write(serv, "\n")
-            io.stderr:flush()
-          end
-          assert(host:find "%.dromozoa%.com$")
-          assert(serv == "https")
-        end
-        n = n - 1
-      else
-        break
+        assert(host:find "%.dromozoa%.com$")
+        assert(serv == "https")
       end
+      n = n - 1
+    else
+      break
     end
   end
 until n == 0
