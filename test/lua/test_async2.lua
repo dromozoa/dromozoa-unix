@@ -39,7 +39,12 @@ local tasks = {
   unix.async_getaddrinfo("nozomi.dromozoa.com", serv, hints);
 }
 for i = 1, #tasks do
-  assert(service:push(tasks[i]))
+  local task = tasks[i]
+  if verbose then
+    io.stderr:write(tostring(task), "\n")
+    io.stderr:flush()
+  end
+  assert(service:push(task))
 end
 local n = #tasks
 
@@ -56,6 +61,10 @@ repeat
         local index
         local a, b = assert(task:result())
         if type(a) == "table" then
+        if verbose then
+          io.stderr:write(tostring(task), "\n")
+          io.stderr:flush()
+        end
           local addrinfo = a
           for i = 1, #addrinfo do
             assert(service:push(addrinfo[i].ai_addr:async_getnameinfo()))
@@ -66,6 +75,7 @@ repeat
           if verbose then
             io.stderr:write(host, "\n")
             io.stderr:write(serv, "\n")
+            io.stderr:flush()
           end
           assert(host:find "%.dromozoa%.com$")
           assert(serv == "https")
