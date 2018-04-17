@@ -1,4 +1,4 @@
--- Copyright (C) 2016 Tomoyuki Fujimori <moyu@dromozoa.com>
+-- Copyright (C) 2016,2018 Tomoyuki Fujimori <moyu@dromozoa.com>
 --
 -- This file is part of dromozoa-unix.
 --
@@ -17,6 +17,8 @@
 
 local unix = require "dromozoa.unix"
 
+local verbose = os.getenv "VERBOSE" == "1"
+
 local t = unix.timespec(1.25)
 assert(t.tv_sec == 1)
 assert(t.tv_nsec == 250000000)
@@ -33,21 +35,25 @@ assert(t.tv_sec == 0)
 assert(100000000 < t.tv_nsec and t.tv_nsec < 300000000)
 assert(0.1 < t:tonumber() and t:tonumber() < 0.3)
 
-local t1 = unix.timespec({ tv_sec = 1, tv_nsec = 0 })
-local t2 = unix.timespec({ tv_sec = 1, tv_nsec = 1 })
+local t1 = unix.timespec { tv_sec = 1, tv_nsec = 0 }
+local t2 = unix.timespec { tv_sec = 1, tv_nsec = 1 }
 assert(t1 <= t1)
 assert(t1 <= t2)
+assert(t2 <= t2)
 
 local t = unix.timespec(1 / 3, unix.TIMESPEC_TYPE_REALTIME)
 local l = t:tostring()
 local u = t:tostring(true)
-assert(l:match("^([^%.]+)") == os.date("%Y-%m-%dT%H:%M:%S", 0))
-assert(u:match("^([^%.]+)") == os.date("!%Y-%m-%dT%H:%M:%S", 0))
+assert(l:match "^([^%.]+)" == os.date("%Y-%m-%dT%H:%M:%S", 0))
+assert(u:match "^([^%.]+)" == os.date("!%Y-%m-%dT%H:%M:%S", 0))
 assert(l == tostring(t))
 
-print(tostring(unix.timespec(os.time(), unix.CLOCK_REALTIME)))
-print(tostring(unix.clock_gettime(unix.CLOCK_REALTIME)))
-print(tostring(unix.clock_gettime(unix.CLOCK_MONOTONIC)))
+if verbose then
+  io.stderr:write(tostring(unix.timespec(os.time(), unix.CLOCK_REALTIME)), "\n")
+  io.stderr:write(tostring(unix.clock_gettime(unix.CLOCK_REALTIME)), "\n")
+  io.stderr:write(tostring(unix.clock_gettime(unix.CLOCK_MONOTONIC)), "\n")
+  io.stderr:write(tostring(unix.clock_gettime(unix.CLOCK_MONOTONIC_RAW)), "\n")
+end
 
 local t = unix.clock_gettime(unix.CLOCK_REALTIME)
 assert(t.tv_type == unix.TIMESPEC_TYPE_REALTIME)
@@ -62,7 +68,11 @@ assert(t.tv_type == unix.TIMESPEC_TYPE_DURATION)
 local t = t - unix.clock_gettime(unix.CLOCK_MONOTONIC_RAW)
 assert(t.tv_type == unix.TIMESPEC_TYPE_UNKNOWN)
 
-assert(not pcall(unix.timespec))
+local result, message, code = pcall(unix.timespec, "foo")
+if verbose then
+  io.stderr:write(message, "\n")
+end
+assert(not result)
 
 local t = unix.timespec(42)
 local t = t:add(2.5)

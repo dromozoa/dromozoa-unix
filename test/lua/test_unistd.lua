@@ -17,6 +17,8 @@
 
 local unix = require "dromozoa.unix"
 
+local verbose = os.getenv "VERBOSE" == "1"
+
 for _, item in ipairs(assert(unix.get_environ())) do
   local k, v = item:match("([^=]+)=(.*)")
   assert(os.getenv(k) == v)
@@ -28,18 +30,49 @@ local tmpdir = assert(unix.mkdtemp("tmp-XXXXXX"))
 assert(unix.chdir(tmpdir))
 assert(os.remove(unix.getcwd()))
 
-local a, b, c = unix.getcwd()
-assert(a == nil)
-assert(c == unix.ENOENT)
+local result, message, code = unix.getcwd()
+if verbose then
+  io.stderr:write(message, "\n")
+end
+assert(not result)
+assert(code == unix.ENOENT)
 
-assert(unix.getuid() > 0)
-assert(unix.getgid() > 0)
-assert(unix.geteuid() > 0)
-assert(unix.getegid() > 0)
-assert(unix.getpid() > 0)
-assert(unix.getpgrp() > 0)
-assert(unix.getppid() > 0)
+assert(unix.getuid()  >= 0)
+assert(unix.getgid()  >= 0)
+assert(unix.geteuid() >= 0)
+assert(unix.getegid() >= 0)
+assert(unix.getpid()  >= 0)
+assert(unix.getpgrp() >= 0)
+assert(unix.getppid() >= 0)
+if verbose then
+  io.stderr:write(([[
+uid  | %d
+gid  | %d
+euid | %d
+egid | %d
+pid  | %d
+pgrp | %d
+ppid | %d
+]]):format(
+    unix.getuid(),
+    unix.getgid(),
+    unix.geteuid(),
+    unix.getegid(),
+    unix.getpid(),
+    unix.getpgrp(),
+    unix.getppid()))
+end
 
 assert(unix.sysconf(unix["_SC_NPROCESSORS_CONF"]))
 assert(unix.sysconf(unix["_SC_NPROCESSORS_ONLN"]))
 assert(unix.hardware_concurrency())
+if verbose then
+  io.stderr:write(([[
+_SC_NPROCESSORS_CONF | %d
+_SC_NPROCESSORS_ONLN | %d
+hardware_concurrency | %d
+]]):format(
+    unix.sysconf(unix["_SC_NPROCESSORS_CONF"]),
+    unix.sysconf(unix["_SC_NPROCESSORS_ONLN"]),
+    unix.hardware_concurrency()))
+end

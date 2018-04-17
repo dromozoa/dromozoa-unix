@@ -1,4 +1,4 @@
--- Copyright (C) 2016 Tomoyuki Fujimori <moyu@dromozoa.com>
+-- Copyright (C) 2016,2018 Tomoyuki Fujimori <moyu@dromozoa.com>
 --
 -- This file is part of dromozoa-unix.
 --
@@ -17,8 +17,15 @@
 
 local unix = require "dromozoa.unix"
 
+local verbose = os.getenv "VERBOSE" == "1"
+
 local timer = unix.timer()
 timer:start()
 unix.nanosleep(0.2)
 timer:stop()
-print(timer:elapsed())
+
+local elapsed = timer:elapsed()
+if verbose then
+  io.stderr:write(elapsed, "\n")
+end
+assert(0.1 < elapsed and elapsed < 0.3)

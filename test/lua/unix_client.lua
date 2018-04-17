@@ -17,10 +17,10 @@
 
 local unix = require "dromozoa.unix"
 
-local fd = assert(unix.socket(unix.AF_UNIX, unix.SOCK_STREAM + unix.SOCK_CLOEXEC))
-assert(fd:connect(unix.sockaddr_un("test.sock")))
-assert(fd:write("x"))
+local fd = assert(unix.socket(unix.AF_UNIX, unix.bor(unix.SOCK_STREAM, unix.SOCK_CLOEXEC)))
+assert(fd:connect(unix.sockaddr_un "test.sock"))
+assert(fd:write "X")
 assert(fd:shutdown(unix.SHUT_WR))
-assert(fd:read(1) == "x")
+assert(fd:read(1) == "X")
 assert(fd:read(1) == "")
 assert(fd:close())

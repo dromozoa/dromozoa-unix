@@ -17,16 +17,21 @@
 
 local unix = require "dromozoa.unix"
 
-local server = assert(unix.socket(unix.AF_UNIX, unix.SOCK_STREAM + unix.SOCK_CLOEXEC))
-os.remove("test.sock")
-assert(server:bind(unix.sockaddr_un("test.sock")))
+local verbose = os.getenv "VERBOSE" == "1"
+
+os.remove "test.sock"
+
+local server = assert(unix.socket(unix.AF_UNIX, unix.bor(unix.SOCK_STREAM, unix.SOCK_CLOEXEC)))
+assert(server:bind(unix.sockaddr_un "test.sock"))
 assert(server:listen())
 unix.stdout:close()
 
-local fd, sa = assert(server:accept())
+local fd = assert(server:accept())
 assert(fd:is_coe())
-assert(fd:read(1) == "x")
+assert(fd:read(1) == "X")
 assert(fd:read(1) == "")
-assert(fd:write("x"))
+assert(fd:write "X")
 assert(fd:close())
 assert(server:close())
+
+assert(os.remove "test.sock")

@@ -1,4 +1,4 @@
--- Copyright (C) 2016 Tomoyuki Fujimori <moyu@dromozoa.com>
+-- Copyright (C) 2016,2018 Tomoyuki Fujimori <moyu@dromozoa.com>
 --
 -- This file is part of dromozoa-unix.
 --
@@ -17,6 +17,14 @@
 
 local unix = require "dromozoa.unix"
 
+local verbose = os.getenv "VERBOSE" == "1"
+
+local result, message, code = unix.mlockall(unix.bor(unix.MCL_CURRENT, unix.MCL_FUTURE))
+if not result and verbose then
+  io.stderr:write(message, "\n")
+end
 assert(unix.reserve_stack_pages(4096))
-print(unix.mlockall(unix.MCL_CURRENT))
-print(unix.munlockall())
+local result, message, code = unix.munlockall()
+if not result and verbose then
+  io.stderr:write(message, "\n")
+end

@@ -18,12 +18,33 @@
 local unix = require "dromozoa.unix"
 local equal = require "equal"
 
-local fd, tmpname = assert(unix.mkstemp("tmp-XXXXXX"))
+local verbose = os.getenv "VERBOSE" == "1"
 
+local function dump(t)
+  if verbose then
+    local keys = {}
+    for k in pairs(t) do
+      keys[#keys + 1] = k
+    end
+    table.sort(keys)
+    io.stderr:write(("-"):rep(70), "\n")
+    for i = 1, #keys do
+      local k = keys[i]
+      io.stderr:write(("%-10s | %s\n"):format(k, tostring(t[k])))
+    end
+  end
+end
+
+local fd, tmpname = assert(unix.mkstemp "test.txt-XXXXXX")
 local current_time = assert(unix.clock_gettime(unix.CLOCK_REALTIME))
+if verbose then
+  io.stderr:write(tostring(current_time), "\n")
+end
 
 local st1 = assert(fd:fstat())
 local st2 = assert(unix.stat(tmpname))
+dump(st1)
+dump(st2)
 assert(equal(st1, st2))
 assert(st1.st_size == 0)
 assert(st2.st_size == 0)
@@ -32,11 +53,13 @@ assert(st1.st_mtim <= current_time)
 assert(st2.st_ctim <= current_time)
 assert(st2.st_mtim <= current_time)
 
-assert(fd:write("foobarbazqux"))
+assert(fd:write "foobarbazqux")
 assert(fd:fsync())
 
 local st1 = assert(fd:fstat())
 local st2 = assert(unix.stat(tmpname))
+dump(st1)
+dump(st2)
 assert(equal(st1, st2))
 assert(st1.st_size == 12)
 assert(st2.st_size == 12)
