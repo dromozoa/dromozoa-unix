@@ -19,7 +19,7 @@ local unix = require "dromozoa.unix"
 
 assert(unix.umask(tonumber("022", 8)))
 
-os.remove("test.txt")
+os.remove "test.txt"
 
 local fd = assert(unix.open("test.txt", unix.bor(unix.O_WRONLY, unix.O_CREAT, unix.O_CLOEXEC)))
 assert(fd:is_coe())

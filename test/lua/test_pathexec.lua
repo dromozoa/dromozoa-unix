@@ -18,7 +18,6 @@
 local unix = require "dromozoa.unix"
 
 local verbose = os.getenv "VERBOSE" == "1"
-
 local PATH = os.getenv "PATH"
 local envp = unix.get_environ()
 envp[#envp + 1] = "foo=bar"
