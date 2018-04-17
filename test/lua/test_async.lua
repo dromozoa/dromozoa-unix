@@ -44,7 +44,12 @@ local tasks = {
   unix.async_getaddrinfo("nozomi.dromozoa.com", serv, hints);
 }
 for i = 1, #tasks do
-  assert(service:push(tasks[i]))
+  local task = tasks[i]
+  if verbose then
+    io.stderr:write(tostring(task), "\n")
+    io.stderr:flush()
+  end
+  assert(service:push(task))
 end
 local n = #tasks
 
@@ -54,32 +59,35 @@ repeat
   local fd, event = assert(selector:event(1))
   assert(fd == service:get())
   assert(event == unix.SELECTOR_READ)
-  if fd == service:get() then
-    assert(service:read() == 1)
-    while true do
-      local task = service:pop()
-      if task then
-        local index
-        local a, b = assert(task:result())
-        if type(a) == "table" then
-          local addrinfo = a
-          for i = 1, #addrinfo do
-            assert(service:push(addrinfo[i].ai_addr:async_getnameinfo()))
-            n = n + 1
-          end
-        else
-          local host, serv = a, b
-          if verbose then
-            io.stderr:write(host, "\n")
-            io.stderr:write(serv, "\n")
-          end
-          assert(host:find "%.dromozoa%.com$")
-          assert(serv == "https")
+  assert(service:read() == 1)
+  while true do
+    local task = service:pop()
+    if task then
+      local index
+      local a, b = assert(task:result())
+      if type(a) == "table" then
+        if verbose then
+          io.stderr:write(tostring(task), "\n")
+          io.stderr:flush()
         end
-        n = n - 1
+        local addrinfo = a
+        for i = 1, #addrinfo do
+          assert(service:push(addrinfo[i].ai_addr:async_getnameinfo()))
+          n = n + 1
+        end
       else
-        break
+        local host, serv = a, b
+        if verbose then
+          io.stderr:write(host, "\n")
+          io.stderr:write(serv, "\n")
+          io.stderr:flush()
+        end
+        assert(host:find "%.dromozoa%.com$")
+        assert(serv == "https")
       end
+      n = n - 1
+    else
+      break
     end
   end
 until n == 0
