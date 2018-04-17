@@ -31,7 +31,7 @@ assert(selector:add(service:get(), unix.SELECTOR_READ))
 timer:start()
 
 local serv = "https"
-local hints = { ai_socktype = unix.SOCK_STREAM }
+local hints = { ai_family = unix.AF_INET, ai_socktype = unix.SOCK_STREAM }
 local tasks = {
   unix.async_getaddrinfo("honoka.dromozoa.com", serv, hints);
   unix.async_getaddrinfo("kotori.dromozoa.com", serv, hints);
