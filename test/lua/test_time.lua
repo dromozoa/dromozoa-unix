@@ -17,6 +17,8 @@
 
 local unix = require "dromozoa.unix"
 
+local verbose = os.getenv "VERBOSE" == "1"
+
 assert(unix.block_signal(unix.SIGCHLD))
 
 local selfpipe = assert(unix.selfpipe())
@@ -25,36 +27,41 @@ local PATH = os.getenv("PATH")
 
 assert(unix.nanosleep(0.2))
 
-print(unix.TIMESPEC_TYPE_REALTIME)
-print(unix.TIMESPEC_TYPE_MONOTONIC)
-print(unix.TIMESPEC_TYPE_DURATION)
-print(unix.TIMESPEC_TYPE_UNKNOWN)
-
-local a, b, c, d = unix.nanosleep(-1)
-assert(a == nil)
-assert(d == unix.timespec(0))
-print(b)
+local result, message, code, t = unix.nanosleep(-1)
+if verbose then
+  io.stderr:write(message, "\n")
+  io.stderr:write(tostring(t), "\n")
+end
+assert(not result)
+assert(code == unix.EINVAL)
+assert(t.tv_sec == 0)
+assert(t.tv_nsec == 0)
 
 local process = assert(unix.process())
 assert(process:forkexec(PATH, { arg[-1], "-e", "local unix = require \"dromozoa.unix\" unix.nanosleep(0.2)" }))
 
 assert(unix.unblock_signal(unix.SIGCHLD))
-local a, b, c, d = unix.nanosleep(10)
+local result, message, code, t = unix.nanosleep(10)
 assert(unix.block_signal(unix.SIGCHLD))
 
-print(a, b, c, d)
-assert(a == nil)
-assert(c == unix.EINTR)
-assert(getmetatable(d))
-assert(d > unix.timespec(5))
-print(b)
-print(d:tonumber())
+if verbose then
+  io.stderr:write(message, "\n")
+  io.stderr:write(tostring(t), "\n")
+end
+assert(not result)
+assert(code == unix.EINTR)
+assert(t > 5)
 
-local a, b, c = assert(unix.wait())
-assert(a == process[1])
-assert(b == "exit")
-assert(c == 0)
+local pid, reason, status = assert(unix.wait())
+assert(pid == process[1])
+assert(reason == "exit")
+assert(status == 0)
 
 local t1 = assert(unix.clock_gettime(unix.CLOCK_MONOTONIC))
 local t2 = assert(unix.clock_gettime(unix.CLOCK_MONOTONIC))
+if verbose then
+  io.stderr:write(tostring(t1), "\n")
+  io.stderr:write(tostring(t2), "\n")
+  io.stderr:write(tostring(t2 - t1), "\n")
+end
 assert(t1 < t2)
