@@ -17,22 +17,30 @@
 
 local unix = require "dromozoa.unix"
 
+local verbose = os.getenv "VERBOSE" == "1"
+
 local reader, writer = assert(unix.pipe(unix.O_CLOEXEC + unix.O_NONBLOCK))
 
-assert(unix.SELECTOR_READ_WRITE == 3)
+assert(unix.SELECTOR_READ_WRITE == unix.bor(unix.SELECTOR_READ, unix.SELECTOR_WRITE))
 
 local selector = assert(unix.selector())
+if verbose then
+  io.stderr:write(selector:get(), "\n")
+end
 assert(selector:get() ~= -1)
 assert(selector:add(reader, unix.SELECTOR_READ))
 
 assert(selector:select(0.2) == 0)
 
-assert(writer:write("x"))
+assert(writer:write "X")
 assert(selector:select() == 1)
-assert(reader:read(1) == "x")
-local a, b, c = reader:read(1)
-assert(a == nil)
-assert(c == unix.EAGAIN or c == unix.EWOULDBLOCK)
+assert(reader:read(1) == "X")
+local result, message, code = reader:read(1)
+if verbose then
+  io.stderr:write(message, "\n")
+end
+assert(not result)
+assert(code == unix.EAGAIN or code == unix.EWOULDBLOCK)
 
 assert(selector:select(0.2) == 0)
 

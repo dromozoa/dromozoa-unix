@@ -1,4 +1,4 @@
--- Copyright (C) 2016 Tomoyuki Fujimori <moyu@dromozoa.com>
+-- Copyright (C) 2016,2018 Tomoyuki Fujimori <moyu@dromozoa.com>
 --
 -- This file is part of dromozoa-unix.
 --
@@ -17,15 +17,19 @@
 
 local unix = require "dromozoa.unix"
 
+local verbose = os.getenv "VERBOSE" == "1"
+
 assert(unix.ignore_signal(unix.SIGPIPE))
 
 local reader, writer = unix.pipe()
-
 assert(reader:close())
-local a, b, c = writer:write("x")
-assert(a == nil)
-assert(c == unix.EPIPE)
-print(b)
+
+local result, message, code = writer:write "X"
+if verbose then
+  io.stderr:write(message, "\n")
+end
+assert(not result)
+assert(code == unix.EPIPE)
 
 assert(unix.kill(unix.getpid(), 0))
 assert(unix.kill(-unix.getpgrp(), 0))
