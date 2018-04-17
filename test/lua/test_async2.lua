@@ -27,18 +27,17 @@ local hints = {
 }
 
 local tasks = {
-  unix.async_getaddrinfo("github.com", "https", hints);
-  unix.async_getaddrinfo("luarocks.org", "https", hints);
-  unix.async_getaddrinfo("www.lua.org", "https", hints);
-  unix.async_getaddrinfo("www.google.com", "https", hints);
-  unix.async_getaddrinfo("test-ipv6.com", "https", hints);
+  unix.async_getaddrinfo("honoka.dromozoa.com", "https", hints);
+  unix.async_getaddrinfo("kotori.dromozoa.com", "https", hints);
+  unix.async_getaddrinfo("hanayo.dromozoa.com", "https", hints);
+  unix.async_getaddrinfo("nozomi.dromozoa.com", "https", hints);
 }
 
 for _, task in ipairs(tasks) do
   assert(service:push(task))
 end
 
-local count = 5
+local count = 4
 while true do
   local task = service:pop()
   if task then

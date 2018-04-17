@@ -38,7 +38,7 @@ local function test()
   assert(processes[3]:forkexec(PATH, { "echo", "baz" }))
   assert(processes[4]:forkexec(PATH, { "echo", "qux" }))
 
-  local n = 0
+  local n = #processes
   repeat
     assert(unix.unblock_signal(unix.SIGCHLD))
     local result, message, code = selector:select(1)
@@ -57,12 +57,12 @@ local function test()
           local result = assert(unix.wait(process[1], unix.WNOHANG))
           if result == process[1] then
             processes[i] = nil
-            n = n + 1
+            n = n - 1
           end
         end
       end
     end
-  until n == 4
+  until n == 0
 end
 
 test()
