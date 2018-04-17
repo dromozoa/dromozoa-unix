@@ -17,6 +17,8 @@
 
 local unix = require "dromozoa.unix"
 
+os.remove "test.sock"
+
 local server = assert(unix.socket(unix.AF_UNIX, unix.bor(unix.SOCK_STREAM, unix.SOCK_CLOEXEC)))
 assert(server:bind(unix.sockaddr_un "test.sock"))
 assert(server:listen())

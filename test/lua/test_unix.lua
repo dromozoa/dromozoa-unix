@@ -36,11 +36,17 @@ if verbose then
 end
 
 local pid, reason, status = assert(unix.wait())
+if verbose then
+  io.stderr:write(pid, "\n")
+end
 assert(pid == process1[1] or process2[1])
 assert(reason == "exit")
 assert(status == 0)
 
 local pid, reason, status = assert(unix.wait())
+if verbose then
+  io.stderr:write(pid, "\n")
+end
 assert(pid == process1[1] or process2[1])
 assert(reason == "exit")
 assert(status == 0)
