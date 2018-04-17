@@ -18,36 +18,69 @@
 local dyld = require "dromozoa.dyld"
 local unix = require "dromozoa.unix"
 
+local verbose = os.getenv "VERBOSE" == "1"
+
 assert(dyld.dlopen_pthread())
 
 local service = unix.async_service(8)
+local selector = assert(unix.selector())
+local timer = assert(unix.timer())
 
-local hints = {
-  ai_socktype = unix.SOCK_STREAM;
-}
+assert(selector:add(service:get(), unix.SELECTOR_READ))
 
+timer:start()
+
+local serv = "https"
+local hints = { ai_socktype = unix.SOCK_STREAM }
 local tasks = {
-  unix.async_getaddrinfo("honoka.dromozoa.com", "https", hints);
-  unix.async_getaddrinfo("kotori.dromozoa.com", "https", hints);
-  unix.async_getaddrinfo("hanayo.dromozoa.com", "https", hints);
-  unix.async_getaddrinfo("nozomi.dromozoa.com", "https", hints);
+  unix.async_getaddrinfo("honoka.dromozoa.com", serv, hints);
+  unix.async_getaddrinfo("kotori.dromozoa.com", serv, hints);
+  unix.async_getaddrinfo("hanayo.dromozoa.com", serv, hints);
+  unix.async_getaddrinfo("nozomi.dromozoa.com", serv, hints);
 }
-
-for _, task in ipairs(tasks) do
-  assert(service:push(task))
+for i = 1, #tasks do
+  assert(service:push(tasks[i]))
 end
+local n = #tasks
 
-local count = 4
-while true do
-  local task = service:pop()
-  if task then
-    count = count - 1
-    if count == 0 then
-      break
+repeat
+  local result = assert(selector:select())
+  assert(result == 1)
+  local fd, event = assert(selector:event(1))
+  assert(fd == service:get())
+  assert(event == unix.SELECTOR_READ)
+  if fd == service:get() then
+    while true do
+      local task = service:pop()
+      if task then
+        local index
+        local a, b = assert(task:result())
+        if type(a) == "table" then
+          local addrinfo = a
+          for i = 1, #addrinfo do
+            assert(service:push(addrinfo[i].ai_addr:async_getnameinfo()))
+            n = n + 1
+          end
+        else
+          local host, serv = a, b
+          if verbose then
+            io.stderr:write(host, "\n")
+            io.stderr:write(serv, "\n")
+          end
+          assert(host:find "%.dromozoa%.com$")
+          assert(serv == "https")
+        end
+        n = n - 1
+      else
+        break
+      end
     end
-  else
-    unix.nanosleep(0.05)
   end
+until n == 0
+
+timer:stop()
+if verbose then
+  io.stderr:write(timer:elapsed(), "\n")
 end
 
 assert(service:close())
