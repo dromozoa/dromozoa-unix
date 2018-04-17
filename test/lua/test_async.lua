@@ -55,6 +55,10 @@ local n = #tasks
 
 repeat
   local result = assert(selector:select())
+  if verbose then
+    io.stderr:write(result, "\n")
+    io.stderr:flush()
+  end
   assert(result == 1)
   local fd, event = assert(selector:event(1))
   assert(fd == service:get())
