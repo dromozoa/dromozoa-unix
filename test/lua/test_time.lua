@@ -20,6 +20,13 @@ local unix = require "dromozoa.unix"
 local verbose = os.getenv "VERBOSE" == "1"
 local PATH = os.getenv "PATH"
 
+local lua
+if _G["dromozoa.bind.driver"] then
+  lua = "lua"
+else
+  lua = arg[-1]
+end
+
 assert(unix.block_signal(unix.SIGCHLD))
 
 local selfpipe = assert(unix.selfpipe())
@@ -37,7 +44,7 @@ assert(t.tv_sec == 0)
 assert(t.tv_nsec == 0)
 
 local process = assert(unix.process())
-assert(process:forkexec(PATH, { arg[-1], "-e", "local unix = require \"dromozoa.unix\" unix.nanosleep(0.2)" }))
+assert(process:forkexec(PATH, { lua, "-e", "local unix = require \"dromozoa.unix\" unix.nanosleep(0.2)" }))
 
 assert(unix.unblock_signal(unix.SIGCHLD))
 local result, message, code, t = unix.nanosleep(10)
@@ -49,7 +56,7 @@ if verbose then
 end
 assert(not result)
 assert(code == unix.EINTR)
-assert(t > 5)
+assert(t > unix.timespec(5))
 
 local pid, reason, status = assert(unix.wait())
 assert(pid == process[1])

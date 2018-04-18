@@ -33,12 +33,24 @@ void error(lua_State* L) {
   exit(1);
 }
 
-void initialize(lua_State* L, const char* filename) {
+void initialize(lua_State* L, const char* filename, int argc, char* argv[]) {
   luaL_openlibs(L);
-  if (luaL_loadfile(L, filename) != LUA_OK) {
+  lua_pushboolean(L, 1);
+  lua_setglobal(L, "dromozoa.bind.driver");
+  lua_newtable(L);
+  for (int i = 0; i < argc; ++i) {
+    lua_pushinteger(L, i - 1);
+    lua_pushstring(L, argv[i]);
+    lua_settable(L, -3);
+  }
+  lua_setglobal(L, "arg");
+  if (luaL_loadfile(L, filename) != 0) {
     error(L);
   }
-  if (lua_pcall(L, 0, 1, 0) != LUA_OK) {
+  for (int i = 2; i < argc; ++i) {
+    lua_pushstring(L, argv[i]);
+  }
+  if (lua_pcall(L, argc - 2, 1, 0) != 0) {
     error(L);
   }
   lua_pushstring(L, "dromozoa.bind.hook");
@@ -51,7 +63,7 @@ void run(lua_State* L) {
   lua_pushstring(L, "dromozoa.bind.hook");
   lua_gettable(L, LUA_REGISTRYINDEX);
   if (!lua_isnil(L, -1)) {
-    if (lua_pcall(L, 0, 0, 0) != LUA_OK) {
+    if (lua_pcall(L, 0, 0, 0) != 0) {
       error(L);
     }
   }
@@ -65,11 +77,11 @@ int main(int argc, char* argv[]) {
   const char* filename = argv[1];
 
   lua_State* L1 = luaL_newstate();
-  initialize(L1, filename);
+  initialize(L1, filename, argc, argv);
   run(L1);
 
   lua_State* L2 = luaL_newstate();
-  initialize(L2, filename);
+  initialize(L2, filename, argc, argv);
   run(L2);
 
   run(L1);

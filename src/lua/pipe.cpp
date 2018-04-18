@@ -16,6 +16,7 @@
 // along with dromozoa-unix.  If not, see <http://www.gnu.org/licenses/>.
 
 #include <fcntl.h>
+
 #include <dromozoa/compat_pipe2.hpp>
 
 #include "common.hpp"
