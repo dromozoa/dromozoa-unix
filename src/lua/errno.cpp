@@ -1,5 +1,3 @@
-// generated from http://pubs.opengroup.org/onlinepubs/9699919799/basedefs/errno.h.html
-
 #include <errno.h>
 
 #include "common.hpp"
