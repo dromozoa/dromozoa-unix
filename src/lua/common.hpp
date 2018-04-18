@@ -19,6 +19,7 @@
 #define DROMOZOA_COMMON_HPP
 
 #include <time.h>
+#include <sys/socket.h>
 
 #include <dromozoa/bind.hpp>
 
