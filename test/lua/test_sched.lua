@@ -40,8 +40,8 @@ fifo_priority_max  | %d
 end
 
 if unix.sched_getscheduler and unix.sched_getparam and unix.sched_setscheduler then
-  assert(unix.sched_getscheduler(0) == unix.SCHED_OTHER)
-  local param = assert(unix.sched_getparam(0))
+  assert(unix.sched_getscheduler() == unix.SCHED_OTHER)
+  local param = assert(unix.sched_getparam())
   if verbose then
     io.stderr:write(param.sched_priority, "\n")
   end
@@ -49,8 +49,8 @@ if unix.sched_getscheduler and unix.sched_getparam and unix.sched_setscheduler t
   local priority = math.min(fifo_priority_min + 1, fifo_priority_max)
   local result, message, code = unix.sched_setscheduler(0, unix.SCHED_FIFO, { sched_priority = priority })
   if result then
-    assert(unix.sched_getscheduler(0) == unix.SCHED_FIFO)
-    local param = assert(unix.sched_getparam(0))
+    assert(unix.sched_getscheduler() == unix.SCHED_FIFO)
+    local param = assert(unix.sched_getparam())
     assert(param.sched_priority == priority)
   elseif verbose then
     io.stderr:write(message, "\n")
@@ -58,7 +58,7 @@ if unix.sched_getscheduler and unix.sched_getparam and unix.sched_setscheduler t
 end
 
 if unix.sched_getaffinity and unix.sched_setaffinity then
-  local affinity = assert(unix.sched_getaffinity(0))
+  local affinity = assert(unix.sched_getaffinity())
   if verbose then
     for i = 1, #affinity do
       io.stderr:write(affinity[i], "\n")

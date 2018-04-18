@@ -24,10 +24,6 @@ namespace dromozoa {
     unref();
   }
 
-  void async_task::result(lua_State* state) {
-    impl_result(state);
-  }
-
   void async_task::ref(lua_State* L, int index) {
     luaX_reference<>(L, index).swap(ref_);
   }

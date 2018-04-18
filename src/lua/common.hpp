@@ -32,13 +32,12 @@ namespace dromozoa {
   class async_task : public async_service_task {
   public:
     virtual void cancel();
-    void result(lua_State* state);
+    virtual void result(lua_State* state) = 0;
     void ref(lua_State* L, int index);
     void unref();
     void get_field(lua_State* L);
   protected:
     async_task();
-    virtual void impl_result(lua_State* L) = 0;
   private:
     luaX_reference<> ref_;
   };
