@@ -1,4 +1,4 @@
--- Copyright (C) 2016 Tomoyuki Fujimori <moyu@dromozoa.com>
+-- Copyright (C) 2016,2018 Tomoyuki Fujimori <moyu@dromozoa.com>
 --
 -- This file is part of dromozoa-unix.
 --
@@ -15,45 +15,50 @@
 -- You should have received a copy of the GNU General Public License
 -- along with dromozoa-unix.  If not, see <http://www.gnu.org/licenses/>.
 
-local sequence = require "dromozoa.commons.sequence"
-local sequence_writer = require "dromozoa.commons.sequence_writer"
 local unix = require "dromozoa.unix"
 
-local PATH = os.getenv("PATH")
+local verbose = os.getenv "VERBOSE" == "1"
+local PATH = os.getenv "PATH"
 local envp = unix.get_environ()
-sequence.push(envp, "foo=bar")
+envp[#envp + 1] = "foo=bar"
 
 local reader, writer = assert(unix.pipe())
 local process = assert(unix.process())
-assert(process:forkexec(PATH, { "sh", "-c", "pwd; echo \"$foo\"" }, envp, "/", { [1] = writer }))
+assert(process:forkexec(PATH, { "sh", "-c", [[pwd; echo "$foo"]] }, envp, "/", { [1] = writer }))
 assert(writer:close())
 
-local out = sequence_writer()
+local buffer = {}
 while true do
-  local data = assert(reader:read(4096))
+  local data = assert(reader:read(256))
   if data == "" then
     break
   else
-    out:write(data)
+    buffer[#buffer + 1] = data
   end
 end
 assert(reader:close())
-assert(out:concat() == "/\nbar\n")
+if verbose then
+  print(("%q"):format(table.concat(buffer)))
+end
+assert(table.concat(buffer) == "/\nbar\n")
 
-local a, b, c = assert(unix.wait())
-assert(a == process[1])
-assert(b == "exit")
-assert(c == 0)
+local pid, reason, status = assert(unix.wait())
+assert(pid == process[1])
+assert(reason == "exit")
+assert(status == 0)
 
 local process = unix.process()
-local a, b, c = process:forkexec(PATH, { "no such command" })
-assert(a == nil)
-assert(c == unix.ENOENT)
+local result, message, code = process:forkexec(PATH, { "no such command" })
+if verbose then
+  print(message)
+end
+assert(not result)
+assert(code == unix.ENOENT)
 
-local a, b, c = assert(unix.wait())
-assert(a == process[1])
-assert(b == "exit")
-assert(c == 1)
+local pid, reason, status = assert(unix.wait())
+assert(pid == process[1])
+assert(reason == "exit")
+assert(status == 1)
 
 local reader, writer = assert(unix.pipe(0))
 assert(reader:coe())
@@ -61,25 +66,32 @@ local process = assert(unix.process())
 assert(process:forkexec_daemon(PATH, { "sh", "-c", "echo foo >&" .. writer:get() .. "; exec sleep 10" }))
 assert(writer:close())
 
-local a, b, c = assert(unix.wait())
-assert(a == process[1])
-assert(b == "exit")
-assert(c == 0)
+local pid, reason, status = assert(unix.wait())
+assert(pid == process[1])
+assert(reason == "exit")
+assert(status == 0)
 
-local t1 = unix.clock_gettime(unix.CLOCK_MONOTONIC_RAW)
+local timer = unix.timer()
+timer:start()
 assert(reader:read(4) == "foo\n")
 assert(unix.kill(process[2], 0))
 assert(unix.kill(process[2]))
 assert(reader:read(4) == "")
-local t2 = unix.clock_gettime(unix.CLOCK_MONOTONIC_RAW)
-assert(t2 - t1 < unix.timespec(5))
+timer:stop()
+if verbose then
+  print(timer:elapsed())
+end
+assert(timer:elapsed() < 5)
 
 local process = unix.process()
-local a, b, c = process:forkexec_daemon(PATH, { "no such command" })
-assert(a == nil)
-assert(c == unix.ENOENT)
+local result, message, code = process:forkexec_daemon(PATH, { "no such command" })
+if verbose then
+  print(message)
+end
+assert(not result)
+assert(code == unix.ENOENT)
 
-local a, b, c = assert(unix.wait())
-assert(a == process[1])
-assert(b == "exit")
-assert(c == 0)
+local pid, reason, status = assert(unix.wait())
+assert(pid == process[1])
+assert(reason == "exit")
+assert(status == 0)

@@ -1,4 +1,4 @@
-// Copyright (C) 2016 Tomoyuki Fujimori <moyu@dromozoa.com>
+// Copyright (C) 2016,2018 Tomoyuki Fujimori <moyu@dromozoa.com>
 //
 // This file is part of dromozoa-unix.
 //
@@ -15,12 +15,11 @@
 // You should have received a copy of the GNU General Public License
 // along with dromozoa-unix.  If not, see <http://www.gnu.org/licenses/>.
 
+#include <assert.h>
 #include <signal.h>
 
 #include <dromozoa/compat_sigmask.hpp>
 #include <dromozoa/sigmask.hpp>
-
-#include "assert.hpp"
 
 void test_sigmask1() {
   sigset_t mask1;
@@ -33,7 +32,7 @@ void test_sigmask1() {
   assert(!sigismember(&mask2, SIGCHLD));
 
   {
-    dromozoa::sigmask_saver save(mask2);
+    dromozoa::sigmask_saver save_sigmask(mask2);
     assert(dromozoa::compat_sigmask(SIG_BLOCK, 0, &mask1) != -1);
   }
   assert(dromozoa::compat_sigmask(SIG_BLOCK, 0, &mask2) != -1);

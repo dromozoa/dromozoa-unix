@@ -1,4 +1,4 @@
--- Copyright (C) 2016 Tomoyuki Fujimori <moyu@dromozoa.com>
+-- Copyright (C) 2016,2018 Tomoyuki Fujimori <moyu@dromozoa.com>
 --
 -- This file is part of dromozoa-unix.
 --
@@ -15,12 +15,22 @@
 -- You should have received a copy of the GNU General Public License
 -- along with dromozoa-unix.  If not, see <http://www.gnu.org/licenses/>.
 
-local uint32 = require "dromozoa.commons.uint32"
 local unix = require "dromozoa.unix"
+
+local verbose = os.getenv "VERBOSE" == "1"
+
+assert(unix.STDIN_FILENO == 0)
+assert(unix.STDOUT_FILENO == 1)
+assert(unix.STDERR_FILENO == 2)
 
 assert(unix.fd.get(0) == 0)
 assert(unix.stdin:get() == 0)
-assert(not unix.fd.close(-2))
+local result, message, code = unix.fd.close(-2)
+if verbose then
+  io.stderr:write(message, "\n")
+end
+assert(not result)
+assert(code == unix.EBADF)
 
 local fd
 
@@ -32,7 +42,12 @@ do
   assert(writer:is_ndelay_off())
   fd = { reader:ndelay_on():get(), writer:get() }
   assert(reader:close())
-  assert(not reader:close())
+  local result, message = reader:close()
+  if verbose then
+    io.stderr:write(message, "\n")
+  end
+  assert(not result)
+  assert(code == unix.EBADF)
 end
 collectgarbage()
 collectgarbage()
@@ -47,27 +62,28 @@ end
 
 do
   local stdout = assert(unix.fd_ref(1))
-  assert(stdout:write("foo\n"))
+  assert(stdout:write "foo\n")
 end
 collectgarbage()
 collectgarbage()
 assert(unix.fd.write(1, "bar\n"))
-assert(unix.stdout:write("baz\n"))
-assert(unix.stderr:write("qux\n"))
+assert(unix.stdout:write "baz\n")
+assert(unix.stderr:write "qux\n")
 
-assert(unix.STDIN_FILENO == 0)
-assert(unix.STDOUT_FILENO == 1)
-assert(unix.STDERR_FILENO == 2)
-
-local reader, writer = assert(unix.pipe(uint32.bor(unix.O_CLOEXEC, unix.O_NONBLOCK)))
-assert(writer:write("foobarbaz"))
+local reader, writer = assert(unix.pipe(unix.bor(unix.O_CLOEXEC, unix.O_NONBLOCK)))
+assert(writer:write "foobarbaz")
 assert(assert(reader:read(3)) == "foo")
 assert(assert(reader:read(3)) == "bar")
 assert(assert(reader:read(3)) == "baz")
-local a, b, c = reader:read(3)
-assert(a == nil)
-assert(c == unix.EAGAIN or c == unix.EWOULDBLOCK)
-assert(writer:write("qux"))
+
+local result, message, code = reader:read(3)
+if verbose then
+  io.stderr:write(message, "\n")
+end
+assert(not result)
+assert(code == unix.EAGAIN or code == unix.EWOULDBLOCK)
+
+assert(writer:write "qux")
 assert(writer:close())
 assert(reader:read(4) == "qux")
 assert(reader:read(4) == "")

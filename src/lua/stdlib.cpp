@@ -1,4 +1,4 @@
-// Copyright (C) 2016,2017 Tomoyuki Fujimori <moyu@dromozoa.com>
+// Copyright (C) 2016-2018 Tomoyuki Fujimori <moyu@dromozoa.com>
 //
 // This file is part of dromozoa-unix.
 //
@@ -36,7 +36,7 @@ namespace dromozoa {
         luaX_push(L, result);
       }
 #else
-      if (char* result = realpath(path, 0)) {
+      if (const char* result = realpath(path, 0)) {
         luaX_push(L, result);
         free(result);
       }

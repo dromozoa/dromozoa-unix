@@ -1,4 +1,4 @@
-// Copyright (C) 2016 Tomoyuki Fujimori <moyu@dromozoa.com>
+// Copyright (C) 2016,2018 Tomoyuki Fujimori <moyu@dromozoa.com>
 //
 // This file is part of dromozoa-unix.
 //
@@ -18,6 +18,8 @@
 #include <errno.h>
 #include <unistd.h>
 
+#include <utility>
+
 #include <dromozoa/bind/unexpected.hpp>
 
 #include <dromozoa/compat_strerror.hpp>
@@ -31,7 +33,7 @@ namespace dromozoa {
 
   file_descriptor::~file_descriptor() {
     if (fd_ != -1) {
-      errno_saver save;
+      errno_saver save_errno;
       if (close() == -1) {
         DROMOZOA_UNEXPECTED(compat_strerror(errno));
       }
@@ -59,8 +61,6 @@ namespace dromozoa {
   }
 
   void file_descriptor::swap(file_descriptor& that) {
-    int fd = fd_;
-    fd_ = that.fd_;
-    that.fd_ = fd;
+    std::swap(fd_, that.fd_);
   }
 }

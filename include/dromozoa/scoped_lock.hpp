@@ -1,4 +1,4 @@
-// Copyright (C) 2016 Tomoyuki Fujimori <moyu@dromozoa.com>
+// Copyright (C) 2018 Tomoyuki Fujimori <moyu@dromozoa.com>
 //
 // This file is part of dromozoa-unix.
 //
@@ -15,16 +15,31 @@
 // You should have received a copy of the GNU General Public License
 // along with dromozoa-unix.  If not, see <http://www.gnu.org/licenses/>.
 
-#ifndef DROMOZOA_ASYNC_TASK_HPP
-#define DROMOZOA_ASYNC_TASK_HPP
+#ifndef DROMOZOA_SCOPED_LOCK_HPP
+#define DROMOZOA_SCOPED_LOCK_HPP
+
+#include <dromozoa/mutex.hpp>
 
 namespace dromozoa {
-  class async_task {
+  template <class T = mutex>
+  class scoped_lock {
   public:
-    virtual ~async_task() = 0;
-    virtual void dispatch() = 0;
-    virtual void cancel() = 0;
-    virtual void result(void* state) = 0;
+    explicit scoped_lock(T& mutex) : mutex_(&mutex) {
+      mutex_->lock();
+    }
+
+    ~scoped_lock() {
+      mutex_->unlock();
+    }
+
+    T* mutex() const {
+      return mutex_;
+    }
+
+  private:
+    T* mutex_;
+    scoped_lock(const scoped_lock&);
+    scoped_lock& operator=(const scoped_lock&);
   };
 }
 

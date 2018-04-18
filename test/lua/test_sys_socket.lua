@@ -1,4 +1,4 @@
--- Copyright (C) 2016 Tomoyuki Fujimori <moyu@dromozoa.com>
+-- Copyright (C) 2016,2018 Tomoyuki Fujimori <moyu@dromozoa.com>
 --
 -- This file is part of dromozoa-unix.
 --
@@ -15,14 +15,15 @@
 -- You should have received a copy of the GNU General Public License
 -- along with dromozoa-unix.  If not, see <http://www.gnu.org/licenses/>.
 
-local uint32 = require "dromozoa.commons.uint32"
 local unix = require "dromozoa.unix"
+
+local verbose = os.getenv "VERBOSE" == "1"
 
 local addrinfo = assert(unix.getaddrinfo(nil, "0", { ai_socktype = unix.SOCK_STREAM, ai_flags = unix.AI_PASSIVE }))
 local ai = addrinfo[1]
 assert(ai.ai_socktype == unix.SOCK_STREAM)
 
-local server = assert(unix.socket(ai.ai_family, uint32.bor(ai.ai_socktype, unix.SOCK_CLOEXEC), ai.ai_protocol))
+local server = assert(unix.socket(ai.ai_family, unix.bor(ai.ai_socktype, unix.SOCK_CLOEXEC), ai.ai_protocol))
 assert(server:is_coe())
 assert(server:getsockopt(unix.SOL_SOCKET, unix.SO_REUSEADDR) == 0)
 assert(server:setsockopt(unix.SOL_SOCKET, unix.SO_REUSEADDR, 1))
@@ -31,12 +32,16 @@ assert(server:bind(ai.ai_addr))
 assert(server:listen())
 
 local sa = assert(server:getsockname())
-local host, serv = assert(sa:getnameinfo(uint32.bor(unix.NI_NUMERICHOST, unix.NI_NUMERICSERV)))
+local host, serv = assert(sa:getnameinfo(unix.bor(unix.NI_NUMERICHOST, unix.NI_NUMERICSERV)))
+if verbose then
+  io.stderr:write(host, "\n")
+  io.stderr:write(serv, "\n")
+end
 assert(host == "0.0.0.0" or host == "::")
 assert(tonumber(serv) > 0)
 assert(server:close())
 
-local fd1, fd2 = assert(unix.socketpair(unix.AF_UNIX, uint32.bor(unix.SOCK_STREAM, unix.SOCK_CLOEXEC)))
+local fd1, fd2 = assert(unix.socketpair(unix.AF_UNIX, unix.bor(unix.SOCK_STREAM, unix.SOCK_CLOEXEC)))
 assert(fd1:is_coe())
 assert(fd2:is_coe())
 
@@ -48,15 +53,20 @@ local sa2 = assert(fd1:getpeername())
 assert(sa2:family() == unix.AF_UNIX)
 assert(sa2:path() == "")
 
-assert(fd1:getsockopt(unix.SOL_SOCKET, unix.SO_ERROR) == 0)
-assert(fd1:getsockopt(unix.SOL_SOCKET, unix.SO_RCVBUF) > 0);
-assert(fd1:getsockopt(unix.SOL_SOCKET, unix.SO_SNDBUF) > 0);
+local so_error = fd1:getsockopt(unix.SOL_SOCKET, unix.SO_ERROR)
+local so_rcvbuf = fd1:getsockopt(unix.SOL_SOCKET, unix.SO_RCVBUF)
+local so_sndbuf = fd1:getsockopt(unix.SOL_SOCKET, unix.SO_SNDBUF)
+if verbose then
+  io.stderr:write(so_rcvbuf, "\n")
+  io.stderr:write(so_sndbuf, "\n")
+end
+assert(so_error == 0)
+assert(so_rcvbuf > 0);
+assert(so_sndbuf > 0);
 
-assert(fd1:write("foo"))
+assert(fd1:write "foo")
 assert(fd1:close())
 
 assert(fd2:read(4) == "foo")
 assert(fd2:read(4) == "")
 assert(fd2:close())
-
-assert(unix.SO_BROADCAST)

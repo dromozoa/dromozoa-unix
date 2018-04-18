@@ -1,4 +1,4 @@
-// Copyright (C) 2016 Tomoyuki Fujimori <moyu@dromozoa.com>
+// Copyright (C) 2016,2018 Tomoyuki Fujimori <moyu@dromozoa.com>
 //
 // This file is part of dromozoa-unix.
 //
@@ -21,15 +21,8 @@
 #include <stddef.h>
 
 namespace dromozoa {
-  size_t pathexec_buffer_size(
-      const char* path,
-      const char* const* argv);
-  int pathexec(
-      const char* path,
-      const char* const* argv,
-      const char* const* envp,
-      char* buffer,
-      size_t size);
+  size_t pathexec_buffer_size(const char* path, const char* const* argv);
+  int pathexec(const char* path, const char* const* argv, const char* const* envp, char* buffer, size_t size);
 }
 
 #endif

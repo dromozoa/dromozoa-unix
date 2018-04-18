@@ -1,4 +1,4 @@
-// Copyright (C) 2015,2016 Tomoyuki Fujimori <moyu@dromozoa.com>
+// Copyright (C) 2016-2018 Tomoyuki Fujimori <moyu@dromozoa.com>
 //
 // This file is part of dromozoa-unix.
 //
@@ -33,8 +33,8 @@ namespace dromozoa {
     }
 
     void impl_strerror(lua_State* L) {
-      errno_saver save;
-      std::string message = compat_strerror(luaX_opt_integer<int>(L, 1, save.get()));
+      errno_saver save_errno;
+      std::string message = compat_strerror(luaX_opt_integer<int>(L, 1, save_errno.get()));
       luaX_push(L, message);
     }
 
@@ -48,11 +48,11 @@ namespace dromozoa {
     }
 
     void impl_get_error(lua_State* L) {
-      errno_saver save;
-      std::string message = compat_strerror(save.get());
+      errno_saver save_errno;
+      std::string message = compat_strerror(save_errno.get());
       luaX_push(L, luaX_nil);
       luaX_push(L, message);
-      luaX_push(L, save.get());
+      luaX_push(L, save_errno.get());
     }
 
     void impl_set_last_errno(lua_State* L) {
@@ -74,12 +74,12 @@ namespace dromozoa {
   }
 
   void push_error(lua_State* L) {
-    errno_saver save;
-    set_last_errno(L, save.get());
-    std::string message = compat_strerror(save.get());
+    errno_saver save_errno;
+    set_last_errno(L, save_errno.get());
+    std::string message = compat_strerror(save_errno.get());
     luaX_push(L, luaX_nil);
     luaX_push(L, message);
-    luaX_push(L, save.get());
+    luaX_push(L, save_errno.get());
   }
 
   void initialize_error(lua_State* L) {

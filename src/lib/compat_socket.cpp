@@ -1,4 +1,4 @@
-// Copyright (C) 2016 Tomoyuki Fujimori <moyu@dromozoa.com>
+// Copyright (C) 2016,2018 Tomoyuki Fujimori <moyu@dromozoa.com>
 //
 // This file is part of dromozoa-unix.
 //
@@ -16,9 +16,8 @@
 // along with dromozoa-unix.  If not, see <http://www.gnu.org/licenses/>.
 
 #include <fcntl.h>
+#include <limits.h>
 #include <sys/socket.h>
-
-#include <limits>
 
 #include <dromozoa/coe.hpp>
 #include <dromozoa/compat_socket.hpp>
@@ -28,7 +27,9 @@
 
 namespace dromozoa {
   namespace {
-    static const int sock_types = SOCK_STREAM | SOCK_DGRAM | SOCK_SEQPACKET
+#if !defined(SOCK_CLOEXEC) || !defined(SOCK_NONBLOCK)
+    struct sock_types {
+      static const int value = SOCK_STREAM | SOCK_DGRAM | SOCK_SEQPACKET
 #ifdef SOCK_RAW
         | SOCK_RAW
 #endif
@@ -39,32 +40,54 @@ namespace dromozoa {
         | SOCK_PACKET
 #endif
         ;
+    };
 
-    int sock_flag(int types, int value) {
-      if ((types & value) == 0) {
-        return value;
-      } else {
-        for (int i = 0x100; i <= std::numeric_limits<int>::max(); i <<= 1) {
-          if ((types & i) == 0) {
-            return i;
-          }
-        }
-        return 0;
-      }
-    }
+    template <int T1, int T2, bool = (T2 <= (INT_MAX >> 2) + 1), bool = (T1 & T2)>
+    struct sock_flag_impl {};
+
+    template <int T1, int T2>
+    struct sock_flag_impl<T1, T2, true, true>  {
+      static const int value = sock_flag_impl<T1, (T2 << 1)>::value;
+    };
+
+    template <int T1, int T2, bool T3>
+    struct sock_flag_impl<T1, T2, T3, false> {
+      static const int value = T2;
+    };
+
+    template <int T1, int T2, bool = (T1 & T2)>
+    struct sock_flag {};
+
+    template <int T1, int T2>
+    struct sock_flag<T1, T2, true> {
+      static const int value = sock_flag_impl<T1, (T2 > 0x100 ? T2 : 0x100)>::value;
+    };
+
+    template <int T1, int T2>
+    struct sock_flag<T1, T2, false> {
+      static const int value = T2;
+    };
+#endif
+
+    struct sock_cloexec {
+#ifdef SOCK_CLOEXEC
+      static const int value = SOCK_CLOEXEC;
+#else
+      static const int value = sock_flag<sock_types::value, O_CLOEXEC>::value;
+#endif
+    };
+
+    struct sock_nonblock {
+#ifdef SOCK_NONBLOCK
+      static const int value = SOCK_NONBLOCK;
+#else
+      static const int value = sock_flag<(sock_types::value | sock_cloexec::value), O_NONBLOCK>::value;
+#endif
+    };
   }
 
-#ifdef SOCK_CLOEXEC
-  const int COMPAT_SOCK_CLOEXEC = SOCK_CLOEXEC;
-#else
-  const int COMPAT_SOCK_CLOEXEC = sock_flag(sock_types, O_CLOEXEC);
-#endif
-
-#ifdef SOCK_NONBLOCK
-  const int COMPAT_SOCK_NONBLOCK = SOCK_NONBLOCK;
-#else
-  const int COMPAT_SOCK_NONBLOCK = sock_flag(sock_types | COMPAT_SOCK_CLOEXEC, O_NONBLOCK);
-#endif
+  const int COMPAT_SOCK_CLOEXEC = sock_cloexec::value;
+  const int COMPAT_SOCK_NONBLOCK = sock_nonblock::value;
 
 #if defined(SOCK_CLOEXEC) && defined(SOCK_NONBLOCK)
   int compat_socket(int domain, int type, int protocol) {

@@ -1,4 +1,4 @@
-// Copyright (C) 2016,2017 Tomoyuki Fujimori <moyu@dromozoa.com>
+// Copyright (C) 2016-2018 Tomoyuki Fujimori <moyu@dromozoa.com>
 //
 // This file is part of dromozoa-unix.
 //
@@ -15,19 +15,7 @@
 // You should have received a copy of the GNU General Public License
 // along with dromozoa-unix.  If not, see <http://www.gnu.org/licenses/>.
 
-#ifdef HAVE_CONFIG_H
-#include "config.h"
-#endif
-
 #include <dromozoa/selector.hpp>
-
-#if defined(HAVE_EPOLL_CREATE) || defined(HAVE_EPOLL_CREATE1)
-#include <dromozoa/selector_epoll.hpp>
-typedef dromozoa::selector_epoll selector_impl;
-#elif defined(HAVE_KQUEUE)
-#include <dromozoa/selector_kqueue.hpp>
-typedef dromozoa::selector_kqueue selector_impl;
-#endif
 
 #include "common.hpp"
 
@@ -43,9 +31,8 @@ namespace dromozoa {
 
     void impl_call(lua_State* L) {
       int flags = luaX_opt_integer<int>(L, 2, SELECTOR_CLOEXEC);
-      file_descriptor fd(selector_impl::open(flags));
-      if (fd.valid()) {
-        luaX_new<selector_impl>(L, fd.release());
+      if (selector_impl* impl = selector::open(flags)) {
+        luaX_new<selector>(L, impl);
         luaX_set_metatable(L, "dromozoa.unix.selector");
       } else {
         push_error(L);

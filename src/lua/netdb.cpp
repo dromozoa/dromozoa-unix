@@ -1,4 +1,4 @@
-// Copyright (C) 2016,2017 Tomoyuki Fujimori <moyu@dromozoa.com>
+// Copyright (C) 2016-2018 Tomoyuki Fujimori <moyu@dromozoa.com>
 //
 // This file is part of dromozoa-unix.
 //
@@ -133,7 +133,7 @@ namespace dromozoa {
       }
     }
 
-    class async_getaddrinfo : public async_task_impl {
+    class async_getaddrinfo : public async_task {
     public:
       async_getaddrinfo(const char* nodename, const char* servname, const optional<struct addrinfo>& hints) : hints_(hints), result_(), code_() {
         if (nodename) {
@@ -156,7 +156,7 @@ namespace dromozoa {
         code_ = getaddrinfo(nodename, servname, hints_.get(), &result_);
       }
 
-      virtual void impl_result(lua_State* L) {
+      virtual void result(lua_State* L) {
         if (result_) {
           new_result(L, result_);
         } else {
@@ -182,7 +182,7 @@ namespace dromozoa {
       luaX_set_metatable(L, "dromozoa.unix.async_task");
     }
 
-    class async_getnameinfo : public async_task_impl {
+    class async_getnameinfo : public async_task {
     public:
       async_getnameinfo(const socket_address& address, int flags) : address_(address), nodename_(NI_MAXHOST), servname_(NI_MAXSERV), flags_(flags) {}
 
@@ -190,7 +190,7 @@ namespace dromozoa {
         code_ = getnameinfo(address_.get(), address_.size(), &nodename_[0], nodename_.size(), &servname_[0], servname_.size(), flags_);
       }
 
-      virtual void impl_result(lua_State* L) {
+      virtual void result(lua_State* L) {
         if (code_ == 0) {
           luaX_push(L, &nodename_[0]);
           luaX_push(L, &servname_[0]);
@@ -237,6 +237,17 @@ namespace dromozoa {
     luaX_set_field(L, -1, "NI_NUMERICSCOPE", NI_NUMERICSCOPE);
 #endif
     luaX_set_field(L, -1, "NI_DGRAM", NI_DGRAM);
+
+    luaX_set_field(L, -1, "EAI_AGAIN", EAI_AGAIN);
+    luaX_set_field(L, -1, "EAI_BADFLAGS", EAI_BADFLAGS);
+    luaX_set_field(L, -1, "EAI_FAIL", EAI_FAIL);
+    luaX_set_field(L, -1, "EAI_FAMILY", EAI_FAMILY);
+    luaX_set_field(L, -1, "EAI_MEMORY", EAI_MEMORY);
+    luaX_set_field(L, -1, "EAI_NONAME", EAI_NONAME);
+    luaX_set_field(L, -1, "EAI_SERVICE", EAI_SERVICE);
+    luaX_set_field(L, -1, "EAI_SOCKTYPE", EAI_SOCKTYPE);
+    luaX_set_field(L, -1, "EAI_SYSTEM", EAI_SYSTEM);
+    luaX_set_field(L, -1, "EAI_OVERFLOW", EAI_OVERFLOW);
   }
 
   void initialize_sockaddr_netdb(lua_State* L) {

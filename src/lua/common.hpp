@@ -1,4 +1,4 @@
-// Copyright (C) 2016,2017 Tomoyuki Fujimori <moyu@dromozoa.com>
+// Copyright (C) 2016-2018 Tomoyuki Fujimori <moyu@dromozoa.com>
 //
 // This file is part of dromozoa-unix.
 //
@@ -19,26 +19,26 @@
 #define DROMOZOA_COMMON_HPP
 
 #include <time.h>
+#include <sys/socket.h>
 
 #include <dromozoa/bind.hpp>
 
 #include <dromozoa/argument_vector.hpp>
-#include <dromozoa/async_task.hpp>
+#include <dromozoa/async_service.hpp>
 #include <dromozoa/socket_address.hpp>
 
 namespace dromozoa {
   argument_vector to_argument_vector(lua_State* L, int arg);
 
-  class async_task_impl : public async_task {
+  class async_task : public async_service_task {
   public:
     virtual void cancel();
-    virtual void result(void* state);
+    virtual void result(lua_State* state) = 0;
     void ref(lua_State* L, int index);
     void unref();
     void get_field(lua_State* L);
   protected:
-    async_task_impl();
-    virtual void impl_result(lua_State* L) = 0;
+    async_task();
   private:
     luaX_reference<> ref_;
   };

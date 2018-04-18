@@ -1,4 +1,4 @@
-// Copyright (C) 2016 Tomoyuki Fujimori <moyu@dromozoa.com>
+// Copyright (C) 2016,2018 Tomoyuki Fujimori <moyu@dromozoa.com>
 //
 // This file is part of dromozoa-unix.
 //
@@ -71,15 +71,33 @@ namespace dromozoa {
     luaX_set_field<int>(L, -1, "SHUT_RDWR", SHUT_RDWR);
 
     luaX_set_field(L, -1, "SOL_SOCKET", SOL_SOCKET);
+
+    luaX_set_field(L, -1, "SO_ACCEPTCONN", SO_ACCEPTCONN);
     luaX_set_field(L, -1, "SO_BROADCAST", SO_BROADCAST);
+    luaX_set_field(L, -1, "SO_DEBUG", SO_DEBUG);
+    luaX_set_field(L, -1, "SO_DONTROUTE", SO_DONTROUTE);
     luaX_set_field(L, -1, "SO_ERROR", SO_ERROR);
+    luaX_set_field(L, -1, "SO_KEEPALIVE", SO_KEEPALIVE);
+    luaX_set_field(L, -1, "SO_LINGER", SO_LINGER);
+    luaX_set_field(L, -1, "SO_OOBINLINE", SO_OOBINLINE);
     luaX_set_field(L, -1, "SO_RCVBUF", SO_RCVBUF);
+    luaX_set_field(L, -1, "SO_RCVLOWAT", SO_RCVLOWAT);
+    luaX_set_field(L, -1, "SO_RCVTIMEO", SO_RCVTIMEO);
     luaX_set_field(L, -1, "SO_REUSEADDR", SO_REUSEADDR);
     luaX_set_field(L, -1, "SO_SNDBUF", SO_SNDBUF);
+    luaX_set_field(L, -1, "SO_SNDLOWAT", SO_SNDLOWAT);
+    luaX_set_field(L, -1, "SO_SNDTIMEO", SO_SNDTIMEO);
+    luaX_set_field(L, -1, "SO_TYPE", SO_TYPE);
 
+    luaX_set_field<int>(L, -1, "MSG_CTRUNC", MSG_CTRUNC);
+    luaX_set_field<int>(L, -1, "MSG_DONTROUTE", MSG_DONTROUTE);
     luaX_set_field<int>(L, -1, "MSG_EOR", MSG_EOR);
     luaX_set_field<int>(L, -1, "MSG_OOB", MSG_OOB);
+#ifdef MSG_NOSIGNAL
+    luaX_set_field<int>(L, -1, "MSG_NOSIGNAL", MSG_NOSIGNAL);
+#endif
     luaX_set_field<int>(L, -1, "MSG_PEEK", MSG_PEEK);
+    luaX_set_field<int>(L, -1, "MSG_TRUNC", MSG_TRUNC);
     luaX_set_field<int>(L, -1, "MSG_WAITALL", MSG_WAITALL);
   }
 }

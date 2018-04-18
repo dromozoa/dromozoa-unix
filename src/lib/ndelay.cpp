@@ -1,4 +1,4 @@
-// Copyright (C) 2016 Tomoyuki Fujimori <moyu@dromozoa.com>
+// Copyright (C) 2016,2018 Tomoyuki Fujimori <moyu@dromozoa.com>
 //
 // This file is part of dromozoa-unix.
 //
@@ -24,15 +24,43 @@ namespace dromozoa {
     int result = fcntl(fd, F_GETFL);
     if (result == -1) {
       return -1;
+    } else {
+      return fcntl(fd, F_SETFL, result | O_NONBLOCK);
     }
-    return fcntl(fd, F_SETFL, result | O_NONBLOCK);
   }
 
   int ndelay_off(int fd) {
     int result = fcntl(fd, F_GETFL);
     if (result == -1) {
       return -1;
+    } else {
+      return fcntl(fd, F_SETFL, result & ~O_NONBLOCK);
     }
-    return fcntl(fd, F_SETFL, result & ~O_NONBLOCK);
+  }
+
+  int is_ndelay_on(int fd) {
+    int result = fcntl(fd, F_GETFL);
+    if (result == -1) {
+      return -1;
+    } else {
+      if (result & O_NONBLOCK) {
+        return 1;
+      } else {
+        return 0;
+      }
+    }
+  }
+
+  int is_ndelay_off(int fd) {
+    int result = fcntl(fd, F_GETFL);
+    if (result == -1) {
+      return -1;
+    } else {
+      if (!(result & O_NONBLOCK)) {
+        return 1;
+      } else {
+        return 0;
+      }
+    }
   }
 }

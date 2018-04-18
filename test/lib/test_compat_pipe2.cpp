@@ -1,4 +1,4 @@
-// Copyright (C) 2016 Tomoyuki Fujimori <moyu@dromozoa.com>
+// Copyright (C) 2016,2018 Tomoyuki Fujimori <moyu@dromozoa.com>
 //
 // This file is part of dromozoa-unix.
 //
@@ -15,14 +15,15 @@
 // You should have received a copy of the GNU General Public License
 // along with dromozoa-unix.  If not, see <http://www.gnu.org/licenses/>.
 
+#include <assert.h>
 #include <fcntl.h>
 #include <unistd.h>
 
 #include <iostream>
 
+#include <dromozoa/coe.hpp>
 #include <dromozoa/compat_pipe2.hpp>
-
-#include "assert.hpp"
+#include <dromozoa/ndelay.hpp>
 
 void test1() {
   int fd[2] = { -1, -1 };
@@ -30,10 +31,10 @@ void test1() {
   std::cout << fd[0] << ", " << fd[1] << "\n";
   assert(fd[0] != -1);
   assert(fd[1] != -1);
-  assert_coe(fd[0]);
-  assert_coe(fd[1]);
-  assert_ndelay_on(fd[0]);
-  assert_ndelay_on(fd[1]);
+  assert(dromozoa::is_coe(fd[0]) == 1);
+  assert(dromozoa::is_coe(fd[1]) == 1);
+  assert(dromozoa::is_ndelay_on(fd[0]) == 1);
+  assert(dromozoa::is_ndelay_on(fd[1]) == 1);
   assert(close(fd[0]) != -1);
   assert(close(fd[1]) != -1);
 }
@@ -44,10 +45,10 @@ void test2() {
   std::cout << fd[0] << ", " << fd[1] << "\n";
   assert(fd[0] != -1);
   assert(fd[1] != -1);
-  assert_coe(fd[0]);
-  assert_coe(fd[1]);
-  assert_ndelay_off(fd[0]);
-  assert_ndelay_off(fd[1]);
+  assert(dromozoa::is_coe(fd[0]) == 1);
+  assert(dromozoa::is_coe(fd[1]) == 1);
+  assert(dromozoa::is_ndelay_off(fd[0]) == 1);
+  assert(dromozoa::is_ndelay_off(fd[1]) == 1);
   assert(close(fd[0]) != -1);
   assert(close(fd[1]) != -1);
 }

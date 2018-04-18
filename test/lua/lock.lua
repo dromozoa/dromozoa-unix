@@ -1,4 +1,4 @@
--- Copyright (C) 2016 Tomoyuki Fujimori <moyu@dromozoa.com>
+-- Copyright (C) 2016,2018 Tomoyuki Fujimori <moyu@dromozoa.com>
 --
 -- This file is part of dromozoa-unix.
 --
@@ -15,26 +15,29 @@
 -- You should have received a copy of the GNU General Public License
 -- along with dromozoa-unix.  If not, see <http://www.gnu.org/licenses/>.
 
-local uint32 = require "dromozoa.commons.uint32"
 local unix = require "dromozoa.unix"
+
+local verbose = os.getenv "VERBOSE" == "1"
 
 local mode = ...
 
-local fd = assert(unix.open("test.lock", uint32.bor(unix.O_WRONLY, unix.O_CREAT, unix.O_CLOEXEC)))
-
+local fd = assert(unix.open("test.lock", unix.bor(unix.O_WRONLY, unix.O_CREAT, unix.O_CLOEXEC)))
 if mode == "1" then
-  assert(io.stdin:read(1) == "x")
-  local a, b, c = fd:lock_exnb()
-  assert(a == nil)
-  assert(c == unix.EWOULDBLOCK)
-  io.stdout:write("x")
-  io.stdout:flush()
+  assert(io.read(1) == "X")
+  local result, message, code = fd:lock_exnb()
+  if verbose then
+    io.stderr:write(message, "\n")
+  end
+  assert(not result)
+  assert(code == unix.EWOULDBLOCK)
+  io.write "X"
+  io.flush()
   assert(fd:lock_ex())
 else
   assert(fd:lock_exnb())
-  io.stdout:write("x")
-  io.stdout:flush()
-  assert(io.stdin:read(1) == "x")
+  io.write "X"
+  io.flush()
+  assert(io.read(1) == "X")
   assert(unix.nanosleep(0.2))
   assert(fd:lock_un())
 end

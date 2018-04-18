@@ -1,4 +1,4 @@
-// Copyright (C) 2016,2017 Tomoyuki Fujimori <moyu@dromozoa.com>
+// Copyright (C) 2016-2018 Tomoyuki Fujimori <moyu@dromozoa.com>
 //
 // This file is part of dromozoa-unix.
 //
@@ -16,9 +16,7 @@
 // along with dromozoa-unix.  If not, see <http://www.gnu.org/licenses/>.
 
 #include <errno.h>
-#include <fcntl.h>
 #include <stddef.h>
-#include <sys/epoll.h>
 
 #include <dromozoa/coe.hpp>
 #include <dromozoa/selector_epoll.hpp>
@@ -30,15 +28,17 @@ namespace dromozoa {
     static const int MAX_BUFFER_SIZE = 4096;
   }
 
-#ifdef EPOLL_CLOEXEC
-  const int SELECTOR_CLOEXEC = EPOLL_CLOEXEC;
-#else
-  const int SELECTOR_CLOEXEC = O_CLOEXEC;
-#endif
+  selector_epoll::selector_epoll() : result_(-1), buffer_(INITIAL_BUFFER_SIZE) {}
 
 #ifdef HAVE_EPOLL_CREATE1
   int selector_epoll::open(int flags) {
-    return epoll_create1(flags);
+    file_descriptor fd(epoll_create1(flags));
+    if (!fd.valid()) {
+      return -1;
+    }
+
+    fd.swap(fd_);
+    return 0;
   }
 #else
   int selector_epoll::open(int flags) {
@@ -59,13 +59,10 @@ namespace dromozoa {
       }
     }
 
-    return fd.release();
+    fd.swap(fd_);
+    return 0;
   }
 #endif
-
-  selector_epoll::selector_epoll(int fd) : fd_(fd), result_(-1), buffer_(INITIAL_BUFFER_SIZE) {}
-
-  selector_epoll::~selector_epoll() {}
 
   int selector_epoll::close() {
     return fd_.close();

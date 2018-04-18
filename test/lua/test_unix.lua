@@ -1,4 +1,4 @@
--- Copyright (C) 2016 Tomoyuki Fujimori <moyu@dromozoa.com>
+-- Copyright (C) 2016,2018 Tomoyuki Fujimori <moyu@dromozoa.com>
 --
 -- This file is part of dromozoa-unix.
 --
@@ -17,20 +17,42 @@
 
 local unix = require "dromozoa.unix"
 
-assert(unix.block_signal(unix.SIGCHLD))
+local verbose = os.getenv "VERBOSE" == "1"
+local PATH = os.getenv "PATH"
 
-local path = os.getenv("PATH")
+local lua
+if _G["dromozoa.bind.driver"] then
+  lua = "lua"
+else
+  lua = arg[-1]
+end
 
 local reader, writer = assert(unix.pipe())
-
 local process1 = assert(unix.process())
-assert(process1:forkexec(path, { arg[-1], "test/lua/unix_server.lua" }, nil, nil, { [1] = writer }))
+assert(process1:forkexec(PATH, { lua, "test/lua/unix_server.lua" }, nil, nil, { [1] = writer }))
 assert(writer:close())
 assert(reader:read(1) == "")
 assert(reader:close())
-
 local process2 = assert(unix.process())
-assert(process2:forkexec(path, { arg[-1], "test/lua/unix_client.lua" }))
+assert(process2:forkexec(PATH, { lua, "test/lua/unix_client.lua" }))
 
-assert(unix.wait())
-assert(unix.wait())
+if verbose then
+  io.stderr:write(process1[1], "\n")
+  io.stderr:write(process2[1], "\n")
+end
+
+local pid, reason, status = assert(unix.wait())
+if verbose then
+  io.stderr:write(pid, "\n")
+end
+assert(pid == process1[1] or process2[1])
+assert(reason == "exit")
+assert(status == 0)
+
+local pid, reason, status = assert(unix.wait())
+if verbose then
+  io.stderr:write(pid, "\n")
+end
+assert(pid == process1[1] or process2[1])
+assert(reason == "exit")
+assert(status == 0)

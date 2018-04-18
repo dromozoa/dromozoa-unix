@@ -1,4 +1,4 @@
--- Copyright (C) 2017 Tomoyuki Fujimori <moyu@dromozoa.com>
+-- Copyright (C) 2018 Tomoyuki Fujimori <moyu@dromozoa.com>
 --
 -- This file is part of dromozoa-unix.
 --
@@ -15,28 +15,12 @@
 -- You should have received a copy of the GNU General Public License
 -- along with dromozoa-unix.  If not, see <http://www.gnu.org/licenses/>.
 
-local sequence = require "dromozoa.commons.sequence"
-local read_file = require "dromozoa.commons.read_file"
-local shell = require "dromozoa.commons.shell"
+local source_filename = "docs/errno.h.html"
+local target_filename = "src/lua/errno.cpp"
 
-local url = ...
-
-local content = assert(shell.eval("curl -fL " .. shell.quote(url)))
-local dl = assert(content:match("<dl compact>(.-)</dl>"))
-local names = sequence()
-for name in dl:gmatch("<dt>%[(.-)%]</dt>") do
-  names:push(name)
-  -- if not dd:match("OB XSR") then
-  --   local name = assert(dt:match("^%[(.*)%]$"))
-  --   print(name)
-  -- end
-end
-
-local out = assert(io.open("src/lua/errno.cpp", "w"))
+local out = assert(io.open(target_filename, "w"))
 
 out:write(([[
-// generated from %s
-
 #include <errno.h>
 
 #include "common.hpp"
@@ -45,12 +29,16 @@ namespace dromozoa {
   void initialize_errno(lua_State* L) {
 ]]):format(url))
 
-for name in names:each() do
-  out:write(([[
+local handle = assert(io.open(source_filename))
+for line in handle:lines() do
+  local name = line:match "<dt>%[(E[%w_]+)%]</dt>"
+  if name then
+    out:write(([[
 #ifdef %s
     luaX_set_field(L, -1, "%s", %s);
 #endif
 ]]):format(name, name, name))
+  end
 end
 
 out:write([[

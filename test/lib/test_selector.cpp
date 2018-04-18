@@ -1,4 +1,4 @@
-// Copyright (C) 2017 Tomoyuki Fujimori <moyu@dromozoa.com>
+// Copyright (C) 2017,2018 Tomoyuki Fujimori <moyu@dromozoa.com>
 //
 // This file is part of dromozoa-unix.
 //
@@ -15,34 +15,31 @@
 // You should have received a copy of the GNU General Public License
 // along with dromozoa-unix.  If not, see <http://www.gnu.org/licenses/>.
 
-#ifdef HAVE_CONFIG_H
-#include "config.h"
-#endif
-
+#include <assert.h>
+#include <errno.h>
 #include <fcntl.h>
 #include <unistd.h>
 
 #include <iostream>
 
+#include <dromozoa/coe.hpp>
 #include <dromozoa/compat_pipe2.hpp>
+#include <dromozoa/ndelay.hpp>
+#include <dromozoa/scoped_ptr.hpp>
 #include <dromozoa/selector.hpp>
 
-#if defined(HAVE_EPOLL_CREATE) || defined(HAVE_EPOLL_CREATE1)
-#include <dromozoa/selector_epoll.hpp>
-typedef dromozoa::selector_epoll selector_impl;
-#elif defined(HAVE_KQUEUE)
-#include <dromozoa/selector_kqueue.hpp>
-typedef dromozoa::selector_kqueue selector_impl;
-#endif
-
-#include "assert.hpp"
-
 void test() {
-  int selector_fd = selector_impl::open(dromozoa::SELECTOR_CLOEXEC);
-  assert(selector_fd != -1);
-  selector_impl selector(selector_fd);
+  dromozoa::scoped_ptr<dromozoa::selector_impl> impl(dromozoa::selector::open(dromozoa::SELECTOR_CLOEXEC));
+  assert(impl.valid());
+  dromozoa::selector selector(impl.release());
 
-  int pipe_fd[2] = { -1,-1 };
+  int selector_fd = selector.get();
+  if (selector_fd != -1) {
+    assert(dromozoa::is_coe(selector_fd) == 1);
+    assert(dromozoa::is_ndelay_off(selector_fd) == 1);
+  }
+
+  int pipe_fd[2] = { -1, -1 };
   assert(dromozoa::compat_pipe2(pipe_fd, O_CLOEXEC) != -1);
 
   struct timespec timeout = {};
@@ -55,8 +52,7 @@ void test() {
   assert(write(pipe_fd[1], "", 1) == 1);
   assert(close(pipe_fd[1]) != -1);
 
-  int result = -1;
-  result = selector.add(pipe_fd[0], dromozoa::SELECTOR_READ);
+  int result = selector.add(pipe_fd[0], dromozoa::SELECTOR_READ);
   assert(result == 0 || errno == EPIPE);
 
   assert(selector.select(&timeout) == 1);

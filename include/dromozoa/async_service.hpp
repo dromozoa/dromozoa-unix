@@ -1,4 +1,4 @@
-// Copyright (C) 2016,2017 Tomoyuki Fujimori <moyu@dromozoa.com>
+// Copyright (C) 2016-2018 Tomoyuki Fujimori <moyu@dromozoa.com>
 //
 // This file is part of dromozoa-unix.
 //
@@ -18,27 +18,35 @@
 #ifndef DROMOZOA_ASYNC_SERVICE_HPP
 #define DROMOZOA_ASYNC_SERVICE_HPP
 
-#include <dromozoa/async_task.hpp>
+#include <dromozoa/scoped_ptr.hpp>
 
 namespace dromozoa {
+  class async_service_task {
+  public:
+    virtual ~async_service_task() = 0;
+    virtual void dispatch() = 0;
+    virtual void cancel() = 0;
+  };
+
+  class async_service_impl;
+
   class async_service {
   public:
-    class impl;
-    static impl* open(unsigned int start_threads);
-    static impl* open(unsigned int start_threads, unsigned int max_threads);
-    static impl* open(unsigned int start_threads, unsigned int max_threads, unsigned int max_spare_threads);
-    async_service(impl* impl);
+    static async_service_impl* open(unsigned int start_threads);
+    static async_service_impl* open(unsigned int start_threads, unsigned int max_threads);
+    static async_service_impl* open(unsigned int start_threads, unsigned int max_threads, unsigned int max_spare_threads);
+    explicit async_service(async_service_impl* impl);
     ~async_service();
     int close();
     bool valid() const;
     int get() const;
     int read() const;
-    void push(async_task* task);
-    bool cancel(async_task* task);
-    async_task* pop();
+    int push(async_service_task* task);
+    bool cancel(async_service_task* task);
+    async_service_task* pop();
     void info(unsigned int& spare_threads, unsigned int& current_threads, unsigned int& current_tasks);
   private:
-    impl* impl_;
+    scoped_ptr<async_service_impl> impl_;
     async_service(const async_service&);
     async_service& operator=(const async_service&);
   };

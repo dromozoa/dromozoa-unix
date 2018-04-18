@@ -1,4 +1,4 @@
-// Copyright (C) 2016 Tomoyuki Fujimori <moyu@dromozoa.com>
+// Copyright (C) 2018 Tomoyuki Fujimori <moyu@dromozoa.com>
 //
 // This file is part of dromozoa-unix.
 //
@@ -15,19 +15,27 @@
 // You should have received a copy of the GNU General Public License
 // along with dromozoa-unix.  If not, see <http://www.gnu.org/licenses/>.
 
-#ifndef DROMOZOA_ASSERT_HPP
-#define DROMOZOA_ASSERT_HPP
+#ifndef DROMOZOA_THREAD_HPP
+#define DROMOZOA_THREAD_HPP
 
-#include <assert.h>
-#include <fcntl.h>
+#include <pthread.h>
 
-#define assert_coe(fd) \
-  assert("assert_coe" && (fcntl((fd), F_GETFD) & FD_CLOEXEC))
-
-#define assert_ndelay_on(fd) \
-  assert("assert_ndelay_on" && (fcntl((fd), F_GETFL) & O_NONBLOCK))
-
-#define assert_ndelay_off(fd) \
-  assert("assert_ndelay_off" && !(fcntl((fd), F_GETFL) & O_NONBLOCK))
+namespace dromozoa {
+  class thread {
+  public:
+    thread(void* (*start_routine)(void*), void* arg);
+    ~thread();
+    bool joinable() const;
+    void join();
+    void detach();
+    pthread_t native_handle();
+    void swap(thread& that);
+  private:
+    pthread_t thread_;
+    bool joinable_;
+    thread(const thread&);
+    thread& operator=(const thread&);
+  };
+}
 
 #endif

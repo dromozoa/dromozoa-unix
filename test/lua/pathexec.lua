@@ -1,4 +1,4 @@
--- Copyright (C) 2016 Tomoyuki Fujimori <moyu@dromozoa.com>
+-- Copyright (C) 2016,2018 Tomoyuki Fujimori <moyu@dromozoa.com>
 --
 -- This file is part of dromozoa-unix.
 --
@@ -17,6 +17,6 @@
 
 local unix = require "dromozoa.unix"
 
-local PATH = os.getenv("PATH")
+local PATH = os.getenv "PATH"
 
-unix.pathexec(PATH, { "env" }, {})
+unix.pathexec(PATH, { "sh", "-c", [[echo "$foo"]] }, { "foo=baz" })

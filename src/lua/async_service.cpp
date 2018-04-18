@@ -1,4 +1,4 @@
-// Copyright (C) 2016,2017 Tomoyuki Fujimori <moyu@dromozoa.com>
+// Copyright (C) 2016-2018 Tomoyuki Fujimori <moyu@dromozoa.com>
 //
 // This file is part of dromozoa-unix.
 //
@@ -31,7 +31,7 @@ namespace dromozoa {
     }
 
     void impl_call(lua_State* L) {
-      async_service::impl* impl = 0;
+      async_service_impl* impl = 0;
       int top = lua_gettop(L);
       if (top < 2) {
         unsigned int concurrency = hardware_concurrency();
@@ -82,10 +82,13 @@ namespace dromozoa {
     }
 
     void impl_push(lua_State* L) {
-      async_task_impl* task = static_cast<async_task_impl*>(check_async_task(L, 2));
+      async_task* task = check_async_task(L, 2);
       task->ref(L, 2);
-      check_async_service(L, 1)->push(task);
-      luaX_push_success(L);
+      if (check_async_service(L, 1)->push(task) == -1) {
+        push_error(L);
+      } else {
+        luaX_push_success(L);
+      }
     }
 
     void impl_cancel(lua_State* L) {
@@ -94,7 +97,7 @@ namespace dromozoa {
     }
 
     void impl_pop(lua_State* L) {
-      async_task_impl* task = static_cast<async_task_impl*>(check_async_service(L, 1)->pop());
+      async_task* task = static_cast<async_task*>(check_async_service(L, 1)->pop());
       if (task) {
         task->get_field(L);
         task->unref();

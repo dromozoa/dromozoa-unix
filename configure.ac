@@ -1,4 +1,4 @@
-# Copyright (C) 2016 Tomoyuki Fujimori <moyu@dromozoa.com>
+# Copyright (C) 2016,2018 Tomoyuki Fujimori <moyu@dromozoa.com>
 #
 # This file is part of dromozoa-unix.
 #
@@ -46,9 +46,9 @@ AC_CHECK_MEMBERS([struct stat.st_ctimespec])
 AC_CHECK_MEMBERS([struct stat.st_mtim])
 AC_CHECK_MEMBERS([struct stat.st_mtimespec])
 
-AC_SEARCH_LIBS([clock_gettime], [rt], [AC_DEFINE(HAVE_CLOCK_GETTIME, 1, [Define to 1 if you have the 'clock_gettime' function.]) ])
+AC_SEARCH_LIBS([clock_gettime], [rt], [AC_DEFINE(HAVE_CLOCK_GETTIME, 1, [Define to 1 if you have the 'clock_gettime' function.])])
 
-AX_PTHREAD()
+AX_PTHREAD([], [AC_MSG_ERROR([could not find pthread])])
 CXXFLAGS="$CXXFLAGS $PTHREAD_CFLAGS"
 LIBS="$LIBS $PTHREAD_LIBS"
 AC_SEARCH_LIBS([pthread_sigmask], [pthread])

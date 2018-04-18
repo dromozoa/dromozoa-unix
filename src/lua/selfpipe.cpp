@@ -1,4 +1,4 @@
-// Copyright (C) 2016 Tomoyuki Fujimori <moyu@dromozoa.com>
+// Copyright (C) 2016,2018 Tomoyuki Fujimori <moyu@dromozoa.com>
 //
 // This file is part of dromozoa-unix.
 //
@@ -21,16 +21,25 @@
 
 namespace dromozoa {
   namespace {
-    void impl_open(lua_State* L) {
-      if (selfpipe_open() == -1) {
-        push_error(L);
+    selfpipe* check_selfpipe(lua_State* L, int arg) {
+      return luaX_check_udata<selfpipe>(L, arg, "dromozoa.unix.selfpipe");
+    }
+
+    void impl_gc(lua_State* L) {
+      check_selfpipe(L, 1)->~selfpipe();
+    }
+
+    void impl_call(lua_State* L) {
+      if (selfpipe_impl* impl = selfpipe::open()) {
+        luaX_new<selfpipe>(L, impl);
+        luaX_set_metatable(L, "dromozoa.unix.selfpipe");
       } else {
-        luaX_push_success(L);
+        push_error(L);
       }
     }
 
     void impl_close(lua_State* L) {
-      if (selfpipe_close() == -1) {
+      if (check_selfpipe(L, 1)->close() == -1) {
         push_error(L);
       } else {
         luaX_push_success(L);
@@ -38,18 +47,24 @@ namespace dromozoa {
     }
 
     void impl_get(lua_State* L) {
-      luaX_push(L, selfpipe_get());
+      luaX_push(L, check_selfpipe(L, 1)->get());
     }
 
     void impl_read(lua_State* L) {
-      luaX_push(L, selfpipe_read());
+      luaX_push(L, check_selfpipe(L, 1)->read());
     }
   }
 
   void initialize_selfpipe(lua_State* L) {
     lua_newtable(L);
     {
-      luaX_set_field(L, -1, "open", impl_open);
+      luaL_newmetatable(L, "dromozoa.unix.selfpipe");
+      lua_pushvalue(L, -2);
+      luaX_set_field(L, -2, "__index");
+      luaX_set_field(L, -1, "__gc", impl_gc);
+      lua_pop(L, 1);
+
+      luaX_set_metafield(L, -1, "__call", impl_call);
       luaX_set_field(L, -1, "close", impl_close);
       luaX_set_field(L, -1, "get", impl_get);
       luaX_set_field(L, -1, "read", impl_read);

@@ -1,4 +1,4 @@
-// Copyright (C) 2015-2017 Tomoyuki Fujimori <moyu@dromozoa.com>
+// Copyright (C) 2016-2018 Tomoyuki Fujimori <moyu@dromozoa.com>
 //
 // This file is part of dromozoa-unix.
 //
@@ -49,7 +49,7 @@ namespace dromozoa {
       }
     }
 
-    class async_nanosleep : public async_task_impl {
+    class async_nanosleep : public async_task {
     public:
       explicit async_nanosleep(const struct timespec& tv1) : tv1_(tv1), tv2_(), result_(), code_() {}
 
@@ -60,7 +60,7 @@ namespace dromozoa {
         }
       }
 
-      virtual void impl_result(lua_State* L) {
+      virtual void result(lua_State* L) {
         if (result_ == -1) {
           errno = code_;
           push_error(L);

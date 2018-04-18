@@ -1,4 +1,4 @@
-// Copyright (C) 2016,2017 Tomoyuki Fujimori <moyu@dromozoa.com>
+// Copyright (C) 2016-2018 Tomoyuki Fujimori <moyu@dromozoa.com>
 //
 // This file is part of dromozoa-unix.
 //
@@ -32,16 +32,19 @@
 
 namespace dromozoa {
 #ifdef HAVE_CLOCK_GETTIME
-#if INT_MIN <= CLOCK_REALTIME && CLOCK_REALTIME <= INT_MAX
-  const int COMPAT_CLOCK_REALTIME = CLOCK_REALTIME;
-#endif
-#if INT_MIN <= CLOCK_MONOTONIC && CLOCK_MONOTONIC <= INT_MAX
-  const int COMPAT_CLOCK_MONOTONIC = CLOCK_MONOTONIC;
-#endif
+  template <intmax_t T, bool = (INT_MIN <= T && T <= INT_MAX)>
+  struct check_int {};
+
+  template <intmax_t T>
+  struct check_int<T, true> {
+    static const int value = T;
+  };
+
+  const int COMPAT_CLOCK_REALTIME = check_int<CLOCK_REALTIME>::value;
+  const int COMPAT_CLOCK_MONOTONIC = check_int<CLOCK_MONOTONIC>::value;
+
 #ifdef CLOCK_MONOTONIC_RAW
-#if INT_MIN <= CLOCK_MONOTONIC_RAW && CLOCK_MONOTONIC_RAW <= INT_MAX
-  const int COMPAT_CLOCK_MONOTONIC_RAW = CLOCK_MONOTONIC_RAW;
-#endif
+  const int COMPAT_CLOCK_MONOTONIC_RAW = check_int<CLOCK_MONOTONIC_RAW>::value;
 #else
   const int COMPAT_CLOCK_MONOTONIC_RAW = COMPAT_CLOCK_MONOTONIC;
 #endif
@@ -86,8 +89,10 @@ namespace dromozoa {
     switch (clock_id) {
       case COMPAT_CLOCK_REALTIME:
         return clock_gettime_realtime(tp);
+#ifdef HAVE_MACH_ABSOLUTE_TIME
       case COMPAT_CLOCK_MONOTONIC:
         return clock_gettime_monotonic(tp);
+#endif
       default:
         errno = EINVAL;
         return -1;

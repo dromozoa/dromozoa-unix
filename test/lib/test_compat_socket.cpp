@@ -1,4 +1,4 @@
-// Copyright (C) 2016 Tomoyuki Fujimori <moyu@dromozoa.com>
+// Copyright (C) 2016,2018 Tomoyuki Fujimori <moyu@dromozoa.com>
 //
 // This file is part of dromozoa-unix.
 //
@@ -15,6 +15,8 @@
 // You should have received a copy of the GNU General Public License
 // along with dromozoa-unix.  If not, see <http://www.gnu.org/licenses/>.
 
+#include <assert.h>
+#include <fcntl.h>
 #include <stddef.h>
 #include <unistd.h>
 #include <sys/socket.h>
@@ -22,16 +24,16 @@
 #include <iomanip>
 #include <iostream>
 
+#include <dromozoa/coe.hpp>
 #include <dromozoa/compat_socket.hpp>
-
-#include "assert.hpp"
+#include <dromozoa/ndelay.hpp>
 
 void test_compat_socket1() {
   int fd = dromozoa::compat_socket(AF_UNIX, SOCK_STREAM | dromozoa::COMPAT_SOCK_CLOEXEC | dromozoa::COMPAT_SOCK_NONBLOCK, 0);
   std::cout << fd << "\n";
   assert(fd != -1);
-  assert_coe(fd);
-  assert_ndelay_on(fd);
+  assert(dromozoa::is_coe(fd) == 1);
+  assert(dromozoa::is_ndelay_on(fd) == 1);
   assert(close(fd) != -1);
 }
 
@@ -39,8 +41,8 @@ void test_compat_socket2() {
   int fd = dromozoa::compat_socket(AF_UNIX, SOCK_STREAM | dromozoa::COMPAT_SOCK_CLOEXEC, 0);
   std::cout << fd << "\n";
   assert(fd != -1);
-  assert_coe(fd);
-  assert_ndelay_off(fd);
+  assert(dromozoa::is_coe(fd) == 1);
+  assert(dromozoa::is_ndelay_off(fd) == 1);
   assert(close(fd) != -1);
 }
 
@@ -50,10 +52,10 @@ void test_compat_socketpair1() {
   std::cout << fd[0] << ", " << fd[1] << "\n";
   assert(fd[0] != -1);
   assert(fd[1] != -1);
-  assert_coe(fd[0]);
-  assert_coe(fd[1]);
-  assert_ndelay_on(fd[0]);
-  assert_ndelay_on(fd[1]);
+  assert(dromozoa::is_coe(fd[0]) == 1);
+  assert(dromozoa::is_coe(fd[1]) == 1);
+  assert(dromozoa::is_ndelay_on(fd[0]) == 1);
+  assert(dromozoa::is_ndelay_on(fd[1]) == 1);
   assert(close(fd[0]) != -1);
   assert(close(fd[1]) != -1);
 }
@@ -64,49 +66,49 @@ void test_compat_socketpair2() {
   std::cout << fd[0] << ", " << fd[1] << "\n";
   assert(fd[0] != -1);
   assert(fd[1] != -1);
-  assert_coe(fd[0]);
-  assert_coe(fd[1]);
-  assert_ndelay_off(fd[0]);
-  assert_ndelay_off(fd[1]);
+  assert(dromozoa::is_coe(fd[0]) == 1);
+  assert(dromozoa::is_coe(fd[1]) == 1);
+  assert(dromozoa::is_ndelay_off(fd[0]) == 1);
+  assert(dromozoa::is_ndelay_off(fd[1]) == 1);
   assert(close(fd[0]) != -1);
   assert(close(fd[1]) != -1);
 }
 
 void dump() {
-  static const size_t width = sizeof(int) * 4;
+  static const size_t width = sizeof(int) * 2;
   std::cout << std::hex << std::setfill('0')
-      << "O_CLOEXEC=0x" << std::setw(width) << O_CLOEXEC << "\n"
-      << "O_NONBLOCK=0x" << std::setw(width) << O_NONBLOCK << "\n"
-      << "SOCK_STREAM=0x" << std::setw(width) << SOCK_STREAM << "\n"
-      << "SOCK_DGRAM=0x" << std::setw(width) << SOCK_DGRAM << "\n"
-      << "SOCK_SEQPACKET=0x" << std::setw(width) << SOCK_SEQPACKET << "\n"
+      << "O_CLOEXEC            0x" << std::setw(width) << O_CLOEXEC << "\n"
+      << "O_NONBLOCK           0x" << std::setw(width) << O_NONBLOCK << "\n"
+      << "SOCK_STREAM          0x" << std::setw(width) << SOCK_STREAM << "\n"
+      << "SOCK_DGRAM           0x" << std::setw(width) << SOCK_DGRAM << "\n"
+      << "SOCK_SEQPACKET       0x" << std::setw(width) << SOCK_SEQPACKET << "\n"
 #ifdef SOCK_RAW
-      << "SOCK_RAW=0x" << std::setw(width) << SOCK_RAW << "\n"
+      << "SOCK_RAW             0x" << std::setw(width) << SOCK_RAW << "\n"
 #else
-      << "SOCK_RAW not defined\n"
+      << "SOCK_RAW             not defined\n"
 #endif
 #ifdef SOCK_RDM
-      << "SOCK_RDM=0x" << std::setw(width) << SOCK_RDM << "\n"
+      << "SOCK_RDM             0x" << std::setw(width) << SOCK_RDM << "\n"
 #else
-      << "SOCK_RDM not defined\n"
+      << "SOCK_RDM             not defined\n"
 #endif
 #ifdef SOCK_PACKET
-      << "SOCK_PACKET=0x" << std::setw(width) << SOCK_PACKET << "\n"
+      << "SOCK_PACKET          0x" << std::setw(width) << SOCK_PACKET << "\n"
 #else
-      << "SOCK_PACKET not defined\n"
+      << "SOCK_PACKET          not defined\n"
 #endif
 #ifdef SOCK_CLOEXEC
-      << "SOCK_CLOEXEC=0x" << std::setw(width) << SOCK_CLOEXEC << "\n"
+      << "SOCK_CLOEXEC         0x" << std::setw(width) << SOCK_CLOEXEC << "\n"
 #else
-      << "SOCK_CLOEXEC not defined\n"
+      << "SOCK_CLOEXEC         not defined\n"
 #endif
 #ifdef SOCK_NONBLOCK
-      << "SOCK_NONBLOCK=0x" << std::setw(width) << SOCK_NONBLOCK << "\n"
+      << "SOCK_NONBLOCK        0x" << std::setw(width) << SOCK_NONBLOCK << "\n"
 #else
-      << "SOCK_NONBLOCK not defined\n"
+      << "SOCK_NONBLOCK        not defined\n"
 #endif
-      << "COMPAT_SOCK_CLOEXEC=0x" << std::setw(width) << dromozoa::COMPAT_SOCK_CLOEXEC << "\n"
-      << "COMPAT_SOCK_NONBLOCK=0x" << std::setw(width) << dromozoa::COMPAT_SOCK_NONBLOCK << "\n"
+      << "COMPAT_SOCK_CLOEXEC  0x" << std::setw(width) << dromozoa::COMPAT_SOCK_CLOEXEC << "\n"
+      << "COMPAT_SOCK_NONBLOCK 0x" << std::setw(width) << dromozoa::COMPAT_SOCK_NONBLOCK << "\n"
       ;
 }
 

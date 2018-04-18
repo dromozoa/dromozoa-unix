@@ -1,4 +1,4 @@
--- Copyright (C) 2016 Tomoyuki Fujimori <moyu@dromozoa.com>
+-- Copyright (C) 2016,2018 Tomoyuki Fujimori <moyu@dromozoa.com>
 --
 -- This file is part of dromozoa-unix.
 --
@@ -15,27 +15,32 @@
 -- You should have received a copy of the GNU General Public License
 -- along with dromozoa-unix.  If not, see <http://www.gnu.org/licenses/>.
 
-local ipairs = require "dromozoa.commons.ipairs"
-local uint32 = require "dromozoa.commons.uint32"
 local unix = require "dromozoa.unix"
 
-local addrinfo = assert(unix.getaddrinfo("127.0.0.1", nil, {
-  ai_socktype = unix.SOCK_DGRAM;
-  ai_flags = unix.AI_PASSIVE;
-}))
+local verbose = os.getenv "VERBOSE" == "1"
+
+local addrinfo = assert(unix.getaddrinfo("127.0.0.1", nil, { ai_socktype = unix.SOCK_DGRAM, ai_flags = unix.AI_PASSIVE }))
 local ai = addrinfo[1]
-local server_fd = assert(unix.socket(ai.ai_family, uint32.bor(ai.ai_socktype, unix.SOCK_CLOEXEC), ai.ai_protocol))
+local server_fd = assert(unix.socket(ai.ai_family, unix.bor(ai.ai_socktype, unix.SOCK_CLOEXEC), ai.ai_protocol))
 assert(server_fd:bind(ai.ai_addr))
 
 local address = assert(server_fd:getsockname())
-print(address:getnameinfo(uint32.bor(unix.NI_NUMERICHOST, unix.NI_NUMERICSERV)))
+if verbose then
+  local host, serv = assert(address:getnameinfo(unix.bor(unix.NI_NUMERICHOST, unix.NI_NUMERICSERV)))
+  io.stderr:write(host, "\n")
+  io.stderr:write(serv, "\n")
+end
 
-local client_fd = assert(unix.socket(ai.ai_family, uint32.bor(ai.ai_socktype, unix.SOCK_CLOEXEC), ai.ai_protocol))
-
+local client_fd = assert(unix.socket(ai.ai_family, unix.bor(ai.ai_socktype, unix.SOCK_CLOEXEC), ai.ai_protocol))
 assert(client_fd:sendto("foobarbaz", nil, nil, nil, address) == 9)
-local result, recv_address = server_fd:recvfrom(16)
+
+local result, recv_address = assert(server_fd:recvfrom(16))
+if verbose then
+  local host, serv = assert(recv_address:getnameinfo(unix.bor(unix.NI_NUMERICHOST, unix.NI_NUMERICSERV)))
+  io.stderr:write(host, "\n")
+  io.stderr:write(serv, "\n")
+end
 assert(result == "foobarbaz")
-print(recv_address:getnameinfo(uint32.bor(unix.NI_NUMERICHOST, unix.NI_NUMERICSERV)))
 
 assert(client_fd:sendto("foobarbaz", 4, 6, nil, address) == 3)
 assert(server_fd:recv(16) == "bar")

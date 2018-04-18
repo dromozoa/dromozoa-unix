@@ -1,4 +1,4 @@
-// Copyright (C) 2016 Tomoyuki Fujimori <moyu@dromozoa.com>
+// Copyright (C) 2016,2018 Tomoyuki Fujimori <moyu@dromozoa.com>
 //
 // This file is part of dromozoa-unix.
 //
@@ -15,12 +15,10 @@
 // You should have received a copy of the GNU General Public License
 // along with dromozoa-unix.  If not, see <http://www.gnu.org/licenses/>.
 
-#ifdef HAVE_CONFIG_H
-#include "config.h"
-#endif
-
+#include <assert.h>
 #include <errno.h>
 #include <stdlib.h>
+#include <unistd.h>
 #include <sys/wait.h>
 
 #include <iostream>
@@ -29,38 +27,28 @@
 #include <dromozoa/forkexec.hpp>
 #include <dromozoa/selector.hpp>
 
-#if defined(HAVE_EPOLL_CREATE) || defined(HAVE_EPOLL_CREATE1)
-#include <dromozoa/selector_epoll.hpp>
-typedef dromozoa::selector_epoll selector_impl;
-#elif defined(HAVE_KQUEUE)
-#include <dromozoa/selector_kqueue.hpp>
-typedef dromozoa::selector_kqueue selector_impl;
-#endif
-
-#include "assert.hpp"
-
 int main(int, char*[]) {
-  assert(dromozoa::selfpipe_open() == 0);
+  dromozoa::selfpipe_impl* impl = dromozoa::selfpipe::open();
+  assert(impl);
+  dromozoa::selfpipe sp1(impl);
 
-  int fd = selector_impl::open(dromozoa::SELECTOR_CLOEXEC);
-  std::cout << fd << "\n";
-  assert(fd != -1);
-  assert_coe(fd);
-  assert_ndelay_off(fd);
+  dromozoa::selfpipe sp2(dromozoa::selfpipe::open());
 
-  selector_impl selector(fd);
-  assert(selector.add(dromozoa::selfpipe_get(), dromozoa::SELECTOR_READ) == 0);
+  std::cout << "pid " << getpid() << "\n";
+
+  dromozoa::selector selector(dromozoa::selector::open(dromozoa::SELECTOR_CLOEXEC));
+  assert(selector.add(sp1.get(), dromozoa::SELECTOR_READ) == 0);
 
   const char* path = getenv("PATH");
-  const char* argv[] = { "env", 0 };
+  const char* argv[] = { "echo", "foo", 0 };
   pid_t pid = -1;
   assert(dromozoa::forkexec(path, argv, 0, 0, 0, pid) == 0);
-  std::cout << pid << "\n";
+  std::cout << "child pid " << pid << "\n";
   assert(pid != -1);
 
   while (true) {
     int result = selector.select(0);
-    std::cout << result << "\n";
+    std::cout << "result " << result << "\n";
     if (result == -1) {
       assert(errno == EINTR);
     } else {
@@ -68,12 +56,17 @@ int main(int, char*[]) {
       break;
     }
   }
-  assert(dromozoa::selfpipe_read() == 1);
+  assert(sp1.read() == 1);
 
   int status = 0;
-  assert(waitpid(-1, &status, 0) == pid);
+  assert(waitpid(pid, &status, 0) == pid);
+  std::cout << "status " << status << "\n";
   assert(WIFEXITED(status) && WEXITSTATUS(status) == 0);
 
-  assert(dromozoa::selfpipe_close() == 0);
+  assert(sp1.close() == 0);
+
+  assert(sp2.read() == 1);
+  assert(sp2.read() == 0);
+
   return 0;
 }

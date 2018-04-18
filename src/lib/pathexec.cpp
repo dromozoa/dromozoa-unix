@@ -1,4 +1,4 @@
-// Copyright (C) 2016 Tomoyuki Fujimori <moyu@dromozoa.com>
+// Copyright (C) 2016,2018 Tomoyuki Fujimori <moyu@dromozoa.com>
 //
 // This file is part of dromozoa-unix.
 //
@@ -104,7 +104,7 @@ namespace dromozoa {
           }
           p = copy(p, '/');
           p = copy(p, command, command_size);
-          p = copy(p, '\0');
+          copy(p, '\0');
           execve(buffer, const_cast<char**>(argv), const_cast<char**>(envp));
           switch (errno) {
             case ENOENT:

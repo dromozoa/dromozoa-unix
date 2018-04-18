@@ -1,4 +1,4 @@
-// Copyright (C) 2016 Tomoyuki Fujimori <moyu@dromozoa.com>
+// Copyright (C) 2016,2018 Tomoyuki Fujimori <moyu@dromozoa.com>
 //
 // This file is part of dromozoa-unix.
 //
@@ -41,13 +41,13 @@ namespace dromozoa {
   }
 #else
   namespace {
-    class scoped_unlink {
+    class scoped_file {
     public:
-      explicit scoped_unlink(const char* path) : path_(path) {}
+      explicit scoped_file(const char* path) : path_(path) {}
 
-      ~scoped_unlink() {
+      ~scoped_file() {
         if (path_) {
-          errno_saver save;
+          errno_saver save_errno;
           if (unlink(path_) == -1) {
             DROMOZOA_UNEXPECTED(compat_strerror(errno));
           }
@@ -62,8 +62,8 @@ namespace dromozoa {
 
     private:
       const char* path_;
-      scoped_unlink(const scoped_unlink&);
-      scoped_unlink& operator=(const scoped_unlink&);
+      scoped_file(const scoped_file&);
+      scoped_file& operator=(const scoped_file&);
     };
   }
 
@@ -78,7 +78,7 @@ namespace dromozoa {
     if (!fd.valid()) {
       return -1;
     }
-    scoped_unlink scoped(tmpl);
+    scoped_file file(tmpl);
 
     if (flags & O_CLOEXEC) {
       if (coe(fd.get()) == -1) {
@@ -97,7 +97,7 @@ namespace dromozoa {
       }
     }
 
-    scoped.release();
+    file.release();
     return fd.release();
   }
 #endif

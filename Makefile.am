@@ -1,4 +1,4 @@
-# Copyright (C) 2016 Tomoyuki Fujimori <moyu@dromozoa.com>
+# Copyright (C) 2016-2018 Tomoyuki Fujimori <moyu@dromozoa.com>
 #
 # This file is part of dromozoa-unix.
 #
@@ -22,9 +22,11 @@ EXTRA_DIST = \
 	.gitignore \
 	README.md \
 	bind \
+	build_errno.lua \
+	docs \
 	dromozoa-unix-*.rockspec \
-	generate.lua \
 	include \
 	m4/update \
 	test/lua \
-	test.sh
+	$(TESTS)
+TESTS = test.sh

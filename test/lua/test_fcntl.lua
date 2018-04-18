@@ -1,4 +1,4 @@
--- Copyright (C) 2016,2017 Tomoyuki Fujimori <moyu@dromozoa.com>
+-- Copyright (C) 2016-2018 Tomoyuki Fujimori <moyu@dromozoa.com>
 --
 -- This file is part of dromozoa-unix.
 --
@@ -15,33 +15,31 @@
 -- You should have received a copy of the GNU General Public License
 -- along with dromozoa-unix.  If not, see <http://www.gnu.org/licenses/>.
 
-local uint32 = require "dromozoa.commons.uint32"
 local unix = require "dromozoa.unix"
 
-assert(unix.O_CLOEXEC)
-assert(unix.O_NONBLOCK)
+assert(unix.umask(tonumber("022", 8)))
 
-os.remove("test.txt")
+os.remove "test.txt"
 
-local fd = assert(unix.open("test.txt", uint32.bor(unix.O_WRONLY, unix.O_CREAT, unix.O_CLOEXEC)))
+local fd = assert(unix.open("test.txt", unix.bor(unix.O_WRONLY, unix.O_CREAT, unix.O_CLOEXEC)))
 assert(fd:is_coe())
 assert(fd:is_ndelay_off())
-fd:write("foo\n")
-fd:close()
+assert(fd:write "foo\n" == 4)
+assert(fd:close())
 
-local fd = assert(unix.open("test.txt"))
+local fd = assert(unix.open "test.txt")
 local st = assert(fd:fstat())
-assert(st.st_mode == uint32.bor(unix.S_IFREG, tonumber("0644", 8)))
+assert(st.st_mode == unix.bor(unix.S_IFREG, tonumber("0644", 8)))
 assert(fd:is_coe())
 assert(fd:is_ndelay_off())
 assert(fd:read(4) == "foo\n")
-fd:close()
+assert(fd:close())
 
-assert(os.remove("test.txt"))
+assert(os.remove "test.txt")
 
-local fd = assert(unix.open("test.txt", uint32.bor(unix.O_WRONLY, unix.O_CREAT, unix.O_CLOEXEC), tonumber("0606", 8)))
+local fd = assert(unix.open("test.txt", unix.bor(unix.O_WRONLY, unix.O_CREAT, unix.O_CLOEXEC), tonumber("0606", 8)))
 local st = assert(fd:fstat())
-assert(st.st_mode == uint32.bor(unix.S_IFREG, tonumber("0604", 8)))
-fd:close()
+assert(st.st_mode == unix.bor(unix.S_IFREG, tonumber("0604", 8)))
+assert(fd:close())
 
-assert(os.remove("test.txt"))
+assert(os.remove "test.txt")

@@ -1,4 +1,4 @@
-# Copyright (C) 2016 Tomoyuki Fujimori <moyu@dromozoa.com>
+# Copyright (C) 2016-2018 Tomoyuki Fujimori <moyu@dromozoa.com>
 #
 # This file is part of dromozoa-unix.
 #
@@ -33,6 +33,7 @@ unix_la_SOURCES = \
 	fd_djb.cpp \
 	fd_socket.cpp \
 	fd_unistd.cpp \
+	int.cpp \
 	module.cpp \
 	netdb.cpp \
 	netinet.cpp \

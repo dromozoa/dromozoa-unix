@@ -1,4 +1,4 @@
-// Copyright (C) 2016,2017 Tomoyuki Fujimori <moyu@dromozoa.com>
+// Copyright (C) 2016-2018 Tomoyuki Fujimori <moyu@dromozoa.com>
 //
 // This file is part of dromozoa-unix.
 //
@@ -37,13 +37,34 @@ namespace dromozoa {
   void initialize_fcntl(lua_State* L) {
     luaX_set_field(L, -1, "open", impl_open);
 
+#ifdef O_ACCMMODE
+    luaX_set_field(L, -1, "O_ACCMMODE", O_ACCMMODE);
+#endif
     luaX_set_field(L, -1, "O_APPEND", O_APPEND);
     luaX_set_field(L, -1, "O_CLOEXEC", O_CLOEXEC);
     luaX_set_field(L, -1, "O_CREAT", O_CREAT);
+    luaX_set_field(L, -1, "O_DIRECTORY", O_DIRECTORY);
+    luaX_set_field(L, -1, "O_DSYNC", O_DSYNC);
+    luaX_set_field(L, -1, "O_EXCL", O_EXCL);
+#ifdef O_EXEC
+    luaX_set_field(L, -1, "O_EXEC", O_EXEC);
+#endif
+    luaX_set_field(L, -1, "O_NOCTTY", O_NOCTTY);
+    luaX_set_field(L, -1, "O_NOFOLLOW", O_NOFOLLOW);
     luaX_set_field(L, -1, "O_NONBLOCK", O_NONBLOCK);
     luaX_set_field(L, -1, "O_RDONLY", O_RDONLY);
     luaX_set_field(L, -1, "O_RDWR", O_RDWR);
+#ifdef O_RSYNC
+    luaX_set_field(L, -1, "O_RSYNC", O_RSYNC);
+#endif
+#ifdef O_SEARCH
+    luaX_set_field(L, -1, "O_SEARCH", O_SEARCH);
+#endif
     luaX_set_field(L, -1, "O_SYNC", O_SYNC);
+    luaX_set_field(L, -1, "O_TRUNC", O_TRUNC);
+#ifdef O_TTY_INIT
+    luaX_set_field(L, -1, "O_TTY_INIT", O_TTY_INIT);
+#endif
     luaX_set_field(L, -1, "O_WRONLY", O_WRONLY);
   }
 }

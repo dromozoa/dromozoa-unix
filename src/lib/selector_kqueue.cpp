@@ -1,4 +1,4 @@
-// Copyright (C) 2016,2017 Tomoyuki Fujimori <moyu@dromozoa.com>
+// Copyright (C) 2016-2018 Tomoyuki Fujimori <moyu@dromozoa.com>
 //
 // This file is part of dromozoa-unix.
 //
@@ -17,7 +17,6 @@
 
 #include <errno.h>
 #include <stddef.h>
-#include <fcntl.h>
 
 #include <dromozoa/coe.hpp>
 #include <dromozoa/selector_kqueue.hpp>
@@ -29,7 +28,7 @@ namespace dromozoa {
     static const int MAX_BUFFER_SIZE = 8192;
   }
 
-  const int SELECTOR_CLOEXEC = O_CLOEXEC;
+  selector_kqueue::selector_kqueue() : result_(-1), buffer_(INITIAL_BUFFER_SIZE) {}
 
   int selector_kqueue::open(int flags) {
     sigset_t mask;
@@ -49,12 +48,9 @@ namespace dromozoa {
       }
     }
 
-    return fd.release();
+    fd.swap(fd_);
+    return 0;
   }
-
-  selector_kqueue::selector_kqueue(int fd) : fd_(fd), result_(-1), buffer_(INITIAL_BUFFER_SIZE) {}
-
-  selector_kqueue::~selector_kqueue() {}
 
   int selector_kqueue::close() {
     return fd_.close();

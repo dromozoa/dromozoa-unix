@@ -1,4 +1,4 @@
-// Copyright (C) 2016,2017 Tomoyuki Fujimori <moyu@dromozoa.com>
+// Copyright (C) 2016-2018 Tomoyuki Fujimori <moyu@dromozoa.com>
 //
 // This file is part of dromozoa-unix.
 //
@@ -21,9 +21,8 @@
 #include <iostream>
 
 #include <dromozoa/async_service.hpp>
-#include <dromozoa/async_task.hpp>
 
-class nanosleep_task : public dromozoa::async_task {
+class nanosleep_task : public dromozoa::async_service_task {
 public:
   explicit nanosleep_task(const struct timespec& tv) : tv_(tv), thread_(), finished_() {}
 
@@ -34,15 +33,7 @@ public:
   }
 
   virtual void cancel() {
-    std::cout
-        << "  dipatch: " << thread_ << "\n"
-        << "  cancel: " << pthread_self() << "\n";
-  }
-
-  virtual void result(void*) {
-    std::cout
-        << "dipatch: " << thread_ << "\n"
-        << "result: " << pthread_self() << "\n";
+    std::cout << "[cancel] " << this << ", " << thread_ << ", " << pthread_self() << "\n";
   }
 
   pthread_t thread() const {
@@ -69,16 +60,18 @@ struct timespec make_timespec(time_t s, long n) {
 }
 
 void test1() {
+  std::cout << "-- test1\n";
+
   nanosleep_task task1(make_timespec(0, 200000000));
   nanosleep_task task2(make_timespec(0, 200000000));
   nanosleep_task task3(make_timespec(0, 200000000));
   nanosleep_task task4(make_timespec(0, 200000000));
 
   dromozoa::async_service service(dromozoa::async_service::open(1));
-  service.push(&task1);
-  service.push(&task2);
-  service.push(&task3);
-  service.push(&task4);
+  assert(service.push(&task1) == 0);
+  assert(service.push(&task2) == 0);
+  assert(service.push(&task3) == 0);
+  assert(service.push(&task4) == 0);
 
   struct timespec tv = make_timespec(0, 300000000);
   nanosleep(&tv, 0);
@@ -93,27 +86,24 @@ void test1() {
   assert(!task3.finished());
   assert(!task4.finished());
 
-  task1.result(0);
-  task2.result(0);
-  task3.result(0);
-  task4.result(0);
-
   assert(pthread_equal(task1.thread(), task2.thread()) != 0);
   assert(pthread_equal(task1.thread(), task3.thread()) == 0);
   assert(pthread_equal(task1.thread(), task4.thread()) == 0);
 }
 
 void test2() {
+  std::cout << "-- test2\n";
+
   nanosleep_task task1(make_timespec(0, 200000000));
   nanosleep_task task2(make_timespec(0, 200000000));
   nanosleep_task task3(make_timespec(0, 200000000));
   nanosleep_task task4(make_timespec(0, 200000000));
 
   dromozoa::async_service service(dromozoa::async_service::open(4));
-  service.push(&task1);
-  service.push(&task2);
-  service.push(&task3);
-  service.push(&task4);
+  assert(service.push(&task1) == 0);
+  assert(service.push(&task2) == 0);
+  assert(service.push(&task3) == 0);
+  assert(service.push(&task4) == 0);
 
   struct timespec tv = make_timespec(0, 100000000);
   nanosleep(&tv, 0);
@@ -124,27 +114,24 @@ void test2() {
   assert(task3.finished());
   assert(task4.finished());
 
-  task1.result(0);
-  task2.result(0);
-  task3.result(0);
-  task4.result(0);
-
   assert(pthread_equal(task1.thread(), task2.thread()) == 0);
   assert(pthread_equal(task1.thread(), task3.thread()) == 0);
   assert(pthread_equal(task1.thread(), task4.thread()) == 0);
 }
 
 void test3() {
+  std::cout << "-- test3\n";
+
   nanosleep_task task1(make_timespec(0, 200000000));
   nanosleep_task task2(make_timespec(0, 200000000));
   nanosleep_task task3(make_timespec(0, 200000000));
   nanosleep_task task4(make_timespec(0, 200000000));
 
   dromozoa::async_service service(dromozoa::async_service::open(1));
-  service.push(&task1);
-  service.push(&task2);
-  service.push(&task3);
-  service.push(&task4);
+  assert(service.push(&task1) == 0);
+  assert(service.push(&task2) == 0);
+  assert(service.push(&task3) == 0);
+  assert(service.push(&task4) == 0);
 
   struct timespec tv = make_timespec(0, 300000000);
   nanosleep(&tv, 0);
@@ -163,17 +150,14 @@ void test3() {
   assert(!task3.finished());
   assert(task4.finished());
 
-  task1.result(0);
-  task2.result(0);
-  task3.result(0);
-  task4.result(0);
-
   assert(pthread_equal(task1.thread(), task2.thread()) != 0);
   assert(pthread_equal(task1.thread(), task3.thread()) == 0);
   assert(pthread_equal(task1.thread(), task4.thread()) != 0);
 }
 
 void test4() {
+  std::cout << "-- test4\n";
+
   unsigned int spare_threads = 0;
   unsigned int current_threads = 0;
   unsigned int current_tasks = 0;
@@ -184,17 +168,19 @@ void test4() {
   dromozoa::async_service service(dromozoa::async_service::open(0, 2, 2));
 
   service.info(spare_threads, current_threads, current_tasks);
-  std::cout << spare_threads << "," << current_threads << "\n";
+  std::cout << spare_threads << ", " << current_threads << ", " << current_tasks << "\n";
   assert(spare_threads == 0);
   assert(current_threads == 0);
+  assert(current_tasks == 0);
 
-  service.push(&task1);
-  service.push(&task2);
+  assert(service.push(&task1) == 0);
+  assert(service.push(&task2) == 0);
 
   service.info(spare_threads, current_threads, current_tasks);
-  std::cout << spare_threads << "," << current_threads << "\n";
+  std::cout << spare_threads << ", " << current_threads << ", " << current_tasks << "\n";
   assert(spare_threads <= 2);
   assert(current_threads == 2);
+  assert(current_tasks == 2);
 
   {
     struct timespec tv = make_timespec(0, 200000000);
@@ -202,9 +188,10 @@ void test4() {
   }
 
   service.info(spare_threads, current_threads, current_tasks);
-  std::cout << spare_threads << "," << current_threads << "\n";
+  std::cout << spare_threads << ", " << current_threads << ", " << current_tasks << "\n";
   assert(spare_threads == 0);
   assert(current_threads == 2);
+  assert(current_tasks == 2);
 
   {
     struct timespec tv = make_timespec(0, 400000000);
@@ -212,14 +199,17 @@ void test4() {
   }
 
   service.info(spare_threads, current_threads, current_tasks);
-  std::cout << spare_threads << "," << current_threads << "\n";
+  std::cout << spare_threads << ", " << current_threads << ", " << current_tasks << "\n";
   assert(spare_threads == 2);
   assert(current_threads == 2);
+  assert(current_tasks == 0);
 
   service.close();
 }
 
 void test5() {
+  std::cout << "-- test5\n";
+
   unsigned int spare_threads = 0;
   unsigned int current_threads = 0;
   unsigned int current_tasks = 0;
@@ -230,11 +220,12 @@ void test5() {
   dromozoa::async_service service(dromozoa::async_service::open(0, 2, 1));
 
   service.info(spare_threads, current_threads, current_tasks);
-  std::cout << spare_threads << "," << current_threads << "\n";
+  std::cout << spare_threads << ", " << current_threads << ", " << current_tasks << "\n";
   assert(spare_threads == 0);
   assert(current_threads == 0);
+  assert(current_tasks == 0);
 
-  service.push(&task1);
+  assert(service.push(&task1) == 0);
 
   {
     struct timespec tv = make_timespec(0, 150000000);
@@ -242,11 +233,12 @@ void test5() {
   }
 
   service.info(spare_threads, current_threads, current_tasks);
-  std::cout << spare_threads << "," << current_threads << "\n";
+  std::cout << spare_threads << ", " << current_threads << ", " << current_tasks << "\n";
   assert(spare_threads == 0);
   assert(current_threads == 1);
+  assert(current_tasks == 1);
 
-  service.push(&task2);
+  assert(service.push(&task2) == 0);
 
   {
     struct timespec tv = make_timespec(0, 150000000);
@@ -254,9 +246,10 @@ void test5() {
   }
 
   service.info(spare_threads, current_threads, current_tasks);
-  std::cout << spare_threads << "," << current_threads << "\n";
+  std::cout << spare_threads << ", " << current_threads << ", " << current_tasks << "\n";
   assert(spare_threads == 0);
   assert(current_threads == 2);
+  assert(current_tasks == 2);
 
   {
     struct timespec tv = make_timespec(0, 150000000);
@@ -264,9 +257,10 @@ void test5() {
   }
 
   service.info(spare_threads, current_threads, current_tasks);
-  std::cout << spare_threads << "," << current_threads << "\n";
+  std::cout << spare_threads << ", " << current_threads << ", " << current_tasks << "\n";
   assert(spare_threads == 1);
   assert(current_threads == 2);
+  assert(current_tasks == 1);
 
   {
     struct timespec tv = make_timespec(0, 150000000);
@@ -274,28 +268,19 @@ void test5() {
   }
 
   service.info(spare_threads, current_threads, current_tasks);
-  std::cout << spare_threads << "," << current_threads << "\n";
+  std::cout << spare_threads << ", " << current_threads << ", " << current_tasks << "\n";
   assert(spare_threads == 1);
   assert(current_threads == 1);
+  assert(current_tasks == 0);
 
   service.close();
 }
 
 int main(int, char*[]) {
-  try {
-    std::cout << "--\n";
-    test1();
-    std::cout << "--\n";
-    test2();
-    std::cout << "--\n";
-    test3();
-    std::cout << "--\n";
-    test4();
-    std::cout << "--\n";
-    test5();
-    return 0;
-  } catch (const std::exception& e) {
-    std::cerr << e.what() << "\n";
-  }
-  return 1;
+  test1();
+  test2();
+  test3();
+  test4();
+  test5();
+  return 0;
 }

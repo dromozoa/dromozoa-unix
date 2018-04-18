@@ -1,4 +1,4 @@
-// Copyright (C) 2016 Tomoyuki Fujimori <moyu@dromozoa.com>
+// Copyright (C) 2016-2018 Tomoyuki Fujimori <moyu@dromozoa.com>
 //
 // This file is part of dromozoa-unix.
 //
@@ -55,7 +55,7 @@ namespace dromozoa {
 
 #ifdef HAVE_SCHED_GETSCHEDULER
     void impl_sched_getscheduler(lua_State* L) {
-      pid_t pid = luaX_check_integer<pid_t>(L, 1);
+      pid_t pid = luaX_opt_integer<pid_t>(L, 1, 0);
       int result = sched_getscheduler(pid);
       if (result == -1) {
         push_error(L);
@@ -67,7 +67,7 @@ namespace dromozoa {
 
 #ifdef HAVE_SCHED_GETPARAM
     void impl_sched_getparam(lua_State* L) {
-      pid_t pid = luaX_check_integer<pid_t>(L, 1);
+      pid_t pid = luaX_opt_integer<pid_t>(L, 1, 0);
       struct sched_param param = {};
       if (sched_getparam(pid, &param) == -1) {
         push_error(L);
@@ -80,7 +80,7 @@ namespace dromozoa {
 
 #ifdef HAVE_SCHED_GETAFFINITY
     void impl_sched_getaffinity(lua_State* L) {
-      pid_t pid = luaX_check_integer<pid_t>(L, 1);
+      pid_t pid = luaX_opt_integer<pid_t>(L, 1, 0);
       cpu_set_t mask;
       CPU_ZERO(&mask);
       if (sched_getaffinity(pid, sizeof(mask), &mask) == -1) {
@@ -101,7 +101,7 @@ namespace dromozoa {
 
 #ifdef HAVE_SCHED_SETSCHEDULER
     void impl_sched_setscheduler(lua_State* L) {
-      pid_t pid = luaX_check_integer<pid_t>(L, 1);
+      pid_t pid = luaX_opt_integer<pid_t>(L, 1, 0);
       int policy = luaX_check_integer<int>(L, 2);
       struct sched_param param = {};
       param.sched_priority = luaX_check_integer_field<int>(L, 3, "sched_priority");
@@ -115,7 +115,7 @@ namespace dromozoa {
 
 #ifdef HAVE_SCHED_SETAFFINITY
     void impl_sched_setaffinity(lua_State* L) {
-      pid_t pid = luaX_check_integer<pid_t>(L, 1);
+      pid_t pid = luaX_opt_integer<pid_t>(L, 1, 0);
       cpu_set_t mask;
       CPU_ZERO(&mask);
       if (lua_istable(L, 2)) {

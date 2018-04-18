@@ -1,4 +1,4 @@
-// Copyright (C) 2016 Tomoyuki Fujimori <moyu@dromozoa.com>
+// Copyright (C) 2016,2018 Tomoyuki Fujimori <moyu@dromozoa.com>
 //
 // This file is part of dromozoa-unix.
 //
@@ -122,6 +122,12 @@ namespace dromozoa {
     luaX_set_field(L, -1, "SIGTSTP", SIGTSTP);
     luaX_set_field(L, -1, "SIGTTIN", SIGTTIN);
     luaX_set_field(L, -1, "SIGTTOU", SIGTTOU);
+#ifdef SIGPOLL
+    luaX_set_field(L, -1, "SIGPOLL", SIGPOLL);
+#endif
+#ifdef SIGPROF
+    luaX_set_field(L, -1, "SIGPROF", SIGPROF);
+#endif
     luaX_set_field(L, -1, "SIGUSR1", SIGUSR1);
     luaX_set_field(L, -1, "SIGUSR2", SIGUSR2);
     luaX_set_field(L, -1, "SIGSYS", SIGSYS);

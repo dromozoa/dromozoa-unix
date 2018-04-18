@@ -1,4 +1,4 @@
--- Copyright (C) 2016 Tomoyuki Fujimori <moyu@dromozoa.com>
+-- Copyright (C) 2016,2018 Tomoyuki Fujimori <moyu@dromozoa.com>
 --
 -- This file is part of dromozoa-unix.
 --
@@ -15,36 +15,34 @@
 -- You should have received a copy of the GNU General Public License
 -- along with dromozoa-unix.  If not, see <http://www.gnu.org/licenses/>.
 
-local sequence = require "dromozoa.commons.sequence"
-local sequence_writer = require "dromozoa.commons.sequence_writer"
-local string_reader = require "dromozoa.commons.string_reader"
 local unix = require "dromozoa.unix"
 
-local PATH = os.getenv("PATH")
+local verbose = os.getenv "VERBOSE" == "1"
+local PATH = os.getenv "PATH"
 local envp = unix.get_environ()
-sequence.push(envp, "foo=bar")
+envp[#envp + 1] = "foo=bar"
 
 local reader, writer = assert(unix.pipe())
-local process = assert(unix.process())
+local process = unix.process()
 assert(process:forkexec(PATH, { arg[-1], "test/lua/pathexec.lua" }, envp, nil, { [1] = writer }))
 assert(writer:close())
 
-local out = sequence_writer()
+local buffer = {}
 while true do
-  local data = assert(reader:read(4096))
+  local data = assert(reader:read(256))
   if data == "" then
     break
   else
-    out:write(data)
+    buffer[#buffer + 1] = data
   end
 end
 assert(reader:close())
-local reader = string_reader(out:concat())
-for line in reader:lines() do
-  assert(line ~= "foo=bar")
+if verbose then
+  print(("%q"):format(table.concat(buffer)))
 end
+assert(table.concat(buffer) == "baz\n")
 
-local a, b, c = assert(unix.wait())
-assert(a == process[1])
-assert(b == "exit")
-assert(c == 0)
+local pid, reason, status = assert(unix.wait())
+assert(pid == process[1])
+assert(reason == "exit")
+assert(status == 0)

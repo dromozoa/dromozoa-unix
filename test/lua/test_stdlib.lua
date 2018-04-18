@@ -1,4 +1,4 @@
--- Copyright (C) 2016 Tomoyuki Fujimori <moyu@dromozoa.com>
+-- Copyright (C) 2016,2018 Tomoyuki Fujimori <moyu@dromozoa.com>
 --
 -- This file is part of dromozoa-unix.
 --
@@ -17,17 +17,23 @@
 
 local unix = require "dromozoa.unix"
 
-assert(unix.realpath(".") == unix.getcwd())
+local verbose = os.getenv "VERBOSE" == "1"
+
+assert(unix.realpath "." == unix.getcwd())
 assert(unix.realpath(arg[0]) == unix.getcwd() .. "/test/lua/test_stdlib.lua")
 
-local tmpdir = assert(unix.mkdtemp("tmp-XXXXXX"))
-print(tmpdir)
+local tmpdir = assert(unix.mkdtemp "test.dir-XXXXXX")
+if verbose then
+  io.stderr:write(tmpdir, "\n")
+end
 assert(os.remove(tmpdir))
 
-local fd, tmpname = assert(unix.mkstemp("tmp-XXXXXX"))
-print(tmpname)
+local fd, tmpname = assert(unix.mkstemp "test.txt-XXXXXX")
+if verbose then
+  io.stderr:write(tmpname, "\n")
+end
 assert(fd:is_coe())
-assert(fd:write("foo\n"))
+assert(fd:write "foo\n")
 assert(fd:close())
 
 local fd = assert(unix.open(tmpname))

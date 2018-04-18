@@ -1,4 +1,4 @@
--- Copyright (C) 2016 Tomoyuki Fujimori <moyu@dromozoa.com>
+-- Copyright (C) 2016,2018 Tomoyuki Fujimori <moyu@dromozoa.com>
 --
 -- This file is part of dromozoa-unix.
 --
@@ -15,10 +15,26 @@
 -- You should have received a copy of the GNU General Public License
 -- along with dromozoa-unix.  If not, see <http://www.gnu.org/licenses/>.
 
-local json = require "dromozoa.commons.json"
 local unix = require "dromozoa.unix"
 
-local fd = assert(unix.open("."))
-print(json.encode(assert(fd:fstatvfs())))
-print(json.encode(assert(unix.statvfs("."))))
+local verbose = os.getenv "VERBOSE" == "1"
+
+local function dump(t)
+  if verbose then
+    local keys = {}
+    for k in pairs(t) do
+      keys[#keys + 1] = k
+    end
+    table.sort(keys)
+    io.stderr:write(("-"):rep(70), "\n")
+    for i = 1, #keys do
+      local k = keys[i]
+      io.stderr:write(("%-9s | %s\n"):format(k, tostring(t[k])))
+    end
+  end
+end
+
+local fd = assert(unix.open ".")
+dump(assert(fd:fstatvfs()))
+dump(assert(unix.statvfs "."))
 fd:close()

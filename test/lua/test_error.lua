@@ -1,4 +1,4 @@
--- Copyright (C) 2016 Tomoyuki Fujimori <moyu@dromozoa.com>
+-- Copyright (C) 2016-2018 Tomoyuki Fujimori <moyu@dromozoa.com>
 --
 -- This file is part of dromozoa-unix.
 --
@@ -17,29 +17,44 @@
 
 local unix = require "dromozoa.unix"
 
+local verbose = os.getenv "VERBOSE" == "1"
+
 unix.set_errno(0)
-print(unix.strerror())
+if verbose then
+  io.stderr:write(unix.strerror(), "\n")
+end
 assert(unix.get_errno() == 0)
 
 unix.set_errno(unix.EAGAIN)
 assert(unix.strerror() == unix.strerror(unix.EAGAIN))
 assert(unix.get_errno() == unix.EAGAIN)
 
-print(unix.strerror(unix.EAGAIN))
-print(unix.strerror(unix.EINTR))
+if verbose then
+  io.stderr:write(unix.strerror(unix.EAGAIN), "\n")
+  io.stderr:write(unix.strerror(unix.EINTR), "\n")
+end
+
 assert(unix.get_errno() == unix.EAGAIN)
-local a, b, c = unix.get_error()
-assert(a == nil)
-assert(b == unix.strerror(unix.EAGAIN))
-assert(c == unix.EAGAIN)
+
+local result, message, code = unix.get_error()
+if verbose then
+  io.stderr:write(message, "\n")
+end
+assert(not result)
+assert(message == unix.strerror(unix.EAGAIN))
+assert(code == unix.EAGAIN)
 
 assert(unix.get_last_errno() == 0)
-assert(unix.open("no such file", unix.O_RDONLY) == nil)
+assert(not unix.open("no such file", unix.O_RDONLY))
 assert(unix.get_last_errno() == unix.ENOENT)
-local a, b, c = unix.get_last_error()
-assert(a == nil)
-assert(b == unix.strerror(unix.ENOENT))
-assert(c == unix.ENOENT)
+
+local result, message, code = unix.get_error()
+if verbose then
+  io.stderr:write(message, "\n")
+end
+assert(not result)
+assert(message == unix.strerror(unix.ENOENT))
+assert(code == unix.ENOENT)
 
 unix.set_errno(unix.EEXIST)
 assert(unix.strerror() == unix.strerror(unix.EEXIST))

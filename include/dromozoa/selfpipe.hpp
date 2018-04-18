@@ -1,4 +1,4 @@
-// Copyright (C) 2016 Tomoyuki Fujimori <moyu@dromozoa.com>
+// Copyright (C) 2016,2018 Tomoyuki Fujimori <moyu@dromozoa.com>
 //
 // This file is part of dromozoa-unix.
 //
@@ -18,12 +18,25 @@
 #ifndef DROMOZOA_SELFPIPE_HPP
 #define DROMOZOA_SELFPIPE_HPP
 
+#include <dromozoa/scoped_ptr.hpp>
+
 namespace dromozoa {
-  int selfpipe_open();
-  int selfpipe_close();
-  bool selfpipe_valid();
-  int selfpipe_get();
-  int selfpipe_read();
+  class selfpipe_impl;
+
+  class selfpipe {
+  public:
+    static selfpipe_impl* open();
+    explicit selfpipe(selfpipe_impl* impl);
+    ~selfpipe();
+    int close();
+    bool valiid() const;
+    int get() const;
+    int read() const;
+  private:
+    scoped_ptr<selfpipe_impl> impl_;
+    selfpipe(const selfpipe&);
+    selfpipe& operator=(const selfpipe&);
+  };
 }
 
 #endif

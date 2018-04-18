@@ -1,4 +1,4 @@
-// Copyright (C) 2016 Tomoyuki Fujimori <moyu@dromozoa.com>
+// Copyright (C) 2018 Tomoyuki Fujimori <moyu@dromozoa.com>
 //
 // This file is part of dromozoa-unix.
 //
@@ -15,8 +15,11 @@
 // You should have received a copy of the GNU General Public License
 // along with dromozoa-unix.  If not, see <http://www.gnu.org/licenses/>.
 
-#include <dromozoa/async_task.hpp>
+#include <iostream>
 
-namespace dromozoa {
-  async_task::~async_task() {}
+#include <dromozoa/hardware_concurrency.hpp>
+
+int main(int, char*[]) {
+  std::cout << dromozoa::hardware_concurrency() << "\n";
+  return 0;
 }

@@ -1,4 +1,4 @@
--- Copyright (C) 2016 Tomoyuki Fujimori <moyu@dromozoa.com>
+-- Copyright (C) 2016,2018 Tomoyuki Fujimori <moyu@dromozoa.com>
 --
 -- This file is part of dromozoa-unix.
 --
@@ -15,38 +15,54 @@
 -- You should have received a copy of the GNU General Public License
 -- along with dromozoa-unix.  If not, see <http://www.gnu.org/licenses/>.
 
-local equal = require "dromozoa.commons.equal"
-local json = require "dromozoa.commons.json"
 local unix = require "dromozoa.unix"
 
+local verbose = os.getenv "VERBOSE" == "1"
+
 assert(unix.sched_yield())
-assert(unix.SCHED_OTHER)
-assert(unix.SCHED_FIFO)
 
 local other_priority_min = assert(unix.sched_get_priority_min(unix.SCHED_OTHER))
 local other_priority_max = assert(unix.sched_get_priority_max(unix.SCHED_OTHER))
-print("other_priority", other_priority_min, other_priority_max)
-
 local fifo_priority_min = assert(unix.sched_get_priority_min(unix.SCHED_FIFO))
 local fifo_priority_max = assert(unix.sched_get_priority_max(unix.SCHED_FIFO))
-print("fifo_priority", fifo_priority_min, fifo_priority_max)
+
+if verbose then
+  io.stderr:write(([[
+other_priority_min | %d
+other_priority_max | %d
+fifo_priority_min  | %d
+fifo_priority_max  | %d
+]]):format(
+    other_priority_min,
+    other_priority_max,
+    fifo_priority_min,
+    fifo_priority_max))
+end
 
 if unix.sched_getscheduler and unix.sched_getparam and unix.sched_setscheduler then
-  assert(unix.sched_getscheduler(0) == unix.SCHED_OTHER)
-  local param = assert(unix.sched_getparam(0))
-  assert(other_priority_min <= param.sched_priority)
-  assert(param.sched_priority <= other_priority_max)
+  assert(unix.sched_getscheduler() == unix.SCHED_OTHER)
+  local param = assert(unix.sched_getparam())
+  if verbose then
+    io.stderr:write(param.sched_priority, "\n")
+  end
+  assert(other_priority_min <= param.sched_priority and param.sched_priority <= other_priority_max)
   local priority = math.min(fifo_priority_min + 1, fifo_priority_max)
-  local a, b, c = unix.sched_setscheduler(0, unix.SCHED_FIFO, { sched_priority = priority })
-  print(a, b, c)
-  if a then
-    local param = assert(unix.sched_getparam(0))
+  local result, message, code = unix.sched_setscheduler(0, unix.SCHED_FIFO, { sched_priority = priority })
+  if result then
+    assert(unix.sched_getscheduler() == unix.SCHED_FIFO)
+    local param = assert(unix.sched_getparam())
     assert(param.sched_priority == priority)
+  elseif verbose then
+    io.stderr:write(message, "\n")
   end
 end
 
 if unix.sched_getaffinity and unix.sched_setaffinity then
-  print("affinity", json.encode(unix.sched_getaffinity(0)))
+  local affinity = assert(unix.sched_getaffinity())
+  if verbose then
+    for i = 1, #affinity do
+      io.stderr:write(affinity[i], "\n")
+    end
+  end
   assert(unix.sched_setaffinity(0, { 0 }))
-  assert(equal(unix.sched_getaffinity(0), { 0 }))
 end

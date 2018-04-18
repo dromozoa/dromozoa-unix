@@ -1,4 +1,4 @@
-# Copyright (C) 2016 Tomoyuki Fujimori <moyu@dromozoa.com>
+# Copyright (C) 2016,2018 Tomoyuki Fujimori <moyu@dromozoa.com>
 #
 # This file is part of dromozoa-unix.
 #
@@ -22,7 +22,6 @@ libdromozoa_unix_la_LDFLAGS = -static
 libdromozoa_unix_la_SOURCES = \
 	argument_vector.cpp \
 	async_service.cpp \
-	async_task.cpp \
 	coe.cpp \
 	compat_accept4.cpp \
 	compat_clock_gettime.cpp \
@@ -31,11 +30,13 @@ libdromozoa_unix_la_SOURCES = \
 	compat_sigmask.cpp \
 	compat_socket.cpp \
 	compat_strerror.cpp \
+	condition_variable.cpp \
 	errno_saver.cpp \
 	file_descriptor.cpp \
 	forkexec.cpp \
 	hardware_concurrency.cpp \
 	lock.cpp \
+	mutex.cpp \
 	ndelay.cpp \
 	pathexec.cpp \
 	selector.cpp \
@@ -43,6 +44,7 @@ libdromozoa_unix_la_SOURCES = \
 	sigmask.cpp \
 	socket_address.cpp \
 	system_error.cpp \
+	thread.cpp \
 	timer.cpp
 
 if HAVE_EPOLL
