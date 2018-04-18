@@ -20,14 +20,21 @@ local unix = require "dromozoa.unix"
 local verbose = os.getenv "VERBOSE" == "1"
 local PATH = os.getenv "PATH"
 
+local lua
+if _G["dromozoa.bind.driver"] then
+  lua = "lua"
+else
+  lua = arg[-1]
+end
+
 local reader, writer = assert(unix.pipe())
 local process1 = assert(unix.process())
-assert(process1:forkexec(PATH, { arg[-1], "test/lua/unix_server.lua" }, nil, nil, { [1] = writer }))
+assert(process1:forkexec(PATH, { lua, "test/lua/unix_server.lua" }, nil, nil, { [1] = writer }))
 assert(writer:close())
 assert(reader:read(1) == "")
 assert(reader:close())
 local process2 = assert(unix.process())
-assert(process2:forkexec(PATH, { arg[-1], "test/lua/unix_client.lua" }))
+assert(process2:forkexec(PATH, { lua, "test/lua/unix_client.lua" }))
 
 if verbose then
   io.stderr:write(process1[1], "\n")

@@ -29,7 +29,8 @@ for i = 1, #environ do
   assert(os.getenv(k) == v)
 end
 
-assert(unix.getcwd() == unix.realpath ".")
+local here = unix.getcwd()
+assert(here == unix.realpath ".")
 
 local tmpdir = assert(unix.mkdtemp "test.dir-XXXXXX")
 assert(unix.chdir(tmpdir))
@@ -41,6 +42,8 @@ if verbose then
 end
 assert(not result)
 assert(code == unix.ENOENT)
+
+assert(unix.chdir(here))
 
 assert(unix.getuid()  >= 0)
 assert(unix.getgid()  >= 0)
