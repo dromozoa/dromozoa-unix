@@ -22,8 +22,9 @@ EXTRA_DIST = \
 	.gitignore \
 	README.md \
 	bind \
+	build_errno.lua \
+	docs \
 	dromozoa-unix-*.rockspec \
-	generate.lua \
 	include \
 	m4/update \
 	test/lua \
