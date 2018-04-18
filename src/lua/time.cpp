@@ -60,7 +60,7 @@ namespace dromozoa {
         }
       }
 
-      virtual void impl_result(lua_State* L) {
+      virtual void result(lua_State* L) {
         if (result_ == -1) {
           errno = code_;
           push_error(L);

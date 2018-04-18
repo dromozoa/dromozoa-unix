@@ -156,7 +156,7 @@ namespace dromozoa {
         code_ = getaddrinfo(nodename, servname, hints_.get(), &result_);
       }
 
-      virtual void impl_result(lua_State* L) {
+      virtual void result(lua_State* L) {
         if (result_) {
           new_result(L, result_);
         } else {
@@ -190,7 +190,7 @@ namespace dromozoa {
         code_ = getnameinfo(address_.get(), address_.size(), &nodename_[0], nodename_.size(), &servname_[0], servname_.size(), flags_);
       }
 
-      virtual void impl_result(lua_State* L) {
+      virtual void result(lua_State* L) {
         if (code_ == 0) {
           luaX_push(L, &nodename_[0]);
           luaX_push(L, &servname_[0]);
