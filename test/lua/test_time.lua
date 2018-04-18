@@ -56,7 +56,7 @@ if verbose then
 end
 assert(not result)
 assert(code == unix.EINTR)
-assert(t > 5)
+assert(t > unix.timespec(5))
 
 local pid, reason, status = assert(unix.wait())
 assert(pid == process[1])
