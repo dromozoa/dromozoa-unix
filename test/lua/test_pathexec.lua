@@ -38,7 +38,7 @@ while true do
 end
 assert(reader:close())
 if verbose then
-  print(("%q"):format(table.concat(buffer)))
+  io.stderr:write(("%q\n"):format(table.concat(buffer)))
 end
 assert(table.concat(buffer) == "baz\n")
 

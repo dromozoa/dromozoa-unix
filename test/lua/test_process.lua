@@ -38,7 +38,7 @@ while true do
 end
 assert(reader:close())
 if verbose then
-  print(("%q"):format(table.concat(buffer)))
+  io.stderr:write(("%q\n"):format(table.concat(buffer)))
 end
 assert(table.concat(buffer) == "/\nbar\n")
 
@@ -50,7 +50,7 @@ assert(status == 0)
 local process = unix.process()
 local result, message, code = process:forkexec(PATH, { "no such command" })
 if verbose then
-  print(message)
+  io.stderr:write(message, "\n")
 end
 assert(not result)
 assert(code == unix.ENOENT)
@@ -79,14 +79,14 @@ assert(unix.kill(process[2]))
 assert(reader:read(4) == "")
 timer:stop()
 if verbose then
-  print(timer:elapsed())
+  io.stderr:write(timer:elapsed(), "\n")
 end
 assert(timer:elapsed() < 5)
 
 local process = unix.process()
 local result, message, code = process:forkexec_daemon(PATH, { "no such command" })
 if verbose then
-  print(message)
+  io.stderr:write(message, "\n")
 end
 assert(not result)
 assert(code == unix.ENOENT)
