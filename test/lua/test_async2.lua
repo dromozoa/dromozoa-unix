@@ -102,3 +102,4 @@ if verbose then
 end
 
 assert(service:close())
+assert(unix.nanosleep(0.25))

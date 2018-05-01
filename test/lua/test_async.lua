@@ -63,7 +63,7 @@ repeat
   local fd, event = assert(selector:event(1))
   assert(fd == service:get())
   assert(event == unix.SELECTOR_READ)
-  assert(service:read() == 1)
+  assert(service:read() > 0)
   while true do
     local task = service:pop()
     if task then

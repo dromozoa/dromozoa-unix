@@ -1,4 +1,4 @@
--- Copyright (C) 2016,2018 Tomoyuki Fujimori <moyu@dromozoa.com>
+-- Copyright (C) 2018 Tomoyuki Fujimori <moyu@dromozoa.com>
 --
 -- This file is part of dromozoa-unix.
 --
@@ -19,37 +19,35 @@ local unix = require "dromozoa.unix"
 
 local verbose = os.getenv "VERBOSE" == "1"
 local PATH = os.getenv "PATH"
-local envp = unix.get_environ()
-envp[#envp + 1] = "foo=bar"
 
-local reader, writer = assert(unix.pipe())
-local process = assert(unix.process())
-assert(process:forkexec(PATH, { "sh", "-c", [[pwd; echo "$foo"]] }, envp, "/", { [1] = writer }))
-assert(writer:close())
+if os.getenv "SKIP_TEST_PROCESS_DAEMON" ~= "1" then
+  local reader, writer = assert(unix.pipe(0))
+  assert(reader:coe())
+  local process = assert(unix.process())
+  assert(process:forkexec_daemon(PATH, { "sh", "-c", "echo foo >&" .. writer:get() .. "; exec sleep 10" }))
+  assert(writer:close())
 
-local buffer = {}
-while true do
-  local data = assert(reader:read(256))
-  if data == "" then
-    break
-  else
-    buffer[#buffer + 1] = data
+  local pid, reason, status = assert(unix.wait())
+  assert(pid == process[1])
+  assert(reason == "exit")
+  assert(status == 0)
+
+  local timer = unix.timer()
+  timer:start()
+  assert(reader:read(4) == "foo\n")
+  assert(unix.kill(process[2], 0))
+  assert(unix.kill(process[2]))
+  assert(reader:read(4) == "")
+  timer:stop()
+  if verbose then
+    io.stderr:write(timer:elapsed(), "\n")
   end
+  assert(timer:elapsed() < 5)
 end
-assert(reader:close())
-if verbose then
-  io.stderr:write(("%q\n"):format(table.concat(buffer)))
-end
-assert(table.concat(buffer) == "/\nbar\n")
-
-local pid, reason, status = assert(unix.wait())
-assert(pid == process[1])
-assert(reason == "exit")
-assert(status == 0)
 
 if os.getenv "SKIP_TEST_PROCESS_NO_SUCH_COMMAND" ~= "1" then
   local process = unix.process()
-  local result, message, code = process:forkexec(PATH, { "no such command" })
+  local result, message, code = process:forkexec_daemon(PATH, { "no such command" })
   if verbose then
     io.stderr:write(message, "\n")
   end
@@ -59,5 +57,5 @@ if os.getenv "SKIP_TEST_PROCESS_NO_SUCH_COMMAND" ~= "1" then
   local pid, reason, status = assert(unix.wait())
   assert(pid == process[1])
   assert(reason == "exit")
-  assert(status == 1)
+  assert(status == 0)
 end

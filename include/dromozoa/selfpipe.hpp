@@ -18,7 +18,7 @@
 #ifndef DROMOZOA_SELFPIPE_HPP
 #define DROMOZOA_SELFPIPE_HPP
 
-#include <dromozoa/scoped_ptr.hpp>
+#include <dromozoa/bind/scoped_ptr.hpp>
 
 namespace dromozoa {
   class selfpipe_impl;
