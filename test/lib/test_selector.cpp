@@ -22,15 +22,16 @@
 
 #include <iostream>
 
+#include <dromozoa/bind/scoped_ptr.hpp>
+
 #include <dromozoa/coe.hpp>
 #include <dromozoa/compat_pipe2.hpp>
 #include <dromozoa/ndelay.hpp>
-#include <dromozoa/scoped_ptr.hpp>
 #include <dromozoa/selector.hpp>
 
 void test() {
   dromozoa::scoped_ptr<dromozoa::selector_impl> impl(dromozoa::selector::open(dromozoa::SELECTOR_CLOEXEC));
-  assert(impl.valid());
+  assert(impl);
   dromozoa::selector selector(impl.release());
 
   int selector_fd = selector.get();
