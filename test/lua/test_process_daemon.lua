@@ -20,38 +20,42 @@ local unix = require "dromozoa.unix"
 local verbose = os.getenv "VERBOSE" == "1"
 local PATH = os.getenv "PATH"
 
-local reader, writer = assert(unix.pipe(0))
-assert(reader:coe())
-local process = assert(unix.process())
-assert(process:forkexec_daemon(PATH, { "sh", "-c", "echo foo >&" .. writer:get() .. "; exec sleep 10" }))
-assert(writer:close())
+if os.getenv "SKIP_TEST_PROCESS_DAEMON" ~= "1" then
+  local reader, writer = assert(unix.pipe(0))
+  assert(reader:coe())
+  local process = assert(unix.process())
+  assert(process:forkexec_daemon(PATH, { "sh", "-c", "echo foo >&" .. writer:get() .. "; exec sleep 10" }))
+  assert(writer:close())
 
-local pid, reason, status = assert(unix.wait())
-assert(pid == process[1])
-assert(reason == "exit")
-assert(status == 0)
+  local pid, reason, status = assert(unix.wait())
+  assert(pid == process[1])
+  assert(reason == "exit")
+  assert(status == 0)
 
-local timer = unix.timer()
-timer:start()
-assert(reader:read(4) == "foo\n")
-assert(unix.kill(process[2], 0))
-assert(unix.kill(process[2]))
-assert(reader:read(4) == "")
-timer:stop()
-if verbose then
-  io.stderr:write(timer:elapsed(), "\n")
+  local timer = unix.timer()
+  timer:start()
+  assert(reader:read(4) == "foo\n")
+  assert(unix.kill(process[2], 0))
+  assert(unix.kill(process[2]))
+  assert(reader:read(4) == "")
+  timer:stop()
+  if verbose then
+    io.stderr:write(timer:elapsed(), "\n")
+  end
+  assert(timer:elapsed() < 5)
 end
-assert(timer:elapsed() < 5)
 
-local process = unix.process()
-local result, message, code = process:forkexec_daemon(PATH, { "no such command" })
-if verbose then
-  io.stderr:write(message, "\n")
+if os.getenv "SKIP_TEST_PROCESS_NO_SUCH_COMMAND" ~= "1" then
+  local process = unix.process()
+  local result, message, code = process:forkexec_daemon(PATH, { "no such command" })
+  if verbose then
+    io.stderr:write(message, "\n")
+  end
+  assert(not result)
+  assert(code == unix.ENOENT)
+
+  local pid, reason, status = assert(unix.wait())
+  assert(pid == process[1])
+  assert(reason == "exit")
+  assert(status == 0)
 end
-assert(not result)
-assert(code == unix.ENOENT)
-
-local pid, reason, status = assert(unix.wait())
-assert(pid == process[1])
-assert(reason == "exit")
-assert(status == 0)

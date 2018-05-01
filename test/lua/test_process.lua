@@ -47,15 +47,17 @@ assert(pid == process[1])
 assert(reason == "exit")
 assert(status == 0)
 
-local process = unix.process()
-local result, message, code = process:forkexec(PATH, { "no such command" })
-if verbose then
-  io.stderr:write(message, "\n")
-end
-assert(not result)
-assert(code == unix.ENOENT)
+if os.getenv "SKIP_TEST_PROCESS_NO_SUCH_COMMAND" ~= "1" then
+  local process = unix.process()
+  local result, message, code = process:forkexec(PATH, { "no such command" })
+  if verbose then
+    io.stderr:write(message, "\n")
+  end
+  assert(not result)
+  assert(code == unix.ENOENT)
 
-local pid, reason, status = assert(unix.wait())
-assert(pid == process[1])
-assert(reason == "exit")
-assert(status == 1)
+  local pid, reason, status = assert(unix.wait())
+  assert(pid == process[1])
+  assert(reason == "exit")
+  assert(status == 1)
+end
