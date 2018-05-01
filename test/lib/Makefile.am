@@ -37,74 +37,74 @@ check_PROGRAMS = \
 	test_socket_address.exe \
 	test_timer.exe
 
-test_argument_vector_exe_CPPFLAGS = -I$(top_srcdir)/include
+test_argument_vector_exe_CPPFLAGS = -I$(top_srcdir)/bind -I$(top_srcdir)/include
 test_argument_vector_exe_LDADD = $(top_builddir)/src/lib/libdromozoa-unix.la
 test_argument_vector_exe_SOURCES = test_argument_vector.cpp
 
-test_async_exe_CPPFLAGS = -I$(top_srcdir)/include
+test_async_exe_CPPFLAGS = -I$(top_srcdir)/bind -I$(top_srcdir)/include
 test_async_exe_LDADD = $(top_builddir)/src/lib/libdromozoa-unix.la
 test_async_exe_SOURCES = test_async.cpp
 
-test_compat_clock_gettime_exe_CPPFLAGS = -I$(top_srcdir)/include
+test_compat_clock_gettime_exe_CPPFLAGS = -I$(top_srcdir)/bind -I$(top_srcdir)/include
 test_compat_clock_gettime_exe_LDADD = $(top_builddir)/src/lib/libdromozoa-unix.la
 test_compat_clock_gettime_exe_SOURCES = test_compat_clock_gettime.cpp
 
-test_compat_pipe2_exe_CPPFLAGS = -I$(top_srcdir)/include
+test_compat_pipe2_exe_CPPFLAGS = -I$(top_srcdir)/bind -I$(top_srcdir)/include
 test_compat_pipe2_exe_LDADD = $(top_builddir)/src/lib/libdromozoa-unix.la
 test_compat_pipe2_exe_SOURCES = test_compat_pipe2.cpp
 
-test_compat_socket_exe_CPPFLAGS = -I$(top_srcdir)/include
+test_compat_socket_exe_CPPFLAGS = -I$(top_srcdir)/bind -I$(top_srcdir)/include
 test_compat_socket_exe_LDADD = $(top_builddir)/src/lib/libdromozoa-unix.la
 test_compat_socket_exe_SOURCES = test_compat_socket.cpp
 
-test_compat_mkostemp_exe_CPPFLAGS = -I$(top_srcdir)/include
+test_compat_mkostemp_exe_CPPFLAGS = -I$(top_srcdir)/bind -I$(top_srcdir)/include
 test_compat_mkostemp_exe_LDADD = $(top_builddir)/src/lib/libdromozoa-unix.la
 test_compat_mkostemp_exe_SOURCES = test_compat_mkostemp.cpp
 
-test_compat_strerror_exe_CPPFLAGS = -I$(top_srcdir)/include
+test_compat_strerror_exe_CPPFLAGS = -I$(top_srcdir)/bind -I$(top_srcdir)/include
 test_compat_strerror_exe_LDADD = $(top_builddir)/src/lib/libdromozoa-unix.la
 test_compat_strerror_exe_SOURCES = test_compat_strerror.cpp
 
-test_djb_exe_CPPFLAGS = -I$(top_srcdir)/include
+test_djb_exe_CPPFLAGS = -I$(top_srcdir)/bind -I$(top_srcdir)/include
 test_djb_exe_LDADD = $(top_builddir)/src/lib/libdromozoa-unix.la
 test_djb_exe_SOURCES = test_djb.cpp
 
-test_errno_saver_exe_CPPFLAGS = -I$(top_srcdir)/include
+test_errno_saver_exe_CPPFLAGS = -I$(top_srcdir)/bind -I$(top_srcdir)/include
 test_errno_saver_exe_LDADD = $(top_builddir)/src/lib/libdromozoa-unix.la
 test_errno_saver_exe_SOURCES = test_errno_saver.cpp
 
-test_file_descriptor_exe_CPPFLAGS = -I$(top_srcdir)/include
+test_file_descriptor_exe_CPPFLAGS = -I$(top_srcdir)/bind -I$(top_srcdir)/include
 test_file_descriptor_exe_LDADD = $(top_builddir)/src/lib/libdromozoa-unix.la
 test_file_descriptor_exe_SOURCES = test_file_descriptor.cpp
 
-test_forkexec_exe_CPPFLAGS = -I$(top_srcdir)/include
+test_forkexec_exe_CPPFLAGS = -I$(top_srcdir)/bind -I$(top_srcdir)/include
 test_forkexec_exe_LDADD = $(top_builddir)/src/lib/libdromozoa-unix.la
 test_forkexec_exe_SOURCES = test_forkexec.cpp
 
-test_hardware_concurrency_exe_CPPFLAGS = -I$(top_srcdir)/include
+test_hardware_concurrency_exe_CPPFLAGS = -I$(top_srcdir)/bind -I$(top_srcdir)/include
 test_hardware_concurrency_exe_LDADD = $(top_builddir)/src/lib/libdromozoa-unix.la
 test_hardware_concurrency_exe_SOURCES = test_hardware_concurrency.cpp
 
-test_pathexec_exe_CPPFLAGS = -I$(top_srcdir)/include
+test_pathexec_exe_CPPFLAGS = -I$(top_srcdir)/bind -I$(top_srcdir)/include
 test_pathexec_exe_LDADD = $(top_builddir)/src/lib/libdromozoa-unix.la
 test_pathexec_exe_SOURCES = test_pathexec.cpp
 
-test_selector_exe_CPPFLAGS = -I$(top_srcdir)/include
+test_selector_exe_CPPFLAGS = -I$(top_srcdir)/bind -I$(top_srcdir)/include
 test_selector_exe_LDADD = $(top_builddir)/src/lib/libdromozoa-unix.la
 test_selector_exe_SOURCES = test_selector.cpp
 
-test_selfpipe_exe_CPPFLAGS = -I$(top_srcdir)/include
+test_selfpipe_exe_CPPFLAGS = -I$(top_srcdir)/bind -I$(top_srcdir)/include
 test_selfpipe_exe_LDADD = $(top_builddir)/src/lib/libdromozoa-unix.la
 test_selfpipe_exe_SOURCES = test_selfpipe.cpp
 
-test_sigmask_exe_CPPFLAGS = -I$(top_srcdir)/include
+test_sigmask_exe_CPPFLAGS = -I$(top_srcdir)/bind -I$(top_srcdir)/include
 test_sigmask_exe_LDADD = $(top_builddir)/src/lib/libdromozoa-unix.la
 test_sigmask_exe_SOURCES = test_sigmask.cpp
 
-test_socket_address_exe_CPPFLAGS = -I$(top_srcdir)/include
+test_socket_address_exe_CPPFLAGS = -I$(top_srcdir)/bind -I$(top_srcdir)/include
 test_socket_address_exe_LDADD = $(top_builddir)/src/lib/libdromozoa-unix.la
 test_socket_address_exe_SOURCES = test_socket_address.cpp
 
-test_timer_exe_CPPFLAGS = -I$(top_srcdir)/include
+test_timer_exe_CPPFLAGS = -I$(top_srcdir)/bind -I$(top_srcdir)/include
 test_timer_exe_LDADD = $(top_builddir)/src/lib/libdromozoa-unix.la
 test_timer_exe_SOURCES = test_timer.cpp
