@@ -18,7 +18,7 @@
 #ifndef DROMOZOA_ASYNC_SERVICE_HPP
 #define DROMOZOA_ASYNC_SERVICE_HPP
 
-#include <dromozoa/scoped_ptr.hpp>
+#include <dromozoa/bind/scoped_ptr.hpp>
 
 namespace dromozoa {
   class async_service_task {

@@ -96,7 +96,7 @@ namespace dromozoa {
           return -1;
         }
 
-        if (!selfpipe_thread.valid()) {
+        if (!selfpipe_thread) {
           int fd[2] = { -1, -1 };
           if (compat_pipe2(fd, O_CLOEXEC) == -1) {
             return -1;

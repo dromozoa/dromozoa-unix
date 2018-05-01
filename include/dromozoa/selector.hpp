@@ -20,7 +20,7 @@
 
 #include <time.h>
 
-#include <dromozoa/scoped_ptr.hpp>
+#include <dromozoa/bind/scoped_ptr.hpp>
 
 namespace dromozoa {
   extern const int SELECTOR_READ;
