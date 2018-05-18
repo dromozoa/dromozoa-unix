@@ -50,6 +50,11 @@ namespace dromozoa {
       char b[256] = { 0 };
       std::copy(s.begin(), s.end(), b);
       luaX_push(L, "あいうえお", b, static_cast<char*>(b), static_cast<const char*>(b), s);
+      luaX_push(L, luaX_string_reference("foo\0bar\0baz", 11));
+      signed char sb[] = { 0x66, 0x6F, 0x6F, 0x00 };
+      luaX_push(L, sb, static_cast<signed char*>(sb), static_cast<const signed char*>(sb), luaX_string_reference(sb, 3));
+      unsigned char ub[] = { 0x62, 0x61, 0x72, 0x00 };
+      luaX_push(L, ub, static_cast<unsigned char*>(ub), static_cast<const unsigned char*>(ub), luaX_string_reference(ub, 3));
     }
 
     void impl_push_success(lua_State* L) {
@@ -84,6 +89,10 @@ namespace dromozoa {
         std::copy(s.begin(), s.end(), b);
       }
       luaX_field_error(L, b, "not an integer");
+    }
+
+    void impl_field_error4(lua_State* L) {
+      luaX_field_error(L, luaX_string_reference("foo\0bar\0baz", 11), "not an integer");
     }
 
     void impl_set_field(lua_State* L) {
@@ -147,6 +156,16 @@ namespace dromozoa {
       luaX_push(L, 42);
       throw failure2();
     }
+
+    void impl_failure3(lua_State* L) {
+      luaX_push(L, 42);
+      luaX_throw_failure("failure3");
+    }
+
+    void impl_failure4(lua_State* L) {
+      luaX_push(L, 42);
+      luaX_throw_failure("failure4", 69);
+    }
   }
 
   void initialize_core(lua_State* L) {
@@ -164,11 +183,14 @@ namespace dromozoa {
       luaX_set_field(L, -1, "field_error1", impl_field_error1);
       luaX_set_field(L, -1, "field_error2", impl_field_error2);
       luaX_set_field(L, -1, "field_error3", impl_field_error3);
+      luaX_set_field(L, -1, "field_error4", impl_field_error4);
       luaX_set_field(L, -1, "set_field", impl_set_field);
       luaX_set_field(L, -1, "set_metafield", impl_set_metafield);
       luaX_set_field(L, -1, "top_saver", impl_top_saver);
       luaX_set_field(L, -1, "failure1", impl_failure1);
       luaX_set_field(L, -1, "failure2", impl_failure2);
+      luaX_set_field(L, -1, "failure3", impl_failure3);
+      luaX_set_field(L, -1, "failure4", impl_failure4);
     }
     luaX_set_field(L, -2, "core");
   }
