@@ -47,9 +47,8 @@ namespace dromozoa {
     }
 
     void impl_mkdtemp(lua_State* L) {
-      size_t size = 0;
-      const char* tmpl = luaL_checklstring(L, 1, &size);
-      std::vector<char> buffer(tmpl, tmpl + size + 1);
+      luaX_string_reference tmpl = luaX_check_string(L, 1);
+      std::vector<char> buffer(tmpl.data(), tmpl.data() + tmpl.size() + 1);
       if (const char* result = mkdtemp(&buffer[0])) {
         luaX_push(L, result);
       } else {
@@ -58,10 +57,9 @@ namespace dromozoa {
     }
 
     void impl_mkstemp(lua_State* L) {
-      size_t size = 0;
-      const char* tmpl = luaL_checklstring(L, 1, &size);
+      luaX_string_reference tmpl = luaX_check_string(L, 1);
       int flags = luaX_opt_integer<int>(L, 2, O_CLOEXEC);
-      std::vector<char> buffer(tmpl, tmpl + size + 1);
+      std::vector<char> buffer(tmpl.data(), tmpl.data() + tmpl.size() + 1);
       int result = compat_mkostemp(&buffer[0], flags);
       if (result == -1) {
         push_error(L);

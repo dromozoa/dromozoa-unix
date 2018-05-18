@@ -1,4 +1,4 @@
-// Copyright (C) 2016 Tomoyuki Fujimori <moyu@dromozoa.com>
+// Copyright (C) 2016,2018 Tomoyuki Fujimori <moyu@dromozoa.com>
 //
 // This file is part of dromozoa-unix.
 //
@@ -35,10 +35,10 @@ namespace dromozoa {
       const socket_address* self = check_sockaddr(L, 1);
       if (self->family() == AF_INET) {
         const struct sockaddr_in* sin = reinterpret_cast<const struct sockaddr_in*>(self->get());
-        lua_pushlstring(L, reinterpret_cast<const char*>(&sin->sin_addr.s_addr), sizeof(in_addr_t));
+        luaX_push(L, luaX_string_reference(reinterpret_cast<const char*>(&sin->sin_addr.s_addr), sizeof(in_addr_t)));
       } else if (self->family() == AF_INET6) {
         const struct sockaddr_in6* sin6 = reinterpret_cast<const struct sockaddr_in6*>(self->get());
-        lua_pushlstring(L, reinterpret_cast<const char*>(&sin6->sin6_addr.s6_addr), 16);
+        luaX_push(L, luaX_string_reference(reinterpret_cast<const char*>(&sin6->sin6_addr.s6_addr), 16));
       }
     }
 
@@ -46,10 +46,10 @@ namespace dromozoa {
       const socket_address* self = check_sockaddr(L, 1);
       if (self->family() == AF_INET) {
         const struct sockaddr_in* sin = reinterpret_cast<const struct sockaddr_in*>(self->get());
-        lua_pushlstring(L, reinterpret_cast<const char*>(&sin->sin_port), sizeof(in_port_t));
+        luaX_push(L, luaX_string_reference(reinterpret_cast<const char*>(&sin->sin_port), sizeof(in_port_t)));
       } else if (self->family() == AF_INET6) {
         const struct sockaddr_in6* sin6 = reinterpret_cast<const struct sockaddr_in6*>(self->get());
-        lua_pushlstring(L, reinterpret_cast<const char*>(&sin6->sin6_port), sizeof(in_port_t));
+        luaX_push(L, luaX_string_reference(reinterpret_cast<const char*>(&sin6->sin6_port), sizeof(in_port_t)));
       }
     }
 
@@ -66,7 +66,7 @@ namespace dromozoa {
             i = 1;
           }
           for (; i < arg && path[i] != '\0'; ++i) {}
-          lua_pushlstring(L, path, i);
+          luaX_push(L, luaX_string_reference(path, i));
         } else {
           luaX_push(L, "");
         }
@@ -76,47 +76,44 @@ namespace dromozoa {
     }
 
     void impl_sockaddr_in(lua_State* L) {
-      size_t size = 0;
-      const char* addr = luaL_checklstring(L, 1, &size);
-      if (size != sizeof(in_addr_t)) {
+      luaX_string_reference addr = luaX_check_string(L, 1);
+      if (addr.size() != sizeof(in_addr_t)) {
         luaL_argerror(L, 1, "invalid string length");
       }
-      const char* port = luaL_checklstring(L, 2, &size);
-      if (size != sizeof(in_port_t)) {
+      luaX_string_reference port = luaX_check_string(L, 2);
+      if (port.size() != sizeof(in_port_t)) {
         luaL_argerror(L, 2, "invalid string length");
       }
       struct sockaddr_in sin = {};
       sin.sin_family = AF_INET;
-      memcpy(&sin.sin_addr.s_addr, addr, sizeof(in_addr_t));
-      memcpy(&sin.sin_port, port, sizeof(in_port_t));
+      memcpy(&sin.sin_addr.s_addr, addr.data(), addr.size());
+      memcpy(&sin.sin_port, port.data(), port.size());
       new_sockaddr(L, reinterpret_cast<const struct sockaddr*>(&sin), sizeof(sin));
     }
 
     void impl_sockaddr_in6(lua_State* L) {
-      size_t size = 0;
-      const char* addr = luaL_checklstring(L, 1, &size);
-      if (size != 16) {
+      luaX_string_reference addr = luaX_check_string(L, 1);
+      if (addr.size() != 16) {
         luaL_argerror(L, 1, "invalid string length");
       }
-      const char* port = luaL_checklstring(L, 2, &size);
-      if (size != sizeof(in_port_t)) {
+      luaX_string_reference port = luaX_check_string(L, 2);
+      if (port.size() != sizeof(in_port_t)) {
         luaL_argerror(L, 2, "invalid string length");
       }
       struct sockaddr_in6 sin6 = {};
       sin6.sin6_family = AF_INET6;
-      memcpy(&sin6.sin6_addr.s6_addr, addr, 16);
-      memcpy(&sin6.sin6_port, port, sizeof(in_port_t));
+      memcpy(&sin6.sin6_addr.s6_addr, addr.data(), addr.size());
+      memcpy(&sin6.sin6_port, port.data(), port.size());
       new_sockaddr(L, reinterpret_cast<const struct sockaddr*>(&sin6), sizeof(sin6));
     }
 
     void impl_sockaddr_un(lua_State* L) {
-      size_t size = 0;
-      const char* path = luaL_checklstring(L, 1, &size);
+      luaX_string_reference path = luaX_check_string(L, 1);
       struct sockaddr_un sun = {};
       sun.sun_family = AF_UNIX;
-      if (size < sizeof(sun.sun_path)) {
-        memcpy(sun.sun_path, path, size);
-        sun.sun_path[size] = '\0';
+      if (path.size() < sizeof(sun.sun_path)) {
+        memcpy(sun.sun_path, path.data(), path.size());
+        sun.sun_path[path.size()] = '\0';
         new_sockaddr(L, reinterpret_cast<const struct sockaddr*>(&sun), sizeof(sun));
       } else {
         luaL_argerror(L, 1, "string too long");

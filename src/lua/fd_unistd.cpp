@@ -1,4 +1,4 @@
-// Copyright (C) 2016 Tomoyuki Fujimori <moyu@dromozoa.com>
+// Copyright (C) 2016,2018 Tomoyuki Fujimori <moyu@dromozoa.com>
 //
 // This file is part of dromozoa-unix.
 //
@@ -31,19 +31,18 @@ namespace dromozoa {
       if (result == -1) {
         push_error(L);
       } else {
-        lua_pushlstring(L, &buffer[0], result);
+        luaX_push(L, luaX_string_reference(&buffer[0], result));
       }
     }
 
     void impl_write(lua_State* L) {
-      size_t size = 0;
-      const char* buffer = luaL_checklstring(L, 2, &size);
-      size_t i = luaX_opt_range_i(L, 3, size);
-      size_t j = luaX_opt_range_j(L, 4, size);
+      luaX_string_reference buffer = luaX_check_string(L, 2);
+      size_t i = luaX_opt_range_i(L, 3, buffer.size());
+      size_t j = luaX_opt_range_j(L, 4, buffer.size());
       if (j < i) {
         j = i;
       }
-      ssize_t result = write(check_fd(L, 1), buffer + i, j - i);
+      ssize_t result = write(check_fd(L, 1), buffer.data() + i, j - i);
       if (result == -1) {
         push_error(L);
       } else {
