@@ -1,4 +1,4 @@
-// Copyright (C) 2016 Tomoyuki Fujimori <moyu@dromozoa.com>
+// Copyright (C) 2016,2018 Tomoyuki Fujimori <moyu@dromozoa.com>
 //
 // This file is part of dromozoa-unix.
 //
@@ -122,7 +122,7 @@ namespace dromozoa {
       if (result == -1) {
         push_error(L);
       } else {
-        lua_pushlstring(L, &buffer[0], result);
+        luaX_push(L, luaX_string_reference(&buffer[0], result));
       }
     }
 
@@ -136,21 +136,20 @@ namespace dromozoa {
       if (result == -1) {
         push_error(L);
       } else {
-        lua_pushlstring(L, &buffer[0], result);
+        luaX_push(L, luaX_string_reference(&buffer[0], result));
         new_sockaddr(L, address);
       }
     }
 
     void impl_send(lua_State* L) {
-      size_t size = 0;
-      const char* buffer = luaL_checklstring(L, 2, &size);
-      size_t i = luaX_opt_range_i(L, 3, size);
-      size_t j = luaX_opt_range_j(L, 4, size);
+      luaX_string_reference buffer = luaX_check_string(L, 2);
+      size_t i = luaX_opt_range_i(L, 3, buffer.size());
+      size_t j = luaX_opt_range_j(L, 4, buffer.size());
       if (j < i) {
         j = i;
       }
       int flags = luaX_opt_integer<int>(L, 5, 0);
-      ssize_t result = send(check_fd(L, 1), buffer + i, j - i, flags);
+      ssize_t result = send(check_fd(L, 1), buffer.data() + i, j - i, flags);
       if (result == -1) {
         push_error(L);
       } else {
@@ -159,10 +158,9 @@ namespace dromozoa {
     }
 
     void impl_sendto(lua_State* L) {
-      size_t size = 0;
-      const char* buffer = luaL_checklstring(L, 2, &size);
-      size_t i = luaX_opt_range_i(L, 3, size);
-      size_t j = luaX_opt_range_j(L, 4, size);
+      luaX_string_reference buffer = luaX_check_string(L, 2);
+      size_t i = luaX_opt_range_i(L, 3, buffer.size());
+      size_t j = luaX_opt_range_j(L, 4, buffer.size());
       if (j < i) {
         j = i;
       }
@@ -174,7 +172,7 @@ namespace dromozoa {
         dest_addr = address->get();
         dest_len = address->size();
       }
-      ssize_t result = sendto(check_fd(L, 1), buffer + i, j - i, flags, dest_addr, dest_len);
+      ssize_t result = sendto(check_fd(L, 1), buffer.data() + i, j - i, flags, dest_addr, dest_len);
       if (result == -1) {
         push_error(L);
       } else {
