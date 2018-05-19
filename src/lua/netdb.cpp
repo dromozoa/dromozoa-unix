@@ -126,8 +126,7 @@ namespace dromozoa {
       std::vector<char> servname(NI_MAXSERV);
       int code = getnameinfo(address->get(), address->size(), &nodename[0], nodename.size(), &servname[0], servname.size(), flags);
       if (code == 0) {
-        luaX_push(L, &nodename[0]);
-        luaX_push(L, &servname[0]);
+        luaX_push(L, &nodename[0], &servname[0]);
       } else {
         push_netdb_error(L, code);
       }
@@ -192,8 +191,7 @@ namespace dromozoa {
 
       virtual void result(lua_State* L) {
         if (code_ == 0) {
-          luaX_push(L, &nodename_[0]);
-          luaX_push(L, &servname_[0]);
+          luaX_push(L, &nodename_[0], &servname_[0]);
         } else {
           push_netdb_error(L, code_);
         }
