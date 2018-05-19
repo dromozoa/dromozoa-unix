@@ -1,4 +1,4 @@
-// Copyright (C) 2016 Tomoyuki Fujimori <moyu@dromozoa.com>
+// Copyright (C) 2016,2018 Tomoyuki Fujimori <moyu@dromozoa.com>
 //
 // This file is part of dromozoa-unix.
 //
@@ -32,17 +32,13 @@ namespace dromozoa {
         luaX_push(L, result);
         if (result != 0) {
           if (WIFEXITED(status)) {
-            luaX_push(L, "exit");
-            luaX_push(L, WEXITSTATUS(status));
+            luaX_push(L, "exit", WEXITSTATUS(status));
           } else if (WIFSIGNALED(status)) {
-            luaX_push(L, "signal");
-            luaX_push(L, WTERMSIG(status));
+            luaX_push(L, "signal", WTERMSIG(status));
           } else if (WIFSTOPPED(status)) {
-            luaX_push(L, "stop");
-            luaX_push(L, WSTOPSIG(status));
+            luaX_push(L, "stop", WSTOPSIG(status));
           } else if (WIFCONTINUED(status)) {
-            luaX_push(L, "continue");
-            luaX_push(L, SIGCONT);
+            luaX_push(L, "continue", SIGCONT);
           }
         }
       }
