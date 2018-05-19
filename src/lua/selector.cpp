@@ -103,8 +103,7 @@ namespace dromozoa {
       if (check_selector(L, 1)->event(i - 1, fd, event) == -1) {
         push_error(L);
       } else {
-        luaX_push(L, fd);
-        luaX_push(L, event);
+        luaX_push(L, fd, event);
       }
     }
   }

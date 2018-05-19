@@ -1,7 +1,7 @@
 package = "dromozoa-unix"
-version = "1.49-1"
+version = "1.50-1"
 source = {
-  url = "https://github.com/dromozoa/dromozoa-unix/releases/download/v1.49/dromozoa-unix-1.49.tar.gz";
+  url = "https://github.com/dromozoa/dromozoa-unix/releases/download/v1.50/dromozoa-unix-1.50.tar.gz";
 }
 description = {
   summary = "Lua bindings for UNIX system interface";
