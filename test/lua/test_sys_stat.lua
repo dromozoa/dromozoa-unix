@@ -1,4 +1,4 @@
--- Copyright (C) 2016-2018 Tomoyuki Fujimori <moyu@dromozoa.com>
+-- Copyright (C) 2016-2019 Tomoyuki Fujimori <moyu@dromozoa.com>
 --
 -- This file is part of dromozoa-unix.
 --
@@ -16,6 +16,8 @@
 -- along with dromozoa-unix.  If not, see <http://www.gnu.org/licenses/>.
 
 local unix = require "dromozoa.unix"
+
+local verbose = os.getenv "VERBOSE" == "1"
 
 assert(unix.umask(tonumber("022", 8)))
 
@@ -40,3 +42,12 @@ local st = assert(unix.stat "test.fifo")
 assert(st.st_mode == unix.bor(unix.S_IFIFO, tonumber("0644", 8)))
 
 assert(os.remove "test.fifo")
+
+assert(unix.UTIME_NOW)
+assert(unix.UTIME_OMIT)
+if verbose then
+  io.write(([[
+UTIME_NOW  | %d
+UTIME_OMIT | %d
+]]):format(unix.UTIME_NOW, unix.UTIME_OMIT))
+end
