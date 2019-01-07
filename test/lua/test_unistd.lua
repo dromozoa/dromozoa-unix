@@ -1,4 +1,4 @@
--- Copyright (C) 2016-2018 Tomoyuki Fujimori <moyu@dromozoa.com>
+-- Copyright (C) 2016-2019 Tomoyuki Fujimori <moyu@dromozoa.com>
 --
 -- This file is part of dromozoa-unix.
 --
@@ -70,6 +70,23 @@ ppid | %d
     unix.getpgrp(),
     unix.getppid()))
 end
+
+if verbose then
+  io.write(([[
+F_OK | %d
+R_OK | %d
+W_OK | %d
+X_OK | %d
+]]):format(unix.F_OK, unix.R_OK, unix.W_OK, unix.X_OK))
+end
+
+local result, message, code = unix.access("no such file", unix.F_OK);
+if verbose then
+  io.stderr:write(message, "\n")
+end
+assert(not result)
+assert(code == unix.ENOENT)
+assert(unix.access(unix.getcwd(), unix.bor(unix.R_OK, unix.W_OK, unix.X_OK)))
 
 assert(unix.sysconf(unix["_SC_NPROCESSORS_CONF"]))
 assert(unix.sysconf(unix["_SC_NPROCESSORS_ONLN"]))
