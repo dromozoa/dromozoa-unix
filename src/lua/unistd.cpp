@@ -1,4 +1,4 @@
-// Copyright (C) 2016,2017 Tomoyuki Fujimori <moyu@dromozoa.com>
+// Copyright (C) 2016,2017,2019 Tomoyuki Fujimori <moyu@dromozoa.com>
 //
 // This file is part of dromozoa-unix.
 //
@@ -101,6 +101,16 @@ namespace dromozoa {
       }
     }
 
+    void impl_access(lua_State* L) {
+      const char* path = luaL_checkstring(L, 1);
+      int mode = luaX_check_integer<int>(L, 2);
+      if (access(path, mode) == -1 ) {
+        push_error(L);
+      } else {
+        luaX_push_success(L);
+      }
+    }
+
     void impl_hardware_concurrency(lua_State* L) {
       luaX_push(L, hardware_concurrency());
     }
@@ -118,11 +128,17 @@ namespace dromozoa {
     luaX_set_field(L, -1, "getpgrp", impl_getpgrp);
     luaX_set_field(L, -1, "getppid", impl_getppid);
     luaX_set_field(L, -1, "sysconf", impl_sysconf);
+    luaX_set_field(L, -1, "access", impl_access);
     luaX_set_field(L, -1, "hardware_concurrency", impl_hardware_concurrency);
 
     luaX_set_field(L, -1, "STDIN_FILENO", STDIN_FILENO);
     luaX_set_field(L, -1, "STDOUT_FILENO", STDOUT_FILENO);
     luaX_set_field(L, -1, "STDERR_FILENO", STDERR_FILENO);
+
+    luaX_set_field(L, -1, "F_OK", F_OK);
+    luaX_set_field(L, -1, "R_OK", R_OK);
+    luaX_set_field(L, -1, "W_OK", W_OK);
+    luaX_set_field(L, -1, "X_OK", X_OK);
 
     luaX_set_field<int>(L, -1, "_SC_NPROCESSORS_CONF", _SC_NPROCESSORS_CONF);
     luaX_set_field<int>(L, -1, "_SC_NPROCESSORS_ONLN", _SC_NPROCESSORS_ONLN);
