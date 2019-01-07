@@ -1,4 +1,4 @@
-// Copyright (C) 2016,2017 Tomoyuki Fujimori <moyu@dromozoa.com>
+// Copyright (C) 2016,2017,2019 Tomoyuki Fujimori <moyu@dromozoa.com>
 //
 // This file is part of dromozoa-unix.
 //
@@ -131,6 +131,9 @@ namespace dromozoa {
     luaX_set_field<mode_t>(L, -1, "S_IFDIR", S_IFDIR);
     luaX_set_field<mode_t>(L, -1, "S_IFLNK", S_IFLNK);
     luaX_set_field<mode_t>(L, -1, "S_IFSOCK", S_IFSOCK);
+
+    luaX_set_field(L, -1, "UTIME_NOW", UTIME_NOW);
+    luaX_set_field(L, -1, "UTIME_OMIT", UTIME_OMIT);
   }
 
   void initialize_fd_stat(lua_State* L) {
