@@ -1,13 +1,18 @@
+rockspec_format = "3.0"
 package = "dromozoa-unix"
-version = "1.52-1"
+version = "1.53-1"
 source = {
-  url = "https://github.com/dromozoa/dromozoa-unix/releases/download/v1.52/dromozoa-unix-1.52.tar.gz";
+  url = "https://github.com/dromozoa/dromozoa-unix/releases/download/v1.53/dromozoa-unix-1.53.tar.gz";
 }
 description = {
   summary = "Lua bindings for UNIX system interface";
   license = "GPL-3";
   homepage = "https://github.com/dromozoa/dromozoa-unix/";
   maintainer = "Tomoyuki Fujimori <moyu@dromozoa.com>";
+}
+test = {
+  type = "command";
+  command = "make check";
 }
 build = {
   type = "command";

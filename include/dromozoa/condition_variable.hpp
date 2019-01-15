@@ -1,4 +1,4 @@
-// Copyright (C) 2018 Tomoyuki Fujimori <moyu@dromozoa.com>
+// Copyright (C) 2018,2019 Tomoyuki Fujimori <moyu@dromozoa.com>
 //
 // This file is part of dromozoa-unix.
 //
@@ -20,8 +20,7 @@
 
 #include <pthread.h>
 
-#include <dromozoa/mutex.hpp>
-#include <dromozoa/scoped_lock.hpp>
+#include <dromozoa/bind/mutex.hpp>
 
 namespace dromozoa {
   class condition_variable {
@@ -30,7 +29,7 @@ namespace dromozoa {
     ~condition_variable();
     void notify_one();
     void notify_all();
-    void wait(scoped_lock<mutex>& lock);
+    void wait(lock_guard<mutex>& lock);
     pthread_cond_t* native_handle();
   private:
     pthread_cond_t cond_;

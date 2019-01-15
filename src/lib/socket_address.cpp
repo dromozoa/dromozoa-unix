@@ -1,4 +1,4 @@
-// Copyright (C) 2016,2018 Tomoyuki Fujimori <moyu@dromozoa.com>
+// Copyright (C) 2016,2018,2019 Tomoyuki Fujimori <moyu@dromozoa.com>
 //
 // This file is part of dromozoa-unix.
 //
@@ -18,8 +18,9 @@
 #include <errno.h>
 #include <string.h>
 
+#include <dromozoa/bind/system_error.hpp>
+
 #include <dromozoa/socket_address.hpp>
-#include <dromozoa/system_error.hpp>
 
 namespace dromozoa {
   socket_address::socket_address() : address_(), size_(sizeof(address_)) {}

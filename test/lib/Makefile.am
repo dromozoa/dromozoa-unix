@@ -1,4 +1,4 @@
-# Copyright (C) 2016-2018 Tomoyuki Fujimori <moyu@dromozoa.com>
+# Copyright (C) 2016-2019 Tomoyuki Fujimori <moyu@dromozoa.com>
 #
 # This file is part of dromozoa-unix.
 #
@@ -24,9 +24,7 @@ check_PROGRAMS = \
 	test_compat_pipe2.exe \
 	test_compat_mkostemp.exe \
 	test_compat_socket.exe \
-	test_compat_strerror.exe \
 	test_djb.exe \
-	test_errno_saver.exe \
 	test_file_descriptor.exe \
 	test_forkexec.exe \
 	test_hardware_concurrency.exe \
@@ -61,17 +59,9 @@ test_compat_mkostemp_exe_CPPFLAGS = -I$(top_srcdir)/bind -I$(top_srcdir)/include
 test_compat_mkostemp_exe_LDADD = $(top_builddir)/src/lib/libdromozoa-unix.la
 test_compat_mkostemp_exe_SOURCES = test_compat_mkostemp.cpp
 
-test_compat_strerror_exe_CPPFLAGS = -I$(top_srcdir)/bind -I$(top_srcdir)/include
-test_compat_strerror_exe_LDADD = $(top_builddir)/src/lib/libdromozoa-unix.la
-test_compat_strerror_exe_SOURCES = test_compat_strerror.cpp
-
 test_djb_exe_CPPFLAGS = -I$(top_srcdir)/bind -I$(top_srcdir)/include
 test_djb_exe_LDADD = $(top_builddir)/src/lib/libdromozoa-unix.la
 test_djb_exe_SOURCES = test_djb.cpp
-
-test_errno_saver_exe_CPPFLAGS = -I$(top_srcdir)/bind -I$(top_srcdir)/include
-test_errno_saver_exe_LDADD = $(top_builddir)/src/lib/libdromozoa-unix.la
-test_errno_saver_exe_SOURCES = test_errno_saver.cpp
 
 test_file_descriptor_exe_CPPFLAGS = -I$(top_srcdir)/bind -I$(top_srcdir)/include
 test_file_descriptor_exe_LDADD = $(top_builddir)/src/lib/libdromozoa-unix.la

@@ -1,4 +1,4 @@
-// Copyright (C) 2016,2018 Tomoyuki Fujimori <moyu@dromozoa.com>
+// Copyright (C) 2016,2018,2019 Tomoyuki Fujimori <moyu@dromozoa.com>
 //
 // This file is part of dromozoa-unix.
 //
@@ -20,10 +20,9 @@
 
 #include <utility>
 
+#include <dromozoa/bind/system_error.hpp>
 #include <dromozoa/bind/unexpected.hpp>
 
-#include <dromozoa/compat_strerror.hpp>
-#include <dromozoa/errno_saver.hpp>
 #include <dromozoa/file_descriptor.hpp>
 
 namespace dromozoa {
