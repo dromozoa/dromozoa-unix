@@ -58,7 +58,7 @@ namespace dromozoa {
         char c;
         ssize_t result = read(selfpipe_reader, &c, 1);
         if (result == 1) {
-          scoped_lock<> subscribers_lock(selfpipe_subscribers_mutex);
+          lock_guard<> subscribers_lock(selfpipe_subscribers_mutex);
           std::set<int>::const_iterator i = selfpipe_subscribers.begin();
           std::set<int>::const_iterator end = selfpipe_subscribers.end();
           for (; i != end; ++i) {
@@ -78,7 +78,7 @@ namespace dromozoa {
     }
 
     int selfpipe_open(int subscriber) {
-      scoped_lock<> lock(selfpipe_mutex);
+      lock_guard<> lock(selfpipe_mutex);
 
       sigset_t mask;
       if (sigmask_block_all_signals(&mask)) {
@@ -87,7 +87,7 @@ namespace dromozoa {
       sigmask_saver save_mask(mask);
 
       {
-        scoped_lock<> subscribers_lock(selfpipe_subscribers_mutex);
+        lock_guard<> subscribers_lock(selfpipe_subscribers_mutex);
         std::set<int> subscribers = selfpipe_subscribers;
         if (!subscribers.insert(subscriber).second) {
           errno = EINVAL;
@@ -139,7 +139,7 @@ namespace dromozoa {
     }
 
     int selfpipe_close(int subscriber) {
-      scoped_lock<> lock(selfpipe_mutex);
+      lock_guard<> lock(selfpipe_mutex);
 
       sigset_t mask;
       if (sigmask_block_all_signals(&mask)) {
@@ -148,7 +148,7 @@ namespace dromozoa {
       sigmask_saver save_mask(mask);
 
       {
-        scoped_lock<> subscribers_lock(selfpipe_subscribers_mutex);
+        lock_guard<> subscribers_lock(selfpipe_subscribers_mutex);
         if (selfpipe_subscribers.erase(subscriber) != 1) {
           errno = EINVAL;
           return -1;

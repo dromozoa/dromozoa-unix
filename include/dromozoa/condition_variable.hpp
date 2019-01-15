@@ -29,7 +29,7 @@ namespace dromozoa {
     ~condition_variable();
     void notify_one();
     void notify_all();
-    void wait(scoped_lock<mutex>& lock);
+    void wait(lock_guard<mutex>& lock);
     pthread_cond_t* native_handle();
   private:
     pthread_cond_t cond_;

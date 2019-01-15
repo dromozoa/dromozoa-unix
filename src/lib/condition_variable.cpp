@@ -48,7 +48,7 @@ namespace dromozoa {
     }
   }
 
-  void condition_variable::wait(scoped_lock<mutex>& lock) {
+  void condition_variable::wait(lock_guard<mutex>& lock) {
     if (int result = pthread_cond_wait(&cond_, lock.mutex()->native_handle())) {
       throw system_error(result);
     }

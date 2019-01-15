@@ -66,7 +66,7 @@ namespace dromozoa {
       file_descriptor writer(fd[1]);
 
       if (start_threads > 0) {
-        scoped_lock<> counter_lock(counter_mutex_);
+        lock_guard<> counter_lock(counter_mutex_);
 
         sigset_t mask;
         if (sigmask_block_all_signals(&mask)) {
@@ -82,7 +82,7 @@ namespace dromozoa {
       }
 
       {
-        scoped_lock<> ready_lock(ready_mutex_);
+        lock_guard<> ready_lock(ready_mutex_);
         ready_reader_.swap(reader);
         ready_writer_.swap(writer);
       }
@@ -94,7 +94,7 @@ namespace dromozoa {
       file_descriptor reader;
       file_descriptor writer;
       {
-        scoped_lock<> ready_lock(ready_mutex_);
+        lock_guard<> ready_lock(ready_mutex_);
         reader.swap(ready_reader_);
         writer.swap(ready_writer_);
       }
@@ -102,7 +102,7 @@ namespace dromozoa {
       queue_type queue;
       queue.push_back(0);
       {
-        scoped_lock<> queue_lock(queue_mutex_);
+        lock_guard<> queue_lock(queue_mutex_);
         queue.swap(queue_);
         queue_index_.clear();
         queue_condition_.notify_all();
@@ -125,7 +125,7 @@ namespace dromozoa {
       }
 
       {
-        scoped_lock<> counter_lock(counter_mutex_);
+        lock_guard<> counter_lock(counter_mutex_);
         current_tasks_ -= canceled_tasks;
         while (current_threads_ > 0) {
           counter_condition_.wait(counter_lock);
@@ -160,7 +160,7 @@ namespace dromozoa {
 
     int push(async_service_task* task) {
       {
-        scoped_lock<> counter_lock(counter_mutex_);
+        lock_guard<> counter_lock(counter_mutex_);
         ++current_tasks_;
         if (current_threads_ < current_tasks_ && current_threads_ < max_threads_) {
           sigset_t mask;
@@ -176,7 +176,7 @@ namespace dromozoa {
       }
 
       {
-        scoped_lock<> queue_lock(queue_mutex_);
+        lock_guard<> queue_lock(queue_mutex_);
         queue_iterator i = queue_.insert(queue_.end(), task);
         queue_index_.insert(std::make_pair(task, i));
         queue_condition_.notify_one();
@@ -186,7 +186,7 @@ namespace dromozoa {
 
     bool cancel(async_service_task* task) {
       {
-        scoped_lock<> queue_lock(queue_mutex_);
+        lock_guard<> queue_lock(queue_mutex_);
         queue_index_iterator i = queue_index_.find(task);
         if (i == queue_index_.end()) {
           return false;
@@ -202,7 +202,7 @@ namespace dromozoa {
       }
 
       {
-        scoped_lock<> counter_lock(counter_mutex_);
+        lock_guard<> counter_lock(counter_mutex_);
         --current_tasks_;
       }
 
@@ -210,7 +210,7 @@ namespace dromozoa {
     }
 
     async_service_task* pop() {
-      scoped_lock<> ready_lock(ready_mutex_);
+      lock_guard<> ready_lock(ready_mutex_);
       if (ready_.empty()) {
         return 0;
       } else {
@@ -221,7 +221,7 @@ namespace dromozoa {
     }
 
     void info(unsigned int& spare_threads, unsigned int& current_threads, unsigned int& current_tasks) {
-      scoped_lock<> counter_lock(counter_mutex_);
+      lock_guard<> counter_lock(counter_mutex_);
       spare_threads = spare_threads_;
       current_threads = current_threads_;
       current_tasks = current_tasks_;
@@ -258,7 +258,7 @@ namespace dromozoa {
         async_service_task* task = 0;
 
         {
-          scoped_lock<> queue_lock(queue_mutex_);
+          lock_guard<> queue_lock(queue_mutex_);
           while (queue_.empty()) {
             queue_condition_.wait(queue_lock);
           }
@@ -270,7 +270,7 @@ namespace dromozoa {
         }
 
         {
-          scoped_lock<> counter_lock(counter_mutex_);
+          lock_guard<> counter_lock(counter_mutex_);
           if (task) {
             --spare_threads_;
           } else {
@@ -288,7 +288,7 @@ namespace dromozoa {
         }
 
         {
-          scoped_lock<> ready_lock(ready_mutex_);
+          lock_guard<> ready_lock(ready_mutex_);
           ready_.push_back(task);
           if (ready_writer_.valid()) {
             write(ready_writer_.get(), "", 1);
@@ -296,7 +296,7 @@ namespace dromozoa {
         }
 
         {
-          scoped_lock<> counter_lock(counter_mutex_);
+          lock_guard<> counter_lock(counter_mutex_);
           --current_tasks_;
           if (current_threads_ <= current_tasks_ || spare_threads_ < max_spare_threads_) {
             ++spare_threads_;
