@@ -34,8 +34,6 @@
 #include <dromozoa/sigmask.hpp>
 
 namespace dromozoa {
-  using dromozoa::bind::errno_saver;
-
 #ifdef HAVE_MKOSTEMP
   int compat_mkostemp(char* tmpl, int flags) {
     return mkostemp(tmpl, flags);

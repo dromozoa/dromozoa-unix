@@ -26,8 +26,6 @@
 #include <dromozoa/file_descriptor.hpp>
 
 namespace dromozoa {
-  using dromozoa::bind::errno_saver;
-
   file_descriptor::file_descriptor() : fd_(-1) {}
 
   file_descriptor::file_descriptor(int fd) : fd_(fd) {}

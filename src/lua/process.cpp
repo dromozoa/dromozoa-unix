@@ -22,8 +22,6 @@
 #include "common.hpp"
 
 namespace dromozoa {
-  using dromozoa::bind::errno_saver;
-
   namespace {
     void impl_call(lua_State* L) {
       lua_newtable(L);

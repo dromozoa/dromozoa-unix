@@ -24,8 +24,6 @@
 #include <dromozoa/sigmask.hpp>
 
 namespace dromozoa {
-  using dromozoa::bind::errno_saver;
-
   int sigmask_block_all_signals(sigset_t* old_mask) {
     sigset_t new_mask;
     if (sigfillset(&new_mask) == -1) {
