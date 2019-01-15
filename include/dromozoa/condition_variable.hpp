@@ -20,8 +20,7 @@
 
 #include <pthread.h>
 
-#include <dromozoa/mutex.hpp>
-#include <dromozoa/scoped_lock.hpp>
+#include <dromozoa/bind/mutex.hpp>
 
 namespace dromozoa {
   class condition_variable {

@@ -17,12 +17,13 @@
 
 #include <errno.h>
 
-#include <dromozoa/compat_strerror.hpp>
-#include <dromozoa/errno_saver.hpp>
+#include <dromozoa/bind/system_error.hpp>
 
 #include "common.hpp"
 
 namespace dromozoa {
+  using dromozoa::bind::errno_saver;
+
   namespace {
     void set_last_errno(lua_State* L, int code) {
       luaX_set_field(L, LUA_REGISTRYINDEX, "dromozoa.unix.last_errno", code);

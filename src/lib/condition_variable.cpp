@@ -19,8 +19,9 @@
 
 #include <exception>
 
+#include <dromozoa/bind/system_error.hpp>
+
 #include <dromozoa/condition_variable.hpp>
-#include <dromozoa/system_error.hpp>
 
 namespace dromozoa {
   condition_variable::condition_variable() : cond_() {

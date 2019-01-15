@@ -24,17 +24,15 @@
 #include <exception>
 #include <set>
 
+#include <dromozoa/bind/mutex.hpp>
+#include <dromozoa/bind/system_error.hpp>
 #include <dromozoa/bind/unexpected.hpp>
 
 #include <dromozoa/compat_pipe2.hpp>
-#include <dromozoa/compat_strerror.hpp>
 #include <dromozoa/file_descriptor.hpp>
-#include <dromozoa/mutex.hpp>
 #include <dromozoa/ndelay.hpp>
-#include <dromozoa/scoped_lock.hpp>
 #include <dromozoa/selfpipe.hpp>
 #include <dromozoa/sigmask.hpp>
-#include <dromozoa/system_error.hpp>
 #include <dromozoa/thread.hpp>
 
 namespace dromozoa {

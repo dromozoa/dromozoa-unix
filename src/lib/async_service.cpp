@@ -24,14 +24,13 @@
 #include <map>
 #include <utility>
 
+#include <dromozoa/bind/mutex.hpp>
 #include <dromozoa/bind/unexpected.hpp>
 
 #include <dromozoa/async_service.hpp>
 #include <dromozoa/compat_pipe2.hpp>
 #include <dromozoa/condition_variable.hpp>
 #include <dromozoa/file_descriptor.hpp>
-#include <dromozoa/mutex.hpp>
-#include <dromozoa/scoped_lock.hpp>
 #include <dromozoa/sigmask.hpp>
 #include <dromozoa/thread.hpp>
 

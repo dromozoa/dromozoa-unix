@@ -20,7 +20,8 @@
 #include <exception>
 #include <utility>
 
-#include <dromozoa/system_error.hpp>
+#include <dromozoa/bind/system_error.hpp>
+
 #include <dromozoa/thread.hpp>
 
 namespace dromozoa {

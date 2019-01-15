@@ -24,17 +24,18 @@
 #include <stdlib.h>
 #include <unistd.h>
 
+#include <dromozoa/bind/system_error.hpp>
 #include <dromozoa/bind/unexpected.hpp>
 
 #include <dromozoa/coe.hpp>
 #include <dromozoa/compat_mkostemp.hpp>
-#include <dromozoa/compat_strerror.hpp>
-#include <dromozoa/errno_saver.hpp>
 #include <dromozoa/file_descriptor.hpp>
 #include <dromozoa/ndelay.hpp>
 #include <dromozoa/sigmask.hpp>
 
 namespace dromozoa {
+  using dromozoa::bind::errno_saver;
+
 #ifdef HAVE_MKOSTEMP
   int compat_mkostemp(char* tmpl, int flags) {
     return mkostemp(tmpl, flags);

@@ -18,8 +18,9 @@
 #include <errno.h>
 #include <string.h>
 
+#include <dromozoa/bind/system_error.hpp>
+
 #include <dromozoa/socket_address.hpp>
-#include <dromozoa/system_error.hpp>
 
 namespace dromozoa {
   socket_address::socket_address() : address_(), size_(sizeof(address_)) {}

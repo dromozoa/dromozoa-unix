@@ -15,12 +15,15 @@
 // You should have received a copy of the GNU General Public License
 // along with dromozoa-unix.  If not, see <http://www.gnu.org/licenses/>.
 
-#include <dromozoa/errno_saver.hpp>
+#include <dromozoa/bind/system_error.hpp>
+
 #include <dromozoa/forkexec.hpp>
 
 #include "common.hpp"
 
 namespace dromozoa {
+  using dromozoa::bind::errno_saver;
+
   namespace {
     void impl_call(lua_State* L) {
       lua_newtable(L);
