@@ -24,17 +24,15 @@
 #include <exception>
 #include <set>
 
+#include <dromozoa/bind/mutex.hpp>
+#include <dromozoa/bind/system_error.hpp>
 #include <dromozoa/bind/unexpected.hpp>
 
 #include <dromozoa/compat_pipe2.hpp>
-#include <dromozoa/compat_strerror.hpp>
 #include <dromozoa/file_descriptor.hpp>
-#include <dromozoa/mutex.hpp>
 #include <dromozoa/ndelay.hpp>
-#include <dromozoa/scoped_lock.hpp>
 #include <dromozoa/selfpipe.hpp>
 #include <dromozoa/sigmask.hpp>
-#include <dromozoa/system_error.hpp>
 #include <dromozoa/thread.hpp>
 
 namespace dromozoa {
@@ -60,7 +58,7 @@ namespace dromozoa {
         char c;
         ssize_t result = read(selfpipe_reader, &c, 1);
         if (result == 1) {
-          scoped_lock<> subscribers_lock(selfpipe_subscribers_mutex);
+          lock_guard<> subscribers_lock(selfpipe_subscribers_mutex);
           std::set<int>::const_iterator i = selfpipe_subscribers.begin();
           std::set<int>::const_iterator end = selfpipe_subscribers.end();
           for (; i != end; ++i) {
@@ -80,7 +78,7 @@ namespace dromozoa {
     }
 
     int selfpipe_open(int subscriber) {
-      scoped_lock<> lock(selfpipe_mutex);
+      lock_guard<> lock(selfpipe_mutex);
 
       sigset_t mask;
       if (sigmask_block_all_signals(&mask)) {
@@ -89,7 +87,7 @@ namespace dromozoa {
       sigmask_saver save_mask(mask);
 
       {
-        scoped_lock<> subscribers_lock(selfpipe_subscribers_mutex);
+        lock_guard<> subscribers_lock(selfpipe_subscribers_mutex);
         std::set<int> subscribers = selfpipe_subscribers;
         if (!subscribers.insert(subscriber).second) {
           errno = EINVAL;
@@ -141,7 +139,7 @@ namespace dromozoa {
     }
 
     int selfpipe_close(int subscriber) {
-      scoped_lock<> lock(selfpipe_mutex);
+      lock_guard<> lock(selfpipe_mutex);
 
       sigset_t mask;
       if (sigmask_block_all_signals(&mask)) {
@@ -150,7 +148,7 @@ namespace dromozoa {
       sigmask_saver save_mask(mask);
 
       {
-        scoped_lock<> subscribers_lock(selfpipe_subscribers_mutex);
+        lock_guard<> subscribers_lock(selfpipe_subscribers_mutex);
         if (selfpipe_subscribers.erase(subscriber) != 1) {
           errno = EINVAL;
           return -1;

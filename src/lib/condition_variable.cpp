@@ -19,8 +19,9 @@
 
 #include <exception>
 
+#include <dromozoa/bind/system_error.hpp>
+
 #include <dromozoa/condition_variable.hpp>
-#include <dromozoa/system_error.hpp>
 
 namespace dromozoa {
   condition_variable::condition_variable() : cond_() {
@@ -47,7 +48,7 @@ namespace dromozoa {
     }
   }
 
-  void condition_variable::wait(scoped_lock<mutex>& lock) {
+  void condition_variable::wait(lock_guard<mutex>& lock) {
     if (int result = pthread_cond_wait(&cond_, lock.mutex()->native_handle())) {
       throw system_error(result);
     }

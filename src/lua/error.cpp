@@ -17,8 +17,7 @@
 
 #include <errno.h>
 
-#include <dromozoa/compat_strerror.hpp>
-#include <dromozoa/errno_saver.hpp>
+#include <dromozoa/bind/system_error.hpp>
 
 #include "common.hpp"
 
