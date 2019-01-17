@@ -29,7 +29,6 @@ libdromozoa_unix_la_SOURCES = \
 	compat_pipe2.cpp \
 	compat_sigmask.cpp \
 	compat_socket.cpp \
-	condition_variable.cpp \
 	file_descriptor.cpp \
 	forkexec.cpp \
 	hardware_concurrency.cpp \
