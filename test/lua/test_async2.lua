@@ -1,4 +1,4 @@
--- Copyright (C) 2016,2018 Tomoyuki Fujimori <moyu@dromozoa.com>
+-- Copyright (C) 2016,2018,2019 Tomoyuki Fujimori <moyu@dromozoa.com>
 --
 -- This file is part of dromozoa-unix.
 --
@@ -22,7 +22,7 @@ local verbose = os.getenv "VERBOSE" == "1"
 
 assert(dyld.dlopen_pthread())
 
-local service = unix.async_service(8)
+local service = assert(unix.async_service(8))
 local selector = assert(unix.selector())
 local timer = unix.timer()
 
