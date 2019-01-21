@@ -26,13 +26,13 @@
 
 #include <dromozoa/bind/mutex.hpp>
 #include <dromozoa/bind/condition_variable.hpp>
+#include <dromozoa/bind/thread.hpp>
 #include <dromozoa/bind/unexpected.hpp>
 
 #include <dromozoa/async_service.hpp>
 #include <dromozoa/compat_pipe2.hpp>
 #include <dromozoa/file_descriptor.hpp>
 #include <dromozoa/sigmask.hpp>
-#include <dromozoa/thread.hpp>
 
 namespace dromozoa {
   async_service_task::~async_service_task() {}

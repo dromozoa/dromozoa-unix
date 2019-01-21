@@ -26,6 +26,7 @@
 
 #include <dromozoa/bind/mutex.hpp>
 #include <dromozoa/bind/system_error.hpp>
+#include <dromozoa/bind/thread.hpp>
 #include <dromozoa/bind/unexpected.hpp>
 
 #include <dromozoa/compat_pipe2.hpp>
@@ -33,7 +34,6 @@
 #include <dromozoa/ndelay.hpp>
 #include <dromozoa/selfpipe.hpp>
 #include <dromozoa/sigmask.hpp>
-#include <dromozoa/thread.hpp>
 
 namespace dromozoa {
   namespace {

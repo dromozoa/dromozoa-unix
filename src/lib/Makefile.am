@@ -39,7 +39,6 @@ libdromozoa_unix_la_SOURCES = \
 	selfpipe.cpp \
 	sigmask.cpp \
 	socket_address.cpp \
-	thread.cpp \
 	timer.cpp
 
 if HAVE_EPOLL
