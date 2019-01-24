@@ -1,4 +1,4 @@
-# Copyright (C) 2016-2018 Tomoyuki Fujimori <moyu@dromozoa.com>
+# Copyright (C) 2016-2019 Tomoyuki Fujimori <moyu@dromozoa.com>
 #
 # This file is part of dromozoa-unix.
 #
@@ -51,6 +51,7 @@ unix_la_SOURCES = \
 	sys_stat.cpp \
 	sys_statvfs.cpp \
 	sys_wait.cpp \
+	syslog.cpp \
 	time.cpp \
 	timer.cpp \
 	timespec.cpp \
