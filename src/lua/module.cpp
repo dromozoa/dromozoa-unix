@@ -41,6 +41,7 @@ namespace dromozoa {
   void initialize_sys_stat(lua_State* L);
   void initialize_sys_statvfs(lua_State* L);
   void initialize_sys_wait(lua_State* L);
+  void initialize_syslog(lua_State* L);
   void initialize_time(lua_State* L);
   void initialize_timer(lua_State* L);
   void initialize_timespec(lua_State* L);
@@ -70,6 +71,7 @@ namespace dromozoa {
     initialize_sys_stat(L);
     initialize_sys_statvfs(L);
     initialize_sys_wait(L);
+    initialize_syslog(L);
     initialize_time(L);
     initialize_timer(L);
     initialize_timespec(L);
