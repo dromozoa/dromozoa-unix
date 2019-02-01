@@ -54,6 +54,8 @@ AC_CHECK_MEMBERS([struct stat.st_ctimespec])
 AC_CHECK_MEMBERS([struct stat.st_mtim])
 AC_CHECK_MEMBERS([struct stat.st_mtimespec])
 
+AC_CHECK_HEADERS([sys/xattr.h])
+
 AC_SEARCH_LIBS([clock_gettime], [rt], [AC_DEFINE(HAVE_CLOCK_GETTIME, 1, [Define to 1 if you have the 'clock_gettime' function.])])
 
 AX_PTHREAD([], [AC_MSG_ERROR([could not find pthread])])
