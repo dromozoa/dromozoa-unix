@@ -76,8 +76,8 @@ namespace dromozoa {
       errno = 0;
       if (struct dirent* result = readdir(dir)) {
         lua_newtable(L);
-        luaX_set_field(L, -1, "d_ino", result->d_ino);
         luaX_set_field(L, -1, "d_name", result->d_name);
+        luaX_set_field(L, -1, "d_ino", result->d_ino);
       } else {
         if (errno == 0) {
           luaX_push(L, luaX_nil);
