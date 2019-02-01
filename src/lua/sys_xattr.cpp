@@ -20,6 +20,7 @@
 #endif
 
 #include <sys/types.h>
+
 #ifdef HAVE_SYS_XATTR_H
 #include <sys/xattr.h>
 #endif
@@ -78,67 +79,57 @@ namespace dromozoa {
     }
 #endif
 
-#ifdef HAVE_COMPAT_GETXATTR
-    void impl_getxattr(lua_State* L) {
+    template <class T>
+    void impl_getxattr_(lua_State* L, T f) {
       luaX_string_reference path = luaX_check_string(L, 1);
       luaX_string_reference name = luaX_check_string(L, 2);
-      ssize_t size = compat_getxattr(path.data(), name.data(), 0, 0);
+      ssize_t size = f(path.data(), name.data(), 0, 0);
       if (size == -1) {
         push_error(L);
       } else {
         std::vector<char> buffer(size);
-        ssize_t result = compat_getxattr(path.data(), name.data(), buffer.data(), buffer.size());
+        ssize_t result = f(path.data(), name.data(), buffer.data(), buffer.size());
         if (result == -1) {
           push_error(L);
         } else {
           luaX_push(L, luaX_string_reference(buffer.data(), result));
         }
       }
+    }
+
+    template <class T>
+    void impl_setxattr_(lua_State* L, T f) {
+      luaX_string_reference path = luaX_check_string(L, 1);
+      luaX_string_reference name = luaX_check_string(L, 2);
+      luaX_string_reference value = luaX_check_string(L, 3);
+      if (f(path.data(), name.data(), value.data(), value.size()) == -1) {
+        push_error(L);
+      } else {
+        luaX_push_success(L);
+      }
+    }
+
+#ifdef HAVE_COMPAT_GETXATTR
+    void impl_getxattr(lua_State* L) {
+      impl_getxattr_(L, compat_getxattr);
     }
 #endif
 
 #ifdef HAVE_COMPAT_LGETXATTR
     void impl_lgetxattr(lua_State* L) {
-      luaX_string_reference path = luaX_check_string(L, 1);
-      luaX_string_reference name = luaX_check_string(L, 2);
-      ssize_t size = compat_lgetxattr(path.data(), name.data(), 0, 0);
-      if (size == -1) {
-        push_error(L);
-      } else {
-        std::vector<char> buffer(size);
-        ssize_t result = compat_lgetxattr(path.data(), name.data(), buffer.data(), buffer.size());
-        if (result == -1) {
-          push_error(L);
-        } else {
-          luaX_push(L, luaX_string_reference(buffer.data(), result));
-        }
-      }
+      impl_getxattr_(L, compat_lgetxattr);
     }
 #endif
 
 #ifdef HAVE_COMPAT_SETXATTR
     void impl_setxattr(lua_State* L) {
-      luaX_string_reference path = luaX_check_string(L, 1);
-      luaX_string_reference name = luaX_check_string(L, 2);
-      luaX_string_reference value = luaX_check_string(L, 3);
-      if (compat_setxattr(path.data(), name.data(), value.data(), value.size()) == -1) {
-        push_error(L);
-      } else {
-        luaX_push_success(L);
-      }
+      impl_setxattr_(L, compat_setxattr);
     }
 #endif
 
 #ifdef HAVE_COMPAT_LSETXATTR
     void impl_lsetxattr(lua_State* L) {
-      luaX_string_reference path = luaX_check_string(L, 1);
-      luaX_string_reference name = luaX_check_string(L, 2);
-      luaX_string_reference value = luaX_check_string(L, 3);
-      if (compat_lsetxattr(path.data(), name.data(), value.data(), value.size()) == -1) {
-        push_error(L);
-      } else {
-        luaX_push_success(L);
-      }
+      impl_setxattr_(L, compat_lsetxattr);
     }
 #endif
   }
