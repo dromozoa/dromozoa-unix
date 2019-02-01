@@ -19,6 +19,7 @@
 #include "config.h"
 #endif
 
+#include <errno.h>
 #include <sys/types.h>
 
 #ifdef HAVE_SYS_XATTR_H
@@ -79,6 +80,31 @@ namespace dromozoa {
     }
 #endif
 
+#ifdef HAVE_REMOVEXATTR
+#define HAVE_COMPAT_REMOVEXATTR 1
+#ifdef XATTR_NOFOLLOW
+    int compat_removexattr(const char* path, const char* name) {
+      return removexattr(path, name, 0);
+    }
+#else
+    int compat_removexattr(const char* path, const char* name) {
+      return removexattr(path, name);
+    }
+#endif
+#endif
+
+#ifdef HAVE_LREMOVEXATTR
+#define HAVE_COMPAT_LREMOVEXATTR 1
+    int compat_lremovexattr(const char* path, const char* name) {
+      return lremovexattr(path, name);
+    }
+#elif defined(HAVE_REMOVEXATTR) && defined(XATTR_NOFOLLOW)
+#define HAVE_COMPAT_LREMOVEXATTR 1
+    int compat_lremovexattr(const char* path, const char* name) {
+      return removexattr(path, name, XATTR_NOFOLLOW);
+    }
+#endif
+
     template <class T>
     void impl_getxattr_(lua_State* L, T f) {
       luaX_string_reference path = luaX_check_string(L, 1);
@@ -109,6 +135,17 @@ namespace dromozoa {
       }
     }
 
+    template <class T>
+    void impl_removexattr_(lua_State* L, T f) {
+      luaX_string_reference path = luaX_check_string(L, 1);
+      luaX_string_reference name = luaX_check_string(L, 2);
+      if (f(path.data(), name.data()) == -1) {
+        push_error(L);
+      } else {
+        luaX_push_success(L);
+      }
+    }
+
 #ifdef HAVE_COMPAT_GETXATTR
     void impl_getxattr(lua_State* L) {
       impl_getxattr_(L, compat_getxattr);
@@ -132,6 +169,18 @@ namespace dromozoa {
       impl_setxattr_(L, compat_lsetxattr);
     }
 #endif
+
+#ifdef HAVE_COMPAT_REMOVEXATTR
+    void impl_removexattr(lua_State* L) {
+      impl_removexattr_(L, compat_removexattr);
+    }
+#endif
+
+#ifdef HAVE_COMPAT_LREMOVEXATTR
+    void impl_lremovexattr(lua_State* L) {
+      impl_removexattr_(L, compat_lremovexattr);
+    }
+#endif
   }
 
   void initialize_sys_xattr(lua_State* L) {
@@ -146,6 +195,16 @@ namespace dromozoa {
 #endif
 #ifdef HAVE_COMPAT_LSETXATTR
     luaX_set_field(L, -1, "lsetxattr", impl_lsetxattr);
+#endif
+#ifdef HAVE_COMPAT_REMOVEXATTR
+    luaX_set_field(L, -1, "removexattr", impl_removexattr);
+#endif
+#ifdef HAVE_COMPAT_LREMOVEXATTR
+    luaX_set_field(L, -1, "lremovexattr", impl_lremovexattr);
+#endif
+
+#ifdef ENOATTR
+    luaX_set_field(L, -1, "ENOATTR", ENOATTR);
 #endif
   }
 }

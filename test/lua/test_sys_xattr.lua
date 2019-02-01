@@ -19,6 +19,14 @@ local unix = require "dromozoa.unix"
 
 local verbose = os.getenv "VERBOSE" == "1"
 
+local function check_no_attr(result, message, code)
+  if verbose then
+    print(message)
+  end
+  assert(not result)
+  assert(code == unix.ENOATTR)
+end
+
 local path = "test.data"
 local link = "test.link"
 
@@ -28,11 +36,37 @@ os.remove(link)
 assert(io.open(path, "w")):close()
 assert(unix.symlink(path, link))
 
-assert(unix.setxattr(path, "dromozoa-test", "foobarbaz"))
-assert(unix.getxattr(path, "dromozoa-test") == "foobarbaz")
-assert(unix.lsetxattr(link, "dromozoa-test", "qux"))
-assert(unix.lgetxattr(link, "dromozoa-test") == "qux")
-assert(unix.getxattr(link, "dromozoa-test") == "foobarbaz")
+assert(unix.setxattr(path, "dromozoa-test", "foo"))
 
+assert(unix.getxattr(path, "dromozoa-test") == "foo")
+assert(unix.getxattr(link, "dromozoa-test") == "foo")
+assert(unix.lgetxattr(path, "dromozoa-test") == "foo")
+check_no_attr(unix.lgetxattr(link, "dromozoa-test"))
 
+assert(unix.lsetxattr(link, "dromozoa-test", "bar"))
 
+assert(unix.getxattr(path, "dromozoa-test") == "foo")
+assert(unix.getxattr(link, "dromozoa-test") == "foo")
+assert(unix.lgetxattr(path, "dromozoa-test") == "foo")
+assert(unix.lgetxattr(link, "dromozoa-test") == "bar")
+
+assert(unix.setxattr(link, "dromozoa-test", "baz"))
+
+assert(unix.getxattr(path, "dromozoa-test") == "baz")
+assert(unix.getxattr(link, "dromozoa-test") == "baz")
+assert(unix.lgetxattr(path, "dromozoa-test") == "baz")
+assert(unix.lgetxattr(link, "dromozoa-test") == "bar")
+
+assert(unix.lremovexattr(link, "dromozoa-test"))
+
+assert(unix.getxattr(path, "dromozoa-test") == "baz")
+assert(unix.getxattr(link, "dromozoa-test") == "baz")
+assert(unix.lgetxattr(path, "dromozoa-test") == "baz")
+check_no_attr(unix.lgetxattr(link, "dromozoa-test"))
+
+assert(unix.removexattr(link, "dromozoa-test"))
+
+check_no_attr(unix.getxattr(path, "dromozoa-test"))
+check_no_attr(unix.getxattr(link, "dromozoa-test"))
+check_no_attr(unix.lgetxattr(path, "dromozoa-test"))
+check_no_attr(unix.lgetxattr(link, "dromozoa-test"))
