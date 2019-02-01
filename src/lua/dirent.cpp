@@ -110,6 +110,34 @@ namespace dromozoa {
         push_error(L);
       }
     }
+
+    void impl_iterator(lua_State* L) {
+      dir_handle* self = check_dir_handle(L, 1);
+      errno = 0;
+      if (struct dirent* result = readdir(self->get())) {
+        luaX_push(L, result->d_name, result->d_ino);
+      } else {
+        if (errno == 0) {
+          if (self->closedir() == -1) {
+            throw system_error(errno);
+          }
+          luaX_push(L, luaX_nil);
+        } else {
+          throw system_error(errno);
+        }
+      }
+    }
+
+    void impl_dirents(lua_State* L) {
+      luaX_string_reference dirname = luaX_check_string(L, 1);
+      if (DIR* dir = opendir(dirname.data())) {
+        luaX_push(L, impl_iterator);
+        luaX_new<dir_handle>(L, dir);
+        luaX_set_metatable(L, "dromozoa.unix.dir");
+      } else {
+        throw system_error(errno);
+      }
+    }
   }
 
   void initialize_dirent(lua_State* L) {
@@ -130,5 +158,6 @@ namespace dromozoa {
     luaX_set_field(L, -2, "dir");
 
     luaX_set_field(L, -1, "opendir", impl_opendir);
+    luaX_set_field(L, -1, "dirents", impl_dirents);
   }
 }

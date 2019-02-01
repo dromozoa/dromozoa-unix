@@ -47,3 +47,11 @@ assert(dir:seekdir(loc):readdir().d_name == "ax_pthread.m4")
 assert(dir:rewinddir())
 
 assert(dir:closedir())
+
+for d_name, d_ino in unix.dirents "m4" do
+  if verbose then
+    print("d_ino", d_ino)
+    print("d_name", d_name)
+  end
+  assert(map[d_name])
+end
