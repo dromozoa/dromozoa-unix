@@ -21,8 +21,8 @@
 
 #include <errno.h>
 #include <string.h>
-#include <sys/types.h>
 
+#include <sys/types.h>
 #ifdef HAVE_SYS_XATTR_H
 #include <sys/xattr.h>
 #endif
@@ -185,16 +185,18 @@ namespace dromozoa {
         ssize_t result = f(path.data(), &buffer[0], buffer.size());
         if (result == -1) {
           push_error(L);
+        } else if (result == 0) {
+          lua_newtable(L);
         } else {
           lua_newtable(L);
           int i = 1;
           ssize_t j = 0;
           while (j < result) {
-            const char* p = &buffer[j];
-            size_t n = strlen(p);
-            luaX_set_field(L, -1, i, luaX_string_reference(p, n));
+            const char* data = &buffer[j];
+            luaX_string_reference name(data, strlen(data));
+            luaX_set_field(L, -1, i, name);
             ++i;
-            j += n + 1;
+            j += name.size() + 1;
           }
         }
       }
