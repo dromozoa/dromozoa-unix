@@ -20,6 +20,7 @@
 #endif
 
 #include <errno.h>
+#include <string.h>
 #include <sys/types.h>
 
 #ifdef HAVE_SYS_XATTR_H
@@ -105,6 +106,31 @@ namespace dromozoa {
     }
 #endif
 
+#ifdef HAVE_LISTXATTR
+#define HAVE_COMPAT_LISTXATTR 1
+#ifdef XATTR_NOFOLLOW
+    ssize_t compat_listxattr(const char* path, char* buffer, size_t size) {
+      return listxattr(path, buffer, size, 0);
+    }
+#else
+    ssize_t compat_listxattr(const char* path, char* buffer, size_t size) {
+      return listxattr(path, buffer, size);
+    }
+#endif
+#endif
+
+#ifdef HAVE_LLISTXATTR
+#define HAVE_COMPAT_LLISTXATTR 1
+    ssize_t compat_llistxattr(const char* path, char* buffer, size_t size) {
+      return llistxattr(path, buffer, size);
+    }
+#elif defined(HAVE_LISTXATTR) && defined(XATTR_NOFOLLOW)
+#define HAVE_COMPAT_LLISTXATTR 1
+    ssize_t compat_llistxattr(const char* path, char* buffer, size_t size) {
+      return listxattr(path, buffer, size, XATTR_NOFOLLOW);
+    }
+#endif
+
     template <class T>
     void impl_getxattr_(lua_State* L, T f) {
       luaX_string_reference path = luaX_check_string(L, 1);
@@ -146,6 +172,34 @@ namespace dromozoa {
       }
     }
 
+    template <class T>
+    void impl_listxattr_(lua_State* L, T f) {
+      luaX_string_reference path = luaX_check_string(L, 1);
+      ssize_t size = f(path.data(), 0, 0);
+      if (size == -1) {
+        push_error(L);
+      } else if (size == 0) {
+        lua_newtable(L);
+      } else {
+        std::vector<char> buffer(size);
+        ssize_t result = f(path.data(), &buffer[0], buffer.size());
+        if (result == -1) {
+          push_error(L);
+        } else {
+          lua_newtable(L);
+          int i = 1;
+          ssize_t j = 0;
+          while (j < result) {
+            const char* p = &buffer[j];
+            size_t n = strlen(p);
+            luaX_set_field(L, -1, i, luaX_string_reference(p, n));
+            ++i;
+            j += n + 1;
+          }
+        }
+      }
+    }
+
 #ifdef HAVE_COMPAT_GETXATTR
     void impl_getxattr(lua_State* L) {
       impl_getxattr_(L, compat_getxattr);
@@ -181,6 +235,18 @@ namespace dromozoa {
       impl_removexattr_(L, compat_lremovexattr);
     }
 #endif
+
+#ifdef HAVE_COMPAT_LISTXATTR
+    void impl_listxattr(lua_State* L) {
+      impl_listxattr_(L, compat_listxattr);
+    }
+#endif
+
+#ifdef HAVE_COMPAT_LLISTXATTR
+    void impl_llistxattr(lua_State* L) {
+      impl_listxattr_(L, compat_llistxattr);
+    }
+#endif
   }
 
   void initialize_sys_xattr(lua_State* L) {
@@ -201,6 +267,12 @@ namespace dromozoa {
 #endif
 #ifdef HAVE_COMPAT_LREMOVEXATTR
     luaX_set_field(L, -1, "lremovexattr", impl_lremovexattr);
+#endif
+#ifdef HAVE_COMPAT_LISTXATTR
+    luaX_set_field(L, -1, "listxattr", impl_listxattr);
+#endif
+#ifdef HAVE_COMPAT_LLISTXATTR
+    luaX_set_field(L, -1, "llistxattr", impl_llistxattr);
 #endif
 
 #ifdef ENOATTR

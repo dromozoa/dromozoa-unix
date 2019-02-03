@@ -70,3 +70,55 @@ check_no_attr(unix.getxattr(path, "dromozoa-test"))
 check_no_attr(unix.getxattr(link, "dromozoa-test"))
 check_no_attr(unix.lgetxattr(path, "dromozoa-test"))
 check_no_attr(unix.lgetxattr(link, "dromozoa-test"))
+
+local function verbose_names(names)
+  if verbose then
+    for i = 1, #names do
+      print(names[i])
+    end
+  end
+end
+
+local names = unix.listxattr(path)
+assert(#names == 0)
+
+local names = unix.listxattr(link)
+assert(#names == 0)
+
+assert(unix.setxattr(path, "dromozoa-test1", "foo"))
+
+local names = unix.listxattr(path)
+verbose_names(names)
+assert(#names == 1)
+
+local names = unix.listxattr(link)
+verbose_names(names)
+assert(#names == 1)
+
+assert(unix.setxattr(path, "dromozoa-test2", "bar"))
+assert(unix.setxattr(path, "dromozoa-test3", "baz"))
+assert(unix.setxattr(path, "dromozoa-test4", "qux"))
+
+local names = unix.listxattr(path)
+verbose_names(names)
+assert(#names == 4)
+
+local names = unix.listxattr(link)
+verbose_names(names)
+assert(#names == 4)
+
+local names = unix.llistxattr(path)
+verbose_names(names)
+assert(#names == 4)
+
+local names = unix.llistxattr(link)
+verbose_names(names)
+assert(#names == 0)
+
+assert(unix.lsetxattr(link, "dromozoa-test5", ("x"):rep(256)))
+assert(unix.lsetxattr(link, "dromozoa-test6", ("y"):rep(256)))
+assert(unix.lsetxattr(link, "dromozoa-test7", ("z"):rep(256)))
+
+local names = unix.llistxattr(link)
+verbose_names(names)
+assert(#names == 3)
