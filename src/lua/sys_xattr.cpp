@@ -59,25 +59,25 @@ namespace dromozoa {
 #ifdef HAVE_SETXATTR
 #define HAVE_COMPAT_SETXATTR 1
 #ifdef XATTR_NOFOLLOW
-    int compat_setxattr(const char* path, const char* name, const void* value, size_t size) {
-      return setxattr(path, name, value, size, 0, 0);
+    int compat_setxattr(const char* path, const char* name, const void* value, size_t size, int flags) {
+      return setxattr(path, name, value, size, 0, flags);
     }
 #else
-    int compat_setxattr(const char* path, const char* name, const void* value, size_t size) {
-      return setxattr(path, name, value, size);
+    int compat_setxattr(const char* path, const char* name, const void* value, size_t size, int flags) {
+      return setxattr(path, name, value, size, flags);
     }
 #endif
 #endif
 
 #ifdef HAVE_LSETXATTR
 #define HAVE_COMPAT_LSETXATTR 1
-    int compat_lsetxattr(const char* path, const char* name, const void* value, size_t size) {
-      return lsetxattr(path, name, value, size);
+    int compat_lsetxattr(const char* path, const char* name, const void* value, size_t size, int flags) {
+      return lsetxattr(path, name, value, size, flags);
     }
 #elif defined(HAVE_SETXATTR) && defined(XATTR_NOFOLLOW)
 #define HAVE_COMPAT_LSETXATTR 1
-    int compat_lsetxattr(const char* path, const char* name, const void* value, size_t size) {
-      return setxattr(path, name, value, size, 0, XATTR_NOFOLLOW);
+    int compat_lsetxattr(const char* path, const char* name, const void* value, size_t size, int flags) {
+      return setxattr(path, name, value, size, 0, flags | XATTR_NOFOLLOW);
     }
 #endif
 
@@ -154,7 +154,8 @@ namespace dromozoa {
       luaX_string_reference path = luaX_check_string(L, 1);
       luaX_string_reference name = luaX_check_string(L, 2);
       luaX_string_reference value = luaX_check_string(L, 3);
-      if (f(path.data(), name.data(), value.data(), value.size()) == -1) {
+      int flags = luaX_opt_integer<int>(L, 4, 0);
+      if (f(path.data(), name.data(), value.data(), value.size(), flags) == -1) {
         push_error(L);
       } else {
         luaX_push_success(L);
@@ -275,6 +276,13 @@ namespace dromozoa {
 #endif
 #ifdef HAVE_COMPAT_LLISTXATTR
     luaX_set_field(L, -1, "llistxattr", impl_llistxattr);
+#endif
+
+#ifdef XATTR_CREATE
+    luaX_set_field(L, -1, "XATTR_CREATE", XATTR_CREATE);
+#endif
+#ifdef XATTR_REPLACE
+    luaX_set_field(L, -1, "XATTR_REPLACE", XATTR_REPLACE);
 #endif
 
 #ifdef ENOATTR
