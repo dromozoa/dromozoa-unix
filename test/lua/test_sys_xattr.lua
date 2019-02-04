@@ -29,13 +29,11 @@ for directories with the sticky bit set (see the chmod(1) manual page
 for an explanation of the sticky bit).
 ]]
 
-local handle = assert(io.popen "uname")
-local uname = handle:read "*a"
-handle:close()
-local test_nofollow = uname:find "Darwin"
+local sysname = unix.uname().sysname
+local test_nofollow = sysname == "Darwin"
 
 if verbose then
-  print(uname, test_nofollow)
+  print(sysname, test_nofollow)
 end
 
 local function check_no_attr(result, message, code)
