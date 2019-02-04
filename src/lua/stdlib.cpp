@@ -1,4 +1,4 @@
-// Copyright (C) 2016-2018 Tomoyuki Fujimori <moyu@dromozoa.com>
+// Copyright (C) 2016-2019 Tomoyuki Fujimori <moyu@dromozoa.com>
 //
 // This file is part of dromozoa-unix.
 //
@@ -29,14 +29,14 @@
 namespace dromozoa {
   namespace {
     void impl_realpath(lua_State* L) {
-      const char* path = luaL_checkstring(L, 1);
+      luaX_string_reference path = luaX_check_string(L, 1);
 #ifdef PATH_MAX
       std::vector<char> buffer(PATH_MAX);
-      if (const char* result = realpath(path, &buffer[0])) {
+      if (const char* result = realpath(path.data(), &buffer[0])) {
         luaX_push(L, result);
       }
 #else
-      if (const char* result = realpath(path, 0)) {
+      if (const char* result = realpath(path.data(), 0)) {
         luaX_push(L, result);
         free(result);
       }

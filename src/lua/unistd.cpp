@@ -40,8 +40,8 @@ namespace dromozoa {
     }
 
     void impl_chdir(lua_State* L) {
-      const char* path = luaL_checkstring(L, 1);
-      if (chdir(path) == -1) {
+      luaX_string_reference path = luaX_check_string(L, 1);
+      if (chdir(path.data()) == -1) {
         push_error(L);
       } else {
         luaX_push_success(L);
@@ -102,9 +102,9 @@ namespace dromozoa {
     }
 
     void impl_access(lua_State* L) {
-      const char* path = luaL_checkstring(L, 1);
+      luaX_string_reference path = luaX_check_string(L, 1);
       int mode = luaX_check_integer<int>(L, 2);
-      if (access(path, mode) == -1 ) {
+      if (access(path.data(), mode) == -1) {
         push_error(L);
       } else {
         luaX_push_success(L);
@@ -113,6 +113,26 @@ namespace dromozoa {
 
     void impl_hardware_concurrency(lua_State* L) {
       luaX_push(L, hardware_concurrency());
+    }
+
+    void impl_link(lua_State* L) {
+      luaX_string_reference path1 = luaX_check_string(L, 1);
+      luaX_string_reference path2= luaX_check_string(L, 2);
+      if (link(path1.data(), path2.data()) == -1) {
+        push_error(L);
+      } else {
+        luaX_push_success(L);
+      }
+    }
+
+    void impl_symlink(lua_State* L) {
+      luaX_string_reference path1 = luaX_check_string(L, 1);
+      luaX_string_reference path2 = luaX_check_string(L, 2);
+      if (symlink(path1.data(), path2.data()) == -1) {
+        push_error(L);
+      } else {
+        luaX_push_success(L);
+      }
     }
   }
 
@@ -130,6 +150,8 @@ namespace dromozoa {
     luaX_set_field(L, -1, "sysconf", impl_sysconf);
     luaX_set_field(L, -1, "access", impl_access);
     luaX_set_field(L, -1, "hardware_concurrency", impl_hardware_concurrency);
+    luaX_set_field(L, -1, "link", impl_link);
+    luaX_set_field(L, -1, "symlink", impl_symlink);
 
     luaX_set_field(L, -1, "STDIN_FILENO", STDIN_FILENO);
     luaX_set_field(L, -1, "STDOUT_FILENO", STDOUT_FILENO);

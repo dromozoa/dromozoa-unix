@@ -1,6 +1,6 @@
 #! /bin/sh -e
 
-# Copyright (C) 2015-2018 Tomoyuki Fujimori <moyu@dromozoa.com>
+# Copyright (C) 2015-2019 Tomoyuki Fujimori <moyu@dromozoa.com>
 #
 # This file is part of dromozoa-unix.
 #
@@ -28,4 +28,4 @@ do
   esac
 done
 
-rm -fr test.lock test.fifo test.sock test.dir* test.txt*
+rm -fr test.lock test.fifo test.sock test.dir* test.txt* test.data test.link

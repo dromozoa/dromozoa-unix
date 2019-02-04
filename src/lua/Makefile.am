@@ -26,6 +26,7 @@ unix_la_SOURCES = \
 	argument_vector.cpp \
 	async_service.cpp \
 	async_task.cpp \
+	dirent.cpp \
 	errno.cpp \
 	error.cpp \
 	fcntl.cpp \
@@ -50,7 +51,9 @@ unix_la_SOURCES = \
 	sys_socket.cpp \
 	sys_stat.cpp \
 	sys_statvfs.cpp \
+	sys_utsname.cpp \
 	sys_wait.cpp \
+	sys_xattr.cpp \
 	syslog.cpp \
 	time.cpp \
 	timer.cpp \

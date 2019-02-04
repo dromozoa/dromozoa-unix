@@ -1,4 +1,4 @@
-// Copyright (C) 2016,2018,2019 Tomoyuki Fujimori <moyu@dromozoa.com>
+// Copyright (C) 2019 Tomoyuki Fujimori <moyu@dromozoa.com>
 //
 // This file is part of dromozoa-unix.
 //
@@ -15,25 +15,28 @@
 // You should have received a copy of the GNU General Public License
 // along with dromozoa-unix.  If not, see <http://www.gnu.org/licenses/>.
 
-#ifndef DROMOZOA_ARGUMENT_VECTOR_HPP
-#define DROMOZOA_ARGUMENT_VECTOR_HPP
+#include <sys/utsname.h>
 
-#include <string>
-#include <vector>
+#include "common.hpp"
 
 namespace dromozoa {
-  class argument_vector {
-  public:
-    argument_vector();
-    void clear();
-    void push_back(const char*);
-    void push_back(const std::string&);
-    const char* const* get() const;
-  private:
-    bool initialized_;
-    std::vector<std::string> str_;
-    mutable std::vector<const char*> ptr_;
-  };
-}
+  namespace {
+    void impl_uname(lua_State* L) {
+      struct utsname name = {};
+      if (uname(&name) == -1) {
+        push_error(L);
+      } else {
+        lua_newtable(L);
+        luaX_set_field(L, -1, "sysname", name.sysname);
+        luaX_set_field(L, -1, "nodename", name.nodename);
+        luaX_set_field(L, -1, "release", name.release);
+        luaX_set_field(L, -1, "version", name.version);
+        luaX_set_field(L, -1, "machine", name.machine);
+      }
+    }
+  }
 
-#endif
+  void initialize_sys_utsname(lua_State* L) {
+    luaX_set_field(L, -1, "uname", impl_uname);
+  }
+}

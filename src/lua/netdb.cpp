@@ -1,4 +1,4 @@
-// Copyright (C) 2016-2018 Tomoyuki Fujimori <moyu@dromozoa.com>
+// Copyright (C) 2016-2019 Tomoyuki Fujimori <moyu@dromozoa.com>
 //
 // This file is part of dromozoa-unix.
 //
@@ -106,11 +106,11 @@ namespace dromozoa {
     }
 
     void impl_getaddrinfo(lua_State* L) {
-      const char* nodename = lua_tostring(L, 1);
-      const char* servname = lua_tostring(L, 2);
+      luaX_string_reference nodename = luaX_to_string(L, 1);
+      luaX_string_reference servname = luaX_to_string(L, 2);
       optional<struct addrinfo> hints = check_hints(L, 3);
       struct addrinfo* result = 0;
-      int code = getaddrinfo(nodename, servname, hints.get(), &result);
+      int code = getaddrinfo(nodename.data(), servname.data(), hints.get(), &result);
       if (code == 0) {
         new_result(L, result);
         freeaddrinfo(result);
@@ -174,10 +174,10 @@ namespace dromozoa {
     };
 
     void impl_async_getaddrinfo(lua_State* L) {
-      const char* nodename = lua_tostring(L, 1);
-      const char* servname = lua_tostring(L, 2);
+      luaX_string_reference nodename = luaX_to_string(L, 1);
+      luaX_string_reference servname = luaX_to_string(L, 2);
       optional<struct addrinfo> hints = check_hints(L, 3);
-      luaX_new<async_getaddrinfo>(L, nodename, servname, hints);
+      luaX_new<async_getaddrinfo>(L, nodename.data(), servname.data(), hints);
       luaX_set_metatable(L, "dromozoa.unix.async_task");
     }
 

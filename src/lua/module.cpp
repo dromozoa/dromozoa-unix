@@ -20,6 +20,7 @@
 namespace dromozoa {
   void initialize_async_service(lua_State* L);
   void initialize_async_task(lua_State* L);
+  void initialize_dirent(lua_State* L);
   void initialize_errno(lua_State* L);
   void initialize_error(lua_State* L);
   void initialize_fcntl(lua_State* L);
@@ -40,7 +41,9 @@ namespace dromozoa {
   void initialize_sys_socket(lua_State* L);
   void initialize_sys_stat(lua_State* L);
   void initialize_sys_statvfs(lua_State* L);
+  void initialize_sys_utsname(lua_State* L);
   void initialize_sys_wait(lua_State* L);
+  void initialize_sys_xattr(lua_State* L);
   void initialize_syslog(lua_State* L);
   void initialize_time(lua_State* L);
   void initialize_timer(lua_State* L);
@@ -50,6 +53,7 @@ namespace dromozoa {
   void initialize(lua_State* L) {
     initialize_async_service(L);
     initialize_async_task(L);
+    initialize_dirent(L);
     initialize_errno(L);
     initialize_error(L);
     initialize_fcntl(L);
@@ -70,7 +74,9 @@ namespace dromozoa {
     initialize_sys_socket(L);
     initialize_sys_stat(L);
     initialize_sys_statvfs(L);
+    initialize_sys_utsname(L);
     initialize_sys_wait(L);
+    initialize_sys_xattr(L);
     initialize_syslog(L);
     initialize_time(L);
     initialize_timer(L);
