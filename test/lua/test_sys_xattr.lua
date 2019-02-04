@@ -24,7 +24,7 @@ local function check_no_attr(result, message, code)
     print(message)
   end
   assert(not result)
-  assert(code == unix.ENOATTR)
+  assert(code == unix.ENOATTR or code == unix.ENODATA)
 end
 
 local path = "test.data"
@@ -36,14 +36,7 @@ os.remove(link)
 assert(io.open(path, "w")):close()
 assert(unix.symlink(path, link))
 
-local result, message, code = unix.setxattr(path, "user.dromozoa-test", "foo")
-if not result then
-  if verbose then
-    print(message)
-  end
-  assert(code == unix.ENOTSUP)
-  return
-end
+assert(unix.setxattr(path, "user.dromozoa-test", "foo"))
 
 assert(unix.getxattr(path, "user.dromozoa-test") == "foo")
 assert(unix.getxattr(link, "user.dromozoa-test") == "foo")
