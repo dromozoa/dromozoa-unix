@@ -279,10 +279,10 @@ namespace dromozoa {
 #endif
 
 #ifdef XATTR_CREATE
-    luaX_set_field(L, -1, "XATTR_CREATE", XATTR_CREATE);
+    luaX_set_field<int>(L, -1, "XATTR_CREATE", XATTR_CREATE);
 #endif
 #ifdef XATTR_REPLACE
-    luaX_set_field(L, -1, "XATTR_REPLACE", XATTR_REPLACE);
+    luaX_set_field<int>(L, -1, "XATTR_REPLACE", XATTR_REPLACE);
 #endif
 
 #ifdef ENOATTR
