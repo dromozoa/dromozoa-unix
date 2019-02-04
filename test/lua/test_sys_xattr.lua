@@ -36,40 +36,47 @@ os.remove(link)
 assert(io.open(path, "w")):close()
 assert(unix.symlink(path, link))
 
-assert(unix.setxattr(path, "dromozoa-test", "foo"))
+local result, message, code = unix.setxattr(path, "user.dromozoa-test", "foo")
+if not result then
+  if verbose then
+    print(message)
+  end
+  assert(code == unix.ENOTSUP)
+  return
+end
 
-assert(unix.getxattr(path, "dromozoa-test") == "foo")
-assert(unix.getxattr(link, "dromozoa-test") == "foo")
-assert(unix.lgetxattr(path, "dromozoa-test") == "foo")
-check_no_attr(unix.lgetxattr(link, "dromozoa-test"))
+assert(unix.getxattr(path, "user.dromozoa-test") == "foo")
+assert(unix.getxattr(link, "user.dromozoa-test") == "foo")
+assert(unix.lgetxattr(path, "user.dromozoa-test") == "foo")
+check_no_attr(unix.lgetxattr(link, "user.dromozoa-test"))
 
-assert(unix.lsetxattr(link, "dromozoa-test", "bar"))
+assert(unix.lsetxattr(link, "user.dromozoa-test", "bar"))
 
-assert(unix.getxattr(path, "dromozoa-test") == "foo")
-assert(unix.getxattr(link, "dromozoa-test") == "foo")
-assert(unix.lgetxattr(path, "dromozoa-test") == "foo")
-assert(unix.lgetxattr(link, "dromozoa-test") == "bar")
+assert(unix.getxattr(path, "user.dromozoa-test") == "foo")
+assert(unix.getxattr(link, "user.dromozoa-test") == "foo")
+assert(unix.lgetxattr(path, "user.dromozoa-test") == "foo")
+assert(unix.lgetxattr(link, "user.dromozoa-test") == "bar")
 
-assert(unix.setxattr(link, "dromozoa-test", "baz"))
+assert(unix.setxattr(link, "user.dromozoa-test", "baz"))
 
-assert(unix.getxattr(path, "dromozoa-test") == "baz")
-assert(unix.getxattr(link, "dromozoa-test") == "baz")
-assert(unix.lgetxattr(path, "dromozoa-test") == "baz")
-assert(unix.lgetxattr(link, "dromozoa-test") == "bar")
+assert(unix.getxattr(path, "user.dromozoa-test") == "baz")
+assert(unix.getxattr(link, "user.dromozoa-test") == "baz")
+assert(unix.lgetxattr(path, "user.dromozoa-test") == "baz")
+assert(unix.lgetxattr(link, "user.dromozoa-test") == "bar")
 
-assert(unix.lremovexattr(link, "dromozoa-test"))
+assert(unix.lremovexattr(link, "user.dromozoa-test"))
 
-assert(unix.getxattr(path, "dromozoa-test") == "baz")
-assert(unix.getxattr(link, "dromozoa-test") == "baz")
-assert(unix.lgetxattr(path, "dromozoa-test") == "baz")
-check_no_attr(unix.lgetxattr(link, "dromozoa-test"))
+assert(unix.getxattr(path, "user.dromozoa-test") == "baz")
+assert(unix.getxattr(link, "user.dromozoa-test") == "baz")
+assert(unix.lgetxattr(path, "user.dromozoa-test") == "baz")
+check_no_attr(unix.lgetxattr(link, "user.dromozoa-test"))
 
-assert(unix.removexattr(link, "dromozoa-test"))
+assert(unix.removexattr(link, "user.dromozoa-test"))
 
-check_no_attr(unix.getxattr(path, "dromozoa-test"))
-check_no_attr(unix.getxattr(link, "dromozoa-test"))
-check_no_attr(unix.lgetxattr(path, "dromozoa-test"))
-check_no_attr(unix.lgetxattr(link, "dromozoa-test"))
+check_no_attr(unix.getxattr(path, "user.dromozoa-test"))
+check_no_attr(unix.getxattr(link, "user.dromozoa-test"))
+check_no_attr(unix.lgetxattr(path, "user.dromozoa-test"))
+check_no_attr(unix.lgetxattr(link, "user.dromozoa-test"))
 
 local function verbose_names(names)
   if verbose then
@@ -85,7 +92,7 @@ assert(#names == 0)
 local names = unix.listxattr(link)
 assert(#names == 0)
 
-assert(unix.setxattr(path, "dromozoa-test1", "foo"))
+assert(unix.setxattr(path, "user.dromozoa-test1", "foo"))
 
 local names = unix.listxattr(path)
 verbose_names(names)
@@ -95,9 +102,9 @@ local names = unix.listxattr(link)
 verbose_names(names)
 assert(#names == 1)
 
-assert(unix.setxattr(path, "dromozoa-test2", "bar"))
-assert(unix.setxattr(path, "dromozoa-test3", "baz"))
-assert(unix.setxattr(path, "dromozoa-test4", "qux"))
+assert(unix.setxattr(path, "user.dromozoa-test2", "bar"))
+assert(unix.setxattr(path, "user.dromozoa-test3", "baz"))
+assert(unix.setxattr(path, "user.dromozoa-test4", "qux"))
 
 local names = unix.listxattr(path)
 verbose_names(names)
@@ -115,9 +122,9 @@ local names = unix.llistxattr(link)
 verbose_names(names)
 assert(#names == 0)
 
-assert(unix.lsetxattr(link, "dromozoa-test5", ("x"):rep(256)))
-assert(unix.lsetxattr(link, "dromozoa-test6", ("y"):rep(256)))
-assert(unix.lsetxattr(link, "dromozoa-test7", ("z"):rep(256)))
+assert(unix.lsetxattr(link, "user.dromozoa-test5", ("x"):rep(256)))
+assert(unix.lsetxattr(link, "user.dromozoa-test6", ("y"):rep(256)))
+assert(unix.lsetxattr(link, "user.dromozoa-test7", ("z"):rep(256)))
 
 local names = unix.llistxattr(link)
 verbose_names(names)
