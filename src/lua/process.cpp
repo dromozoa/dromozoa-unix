@@ -33,7 +33,7 @@ namespace dromozoa {
       luaL_checktype(L, 3, LUA_TTABLE);
       argument_vector argv = to_argument_vector(L, 3);
       argument_vector envp = to_argument_vector(L, 4);
-      const char* chdir = lua_tostring(L, 5);
+      luaX_string_reference chdir = luaX_to_string(L, 5);
       int dup2_stdio[3] = { -1, -1, -1 };
       if (lua_istable(L, 6)) {
         for (int i = 0; i < 3; ++i) {
@@ -44,7 +44,7 @@ namespace dromozoa {
       }
 
       pid_t pid = -1;
-      int result = forkexec(path, argv.get(), envp.get(), chdir, dup2_stdio, pid);
+      int result = forkexec(path, argv.get(), envp.get(), chdir.data(), dup2_stdio, pid);
 
       {
         errno_saver save_errno;
@@ -65,11 +65,11 @@ namespace dromozoa {
       luaL_checktype(L, 3, LUA_TTABLE);
       argument_vector argv = to_argument_vector(L, 3);
       argument_vector envp = to_argument_vector(L, 4);
-      const char* chdir = lua_tostring(L, 5);
+      luaX_string_reference chdir = luaX_to_string(L, 5);
 
       pid_t pid1 = -1;
       pid_t pid2 = -1;
-      int result = forkexec_daemon(path, argv.get(), envp.get(), chdir, pid1, pid2);
+      int result = forkexec_daemon(path, argv.get(), envp.get(), chdir.data(), pid1, pid2);
 
       {
         errno_saver save_errno;
