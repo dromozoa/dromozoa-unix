@@ -40,8 +40,8 @@ namespace dromozoa {
     }
 
     void impl_chdir(lua_State* L) {
-      const char* path = luaL_checkstring(L, 1);
-      if (chdir(path) == -1) {
+      luaX_string_reference path = luaX_check_string(L, 1);
+      if (chdir(path.data()) == -1) {
         push_error(L);
       } else {
         luaX_push_success(L);
@@ -102,9 +102,9 @@ namespace dromozoa {
     }
 
     void impl_access(lua_State* L) {
-      const char* path = luaL_checkstring(L, 1);
+      luaX_string_reference path = luaX_check_string(L, 1);
       int mode = luaX_check_integer<int>(L, 2);
-      if (access(path, mode) == -1) {
+      if (access(path.data(), mode) == -1) {
         push_error(L);
       } else {
         luaX_push_success(L);

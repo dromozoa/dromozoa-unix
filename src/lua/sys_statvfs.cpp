@@ -1,4 +1,4 @@
-// Copyright (C) 2016 Tomoyuki Fujimori <moyu@dromozoa.com>
+// Copyright (C) 2016,2019 Tomoyuki Fujimori <moyu@dromozoa.com>
 //
 // This file is part of dromozoa-unix.
 //
@@ -37,9 +37,9 @@ namespace dromozoa {
     }
 
     void impl_statvfs(lua_State* L) {
-      const char* path = luaL_checkstring(L, 1);
+      luaX_string_reference path = luaX_check_string(L, 1);
       struct statvfs buf = {};
-      if (statvfs(path, &buf) == -1) {
+      if (statvfs(path.data(), &buf) == -1) {
         push_error(L);
       } else {
         new_statvfs(L, buf);

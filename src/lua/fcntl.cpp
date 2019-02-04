@@ -1,4 +1,4 @@
-// Copyright (C) 2016-2018 Tomoyuki Fujimori <moyu@dromozoa.com>
+// Copyright (C) 2016-2019 Tomoyuki Fujimori <moyu@dromozoa.com>
 //
 // This file is part of dromozoa-unix.
 //
@@ -22,10 +22,10 @@
 namespace dromozoa {
   namespace {
     void impl_open(lua_State* L) {
-      const char* path = luaL_checkstring(L, 1);
+      luaX_string_reference path = luaX_check_string(L, 1);
       int flags = luaX_opt_integer<int>(L, 2, O_RDONLY | O_CLOEXEC);
       mode_t mode = luaX_opt_integer<mode_t>(L, 3, 0666);
-      int result = open(path, flags, mode);
+      int result = open(path.data(), flags, mode);
       if (result == -1) {
         push_error(L);
       } else {
