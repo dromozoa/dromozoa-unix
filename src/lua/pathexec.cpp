@@ -1,4 +1,4 @@
-// Copyright (C) 2016 Tomoyuki Fujimori <moyu@dromozoa.com>
+// Copyright (C) 2016,2019 Tomoyuki Fujimori <moyu@dromozoa.com>
 //
 // This file is part of dromozoa-unix.
 //
@@ -24,12 +24,12 @@
 namespace dromozoa {
   namespace {
     void impl_pathexec(lua_State* L) {
-      const char* path = luaL_checkstring(L, 1);
+      luaX_string_reference path = luaX_check_string(L, 1);
       luaL_checktype(L, 2, LUA_TTABLE);
       argument_vector argv = to_argument_vector(L, 2);
       argument_vector envp = to_argument_vector(L, 3);
-      std::vector<char> buffer(pathexec_buffer_size(path, argv.get()));
-      if (pathexec(path, argv.get(), envp.get(), &buffer[0], buffer.size()) == -1) {
+      std::vector<char> buffer(pathexec_buffer_size(path.data(), argv.get()));
+      if (pathexec(path.data(), argv.get(), envp.get(), &buffer[0], buffer.size()) == -1) {
         push_error(L);
       } else {
         luaX_push_success(L);

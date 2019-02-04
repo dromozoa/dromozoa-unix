@@ -1,4 +1,4 @@
-// Copyright (C) 2016,2018 Tomoyuki Fujimori <moyu@dromozoa.com>
+// Copyright (C) 2016,2018,2019 Tomoyuki Fujimori <moyu@dromozoa.com>
 //
 // This file is part of dromozoa-unix.
 //
@@ -26,8 +26,8 @@ namespace dromozoa {
   public:
     argument_vector();
     void clear();
-    void push_back(const char* value);
-    void push_back(const std::string& value);
+    void push_back(const char*);
+    void push_back(const std::string&);
     const char* const* get() const;
   private:
     bool initialized_;

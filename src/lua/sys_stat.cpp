@@ -74,9 +74,9 @@ namespace dromozoa {
     }
 
     void impl_stat(lua_State* L) {
-      const char* path = luaL_checkstring(L, 1);
+      luaX_string_reference path = luaX_check_string(L, 1);
       struct stat buf = {};
-      if (stat(path, &buf) == -1) {
+      if (stat(path.data(), &buf) == -1) {
         push_error(L);
       } else {
         new_stat(L, buf);
@@ -97,9 +97,9 @@ namespace dromozoa {
     }
 
     void impl_mkdir(lua_State* L) {
-      const char* path = luaL_checkstring(L, 1);
+      luaX_string_reference path = luaX_check_string(L, 1);
       mode_t mode = luaX_opt_integer<mode_t>(L, 2, 0777);
-      if (mkdir(path, mode) == -1) {
+      if (mkdir(path.data(), mode) == -1) {
         push_error(L);
       } else {
         luaX_push_success(L);
@@ -107,9 +107,9 @@ namespace dromozoa {
     }
 
     void impl_mkfifo(lua_State* L) {
-      const char* path = luaL_checkstring(L, 1);
+      luaX_string_reference path = luaX_check_string(L, 1);
       mode_t mode = luaX_opt_integer<mode_t>(L, 2, 0666);
-      if (mkfifo(path, mode) == -1) {
+      if (mkfifo(path.data(), mode) == -1) {
         push_error(L);
       } else {
         luaX_push_success(L);
