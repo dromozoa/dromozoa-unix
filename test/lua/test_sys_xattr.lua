@@ -99,58 +99,45 @@ if test_nofollow then
   check_no_attr(unix.lgetxattr(link, "user.dromozoa-test"))
 end
 
-local function verbose_names(names)
-  if verbose then
-    for i = 1, #names do
-      print(names[i])
+local function check_names(names, expect)
+  local n = 0
+  for i = 1, #names do
+    local name = names[i]
+    if verbose then
+      print(name)
+    end
+    if name:find "^user%." then
+      n = n + 1
     end
   end
+  assert(n == expect)
 end
 
-local names = unix.listxattr(path)
-assert(#names == 0)
-
-local names = unix.listxattr(link)
-assert(#names == 0)
+check_names(unix.listxattr(path), 0)
+check_names(unix.listxattr(link), 0)
 
 assert(unix.setxattr(path, "user.dromozoa-test1", "foo"))
 
-local names = unix.listxattr(path)
-verbose_names(names)
-assert(#names == 1)
-
-local names = unix.listxattr(link)
-verbose_names(names)
-assert(#names == 1)
+check_names(unix.listxattr(path), 1)
+check_names(unix.listxattr(link), 1)
 
 assert(unix.setxattr(path, "user.dromozoa-test2", "bar"))
 assert(unix.setxattr(path, "user.dromozoa-test3", "baz"))
 assert(unix.setxattr(path, "user.dromozoa-test4", "qux"))
 
-local names = unix.listxattr(path)
-verbose_names(names)
-assert(#names == 4)
-
-local names = unix.listxattr(link)
-verbose_names(names)
-assert(#names == 4)
+check_names(unix.listxattr(path), 4)
+check_names(unix.listxattr(link), 4)
 
 if test_nofollow then
-  local names = unix.llistxattr(path)
-  verbose_names(names)
-  assert(#names == 4)
-
-  local names = unix.llistxattr(link)
-  verbose_names(names)
-  assert(#names == 0)
+  check_names(unix.llistxattr(path), 4)
+  check_names(unix.llistxattr(link), 0)
 
   assert(unix.lsetxattr(link, "user.dromozoa-test5", ("x"):rep(256)))
   assert(unix.lsetxattr(link, "user.dromozoa-test6", ("y"):rep(256)))
   assert(unix.lsetxattr(link, "user.dromozoa-test7", ("z"):rep(256)))
 
-  local names = unix.llistxattr(link)
-  verbose_names(names)
-  assert(#names == 3)
+  check_names(unix.llistxattr(path), 4)
+  check_names(unix.llistxattr(link), 3)
 end
 
 os.remove(path)
