@@ -51,6 +51,7 @@ unix_la_SOURCES = \
 	sys_socket.cpp \
 	sys_stat.cpp \
 	sys_statvfs.cpp \
+	sys_utsname.cpp \
 	sys_wait.cpp \
 	sys_xattr.cpp \
 	syslog.cpp \

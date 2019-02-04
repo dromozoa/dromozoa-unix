@@ -41,6 +41,7 @@ namespace dromozoa {
   void initialize_sys_socket(lua_State* L);
   void initialize_sys_stat(lua_State* L);
   void initialize_sys_statvfs(lua_State* L);
+  void initialize_sys_utsname(lua_State* L);
   void initialize_sys_wait(lua_State* L);
   void initialize_sys_xattr(lua_State* L);
   void initialize_syslog(lua_State* L);
@@ -73,6 +74,7 @@ namespace dromozoa {
     initialize_sys_socket(L);
     initialize_sys_stat(L);
     initialize_sys_statvfs(L);
+    initialize_sys_utsname(L);
     initialize_sys_wait(L);
     initialize_sys_xattr(L);
     initialize_syslog(L);
