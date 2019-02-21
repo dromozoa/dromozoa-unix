@@ -145,6 +145,16 @@ namespace dromozoa {
         luaX_push_success(L);
       }
     }
+
+    void impl_truncate(lua_State* L) {
+      luaX_string_reference path = luaX_check_string(L, 1);
+      off_t size = luaX_check_integer<off_t>(L, 2);
+      if (truncate(path.data(), size) == -1) {
+        push_error(L);
+      } else {
+        luaX_push_success(L);
+      }
+    }
   }
 
   void initialize_unistd(lua_State* L) {
@@ -164,6 +174,7 @@ namespace dromozoa {
     luaX_set_field(L, -1, "link", impl_link);
     luaX_set_field(L, -1, "symlink", impl_symlink);
     luaX_set_field(L, -1, "chown", impl_chown);
+    luaX_set_field(L, -1, "truncate", impl_truncate);
 
     luaX_set_field(L, -1, "STDIN_FILENO", STDIN_FILENO);
     luaX_set_field(L, -1, "STDOUT_FILENO", STDOUT_FILENO);
