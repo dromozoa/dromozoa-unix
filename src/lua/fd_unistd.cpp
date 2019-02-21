@@ -57,11 +57,23 @@ namespace dromozoa {
         luaX_push_success(L);
       }
     }
+
+    void impl_lseek(lua_State* L) {
+      off_t offset = luaX_check_integer<off_t>(L, 2);
+      int whence = luaX_check_integer<int>(L, 3);
+      off_t result = lseek(check_fd(L, 1), offset, whence);
+      if (result == -1) {
+        push_error(L);
+      } else {
+        luaX_push(L, result);
+      }
+    }
   }
 
   void initialize_fd_unistd(lua_State* L) {
     luaX_set_field(L, -1, "read", impl_read);
     luaX_set_field(L, -1, "write", impl_write);
     luaX_set_field(L, -1, "fsync", impl_fsync);
+    luaX_set_field(L, -1, "lseek", impl_lseek);
   }
 }
