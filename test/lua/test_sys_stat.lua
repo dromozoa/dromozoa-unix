@@ -51,3 +51,12 @@ UTIME_NOW  | %d
 UTIME_OMIT | %d
 ]]):format(unix.UTIME_NOW, unix.UTIME_OMIT))
 end
+
+assert(io.open("test.txt", "w")):close()
+assert(unix.chmod("test.txt", tonumber("0666", 8)))
+local st = assert(unix.stat "test.txt")
+assert(st.st_mode == unix.bor(unix.S_IFREG, tonumber("0666", 8)))
+assert(unix.chmod("test.txt", tonumber("0600", 8)))
+local st = assert(unix.stat "test.txt")
+assert(st.st_mode == unix.bor(unix.S_IFREG, tonumber("0600", 8)))
+assert(os.remove "test.txt")

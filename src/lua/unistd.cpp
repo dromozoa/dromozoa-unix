@@ -134,6 +134,17 @@ namespace dromozoa {
         luaX_push_success(L);
       }
     }
+
+    void impl_chown(lua_State* L) {
+      luaX_string_reference path = luaX_check_string(L, 1);
+      uid_t uid = luaX_check_integer<uid_t>(L, 2);
+      gid_t gid = luaX_check_integer<gid_t>(L, 3);
+      if (chown(path.data(), uid, gid) == -1) {
+        push_error(L);
+      } else {
+        luaX_push_success(L);
+      }
+    }
   }
 
   void initialize_unistd(lua_State* L) {
@@ -152,6 +163,7 @@ namespace dromozoa {
     luaX_set_field(L, -1, "hardware_concurrency", impl_hardware_concurrency);
     luaX_set_field(L, -1, "link", impl_link);
     luaX_set_field(L, -1, "symlink", impl_symlink);
+    luaX_set_field(L, -1, "chown", impl_chown);
 
     luaX_set_field(L, -1, "STDIN_FILENO", STDIN_FILENO);
     luaX_set_field(L, -1, "STDOUT_FILENO", STDOUT_FILENO);
