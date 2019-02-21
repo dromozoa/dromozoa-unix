@@ -109,7 +109,6 @@ end
 assert(not result)
 assert(code == unix.ENOENT)
 
-os.remove "test.txt"
 assert(io.open("test.txt", "w")):close()
 local handle = assert(io.open("test.txt"))
 assert(handle:read "*a" == "")
@@ -124,3 +123,21 @@ assert(unix.truncate("test.txt", 4))
 local handle = assert(io.open("test.txt"))
 assert(handle:read "*a" == "\0\0\0\0")
 handle:close()
+
+local fd = assert(unix.open("test.txt", unix.bor(unix.O_RDWR, unix.O_CLOEXEC)))
+assert(fd:lseek(0, unix.SEEK_CUR) == 0)
+assert(fd:write "ab")
+assert(fd:lseek(0, unix.SEEK_CUR) == 2)
+assert(fd:lseek(4, unix.SEEK_SET) == 4)
+assert(fd:write "ef")
+assert(fd:lseek(-5, unix.SEEK_END) == 1)
+assert(fd:read(4) == "b\0\0e")
+assert(fd:lseek(-3, unix.SEEK_CUR) == 2)
+assert(fd:write "cd")
+assert(fd:close())
+
+local handle = assert(io.open("test.txt"))
+assert(handle:read "*a" == "abcdef")
+handle:close()
+
+os.remove "test.txt"
