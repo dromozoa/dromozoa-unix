@@ -101,3 +101,10 @@ hardware_concurrency | %d
     unix.sysconf(unix["_SC_NPROCESSORS_ONLN"]),
     unix.hardware_concurrency()))
 end
+
+local result, message, code = unix.chown("no such file", 0, 0)
+if verbose then
+  io.stderr:write(message, "\n")
+end
+assert(not result)
+assert(code == unix.ENOENT)
