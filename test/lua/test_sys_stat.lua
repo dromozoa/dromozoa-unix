@@ -111,3 +111,9 @@ assert(st.st_atim == unix.timespec(0))
 assert(st.st_mtim > t)
 
 assert(os.remove "test.txt")
+
+assert(unix.mknod("test.fifo", unix.bor(unix.S_IFIFO, tonumber("0644", 8)), 0))
+local st = assert(unix.stat "test.fifo")
+assert(st.st_mode == unix.bor(unix.S_IFIFO, tonumber("0644", 8)))
+
+assert(os.remove "test.fifo")
