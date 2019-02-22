@@ -1,4 +1,4 @@
--- Copyright (C) 2016-2018 Tomoyuki Fujimori <moyu@dromozoa.com>
+-- Copyright (C) 2016-2019 Tomoyuki Fujimori <moyu@dromozoa.com>
 --
 -- This file is part of dromozoa-unix.
 --
@@ -16,6 +16,8 @@
 -- along with dromozoa-unix.  If not, see <http://www.gnu.org/licenses/>.
 
 local unix = require "dromozoa.unix"
+
+local verbose = os.getenv "VERBOSE" == "1"
 
 assert(unix.umask(tonumber("022", 8)))
 
@@ -43,3 +45,8 @@ assert(st.st_mode == unix.bor(unix.S_IFREG, tonumber("0604", 8)))
 assert(fd:close())
 
 assert(os.remove "test.txt")
+
+if verbose then
+  io.write("AT_FDCWD ", unix.AT_FDCWD, "\n")
+end
+assert(unix.AT_FDCWD)
