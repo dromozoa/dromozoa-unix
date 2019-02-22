@@ -59,4 +59,51 @@ assert(st.st_mode == unix.bor(unix.S_IFREG, tonumber("0666", 8)))
 assert(unix.chmod("test.txt", tonumber("0600", 8)))
 local st = assert(unix.stat "test.txt")
 assert(st.st_mode == unix.bor(unix.S_IFREG, tonumber("0600", 8)))
+
+local t = unix.clock_gettime(unix.TIMESPEC_TYPE_REALTIME)
+
+assert(unix.utimensat(unix.AT_FDCWD, "test.txt", 0, 0))
+local st = assert(unix.stat "test.txt")
+if verbose then
+  io.write(([[
+st_atim: %s
+st_mtim: %s
+]]):format(tostring(st.st_atim), tostring(st.st_mtim)))
+end
+assert(st.st_atim == unix.timespec(0))
+assert(st.st_mtim == unix.timespec(0))
+
+assert(unix.utimensat(unix.AT_FDCWD, "test.txt"))
+local st = assert(unix.stat "test.txt")
+if verbose then
+  io.write(([[
+st_atim: %s
+st_mtim: %s
+]]):format(tostring(st.st_atim), tostring(st.st_mtim)))
+end
+assert(st.st_atim > t)
+assert(st.st_mtim > t)
+
+assert(unix.utimensat(unix.AT_FDCWD, "test.txt", nil, 0))
+local st = assert(unix.stat "test.txt")
+if verbose then
+  io.write(([[
+st_atim: %s
+st_mtim: %s
+]]):format(tostring(st.st_atim), tostring(st.st_mtim)))
+end
+assert(st.st_atim > t)
+assert(st.st_mtim == unix.timespec(0))
+
+assert(unix.utimensat(unix.AT_FDCWD, "test.txt", 0, nil))
+local st = assert(unix.stat "test.txt")
+if verbose then
+  io.write(([[
+st_atim: %s
+st_mtim: %s
+]]):format(tostring(st.st_atim), tostring(st.st_mtim)))
+end
+assert(st.st_atim == unix.timespec(0))
+assert(st.st_mtim > t)
+
 assert(os.remove "test.txt")

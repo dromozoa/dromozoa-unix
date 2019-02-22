@@ -17,6 +17,8 @@
 
 local unix = require "dromozoa.unix"
 
+local verbose = os.getenv "VERBOSE" == "1"
+
 assert(unix.umask(tonumber("022", 8)))
 
 os.remove "test.txt"
@@ -43,3 +45,8 @@ assert(st.st_mode == unix.bor(unix.S_IFREG, tonumber("0604", 8)))
 assert(fd:close())
 
 assert(os.remove "test.txt")
+
+if verbose then
+  io.write("AT_FDCWD ", unix.AT_FDCWD, "\n")
+end
+assert(unix.AT_FDCWD)
