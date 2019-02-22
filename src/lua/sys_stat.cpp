@@ -159,6 +159,17 @@ namespace dromozoa {
         luaX_push_success(L);
       }
     }
+
+    void impl_mknod(lua_State* L) {
+      luaX_string_reference path = luaX_check_string(L, 1);
+      mode_t mode = luaX_check_integer<mode_t>(L, 2);
+      dev_t dev = luaX_opt_integer<dev_t>(L, 3, 0);
+      if (mknod(path.data(), mode, dev) == -1) {
+        push_error(L);
+      } else {
+        luaX_push_success(L);
+      }
+    }
   }
 
   void initialize_sys_stat(lua_State* L) {
@@ -168,6 +179,7 @@ namespace dromozoa {
     luaX_set_field(L, -1, "mkfifo", impl_mkfifo);
     luaX_set_field(L, -1, "chmod", impl_chmod);
     luaX_set_field(L, -1, "utimensat", impl_utimensat);
+    luaX_set_field(L, -1, "mknod", impl_mknod);
 
     luaX_set_field<mode_t>(L, -1, "S_IFMT", S_IFMT);
     luaX_set_field<mode_t>(L, -1, "S_IFBLK", S_IFBLK);
