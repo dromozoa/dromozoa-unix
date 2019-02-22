@@ -61,6 +61,10 @@ local st = assert(unix.stat "test.txt")
 assert(st.st_mode == unix.bor(unix.S_IFREG, tonumber("0600", 8)))
 
 local t = unix.clock_gettime(unix.TIMESPEC_TYPE_REALTIME)
+t = t - 1 -- hack
+if verbose then
+  io.write(("t: %s\n"):format(tostring(t)))
+end
 
 assert(unix.utimensat(unix.AT_FDCWD, "test.txt", 0, 0))
 local st = assert(unix.stat "test.txt")
