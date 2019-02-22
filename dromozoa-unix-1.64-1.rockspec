@@ -1,8 +1,8 @@
 rockspec_format = "3.0"
 package = "dromozoa-unix"
-version = "1.63-1"
+version = "1.64-1"
 source = {
-  url = "https://github.com/dromozoa/dromozoa-unix/releases/download/v1.63/dromozoa-unix-1.63.tar.gz";
+  url = "https://github.com/dromozoa/dromozoa-unix/releases/download/v1.64/dromozoa-unix-1.64.tar.gz";
 }
 description = {
   summary = "Lua bindings for UNIX system interface";
