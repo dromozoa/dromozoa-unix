@@ -42,7 +42,6 @@ assert(map["."])
 assert(map[".."])
 assert(map["ax_lua.m4"])
 local loc = assert(map["ax_pthread.m4"])
-assert(dir:seekdir(loc):readdir().d_name == "ax_pthread.m4")
 
 assert(dir:rewinddir())
 
