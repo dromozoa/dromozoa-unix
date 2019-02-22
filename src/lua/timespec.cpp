@@ -1,4 +1,4 @@
-// Copyright (C) 2016,2018 Tomoyuki Fujimori <moyu@dromozoa.com>
+// Copyright (C) 2016,2018,2019 Tomoyuki Fujimori <moyu@dromozoa.com>
 //
 // This file is part of dromozoa-unix.
 //
@@ -175,7 +175,7 @@ namespace dromozoa {
     luaX_set_metatable(L, "dromozoa.unix.timespec");
   }
 
-  int check_timespec(lua_State* L, int arg, struct timespec& tv) {
+  int check_timespec(lua_State* L, int arg, struct timespec& tv, bool check_nsec) {
     if (lua_isnumber(L, arg)) {
       double t = lua_tonumber(L, arg);
       double i = 0;
@@ -185,7 +185,11 @@ namespace dromozoa {
       return TIMESPEC_TYPE_UNKNOWN;
     } else if (lua_istable(L, arg)) {
       tv.tv_sec = luaX_opt_integer_field<time_t>(L, arg, "tv_sec", 0);
-      tv.tv_nsec = luaX_opt_integer_field<long>(L, arg, "tv_nsec", 0, 0L, 999999999L);
+      if (check_nsec) {
+        tv.tv_nsec = luaX_opt_integer_field<long>(L, arg, "tv_nsec", 0, 0L, 999999999L);
+      } else {
+        tv.tv_nsec = luaX_opt_integer_field<long>(L, arg, "tv_nsec", 0);
+      }
       return luaX_opt_integer_field<int>(L, arg, "tv_type", TIMESPEC_TYPE_UNKNOWN, TIMESPEC_TYPE_MIN, TIMESPEC_TYPE_MAX);
     } else {
       luaL_argerror(L, arg, "number or table expected");

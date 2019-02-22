@@ -66,5 +66,8 @@ namespace dromozoa {
     luaX_set_field(L, -1, "O_TTY_INIT", O_TTY_INIT);
 #endif
     luaX_set_field(L, -1, "O_WRONLY", O_WRONLY);
+
+    luaX_set_field(L, -1, "AT_FDCWD", AT_FDCWD);
+    luaX_set_field(L, -1, "AT_SYMLINK_NOFOLLOW", AT_SYMLINK_NOFOLLOW);
   }
 }

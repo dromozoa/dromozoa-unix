@@ -19,6 +19,8 @@
 #include "config.h"
 #endif
 
+#include <math.h>
+
 #include <sys/stat.h>
 
 #include "common.hpp"
@@ -125,6 +127,38 @@ namespace dromozoa {
         luaX_push_success(L);
       }
     }
+
+    void impl_utimensat(lua_State* L) {
+      int fd = check_fd(L, 1);
+      luaX_string_reference path = luaX_check_string(L, 2);
+      bool atime_isnoneornil = lua_isnoneornil(L, 3);
+      bool mtime_isnoneornil = lua_isnoneornil(L, 4);
+      int flags = luaX_opt_integer<int>(L, 5, 0);
+
+      int result = -1;
+      if (atime_isnoneornil && mtime_isnoneornil) {
+        result = utimensat(fd, path.data(), 0, flags);
+      } else {
+        struct timespec times[2] = {};
+        if (atime_isnoneornil) {
+          times[0].tv_nsec = UTIME_NOW;
+        } else {
+          check_timespec(L, 3, times[0], false);
+        }
+        if (mtime_isnoneornil) {
+          times[1].tv_nsec = UTIME_NOW;
+        } else {
+          check_timespec(L, 4, times[1], false);
+        }
+        result = utimensat(fd, path.data(), times, flags);
+      }
+
+      if (result == -1) {
+        push_error(L);
+      } else {
+        luaX_push_success(L);
+      }
+    }
   }
 
   void initialize_sys_stat(lua_State* L) {
@@ -133,6 +167,7 @@ namespace dromozoa {
     luaX_set_field(L, -1, "mkdir", impl_mkdir);
     luaX_set_field(L, -1, "mkfifo", impl_mkfifo);
     luaX_set_field(L, -1, "chmod", impl_chmod);
+    luaX_set_field(L, -1, "utimensat", impl_utimensat);
 
     luaX_set_field<mode_t>(L, -1, "S_IFMT", S_IFMT);
     luaX_set_field<mode_t>(L, -1, "S_IFBLK", S_IFBLK);
