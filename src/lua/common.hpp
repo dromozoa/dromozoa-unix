@@ -28,39 +28,39 @@
 #include <dromozoa/socket_address.hpp>
 
 namespace dromozoa {
-  argument_vector to_argument_vector(lua_State* L, int arg);
+  argument_vector to_argument_vector(lua_State*, int);
 
   class async_task : public async_service_task {
   public:
     virtual void cancel();
-    virtual void result(lua_State* state) = 0;
-    void ref(lua_State* L, int index);
+    virtual void result(lua_State*) = 0;
+    void ref(lua_State*, int);
     void unref();
-    void get_field(lua_State* L);
+    void get_field(lua_State*);
   protected:
     async_task();
   private:
     luaX_reference<> ref_;
   };
 
-  async_task* check_async_task(lua_State* L, int arg);
+  async_task* check_async_task(lua_State*, int);
 
-  void push_error(lua_State* L);
+  void push_error(lua_State*);
 
-  void new_fd(lua_State* L, int fd);
-  int to_fd(lua_State* L, int index);
-  int check_fd(lua_State* L, int arg);
+  void new_fd(lua_State*, int);
+  int to_fd(lua_State*, int);
+  int check_fd(lua_State*, int);
 
-  void new_sockaddr(lua_State* L, const socket_address& address);
-  void new_sockaddr(lua_State* L, const struct sockaddr* address, socklen_t size);
-  const socket_address* check_sockaddr(lua_State* L, int arg);
+  void new_sockaddr(lua_State*, const socket_address&);
+  void new_sockaddr(lua_State*, const struct sockaddr*, socklen_t);
+  const socket_address* check_sockaddr(lua_State*, int);
 
   static const int TIMESPEC_TYPE_REALTIME = 0;
   static const int TIMESPEC_TYPE_MONOTONIC = 1;
   static const int TIMESPEC_TYPE_DURATION = 2;
   static const int TIMESPEC_TYPE_UNKNOWN = 3;
-  void new_timespec(lua_State* L, const timespec& tv, int type);
-  int check_timespec(lua_State* L, int arg, struct timespec& tv, bool check_nsec = true);
+  void new_timespec(lua_State*, const timespec&, int);
+  int check_timespec(lua_State*, int, struct timespec&, bool = true);
 }
 
 #endif
