@@ -141,3 +141,15 @@ assert(handle:read "*a" == "abcdef")
 handle:close()
 
 os.remove "test.txt"
+
+assert(unix.sysconf(unix["_SC_GETPW_R_SIZE_MAX"]))
+assert(unix.sysconf(unix["_SC_GETGR_R_SIZE_MAX"]))
+assert(unix.hardware_concurrency())
+if verbose then
+  io.stderr:write(([[
+_SC_GETPW_R_SIZE_MAX | %d
+_SC_GETGR_R_SIZE_MAX | %d
+]]):format(
+    unix.sysconf(unix["_SC_GETPW_R_SIZE_MAX"]),
+    unix.sysconf(unix["_SC_GETGR_R_SIZE_MAX"])))
+end
