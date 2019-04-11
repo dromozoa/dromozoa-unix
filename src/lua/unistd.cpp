@@ -187,6 +187,8 @@ namespace dromozoa {
 
     luaX_set_field<int>(L, -1, "_SC_NPROCESSORS_CONF", _SC_NPROCESSORS_CONF);
     luaX_set_field<int>(L, -1, "_SC_NPROCESSORS_ONLN", _SC_NPROCESSORS_ONLN);
+    luaX_set_field<int>(L, -1, "_SC_GETPW_R_SIZE_MAX", _SC_GETPW_R_SIZE_MAX);
+    luaX_set_field<int>(L, -1, "_SC_GETGR_R_SIZE_MAX", _SC_GETGR_R_SIZE_MAX);
 
     luaX_set_field(L, -1, "SEEK_CUR", SEEK_CUR);
     luaX_set_field(L, -1, "SEEK_END", SEEK_END);
