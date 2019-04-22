@@ -50,3 +50,16 @@ if verbose then
   io.write("AT_FDCWD ", unix.AT_FDCWD, "\n")
 end
 assert(unix.AT_FDCWD)
+
+if verbose then
+  io.write(([[
+O_ACCMODE: %d
+O_RDONLY:  %d
+O_WRONLY:  %d
+O_RDWR:    %d
+]]):format(unix.O_ACCMODE, unix.O_RDONLY, unix.O_WRONLY, unix.O_RDWR))
+end
+assert(unix.O_ACCMODE)
+assert(unix.O_RDONLY)
+assert(unix.O_WRONLY)
+assert(unix.O_RDWR)
