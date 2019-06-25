@@ -68,6 +68,15 @@ namespace dromozoa {
         luaX_push(L, result);
       }
     }
+
+    void impl_ftruncate(lua_State* L) {
+      off_t size = luaX_check_integer<off_t>(L, 2);
+      if (ftruncate(check_fd(L, 1), size) == -1) {
+        push_error(L);
+      } else {
+        luaX_push_success(L);
+      }
+    }
   }
 
   void initialize_fd_unistd(lua_State* L) {
@@ -75,5 +84,6 @@ namespace dromozoa {
     luaX_set_field(L, -1, "write", impl_write);
     luaX_set_field(L, -1, "fsync", impl_fsync);
     luaX_set_field(L, -1, "lseek", impl_lseek);
+    luaX_set_field(L, -1, "ftruncate", impl_ftruncate);
   }
 }

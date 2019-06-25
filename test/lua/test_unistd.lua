@@ -140,6 +140,16 @@ local handle = assert(io.open("test.txt"))
 assert(handle:read "*a" == "abcdef")
 handle:close()
 
+local fd = assert(unix.open("test.txt", unix.bor(unix.O_RDWR, unix.O_CLOEXEC)))
+assert(fd:read(2) == "ab")
+assert(fd:ftruncate(4))
+assert(fd:write "C")
+assert(fd:close())
+
+local handle = assert(io.open("test.txt"))
+assert(handle:read "*a" == "abCd")
+handle:close()
+
 os.remove "test.txt"
 
 assert(unix.sysconf(unix["_SC_GETPW_R_SIZE_MAX"]))
