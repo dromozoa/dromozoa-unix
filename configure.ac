@@ -65,7 +65,7 @@ AC_SEARCH_LIBS([pthread_create], [pthread])
 
 AX_PROG_LUA([5.1], [], [], [AC_MSG_ERROR([could not find lua])])
 AX_LUA_HEADERS([], [AC_MSG_ERROR([could not find lua])])
-AX_LUA_LIBS([], [AC_MSG_ERROR([could not find lua])])
+# AX_LUA_LIBS([], [AC_MSG_ERROR([could not find lua])])
 
 AM_CONDITIONAL([HAVE_EPOLL], [test "X$ac_cv_func_epoll_create" = Xyes || test "X$ac_cv_func_epoll_create1" = Xyes])
 AM_CONDITIONAL([HAVE_KQUEUE], [test "X$ac_cv_func_kqueue" = Xyes])

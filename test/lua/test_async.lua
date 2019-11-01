@@ -1,4 +1,4 @@
--- Copyright (C) 2016-2018 Tomoyuki Fujimori <moyu@dromozoa.com>
+-- Copyright (C) 2016-2019 Tomoyuki Fujimori <moyu@dromozoa.com>
 --
 -- This file is part of dromozoa-unix.
 --
@@ -40,7 +40,6 @@ local hints = { ai_family = unix.AF_INET, ai_socktype = unix.SOCK_STREAM }
 local tasks = {
   unix.async_getaddrinfo("honoka.dromozoa.com", serv, hints);
   unix.async_getaddrinfo("kotori.dromozoa.com", serv, hints);
-  unix.async_getaddrinfo("hanayo.dromozoa.com", serv, hints);
   unix.async_getaddrinfo("nozomi.dromozoa.com", serv, hints);
 }
 for i = 1, #tasks do

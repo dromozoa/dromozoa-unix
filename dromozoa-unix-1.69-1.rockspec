@@ -1,8 +1,8 @@
 rockspec_format = "3.0"
 package = "dromozoa-unix"
-version = "1.68-1"
+version = "1.69-1"
 source = {
-  url = "https://github.com/dromozoa/dromozoa-unix/releases/download/v1.68/dromozoa-unix-1.68.tar.gz";
+  url = "https://github.com/dromozoa/dromozoa-unix/releases/download/v1.69/dromozoa-unix-1.69.tar.gz";
 }
 description = {
   summary = "Lua bindings for UNIX system interface";
@@ -16,6 +16,6 @@ test = {
 }
 build = {
   type = "command";
-  build_command = [[env PATH="$(LUA_BINDIR):$PATH" CPPFLAGS="$CPPFLAGS -I$(LUA_INCDIR)" CXXFLAGS="$CXXFLAGS -Wall -W -Wno-missing-field-initializers $(CFLAGS)" LDFLAGS="$LDFLAGS -L$(LUA_LIBDIR)" LUA="$(LUA)" ./configure --prefix="$(PREFIX)" && make]];
+  build_command = [[env PATH="$(LUA_BINDIR):$PATH" CPPFLAGS="$CPPFLAGS -I$(LUA_INCDIR)" CXXFLAGS="$CXXFLAGS -Wall -W -Wno-missing-field-initializers $(CFLAGS)" LUA="$(LUA)" ./configure --prefix="$(PREFIX)" && make]];
   install_command = [[make luadir="$(LUADIR)" luaexecdir="$(LIBDIR)/dromozoa" install]];
 }
