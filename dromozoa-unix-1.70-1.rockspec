@@ -1,4 +1,3 @@
-rockspec_format = "3.0"
 package = "dromozoa-unix"
 version = "1.70-1"
 source = {
@@ -9,10 +8,6 @@ description = {
   license = "GPL-3";
   homepage = "https://github.com/dromozoa/dromozoa-unix/";
   maintainer = "Tomoyuki Fujimori <moyu@dromozoa.com>";
-}
-test = {
-  type = "command";
-  command = "make check";
 }
 build = {
   type = "command";
