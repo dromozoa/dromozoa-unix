@@ -133,6 +133,16 @@ namespace dromozoa {
       luaX_set_field(L, -1, "HUPCL", HUPCL);
       luaX_set_field(L, -1, "CLOCAL", CLOCAL);
 
+      luaX_set_field(L, -1, "ECHO", ECHO);
+      luaX_set_field(L, -1, "ECHOE", ECHOE);
+      luaX_set_field(L, -1, "ECHOK", ECHOK);
+      luaX_set_field(L, -1, "ECHONL", ECHONL);
+      luaX_set_field(L, -1, "ICANON", ICANON);
+      luaX_set_field(L, -1, "IEXTEN", IEXTEN);
+      luaX_set_field(L, -1, "ISIG", ISIG);
+      luaX_set_field(L, -1, "NOFLSH", NOFLSH);
+      luaX_set_field(L, -1, "TOSTOP", TOSTOP);
+
       luaX_set_field(L, -1, "TCSANOW", TCSANOW);
       luaX_set_field(L, -1, "TCSADRAIN", TCSADRAIN);
       luaX_set_field(L, -1, "TCSAFLUSH", TCSAFLUSH);
