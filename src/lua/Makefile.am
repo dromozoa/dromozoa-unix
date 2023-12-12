@@ -33,6 +33,7 @@ unix_la_SOURCES = \
 	fd.cpp \
 	fd_djb.cpp \
 	fd_socket.cpp \
+	fd_termios.cpp \
 	fd_unistd.cpp \
 	int.cpp \
 	module.cpp \
@@ -56,6 +57,7 @@ unix_la_SOURCES = \
 	sys_wait.cpp \
 	sys_xattr.cpp \
 	syslog.cpp \
+	termios.cpp \
 	time.cpp \
 	timer.cpp \
 	timespec.cpp \
