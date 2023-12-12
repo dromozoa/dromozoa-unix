@@ -1,4 +1,4 @@
-// Copyright (C) 2016-2019 Tomoyuki Fujimori <moyu@dromozoa.com>
+// Copyright (C) 2016-2019,2023 Tomoyuki Fujimori <moyu@dromozoa.com>
 //
 // This file is part of dromozoa-unix.
 //
@@ -18,6 +18,7 @@
 #ifndef DROMOZOA_COMMON_HPP
 #define DROMOZOA_COMMON_HPP
 
+#include <termios.h>
 #include <time.h>
 #include <sys/socket.h>
 
@@ -61,6 +62,9 @@ namespace dromozoa {
   static const int TIMESPEC_TYPE_UNKNOWN = 3;
   void new_timespec(lua_State*, const timespec&, int);
   int check_timespec(lua_State*, int, struct timespec&, bool = true);
+
+  void new_termios(lua_State*, const struct termios&);
+  struct termios* check_termios(lua_State*, int);
 }
 
 #endif
