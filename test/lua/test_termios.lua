@@ -54,6 +54,12 @@ assert(t:cfsetospeed(ospeed))
 
 assert(fd:tcsetattr(t.TCSANOW, t))
 
+write("CSIZE: ", t.CSIZE, "\n")
+write("CS5: ", t.CS5, "\n")
+write("CS6: ", t.CS6, "\n")
+write("CS7: ", t.CS7, "\n")
+write("CS8: ", t.CS8, "\n")
+
 if verbose then
   fd:write "end\n"
 end

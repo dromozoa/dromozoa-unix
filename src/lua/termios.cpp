@@ -103,6 +103,19 @@ namespace dromozoa {
 
       luaX_set_field(L, -1, "NCCS", NCCS);
 
+      luaX_set_field(L, -1, "CSIZE", CSIZE);
+      luaX_set_field(L, -1, "CS5", CS5);
+      luaX_set_field(L, -1, "CS6", CS6);
+      luaX_set_field(L, -1, "CS7", CS7);
+      luaX_set_field(L, -1, "CS8", CS8);
+
+      luaX_set_field(L, -1, "CSTOPB", CSTOPB);
+      luaX_set_field(L, -1, "CREAD", CREAD);
+      luaX_set_field(L, -1, "PARENB", PARENB);
+      luaX_set_field(L, -1, "PARODD", PARODD);
+      luaX_set_field(L, -1, "HUPCL", HUPCL);
+      luaX_set_field(L, -1, "CLOCAL", CLOCAL);
+
       luaX_set_field(L, -1, "TCSANOW", TCSANOW);
       luaX_set_field(L, -1, "TCSADRAIN", TCSADRAIN);
       luaX_set_field(L, -1, "TCSAFLUSH", TCSAFLUSH);
